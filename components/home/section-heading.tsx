@@ -9,7 +9,7 @@ export default function SectionHeading({ title, description}: { title: string, d
         </h1>
         {
          description &&
-         <p className='text-xl font-medium text-slate-400 w-3/5 mx-auto mt-4'>
+         <p className='text-xl font-medium text-slate-400 w-3/5 mx-auto mt-8'>
             {description}
          </p>
         }

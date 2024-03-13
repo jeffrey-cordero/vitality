@@ -1,11 +1,13 @@
 import './global.css';
 import { sfPro, inter } from "./fonts";
 import cx from "classnames";
-import { Suspense } from "react";
 
 // Metadata
 import { Metadata } from 'next';
-import Head from 'next/head';
+// import Font Awesome CSS
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { config } from "@fortawesome/fontawesome-svg-core";
+config.autoAddCss = false;
 
 export const metadata: Metadata = {
   title: {
@@ -24,10 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <Head>
-        <link rel="shortcut icon" href="/favicon.ico" />
-      </Head>
-      <body className={cx(sfPro.variable, inter.variable, 'bg-gradient-to-r from-indigo-50 via-white to-indigo-50')}>
+      <body className={cx(sfPro.variable, inter.variable, 'bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black')}>
         {children}
       </body>
     </html>
