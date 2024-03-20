@@ -26,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={cx(sfPro.variable, inter.variable, 'bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black')}>
+      <body className={cx(sfPro.variable, inter.variable, 'bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black overflow-none')}>
         {children}
       </body>
     </html>

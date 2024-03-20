@@ -5,7 +5,8 @@ import cx from "classnames";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { Button } from '../global/button';
+import { Carousel } from '../global/carousel';
 
 
 interface TestimonialData {
@@ -19,7 +20,7 @@ const people: TestimonialData[] = [
    {
       testimonial: "This app has revolutionized the way I approach my fitness routine. Its seamless interface and user-friendly design make tracking workouts, steps, and calories a simple and enjoyable task. With just a few taps, I can access all the data I need to stay on track towards my fitness goals.",
       name: "Micheal Wong",
-      stars: [1, 1, 1, 0, 0],
+      stars: [1, 1, 1, 1, 1],
       image: "/testimonial-one.jpg"
    },
    {
@@ -49,88 +50,10 @@ const people: TestimonialData[] = [
    {
       "testimonial": "This app has become my go-to fitness companion for its seamless integration with my daily routine. From tracking my nutrition intake to providing insightful analytics on my sleep patterns, it has empowered me to make informed decisions about my health and well-being.",
       "name": "Daniel Brown",
-      "stars": [1, 1, 1, 0, 0],
+      "stars": [1, 1, 1, 1, 1],
       "image": "/testimonial-six.jpg"
    }
 ]
-
-
-function CarouselItem({color, text, index} : {color : string, text: string, index: number}): JSX.Element {
-   // Need to wrap the Testimonial in this React Component
-   return(
-      <div className={cx("flex align-center justify-center items-center", color)} style={{height:700}}>
-         <h1 className="font-bold text-3xl">{text}</h1>
-      </div>
-   )
-}
-
-function Carousel(): JSX.Element {
-   const [currentIndex, setCurrentIndex] = useState(0);
-   const slides = [
-      <CarouselItem color='bg-red-500' text = 'SLIDE 1' index = {1} key={1} />,
-      <CarouselItem color='bg-blue-500' text = 'SLIDE 2' index = {2} key={2} />,
-      <CarouselItem color='bg-yellow-500' text = 'SLIDE 3' index = {3} key={3} />,
-      <CarouselItem color='bg-green-500' text = 'SLIDE 4' index = {4} key={4} />,
-      <CarouselItem color='bg-purple-500' text = 'SLIDE 5' index = {5} key={5} />,
-      <CarouselItem color='bg-blue-500' text = 'SLIDE 6' index = {6} key={6} />,
-   ];
-
-   const nextSlide = () => {
-      setCurrentIndex((currentIndex + 2) % slides.length);
-   };
-
-   const prevSlide = () => {
-      setCurrentIndex((currentIndex - 2 + slides.length) % slides.length);
-   };
-
-   const slideWidth = 100 / 2;
-
-   return (
-
-      <div className="relative bg-gray-200 rounded-2xl shadow-2xl overflow-hidden" style={{height:700}}>
-         <div
-          className="carousel-inner flex transition-transform duration-500"
-          style={{
-            transform: `translateX(-${currentIndex * slideWidth}%)`
-          }}
-        >
-          {slides.map((slide, index) => (
-            <div
-              key={index}
-              className={clsx("carousel-item flex-shrink-0", {
-                'w-full': index === currentIndex || index === currentIndex - 1 || index === currentIndex + 1,
-                'opacity-50': index !== currentIndex && index !== currentIndex - 1 && index !== currentIndex + 1,
-              })}
-              style={{ width: `${slideWidth}%` }}
-            >
-              {slide}
-            </div>
-          ))}
-        </div>
-
-
-         <div className="carousel-buttons">
-            <button type="button" className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" onClick={prevSlide}>
-               <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                  <svg className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 1 1 5l4 4" />
-                  </svg>
-                  <span className="sr-only">Previous</span>
-               </span>
-            </button>
-            <button type="button" className="absolute top-1/2 -translate-y-1/2 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-next onClick={nextSlide}>
-               <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                  <svg className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4" />
-                  </svg>
-                  <span className="sr-only">Next</span>
-               </span>
-            </button>
-         </div>
-      </div>
-   );
-};
-
 
 function Testimonial(data: TestimonialData): JSX.Element {
    return (
@@ -138,19 +61,21 @@ function Testimonial(data: TestimonialData): JSX.Element {
          <FontAwesomeIcon icon={faQuoteLeft} className="text-3xl text-blue-700" />
          <p className="font-medium text-sm h-80 my-8">{data.testimonial}</p>
          <div>
-            <div className="flex flex-row gap-7 justify-center align-center w-full mx-auto p-5">
-               <div className="flex align-center justify-center rounded-full shadow-2xl h-24 w-24 ">
-                  {/* <Image
-                     src={data.image}
-                     width={1000}
-                     height={1000}
-                     alt='Testimonial Image'
-                  /> */}
+            <div className="relative flex flex-row gap-7 justify-center align-center w-full mx-auto p-5">
+               <div className='w-12 h-12 overflow-hidden'>
+                  <Image
+                     fill
+                     style =  {{objectFit: "cover", width: "100%", height: "100%"}}
+                     quality={100}
+                     src = {data.image}
+                     className='rounded-full'
+                     alt="Rounded avatar"
+                  />
+
+
                </div>
-
-
-               <div className="w-full mx-auto h-60 mt-10">
-                  <p className="font-bold text-md">{data.name}</p>
+               <div className="relative w-full mx-auto h-60 mt-10">
+                  <p className="font-bold text-lg">{data.name}</p>
                   {
                      data.stars.map((rating, index) => {
                         return <FontAwesomeIcon key={index} icon={faStar} className={clsx('text-sm', {
@@ -168,22 +93,15 @@ function Testimonial(data: TestimonialData): JSX.Element {
 }
 
 export default function Testimonials(): JSX.Element {
-   return (
-      <div className='my-11 pb-12'>
-         <Carousel />
-         {/* {people.map((person, index) => {
-            return (
-               <Testimonial
-                  testimonial={person.testimonial}
-                  name={person.name}
-                  stars={person.stars}
-                  image={person.image}
-                  key={index}
-               />
-            )
-         })} */}
-         {/* <Carousel /> */}
+   const testimonialElements : JSX.Element[] = people.map((person, index) => {
+      return (
+         <Testimonial {...person} key = {index} />
+      );
+   })
 
+   return (
+      <div className='w-7/12 mx-auto m-12'>
+         <Carousel items = {testimonialElements} slideWidth = {100} slideHeight = {450} />
       </div>
    )
 }
