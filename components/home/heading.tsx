@@ -1,4 +1,4 @@
-export default function SectionHeading({ title, description }: { title: string, description?: string }): JSX.Element {
+export default function Heading({ title, description }: { title: string, description?: string }): JSX.Element {
    return (
       <div className="w-100 mt-8">
          <h1
@@ -13,7 +13,6 @@ export default function SectionHeading({ title, description }: { title: string, 
                {description}
             </p>
          }
-
       </div>
    )
 }

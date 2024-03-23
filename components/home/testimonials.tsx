@@ -1,13 +1,11 @@
 "use client";
 import Image from 'next/image'
 import clsx from 'clsx';
-import cx from "classnames";
+import Heading from "@/components/home/heading";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { Button } from '../global/button';
 import { Carousel } from '../global/carousel';
-
 
 interface TestimonialData {
    testimonial: string,
@@ -32,12 +30,12 @@ const people: TestimonialData[] = [
    {
       "testimonial": "I've always struggled with maintaining a consistent fitness routine, but this app has completely changed the game for me. Its intuitive features and motivational reminders keep me accountable and motivated to reach my fitness goals.",
       "name": "Emily Johnson",
-      "stars": [1, 1, 1, 1, 0],
+      "stars": [1, 1, 1, 1, 1],
       "image": "/testimonial-three.jpg"
    },
    {
       "testimonial": "As a busy professional, finding time for fitness can be challenging. However, this app has made it incredibly convenient for me to stay active throughout the day. Its seamless integration with my smart devices allows me to effortlessly track my activity levels and make healthier choices.",
-      "name": "David Smith",
+      "name": "John Smith",
       "stars": [1, 1, 1, 1, 1],
       "image": "/testimonial-four.jpg"
    },
@@ -49,7 +47,7 @@ const people: TestimonialData[] = [
    },
    {
       "testimonial": "This app has become my go-to fitness companion for its seamless integration with my daily routine. From tracking my nutrition intake to providing insightful analytics on my sleep patterns, it has empowered me to make informed decisions about my health and well-being.",
-      "name": "Daniel Brown",
+      "name": "Daniel Patel",
       "stars": [1, 1, 1, 1, 1],
       "image": "/testimonial-six.jpg"
    }
@@ -57,28 +55,25 @@ const people: TestimonialData[] = [
 
 function Testimonial(data: TestimonialData): JSX.Element {
    return (
-      <div className="flex flex-col gap-3 justify-between align-center w-10/12 mx-auto h-80 p-5 my-6">
-         <FontAwesomeIcon icon={faQuoteLeft} className="text-3xl text-blue-700" />
-         <p className="font-medium text-sm h-80 my-8">{data.testimonial}</p>
+      <div className="flex flex-col gap-1 justify-between align-center w-10/12 mx-auto h-80 p-5 my-6">
+         <FontAwesomeIcon icon={faQuoteLeft} className="text-5xl text-blue-700" />
+         <p className="font-medium text-md h-80 my-8">{data.testimonial}</p>
          <div>
-            <div className="relative flex flex-row gap-7 justify-center align-center w-full mx-auto p-5">
-               <div className='w-12 h-12 overflow-hidden'>
+            <div className="flex flex-row gap-7 justify-center items-center w-full mx-auto p-5 h-40">
+               <div className='relative w-28 h-28 sm:w-20 sm:h-20 overflow-hidden rounded-full bg-slate-600'>
                   <Image
-                     fill
-                     style =  {{objectFit: "cover", width: "100%", height: "100%"}}
+                     layout="fill"
+                     objectFit="cover"
                      quality={100}
-                     src = {data.image}
-                     className='rounded-full'
+                     src={data.image}
                      alt="Rounded avatar"
                   />
-
-
                </div>
-               <div className="relative w-full mx-auto h-60 mt-10">
-                  <p className="font-bold text-lg">{data.name}</p>
+               <div>
+                  <p className="font-bold text-xl sm:text-md">{data.name}</p>
                   {
                      data.stars.map((rating, index) => {
-                        return <FontAwesomeIcon key={index} icon={faStar} className={clsx('text-sm', {
+                        return <FontAwesomeIcon key={index} icon={faStar} className={clsx('text-xl sm:text-sm my-2', {
                            'text-yellow-500': rating,
                            'text-slate-400': !rating,
                         })} />
@@ -93,15 +88,21 @@ function Testimonial(data: TestimonialData): JSX.Element {
 }
 
 export default function Testimonials(): JSX.Element {
-   const testimonialElements : JSX.Element[] = people.map((person, index) => {
+   const testimonialElements: JSX.Element[] = people.map((person, index) => {
       return (
-         <Testimonial {...person} key = {index} />
+         <Testimonial {...person} key={index} />
       );
    })
 
    return (
-      <div className='w-7/12 mx-auto m-12'>
-         <Carousel items = {testimonialElements} slideWidth = {100} slideHeight = {450} />
+      <div className="w-full mx-auto">
+         <Heading
+            title="Testimonials"
+            description="Discover the firsthand experiences of our valued users as they share insights into their fitness journey with our app"
+         />
+         <div className='w-7/12 mx-auto'>
+            <Carousel items={testimonialElements} slideWidth={100} slideHeight={450} />
+         </div>
       </div>
-   )
+   );
 }
