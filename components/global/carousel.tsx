@@ -6,10 +6,18 @@ export function Carousel({ items, slideWidth, slideHeight }: { items: JSX.Elemen
 
    const nextSlide = () => {
       setCurrentIndex((currentIndex + (100 / slideWidth)) % items.length);
+
+      if (currentIndex > 3) {
+         console.log("FIX 1");
+      }
    };
 
    const prevSlide = () => {
       setCurrentIndex((currentIndex - (100 / slideWidth) + items.length) % items.length);
+
+      if (currentIndex < 3) {
+         console.log("FIX 2");
+      }
    };
 
    return (
