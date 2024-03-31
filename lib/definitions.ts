@@ -13,6 +13,5 @@ export type InputFormat<FormType> = {
   inputId: string;
   inputType?: string;
   state: string;
-  formType: FormType;
   onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 };

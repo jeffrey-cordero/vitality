@@ -1,8 +1,10 @@
 "use client"
 import Heading from "@/components/home/heading";
+import { Button } from "@/components/global/button";
 import Input from "../global/input";
-import { ChangeEvent, ChangeEventHandler, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, FormEvent, useState } from "react";
 import TextArea from "../global/textarea";
+
 
 
 type SurveyForm = {
@@ -12,24 +14,28 @@ type SurveyForm = {
 };
 
 async function action(formData: SurveyForm): Promise<void> {
-   // TODO
+   console.log(formData);
 }
 
 function ResponseForm(): JSX.Element {
    const [survey, setSurvey] = useState<SurveyForm>({name: "", email: "", message: ""});
-   console.log(survey);
+
    const handleFormChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void  => {
       setSurvey({ ...survey, [String(event.target.dataset.state)]: event.target.value });
    };
 
    return (
       <div className="w-full mx-auto my-8">
-         <form className="w-1/2 mx-auto flex flex-col justify-center align-center gap-3">
+         <form
+            className="w-1/2 mx-auto flex flex-col justify-center align-center gap-3"
+            onSubmit={(event: FormEvent)=> {
+                        event.preventDefault();
+                        action(survey);
+                     }}>
             <Input
                label="Full Name"
                inputId="user-full-name"
                inputType="text"
-               formType={survey}
                state="name"
                onChange={handleFormChange}
             />
@@ -37,17 +43,21 @@ function ResponseForm(): JSX.Element {
                label="Email"
                inputId="user-email"
                inputType="email"
-               formType={survey}
                state="email"
                onChange={handleFormChange}
             />
             <TextArea
                label="Message"
                inputId="user-message"
-               formType={survey}
                state="message"
                onChange={handleFormChange}
             />
+            <Button
+               type="submit"
+               className="bg-blue-700 text-white hover:scale-[1.01]"
+               >
+               Submit
+            </Button>
          </form>
       </div>
    );
