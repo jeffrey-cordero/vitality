@@ -15,3 +15,9 @@ export type InputFormat<FormType> = {
   state: string;
   onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 };
+
+export type FeedbackForm = {
+  name: string;
+  email: string;
+  message: string;
+};

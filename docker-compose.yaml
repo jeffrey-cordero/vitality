@@ -1,12 +1,13 @@
 version: '3.8'
 
 services:
-  db: 
+  postgres: 
     image: postgres
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_DB: vitality-venture
     ports:
       - "5432:5432"
@@ -14,19 +15,10 @@ services:
       - vv_pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-       test: ["CMD-SHELL", "pg_isready -U postgres"]
+       test: ['CMD', 'pg_isready', '-U', 'postgres', '-d', 'vitality-venture']
        interval: 5s
        timeout: 5s
        retries: 5
     container_name: vv_postgres_container
-  nextjs:
-    image: node:alpine
-    working_dir: /app
-    command: sh -c "npm install && npm run dev"
-    ports:
-      - "3000:3000"
-    volumes:
-      - .:/app
-    container_name: nextjs_container
 volumes:
   vv_pgdata:

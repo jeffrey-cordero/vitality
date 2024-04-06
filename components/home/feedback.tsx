@@ -2,24 +2,13 @@
 import Heading from "@/components/home/heading";
 import { Button } from "@/components/global/button";
 import Input from "../global/input";
-import { ChangeEvent, ChangeEventHandler, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import TextArea from "../global/textarea";
-
-
-
-type SurveyForm = {
-   name: string;
-   email: string;
-   message: string;
-};
-
-async function action(formData: SurveyForm): Promise<void> {
-   console.log(formData);
-}
+import { sendFeedback } from '@/lib/actions';
+import { FeedbackForm } from '@/lib/definitions';
 
 function ResponseForm(): JSX.Element {
-   const [survey, setSurvey] = useState<SurveyForm>({name: "", email: "", message: ""});
-
+   const [survey, setSurvey] = useState<FeedbackForm>({name: "", email: "", message: ""});
    const handleFormChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void  => {
       setSurvey({ ...survey, [String(event.target.dataset.state)]: event.target.value });
    };
@@ -28,9 +17,10 @@ function ResponseForm(): JSX.Element {
       <div className="w-full mx-auto my-8">
          <form
             className="w-1/2 mx-auto flex flex-col justify-center align-center gap-3"
-            onSubmit={(event: FormEvent)=> {
+            onSubmit={async (event: FormEvent)=> {
                         event.preventDefault();
-                        action(survey);
+                        const response = await sendFeedback(survey);
+                        alert(response);
                      }}>
             <Input
                label="Full Name"
@@ -63,7 +53,7 @@ function ResponseForm(): JSX.Element {
    );
 }
 
-export default function Survey(): JSX.Element {
+export default function Feedback(): JSX.Element {
    return (
       <>
          <div className="w-full mx-auto">
@@ -72,9 +62,6 @@ export default function Survey(): JSX.Element {
                description="Welcome to our fitness tracker app – your ultimate companion for achieving optimal health and fitness"
             />
             <ResponseForm />
-
-
-
          </div>
       </>
    );

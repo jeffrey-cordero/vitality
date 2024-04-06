@@ -1,19 +1,31 @@
 ## Vitality Venture
 
-
+## starting dev
+``` bash 
+npx prisma generate 
+```
 
 ## Development
-The local development process is simplified using docker containers for each service.
+The local development process is simplified using docker containers for dependencies like the database.
 ``` bash
-docker-compose up
-or
 docker-compose up -d 
+npm run dev
 ```
 
-To stop development, run the following:
+To stop containers, run the following:
 ```bash
+
 docker-compose down
 ```
+
+To reset local environment, including all database data, run the following:
+```bash
+docker-compose down -v --remove-orphans
+
+docker-compose up -d 
+npm run dev
+```
+
 The application can be accessed [here](http://localhost:3000/) once the server is up and running. Any local changes should be reflected relatively quickly.
 
 
@@ -29,3 +41,5 @@ If the above is causing local port conflicts, you can change the `docker-compose
 ports:
       - "desired port:5432"
 ```
+
+
