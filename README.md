@@ -34,7 +34,13 @@ The application can be accessed [here](http://localhost:3000/) once the server i
 All relevant credentials are stored in `docker-compose.yaml`
 ``` bash
 psql -h localhost -p 5432 -U postgres -d vitality-venture
+or
+docker exec -it vv_postgres_container psql -U postgres -d vitality-venture
 ```
+
+To exit:
+```bash
+\q 
 
 If the above is causing local port conflicts, you can change the `docker-compose.yaml` file to change the following host port:
 ``` yaml

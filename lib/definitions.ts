@@ -8,16 +8,10 @@ export type User = {
   password: string;
 };
 
-export type InputFormat<FormType> = {
+export type InputFormat = {
   label: string;
   inputId: string;
   inputType?: string;
-  state: string;
-  onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-};
-
-export type FeedbackForm = {
-  name: string;
-  email: string;
-  message: string;
+  value: any;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 };

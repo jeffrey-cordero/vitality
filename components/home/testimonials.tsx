@@ -5,7 +5,7 @@ import Heading from "@/components/home/heading";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { Carousel } from '../global/carousel';
+import Carousel from "@/components/global/carousel";
 
 interface TestimonialData {
    testimonial: string,
@@ -62,7 +62,7 @@ function Testimonial(data: TestimonialData): JSX.Element {
             <div className="flex flex-row gap-7 justify-center items-center w-full mx-auto p-5 h-40">
                <div className='relative w-28 h-28 sm:w-20 sm:h-20 overflow-hidden rounded-full bg-slate-600'>
                   <Image
-                     layout="fill"
+                     fill
                      objectFit="cover"
                      quality={100}
                      src={data.image}

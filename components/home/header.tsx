@@ -1,4 +1,4 @@
-import { Button } from '../global/button'
+import Button from '@/components/global/button';
 
 export default function Header(): JSX.Element {
    return (

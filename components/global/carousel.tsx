@@ -1,7 +1,7 @@
 import { useState } from "react";
 import clsx from 'clsx';
 
-export function Carousel({ items, slideWidth, slideHeight }: { items: JSX.Element[], slideWidth: number, slideHeight: number }): JSX.Element {
+export default function Carousel({ items, slideWidth, slideHeight }: { items: JSX.Element[], slideWidth: number, slideHeight: number }): JSX.Element {
    const [currentIndex, setCurrentIndex] = useState(1);
 
    const nextSlide = () => {
@@ -35,7 +35,7 @@ export function Carousel({ items, slideWidth, slideHeight }: { items: JSX.Elemen
                      'opacity-100': index === currentIndex,
                      'opacity-20': index !== currentIndex,
                   })}
-                  style={{ width: `${slideWidth}%`}}
+                  style={{ width: `${slideWidth}%` }}
                >
                   {slide}
                </div>

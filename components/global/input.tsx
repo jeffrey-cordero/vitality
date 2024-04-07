@@ -1,12 +1,10 @@
-import cx from "classnames";
-import { ChangeEvent } from "react";
 import { InputFormat } from "@/lib/definitions";
 
-export default function Input(representation: InputFormat<Object>): JSX.Element {
+export default function Input(representation: InputFormat): JSX.Element {
    return (
       <div className="relative">
          <input
-            data-state={representation.state}
+            value={representation.value}
             type={representation.inputType}
             id={representation.inputId}
             className="peer p-4 block w-full border-gray-200 rounded-lg text-sm font-semibold placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2"

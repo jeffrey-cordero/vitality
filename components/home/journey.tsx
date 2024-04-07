@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Heading from "@/components/home/heading";
-import { Button } from '../global/button'
+import Button from '@/components/global/button';
 
 export default function Journey(): JSX.Element {
    return (
@@ -16,6 +16,7 @@ export default function Journey(): JSX.Element {
                   width={1200}
                   height={550}
                   alt='Journey Image'
+                  priority
                />
             </div>
             <div className='absolute top-0 right-0 lg:w-96 z-10 shadow-2xl ' style={{ transform: 'translate(50%, 50%)' }}>
