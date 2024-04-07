@@ -1,9 +1,7 @@
 import Heading from "@/components/home/heading";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faPaintbrush } from "@fortawesome/free-solid-svg-icons";
-import { faCode } from "@fortawesome/free-solid-svg-icons";
-import { faChartColumn } from "@fortawesome/free-solid-svg-icons";
+import { faPaintbrush, faCode, faChartColumn } from "@fortawesome/free-solid-svg-icons";
 
 function Card({ icon, title, description }: { icon: IconProp, title: string, description: string }): JSX.Element {
   return (

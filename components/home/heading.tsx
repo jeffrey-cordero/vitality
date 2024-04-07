@@ -1,8 +1,8 @@
 export default function Heading({ title, description }: { title: string, description?: string }): JSX.Element {
    return (
-      <div className="w-100 mt-8">
+      <div className="w-100 mt-8 ">
          <h1
-            className="animate-fade-up text-blue-700 text-3xl font-bold tracking-[-0.02em] opacity-1 drop-shadow-sm [text-wrap:balance] md:text-5xl md:leading-[3.2rem] w-1/2 mx-auto"
+            className="text-blue-700 text-3xl font-bold tracking-[-0.02em] opacity-1 drop-shadow-sm [text-wrap:balance] md:text-5xl md:leading-[3.2rem] w-1/2 mx-auto"
             style={{ animationDelay: "0.15s", animationFillMode: "forwards" }}
          >
             {title}

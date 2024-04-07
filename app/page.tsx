@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main className="flex min-h-screen w-full flex-col items-center justify-start p-4 text-center">
+      <main className="animate-slidein flex min-h-screen w-full flex-col items-center justify-start p-4 text-center">
         <Journey />
         <Highlights />
         <Services />

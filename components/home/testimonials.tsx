@@ -3,8 +3,7 @@ import Image from 'next/image'
 import clsx from 'clsx';
 import Heading from "@/components/home/heading";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons";
-import { faStar } from "@fortawesome/free-solid-svg-icons";
+import { faQuoteLeft, faStar } from "@fortawesome/free-solid-svg-icons";
 import Carousel from "@/components/global/carousel";
 
 interface TestimonialData {

@@ -21,12 +21,30 @@ const config: Config = {
       },
     },
     keyframes: {
-      shimmer: {
-        '100%': {
-          transform: 'translateX(100%)',
+      slidein: {
+        from: {
+          opacity: "0",
+          transform: "translateY(-30px)",
+        },
+        to: {
+          opacity: "1",
+          transform: "translateY(0)",
+        },
+      },
+
+      fadein: {
+        from: {
+          opacity: "0",
+        },
+        to: {
+          opacity: "1",
         },
       },
     },
+    animation: {
+      slidein: "slidein 1s ease-in-out 300ms",
+      fadein: "fadein 1s ease-in-out 300ms forwards",
+    }
   },
   plugins: [require('@tailwindcss/forms')],
 };
