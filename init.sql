@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS feedback (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      name VARCHAR NOT NULL,
-      email VARCHAR NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL,
       message TEXT NOT NULL
 );
 

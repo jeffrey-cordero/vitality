@@ -1,15 +1,16 @@
-## Vitality Venture
+## Vitality
 
-## starting dev
+
+## Starting development
+
 ``` bash 
 npx prisma generate 
 ```
 
 ## Development
-The local development process is simplified using docker containers for dependencies like the database.
+The local development process is simplified using docker containers:
 ``` bash
-docker-compose up -d 
-npm run dev
+docker-compose up 
 ```
 
 To stop containers, run the following:
@@ -33,9 +34,9 @@ The application can be accessed [here](http://localhost:3000/) once the server i
 ## Connecting to the database 
 All relevant credentials are stored in `docker-compose.yaml`
 ``` bash
-psql -h localhost -p 5432 -U postgres -d vitality-venture
+psql -h localhost -p 5432 -U prisma -d vitality
 or
-docker exec -it vv_postgres_container psql -U postgres -d vitality-venture
+docker exec -it v_postgres_container psql -U prisma -d vitality
 ```
 
 To exit:
@@ -48,4 +49,17 @@ ports:
       - "desired port:5432"
 ```
 
+Database migrations:
+``` bash
+Add formatted model to schema.prisma
 
+docker exec -it v_nextjs_container npx prisma generate
+docker exec -it v_nextjs_container npx prisma migrate dev 
+
+docker exec -it v_nextjs_container npx prisma migrate dev --name <migration-name>
+
+Then restart containers to take immediate effect:
+docker restart v_nextjs_container
+```
+
+Testing

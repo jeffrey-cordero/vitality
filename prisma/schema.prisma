@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  binaryTargets = ["darwin-arm64", "linux-musl-arm64-openssl-3.0.x"]
+  binaryTargets = ["darwin-arm64", "linux-musl-arm64-openssl-3.0.x", "native", "linux-musl"]
 }
 
 datasource db {
@@ -14,11 +14,25 @@ datasource db {
   url = env("DATABASE_URL")
 }
 
-model Feedback {
-  id String @id @default(uuid()) @db.Uuid
-  name String
-  email String
-  message String
+model User {
+  id       String  @id @default(uuid()) @db.Uuid
+  username String  @db.VarChar(30)
+  password String  @db.VarChar(255)
+  email    String  @db.VarChar
+}
 
-  @@map("feedback")
+model Feedback {
+  id      String @id @default(uuid()) @db.Uuid
+  name    String @db.VarChar(255)
+  email   String @db.VarChar(255)
+  message String @db.Text
+}
+
+model Movie {
+  id        String   @id @default(uuid()) @db.Uuid
+  title     String
+  director  String?
+  releaseYear Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

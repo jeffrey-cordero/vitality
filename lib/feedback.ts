@@ -30,6 +30,8 @@ export async function sendFeedback(feedback: FeedbackForm): Promise<FormStatus> 
 
    try {
       prisma.$connect();
+      const allFeedback = await prisma.movie.findMany();
+      console.log(`All Movies: ${allFeedback}`)
    } catch (err) {
       console.log(err);
    } finally {

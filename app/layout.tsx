@@ -11,8 +11,8 @@ config.autoAddCss = false;
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Vitality Venture',
-    default: 'Vitality Venture',
+    template: '%s | Vitality',
+    default: 'Vitality',
   },
   description: 'TODO',
   metadataBase: new URL('https://www.google.com/'),

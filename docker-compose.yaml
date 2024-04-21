@@ -1,24 +1,47 @@
 version: '3.8'
 
 services:
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://prisma:prisma@host.docker.internal:5432/vitality?schema=public
+      NODE_ENV: development
+    volumes:
+      - .:/app
+      - ./.env:/app/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    command: sh -c "npx prisma generate && npx prisma migrate dev && npm run dev"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+    container_name: v_nextjs_container
+
   postgres: 
     image: postgres
-    restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_DB: vitality-venture
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+      POSTGRES_DB: vitality
     ports:
       - "5432:5432"
     volumes:
-      - vv_pgdata:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - v_postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initpostgres.d/init.sql
     healthcheck:
-       test: ['CMD', 'pg_isready', '-U', 'postgres', '-d', 'vitality-venture']
+       test: ['CMD', 'pg_isready', '-U', 'prisma', '-d', 'vitality']
        interval: 5s
        timeout: 5s
        retries: 5
-    container_name: vv_postgres_container
+    restart: always
+    container_name: v_postgres_container
+
 volumes:
-  vv_pgdata:
+  v_postgres_data:
