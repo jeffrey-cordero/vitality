@@ -27,12 +27,3 @@ model Feedback {
   email   String @db.VarChar(255)
   message String @db.Text
 }
-
-model Movie {
-  id        String   @id @default(uuid()) @db.Uuid
-  title     String
-  director  String?
-  releaseYear Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}

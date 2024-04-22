@@ -23,8 +23,7 @@ To reset local environment, including all database data, run the following:
 ```bash
 docker-compose down -v --remove-orphans
 
-docker-compose up -d 
-npm run dev
+docker-compose up 
 ```
 
 The application can be accessed [here](http://localhost:3000/) once the server is up and running. Any local changes should be reflected relatively quickly.
@@ -54,12 +53,18 @@ Database migrations:
 Add formatted model to schema.prisma
 
 docker exec -it v_nextjs_container npx prisma generate
-docker exec -it v_nextjs_container npx prisma migrate dev 
-
 docker exec -it v_nextjs_container npx prisma migrate dev --name <migration-name>
-
-Then restart containers to take immediate effect:
-docker restart v_nextjs_container
 ```
 
 Testing
+
+Logs:
+
+<!-- View logs in realtime -->
+docker-compose logs -f
+
+<!--  Most recent logs -->
+docker-compose logs
+
+<!-- Specific container -->
+docker logs <v_postgres_container | v_nextjs_container>

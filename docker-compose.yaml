@@ -2,12 +2,10 @@ version: '3.8'
 
 services:
   nextjs:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: node:alpine
+    working_dir: /app
     environment:
       DATABASE_URL: postgresql://prisma:prisma@host.docker.internal:5432/vitality?schema=public
-      NODE_ENV: development
     volumes:
       - .:/app
       - ./.env:/app/.env
@@ -15,13 +13,18 @@ services:
       - "3000:3000"
     depends_on:
       - postgres
-    command: sh -c "npx prisma generate && npx prisma migrate dev && npm run dev"
+    command: sh -c "npm install && npx prisma generate && npx prisma migrate dev && npm run dev"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     container_name: v_nextjs_container
 
   postgres: 
@@ -41,6 +44,11 @@ services:
        timeout: 5s
        retries: 5
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     container_name: v_postgres_container
 
 volumes:

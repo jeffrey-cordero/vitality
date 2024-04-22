@@ -30,8 +30,11 @@ export async function sendFeedback(feedback: FeedbackForm): Promise<FormStatus> 
 
    try {
       prisma.$connect();
-      const allFeedback = await prisma.movie.findMany();
-      console.log(`All Movies: ${allFeedback}`)
+      const tableNames = await prisma.$queryRaw`SELECT table_name
+      FROM information_schema.tables
+      `;
+
+      console.log(tableNames);
    } catch (err) {
       console.log(err);
    } finally {
