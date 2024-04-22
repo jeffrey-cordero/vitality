@@ -1,19 +1,19 @@
 version: '3.8'
-
 services:
   nextjs:
     image: node:alpine
     working_dir: /app
     environment:
-      DATABASE_URL: postgresql://prisma:prisma@host.docker.internal:5432/vitality?schema=public
+      DATABASE_URL: postgresql://prisma:prisma@postgres:5432/vitality?schema=public
     volumes:
       - .:/app
       - ./.env:/app/.env
+    networks:
+      - vitality-network
     ports:
       - "3000:3000"
     depends_on:
       - postgres
-    command: sh -c "npm install && npx prisma generate && npx prisma migrate dev && npm run dev"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
       interval: 30s
@@ -25,7 +25,31 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    container_name: v_nextjs_container
+    command: sh -c "npm install && npx prisma generate && npx prisma migrate dev && npm run dev" # --> Development
+    # command: sh -c "npm install && npx prisma generate && npx prisma migrate dev && npm run build && npm start" --> Production
+    container_name: vitality_nextjs_container
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - vitality-network
+    ports:
+      - "80:80"
+    depends_on:
+      - nextjs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    container_name: vitality_nginx_container
 
   postgres: 
     image: postgres
@@ -33,11 +57,13 @@ services:
       POSTGRES_USER: prisma
       POSTGRES_PASSWORD: prisma
       POSTGRES_DB: vitality
+    volumes:
+      - vitality_postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initpostgres.d/init.sql
+    networks:
+      - vitality-network
     ports:
       - "5432:5432"
-    volumes:
-      - v_postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initpostgres.d/init.sql
     healthcheck:
        test: ['CMD', 'pg_isready', '-U', 'prisma', '-d', 'vitality']
        interval: 5s
@@ -49,7 +75,12 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    container_name: v_postgres_container
+    container_name: vitality_postgres_container
+
+networks:
+  vitality-network:
+    driver: bridge
 
 volumes:
-  v_postgres_data:
+  vitality_postgres_data:
+

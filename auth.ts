@@ -1,16 +1,22 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
+import { PrismaClient, User } from '@prisma/client';
 import { z } from 'zod';
-
-import { sql } from '@vercel/postgres';
-import type { User } from '@/lib/definitions';
 import bcrypt from 'bcrypt';
 
-async function getUser(email: string): Promise<User | undefined> {
+async function getUser(email: string): Promise<User | null> {
+  const prisma = new PrismaClient();
+
   try {
-    const user = await sql<User>`SELECT * FROM Users WHERE email=${email}`;
-    return user.rows[0];
+    await prisma.$connect();
+    const user = prisma.user.findFirst({
+      where: {
+        email: email
+      }
+    });
+
+    return user; 
   } catch (error) {
     console.error('Failed to fetch user:', error);
     throw new Error('Failed to fetch user.');

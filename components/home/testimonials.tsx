@@ -62,7 +62,7 @@ function Testimonial(data: TestimonialData): JSX.Element {
                <div className='relative w-28 h-28 sm:w-20 sm:h-20 overflow-hidden rounded-full bg-slate-600'>
                   <Image
                      fill
-                     objectFit="cover"
+                     style={{objectFit:"cover"}}
                      quality={100}
                      src={data.image}
                      alt="Rounded avatar"

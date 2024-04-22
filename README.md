@@ -3,10 +3,6 @@
 
 ## Starting development
 
-``` bash 
-npx prisma generate 
-```
-
 ## Development
 The local development process is simplified using docker containers:
 ``` bash
@@ -35,7 +31,7 @@ All relevant credentials are stored in `docker-compose.yaml`
 ``` bash
 psql -h localhost -p 5432 -U prisma -d vitality
 or
-docker exec -it v_postgres_container psql -U prisma -d vitality
+docker exec -it vitality_postgres_container psql -U prisma -d vitality
 ```
 
 To exit:
@@ -52,8 +48,8 @@ Database migrations:
 ``` bash
 Add formatted model to schema.prisma
 
-docker exec -it v_nextjs_container npx prisma generate
-docker exec -it v_nextjs_container npx prisma migrate dev --name <migration-name>
+docker exec -it vitality_nextjs_container npx prisma generate
+docker exec -it vitality_nextjs_container npx prisma migrate dev --name <migration-name>
 ```
 
 Testing
@@ -67,4 +63,7 @@ docker-compose logs -f
 docker-compose logs
 
 <!-- Specific container -->
-docker logs <v_postgres_container | v_nextjs_container>
+docker logs <vitality_postgres_container | vitality_nextjs_container>
+
+<!-- Section about Nginx server -->
+http://localhost for server...
