@@ -3,7 +3,7 @@ import Journey from "@/components/home/journey";
 import Highlights from "@/components/home/highlights";
 import Services from "@/components/home/services";
 import Testimonials from "@/components/home/testimonials";
-import Feedback from "@/components/home/feedback";
+import FeedbackForm from "@/components/home/feedback";
 
 export default function Home() {
   return (
@@ -14,7 +14,7 @@ export default function Home() {
         <Highlights />
         <Services />
         <Testimonials />
-        <Feedback />
+        <FeedbackForm />
       </main>
     </>
 

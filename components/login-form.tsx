@@ -3,7 +3,7 @@
 import { AtSymbolIcon, KeyIcon, ExclamationCircleIcon, } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import Button from '@/components/global/button';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormState, useSubmissionStatus } from 'react-dom';
 import { authenticate } from '@/lib/authentication';
 
 export default function LoginForm() {
@@ -75,7 +75,7 @@ export default function LoginForm() {
 }
 
 function LoginButton() {
-  const { pending } = useFormStatus();
+  const { pending } = useSubmissionStatus();
 
   return (
     <Button className="mt-4 w-full" aria-disabled={pending}>

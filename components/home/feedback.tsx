@@ -1,27 +1,28 @@
 'use client'
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useImmer } from 'use-immer';
-import { sendFeedback, FeedbackForm } from '@/lib/feedback';
-import { Input, TextArea, FormStatus } from '@/components/global/form';
+import { feedback } from '@prisma/client';
+import { sendFeedback } from '@/lib/feedback';
+import { Input, TextArea } from '@/components/global/form';
+import { SubmissionStatus } from '@/lib/form';
 import Heading from '@/components/home/heading';
 import Button from '@/components/global/button';
 
 import { faSignature, faEnvelope, faMessage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-
 function ResponseForm(): JSX.Element {
-   const [status, setStatus] = useState<FormStatus>( { status: 'initial' } );
-   const [feedback, setFeedback] = useImmer<FeedbackForm>({ name: '', email: '', message: '' });
+   const [status, setStatus] = useState<SubmissionStatus>( { status: 'initial', errors: {} } );
+   const [feedback, setFeedback] = useImmer<any>({ name: '', email: '', message: '' });
 
    const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { id, value } = event.target;
       
       if (status.errors && status.errors.id) {
-         // remove status of error input
+         // TODO --> remove status of error input
       }
 
-      setFeedback(prevState => ({
+      setFeedback((prevState : any) => ({
          ...prevState,
          [id]: value
       }));
@@ -91,7 +92,7 @@ function ResponseForm(): JSX.Element {
    );
 }
 
-export default function Feedback(): JSX.Element {
+export default function FeedbackForm(): JSX.Element {
    return (
       <>
          <div className='w-full mx-auto'>

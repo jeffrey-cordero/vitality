@@ -1,20 +1,7 @@
+"use client";
 import { ChangeEvent, useRef } from "react";
+import { InputFormat } from "@/lib/form";
 import clsx from 'clsx';
-
-export type FormStatus = {
-   status: 'initial' | 'sending' | 'errors' | 'success';
-   data?: any;
-   errors?: { [key: string]: string[]; };
-};
-
-type InputFormat = {
-   label: string;
-   inputId: string;
-   error: string;
-   inputType?: string;
-   value: any;
-   onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-};
 
 export function Input(representation: InputFormat): JSX.Element {
    return (
@@ -39,9 +26,6 @@ export function Input(representation: InputFormat): JSX.Element {
       </div>
    );
 }
-
-
-
 
 export function TextArea(representation: InputFormat): JSX.Element {
    const textArea = useRef<HTMLTextAreaElement | null>(null);

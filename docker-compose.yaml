@@ -25,7 +25,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    command: sh -c "npm install && npx prisma generate && npx prisma migrate dev && npm run dev" # --> Development
+    command: sh -c "npm install && npx prisma generate && npm run dev" # --> Development
     # command: sh -c "npm install && npx prisma generate && npx prisma migrate dev && npm run build && npm start" --> Production
     container_name: vitality_nextjs_container
 
@@ -59,7 +59,7 @@ services:
       POSTGRES_DB: vitality
     volumes:
       - vitality_postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initpostgres.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - vitality-network
     ports:
