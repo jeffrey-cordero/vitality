@@ -1,69 +1,94 @@
-## Vitality
+# Vitality
 
-
-## Starting development
+Your all-in-one modern fitness tracker for progress and performance to fuel your fitness goals.
 
 ## Development
-The local development process is simplified using docker containers:
+
+Docker is the cornerstone of the current development process. Services currently used to mimic to production environment include containers for NextJS, PostgreSQL, and Nginx all detailed in `docker-compose.yaml` file from root of project.
+
+To start the development processes.
+
 ``` bash
 docker-compose up 
 ```
 
-To stop containers, run the following:
+To pause development processes.
+
 ```bash
 
-docker-compose down
+docker-compose stop
 ```
 
-To reset local environment, including all database data, run the following:
+To restart completely by clearing all associated containers, networks, and volumes.
+
 ```bash
-docker-compose down -v --remove-orphans
-
-docker-compose up 
+docker-compose down -v --remove-orphans 
 ```
 
-The application can be accessed [here](http://localhost:3000/) once the server is up and running. Any local changes should be reflected relatively quickly.
+The application can be accessed [http://localhost:3000/](http://localhost:3000/), which represents output from the NextJS container. For a production-like environment, you can visit [http://localhost/](http://localhost/), which represents output from the Nginx container to mimic the Nginx Server on the production machine, crucial for optimized content delivery. The Nginx service can be commented it out in `docker-compose.yaml` to save resources.
 
+### Logs
 
+View logs for all services in realtime.
 
-## Connecting to the database 
-All relevant credentials are stored in `docker-compose.yaml`
-``` bash
-psql -h localhost -p 5432 -U prisma -d vitality
-or
-docker exec -it vitality_postgres_container psql -U prisma -d vitality
-```
-
-To exit:
 ```bash
-\q 
+docker-compose logs -f
+```
 
-If the above is causing local port conflicts, you can change the `docker-compose.yaml` file to change the following host port:
+View most recent logs for all services.
+
+```bash
+docker-compose logs 
+```
+
+View most recent logs for specific services, which could also be realtime with the `-f` clause.
+
+```bash
+docker logs <container-name> 
+```
+
+## Database
+
+The PostgreSQL database is called `vitality` and can be accessed through the local 5432 port. For any conflicts, you can change the port attached to your local machine in the `docker-compose.yaml` file.
+
 ``` yaml
-ports:
-      - "desired port:5432"
+services:
+      postgres:   
+            ...
+            ports:
+                  - "[X]:5432"
+            ...
 ```
 
-Database migrations:
-``` bash
-Add formatted model to schema.prisma
+There are 2 ways to currently access the database for viewing current state or making adjustments to records.
 
-docker exec -it vitality_nextjs_container npx prisma generate
+Through the docker container.
+
+``` bash
+docker exec -it vitality_postgres_container psql -U postgres -d vitality
+```
+
+Through the Prisma ORM.
+
+``` bash
+npx prisma studio
+```
+
+### Database migrations
+
+- Add the proposed changes to the model located at `prisma/schema.prisma`
+- Run the following command to apply the changes
+
+``` bash
 docker exec -it vitality_nextjs_container npx prisma migrate dev --name <migration-name>
 ```
 
-Testing
+## Testing
 
-Logs:
+### Jest
 
-<!-- View logs in realtime -->
-docker-compose logs -f
+TBD
 
-<!--  Most recent logs -->
-docker-compose logs
+### Cypress
 
-<!-- Specific container -->
-docker logs <vitality_postgres_container | vitality_nextjs_container>
-
-<!-- Section about Nginx server -->
-http://localhost for server...
+TBD

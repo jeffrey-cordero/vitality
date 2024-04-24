@@ -22,7 +22,7 @@ export default function Journey(): JSX.Element {
             <div className='absolute top-0 right-0 lg:w-96 z-10 shadow-2xl ' style={{ transform: 'translate(50%, 50%)' }}>
                <div className=' text-white bg-blue-700 flex flex-col justify-center align-center gap-8 text-left p-12 shadow-2xl'>
                   <h1 className='text-2xl font-bold'>
-                     The Journey
+                     Fitness Journey
                   </h1>
                   <p className='text-md font-light'>
                      Discover the power of tracking your fitness journey as you strive towards your goals. By monitoring your progress, you gain valuable insights, stay accountable, and fuel your motivation.

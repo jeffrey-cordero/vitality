@@ -40,10 +40,25 @@ const config: Config = {
           opacity: "1",
         },
       },
+      notificationIn: {
+        from: {
+          position: "fixed",
+          top: "-100%", 
+          left: "50%",
+          transform: "translateX(-50%) translateY(-50%)",
+        },
+        to: {
+          position: "fixed",
+          top: "1.2rem", 
+          left: "50%",
+          transform: "translateX(-50%) translateY(-50%)",
+        },
+      },
     },
     animation: {
       slidein: "slidein 1s ease-in-out 300ms",
       fadein: "fadein 1s ease-in-out 300ms forwards",
+      notificationIn: "notificationIn 1.5s ease-in-out 300ms forwards",
     }
   },
   plugins: [require('@tailwindcss/forms')],

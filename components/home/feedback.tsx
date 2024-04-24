@@ -1,18 +1,17 @@
 'use client'
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useImmer } from 'use-immer';
-import { feedback } from '@prisma/client';
 import { sendFeedback } from '@/lib/feedback';
 import { Input, TextArea } from '@/components/global/form';
+import { Notification } from '@/components/global/notification';
 import { SubmissionStatus } from '@/lib/form';
 import Heading from '@/components/home/heading';
 import Button from '@/components/global/button';
-
 import { faSignature, faEnvelope, faMessage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function ResponseForm(): JSX.Element {
-   const [status, setStatus] = useState<SubmissionStatus>( { status: 'initial', errors: {} } );
+   const [status, setStatus] = useState<SubmissionStatus>( { status: 'initial' } );
    const [feedback, setFeedback] = useImmer<any>({ name: '', email: '', message: '' });
 
    const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -80,6 +79,9 @@ function ResponseForm(): JSX.Element {
                   <FontAwesomeIcon icon={faMessage} className="text-lg text-red-500 mt-1" />
                   <p className='text-red-500 font-semibold '> { status.errors.message[0] } </p>
                </div>  
+            }
+            {
+               status.status != "initial" && Notification(status, "w-[15rem] h-[3rem] p-3")
             }
             <Button
                type='submit'
