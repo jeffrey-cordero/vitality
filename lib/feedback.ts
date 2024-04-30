@@ -1,6 +1,6 @@
 "use server";
 import { z } from 'zod';
-import { PrismaClient, feedback as Feedback } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from '@/lib/form';
 
 const feedbackSchema = z.object({
@@ -9,12 +9,12 @@ const feedbackSchema = z.object({
    message: z.string().trim().min(1, { message: 'Message is required' })
 });
 
-export async function sendFeedback(feedback: Feedback): Promise<SubmissionStatus>  {
+export async function sendFeedback(feedback): Promise<SubmissionStatus>  {
    // Validate the feedback form first
    const fields = feedbackSchema.safeParse(feedback);
 
    if (!fields.success) {
-      return sendErrorMessage("errors", fields.error.flatten().fieldErrors);
+      return sendErrorMessage("Error", fields.error.flatten().fieldErrors);
    }
 
    const prisma = new PrismaClient();
@@ -27,13 +27,13 @@ export async function sendFeedback(feedback: Feedback): Promise<SubmissionStatus
          data: feedback
       });
 
-      return sendSuccessMessage();
+      return sendSuccessMessage("Successfully received your feedback!");
    } catch (err) {
       console.log(err);
    } finally {
       prisma.$disconnect();
    }
 
-   return sendErrorMessage("failure");
+   return sendErrorMessage("Failure");
 }
  

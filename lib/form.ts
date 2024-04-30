@@ -1,30 +1,31 @@
 import { ChangeEvent } from "react";
 
-export type InputFormat = {
+export type InputState = { 
    label: string;
-   inputId: string;
-   error: string;
    inputType?: string;
+   inputId: string;
    value: any;
+   error: string | null;
    onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 };
 
 export type SubmissionStatus = {
-   status: 'initial' | 'errors' | 'success' | 'failure';
-   data?: any;
+   state: 'Initial' | 'Error' | 'Success' | 'Failure';
+   response?: { message: string, data?: any };
    errors?: { [key: string]: string[]; };
 };
 
-export function sendSuccessMessage(data?: any): SubmissionStatus {
+export function sendSuccessMessage(message: string, data?: any): SubmissionStatus {
    return {
-      status: "success",
-      data: data ? data : null
+      state: 'Success',
+      response: { message: message, data: data }
    };
 }
 
-export function sendErrorMessage(status: 'errors' | 'failure', errors?: { [key: string]: string[] }): SubmissionStatus {
+export function sendErrorMessage(status: 'Error' | 'Failure', errors?: { [key: string]: string[] }): SubmissionStatus {
    return {
-      status: status,
+      state: status,
+      response: {message: 'Unknown error has occurred when processing your request. Please try again.'},
       errors: errors ? errors : { 'system' : ['Unknown error has occurred when processing your request. Please try again.'] }
    }
 }

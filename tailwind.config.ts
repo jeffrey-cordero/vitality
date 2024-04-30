@@ -49,7 +49,7 @@ const config: Config = {
         },
         to: {
           position: "fixed",
-          top: "1.2rem", 
+          top: "4rem", 
           left: "50%",
           transform: "translateX(-50%) translateY(-50%)",
         },

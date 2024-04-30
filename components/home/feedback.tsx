@@ -1,37 +1,39 @@
 'use client'
-import { ChangeEvent, FormEvent, useState } from 'react';
-import { useImmer } from 'use-immer';
+import { FormEvent, useState } from 'react';
 import { sendFeedback } from '@/lib/feedback';
-import { Input, TextArea } from '@/components/global/form';
+import { Input, TextArea, useFormInput } from '@/components/global/form';
 import { Notification } from '@/components/global/notification';
 import { SubmissionStatus } from '@/lib/form';
 import Heading from '@/components/home/heading';
 import Button from '@/components/global/button';
-import { faSignature, faEnvelope, faMessage } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function ResponseForm(): JSX.Element {
-   const [status, setStatus] = useState<SubmissionStatus>( { status: 'initial' } );
-   const [feedback, setFeedback] = useImmer<any>({ name: '', email: '', message: '' });
+   const [status, setStatus] = useState<SubmissionStatus>( { state: 'Initial' } );
 
-   const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const { id, value } = event.target;
-      
-      if (status.errors && status.errors.id) {
-         // TODO --> remove status of error input
-      }
-
-      setFeedback((prevState : any) => ({
-         ...prevState,
-         [id]: value
-      }));
-   };
+   const feedback = {
+      "name" : useFormInput(""),
+      "email" : useFormInput(""),
+      "message" : useFormInput("")
+   }
 
    const handleSubmit = async (event: FormEvent) => {
       event.preventDefault();
 
-      const response = await sendFeedback(feedback);
+      const response = await sendFeedback({
+         name: feedback.name.value,
+         email: feedback.email.value,
+         message: feedback.message.value,
+      });
+
       setStatus(response);
+
+      console.log(response);
+
+      if (response.errors) {
+         for (const input of Object.keys(response.errors)) {
+            feedback[input].setError(response.errors[input][0]);
+         }
+      }   
    }
 
    return (
@@ -43,46 +45,30 @@ function ResponseForm(): JSX.Element {
                label='Name'
                inputId='name'
                inputType='text'
-               value={feedback.name}
-               error={status.errors && status.errors.name ? status.errors.name[0] : ''}
-               onChange={handleInputChange}
+               value={feedback.name.value}
+               error={feedback.name.error}
+               onChange={feedback.name.onChange}
             />
-            { status.errors && status.errors.name && 
-               <div className="flex justify-center align-center gap-2 p-1 opacity-0 animate-fadein">
-                  <FontAwesomeIcon icon={faSignature} className="text-lg text-red-500 mt-1" />
-                  <p className='text-red-500 font-semibold '> { status.errors.name[0] } </p>
-               </div>  
-            }
             <Input
                label='Email'
                inputId='email'
                inputType='email'
-               value={feedback.email}
-               error={status.errors && status.errors.email ? status.errors.email[0] : ''}
-               onChange={handleInputChange}
+               value={feedback.email.value}
+               error={feedback.email.error}
+               onChange={feedback.email.onChange}
             />
-            { status.errors && status.errors.email && 
-               <div className="flex justify-center align-center gap-2 p-1 opacity-0 animate-fadein">
-                  <FontAwesomeIcon icon={faEnvelope} className="text-lg text-red-500 mt-1" />
-                  <p className='text-red-500 font-semibold '> { status.errors.email[0] } </p>
-               </div>  
-            }
             <TextArea
                label='Message'
                inputId='message'
-               value={feedback.message}
-               error={status.errors && status.errors.message ? status.errors.message[0] : ''}
-               onChange={handleInputChange}
+               value={feedback.message.value}
+               error={feedback.message.error}
+               onChange={feedback.message.onChange}
             />
-            { status.errors && status.errors.message && 
-               <div className="flex justify-center align-center gap-2 p-1 opacity-0 animate-fadein">
-                  <FontAwesomeIcon icon={faMessage} className="text-lg text-red-500 mt-1" />
-                  <p className='text-red-500 font-semibold '> { status.errors.message[0] } </p>
-               </div>  
-            }
-            {
-               status.status != "initial" && Notification(status, "w-[15rem] h-[3rem] p-3")
-            }
+            {status.state !== "Initial" && status.state != "Error" && (
+               <Notification
+                  status={status}
+               />
+            )}
             <Button
                type='submit'
                className='bg-blue-700 text-white hover:scale-[1.01]'

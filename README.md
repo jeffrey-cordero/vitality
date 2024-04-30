@@ -9,20 +9,20 @@ Docker is the cornerstone of the current development process. Services currently
 To start the development processes.
 
 ``` bash
-docker-compose up 
+docker compose up 
 ```
 
 To pause development processes.
 
 ```bash
 
-docker-compose stop
+docker compose stop
 ```
 
 To restart completely by clearing all associated containers, networks, and volumes.
 
 ```bash
-docker-compose down -v --remove-orphans 
+docker compose down -v --remove-orphans 
 ```
 
 The application can be accessed [http://localhost:3000/](http://localhost:3000/), which represents output from the NextJS container. For a production-like environment, you can visit [http://localhost/](http://localhost/), which represents output from the Nginx container to mimic the Nginx Server on the production machine, crucial for optimized content delivery. The Nginx service can be commented it out in `docker-compose.yaml` to save resources.
@@ -32,13 +32,13 @@ The application can be accessed [http://localhost:3000/](http://localhost:3000/)
 View logs for all services in realtime.
 
 ```bash
-docker-compose logs -f
+docker compose logs -f
 ```
 
 View most recent logs for all services.
 
 ```bash
-docker-compose logs 
+docker compose logs 
 ```
 
 View most recent logs for specific services, which could also be realtime with the `-f` clause.
@@ -65,7 +65,7 @@ There are 2 ways to currently access the database for viewing current state or m
 Through the docker container.
 
 ``` bash
-docker exec -it vitality_postgres_container psql -U postgres -d vitality
+docker exec -it vitality_postgres psql -U postgres -d vitality
 ```
 
 Through the Prisma ORM.
@@ -80,15 +80,21 @@ npx prisma studio
 - Run the following command to apply the changes
 
 ``` bash
-docker exec -it vitality_nextjs_container npx prisma migrate dev --name <migration-name>
+docker exec -it vitality_app npx prisma migrate dev --name <migration-name>
 ```
 
 ## Testing
 
 ### Jest
 
-TBD
+Run all unit tests.
+
+```bash
+npx jest  
+```
 
 ### Cypress
 
-TBD
+```bash
+npx cypress open
+```
