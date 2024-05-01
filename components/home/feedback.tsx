@@ -11,9 +11,9 @@ function ResponseForm(): JSX.Element {
    const [status, setStatus] = useState<SubmissionStatus>( { state: 'Initial' } );
 
    const feedback = {
-      "name" : useFormInput(""),
-      "email" : useFormInput(""),
-      "message" : useFormInput("")
+      'name' : useFormInput(''),
+      'email' : useFormInput(''),
+      'message' : useFormInput('')
    }
 
    const handleSubmit = async (event: FormEvent) => {
@@ -64,7 +64,7 @@ function ResponseForm(): JSX.Element {
                error={feedback.message.error}
                onChange={feedback.message.onChange}
             />
-            {status.state !== "Initial" && status.state != "Error" && (
+            {status.state !== 'Initial' && status.state != 'Error' && (
                <Notification
                   status={status}
                />
