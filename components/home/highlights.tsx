@@ -9,7 +9,7 @@ function Card({ icon, title, description }: { icon: IconProp, title: string, des
       <div className='flex flex-col text-center justify-center align-center gap-4 py-16 px-8 text-black'>
         <FontAwesomeIcon icon={icon} className='text-3xl text-blue-700' />
         <h1 className='font-semibold text-2xl text-blue-700'>{title}</h1>
-        <p className='font-medium text-slate-400'>{description}</p>
+        <p className='font-medium text-slate-500'>{description}</p>
       </div>
 
     </div>

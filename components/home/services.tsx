@@ -13,7 +13,7 @@ function Service({ icon, title, background, color, divider }: { icon: IconProp, 
    return (
       <div className={cx(background, color, 'flex flex-col align-center justify-center gap-5 text-center rounded-2xl border border-gray-200 shadow-md p-5 lg:h-[14rem] lg:w-[14rem] w-[13rem] h-[13rem] mx-auto')}>
          <FontAwesomeIcon icon={icon} className={cx(color, 'text-3xl')} />
-         <div className={cx(divider, 'w-1/2 mx-auto my-1')} style={{ height: 3 }} />
+         <div className={cx(divider, 'w-1/2 mx-auto my-1')} />
          <h1 className='font-semibold text-2xl'>{title}</h1>
       </div>
    )

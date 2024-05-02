@@ -2,23 +2,23 @@ import { ChangeEvent } from "react";
 
 export type InputState = { 
    label: string;
-   inputType?: string;
-   inputId: string;
-   value: any;
+   type?: string;
+   id: string;
    error: string | null;
    onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 };
 
 export type SubmissionStatus = {
    state: 'Initial' | 'Error' | 'Success' | 'Failure';
-   response?: { message: string, data?: any };
-   errors?: { [key: string]: string[]; };
+   response: { message?: string, data?: any };
+   errors: { [key: string]: string[]; };
 };
 
 export function sendSuccessMessage(message: string, data?: any): SubmissionStatus {
    return {
       state: 'Success',
-      response: { message: message, data: data }
+      response: { message: message, data: data },
+      errors: {}
    };
 }
 

@@ -3,7 +3,7 @@
 import { AtSymbolIcon, KeyIcon, ExclamationCircleIcon, } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import Button from '@/components/global/button';
-import { useFormState, useSubmissionStatus } from 'react-dom';
+import { useFormState } from 'react-dom';
 import { authenticate } from '@/lib/authentication';
 
 export default function LoginForm() {
@@ -62,10 +62,10 @@ export default function LoginForm() {
           aria-live="polite"
           aria-atomic="true"
         >
-          {errorMessage && (
+          {true && (
             <>
               <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
-              <p className="text-sm text-red-500">{errorMessage}</p>
+              <p className="text-sm text-red-500">This is an error message</p>
             </>
           )}
         </div>
@@ -75,11 +75,9 @@ export default function LoginForm() {
 }
 
 function LoginButton() {
-  const { pending } = useSubmissionStatus();
-
   return (
-    <Button className="mt-4 w-full" aria-disabled={pending}>
-      Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+    <Button className="mt-4 w-full bg-blue-600" type='submit'>
+      Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-black" />
     </Button>
   );
 }

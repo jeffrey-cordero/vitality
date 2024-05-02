@@ -54,12 +54,12 @@ const people: TestimonialData[] = [
 
 function Testimonial(data: TestimonialData): JSX.Element {
    return (
-      <div className='flex flex-col gap-1 justify-center align-center w-10/12 h-[27rem] mx-auto p-5'>
+      <div className='flex flex-col gap-1 justify-center align-center w-full min-h-[25rem] max-h-ful mx-auto p-8'>
          <FontAwesomeIcon icon={faQuoteLeft} className='text-4xl text-blue-700' />
-         <p className='font-medium text-md xsm:text-sm my-8'>{data.testimonial}</p>
+         <p className='font-semibold text-sm my-8'>{data.testimonial}</p>
          <div>
             <div className='flex flex-row flex-wrap gap-3 justify-center items-center w-full mx-auto p-5'>
-               <div className='relative w-[4.5rem] h-[4.5rem] overflow-hidden rounded-full bg-slate-400'>
+               <div className='relative w-[4.5rem] h-[4.5rem] overflow-hidden rounded-full bg-slate-500'>
                   <Image
                      fill
                      style={{objectFit:'cover'}}
@@ -74,7 +74,7 @@ function Testimonial(data: TestimonialData): JSX.Element {
                      data.stars.map((rating, index) => {
                         return <FontAwesomeIcon key={index} icon={faStar} className={clsx('text-xl sm:text-sm my-2', {
                            'text-yellow-500': rating,
-                           'text-slate-400': !rating,
+                           'text-slate-500': !rating,
                         })} />
                      })
                   }
@@ -99,7 +99,7 @@ export default function Testimonials(): JSX.Element {
             title='Testimonials'
             description='Discover the firsthand experiences of our valued users as they share insights into their fitness journey with our app'
          />
-         <div className='w-7/12 xsm:w-9/12 mx-auto'>
+         <div className='min-w-7/12 w-8/12 max-w-10/12 mx-auto'>
             <Carousel items={testimonialElements} slideWidth={100} />
          </div>
       </div>
