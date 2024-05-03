@@ -61,14 +61,14 @@ function ResponseForm(): JSX.Element {
                error={status.errors.message?.[0] ?? null}
                onChange={handleChange}
             />
-            {status.state !== 'Initial' && status.state != 'Error' && (
+            {status.state !== 'Initial' && status.state !== 'Error' && (
                <Notification
                   status={status}
                />
             )}
             <Button
                type='submit'
-               className='bg-blue-700 text-white hover:scale-[1.01]'
+               className='bg-primary text-white hover:scale-[1.00] h-[3rem]'
             >
                Submit
             </Button>
@@ -82,8 +82,8 @@ export default function FeedbackForm(): JSX.Element {
       <>
          <div className='w-full mx-auto'>
             <Heading
-               title='Your Fitness Journey Starts Here'
-               description='Welcome to our fitness tracker app - your ultimate companion for achieving optimal health and fitness'
+               title="We're here for your health"
+               description='Please feel free to leave us a message to help us improve our services.'
             />
             <ResponseForm />
          </div>

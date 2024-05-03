@@ -5,10 +5,10 @@ import { faPaintbrush, faCode, faChartColumn } from '@fortawesome/free-solid-svg
 
 function Card({ icon, title, description }: { icon: IconProp, title: string, description: string }): JSX.Element {
   return (
-    <div className='w-[17rem] h-[24rem] text-center rounded-2xl border border-gray-200 bg-white shadow-md'>
-      <div className='flex flex-col text-center justify-center align-center gap-4 py-16 px-8 text-black'>
-        <FontAwesomeIcon icon={icon} className='text-3xl text-blue-700' />
-        <h1 className='font-semibold text-2xl text-blue-700'>{title}</h1>
+    <div className='w-[22rem] min-h-[25rem] text-center rounded-2xl border border-gray-200 bg-white shadow-md hover:cursor-pointer hover:scale-[1.05] transition duration-300 ease-in-out'>
+      <div className='flex flex-col text-center justify-center align-center gap-4 py-16 px-12 text-black'>
+        <FontAwesomeIcon icon={icon} className='text-4xl text-primary' />
+        <h1 className='font-semibold text-3xl text-primary'>{title}</h1>
         <p className='font-medium text-slate-500'>{description}</p>
       </div>
 
@@ -19,7 +19,7 @@ function Card({ icon, title, description }: { icon: IconProp, title: string, des
 
 export default function Highlights(): JSX.Element {
   return (
-    <div className='w-11/12 mx-auto mt-8'>
+    <div className='w-full mx-auto mt-8'>
       <Heading
         title='Why Us?'
         description="We've developed a cutting-edge fitness tracker that empowers users to effortlessly monitor their progress, set goals, and achieve optimal fitness levels"

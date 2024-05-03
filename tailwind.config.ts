@@ -12,16 +12,11 @@ const config: Config = {
         '13': 'repeat(13, minmax(0, 1fr))',
       },
       colors: {
-        blue: {
-          400: '#2589FE',
-          500: '#0070F3',
-          600: '#2F6FEB',
-          700: '#2947A9'
-        }
+        primary: "#2947A9"
       },
     },
     keyframes: {
-      slidein: {
+      slideIn: {
         from: {
           opacity: "0",
           transform: "translateY(-30px)",
@@ -32,7 +27,7 @@ const config: Config = {
         },
       },
 
-      fadein: {
+      fadeIn: {
         from: {
           opacity: "0",
         },
@@ -40,25 +35,49 @@ const config: Config = {
           opacity: "1",
         },
       },
+      fadeOut: {
+        from: {
+          opacity: "1",
+        },
+        to: {
+          opacity: "0",
+        },
+      },
       notificationIn: {
         from: {
           position: "fixed",
-          top: "-100%", 
+          top: "-15rem", 
           left: "50%",
           transform: "translateX(-50%) translateY(-50%)",
         },
         to: {
           position: "fixed",
-          top: "4rem", 
+          top: "7.5rem", 
           left: "50%",
           transform: "translateX(-50%) translateY(-50%)",
         },
       },
     },
+    notificationOut: {
+      from: {
+        position: "fixed",
+        top: "7.5rem", 
+        left: "50%",
+        transform: "translateX(-50%) translateY(-50%)",
+      },
+      to: {
+        position: "fixed",
+        top: "-15rem", 
+        left: "50%",
+        transform: "translateX(-50%) translateY(-50%)",
+      },
+    },
     animation: {
-      slidein: "slidein 1s ease-in-out 300ms",
-      fadein: "fadein 1s ease-in-out 300ms forwards",
+      slideIn: "slideIn 1s ease-in-out 300ms",
+      fadeIn: "fadeIn 1s ease-in-out 300ms forwards",
+      fadeOut: "fadeOut 1s ease-in-out 300ms forwards",
       notificationIn: "notificationIn 1.5s ease-in-out 300ms forwards",
+      notificationOut: "notificationOut 1.5s ease-in-out 300ms forwards",
     }
   },
   plugins: [require('@tailwindcss/forms')],

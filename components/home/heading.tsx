@@ -2,7 +2,7 @@ export default function Heading({ title, description }: { title: string, descrip
    return (
       <div className='w-full my-12'>
          <h1
-            className='text-blue-700 text-4xl md:text-5xl w-full sm:w-3/5  font-bold mx-auto'
+            className='text-primary text-4xl md:text-5xl w-full sm:w-3/5  font-bold mx-auto'
          >
             {title}
          </h1>
