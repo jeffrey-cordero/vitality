@@ -1,6 +1,6 @@
 import { ChangeEvent } from "react";
 
-export type InputState = { 
+export type InputState = {
    label: string;
    type?: string;
    id: string;
@@ -9,23 +9,23 @@ export type InputState = {
 };
 
 export type SubmissionStatus = {
-   state: 'Initial' | 'Error' | 'Success' | 'Failure';
+   state: "Initial" | "Error" | "Success" | "Failure";
    response: { message?: string, data?: any };
    errors: { [key: string]: string[]; };
 };
 
-export function sendSuccessMessage(message: string, data?: any): SubmissionStatus {
+export function sendSuccessMessage (message: string, data?: any): SubmissionStatus {
    return {
-      state: 'Success',
+      state: "Success",
       response: { message: message, data: data },
       errors: {}
    };
 }
 
-export function sendErrorMessage(status: 'Error' | 'Failure', errors?: { [key: string]: string[] }): SubmissionStatus {
+export function sendErrorMessage (status: "Error" | "Failure", errors?: { [key: string]: string[] }): SubmissionStatus {
    return {
       state: status,
-      response: {message: 'Unknown error has occurred when processing your request. Please try again.'},
-      errors: errors ? errors : { 'system' : ['Unknown error has occurred when processing your request. Please try again.'] }
-   }
+      response: { message: "Unknown error has occurred when processing your request. Please try again." },
+      errors: errors ? errors : { "system" : ["Unknown error has occurred when processing your request. Please try again."] }
+   };
 }

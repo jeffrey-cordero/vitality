@@ -46,13 +46,13 @@ const config: Config = {
       notificationIn: {
         from: {
           position: "fixed",
-          top: "-15rem", 
+          top: "-100%", 
           left: "50%",
           transform: "translateX(-50%) translateY(-50%)",
         },
         to: {
           position: "fixed",
-          top: "7.5rem", 
+          top: "6.5rem", 
           left: "50%",
           transform: "translateX(-50%) translateY(-50%)",
         },

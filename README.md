@@ -98,3 +98,10 @@ npx jest
 ```bash
 npx cypress open
 ```
+
+
+## Linting
+
+```bash
+npx next lint OR npx next lint --fix
+```

@@ -7,16 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model feedback {
+model User {
+  id            Int      @id @default(autoincrement())
+  name          String   @db.VarChar(255)
+  birthday      DateTime @db.Date
+  username      String   @unique @db.VarChar(30)
+  password      String
+  email         String   @unique
+  emailverified Boolean  @default(false)
+  phone         String?  @unique @db.VarChar(20)
+  phoneverified Boolean? @default(false)
+}
+
+model VerificationToken {
+  identifier String   @id
+  token      String   @unique
+  expires    DateTime @db.Timestamp(6)
+}
+
+model Feedback {
   id      Int    @id @default(autoincrement())
   name    String @db.VarChar(255)
   email   String @db.VarChar(255)
   message String
-}
-
-model users {
-  id       Int    @id @default(autoincrement())
-  username String @unique @db.VarChar(30)
-  password String @db.VarChar(255)
-  email    String @unique @db.VarChar
 }
