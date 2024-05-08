@@ -5,7 +5,7 @@ import { AuthError } from "next-auth";
 import { z } from "zod";
 import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/form";
 
-export interface User {
+export interface RegisterUser {
    name: string;
    birthday: Date;
    username: string;
@@ -41,7 +41,7 @@ export async function authenticate (prevState: string | undefined, formData: For
    }
 }
 
-export async function register (user: User): Promise<SubmissionStatus> {
+export async function register (user: RegisterUser): Promise<SubmissionStatus> {
    const fields = userSchema.safeParse(user);
 
    if (!(fields.success)) {

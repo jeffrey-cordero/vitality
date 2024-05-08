@@ -39,5 +39,5 @@ next-env.d.ts
 # misc
 .vscode
 
-#PostgreSQL volume
+# postgres volume
 data/*

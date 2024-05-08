@@ -6,10 +6,9 @@ import Pricing from "@/components/landing/pricing";
 import Testimonials from "@/components/landing/testimonials";
 import Footer from "@/components/global/footer";
 
-export default function Home () {
+export default function Landing () {
    return (
       <>
-         <Header />
          <main className = "animate-slideIn flex min-h-screen w-full flex-col items-center justify-start p-4 text-center">
             <Journey />
             <Highlights />
@@ -19,6 +18,5 @@ export default function Home () {
             <Footer />
          </main>
       </>
-
    );
 }

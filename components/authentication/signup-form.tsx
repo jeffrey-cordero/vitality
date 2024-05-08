@@ -1,72 +1,100 @@
 "use client";
-import { ChangeEvent, FormEvent } from "react";
+import { FormEvent, useEffect } from "react";
 import { useImmer } from "use-immer";
-import { SubmissionStatus } from "@/lib/form";
-import { sendFeedback, Feedback } from "@/lib/feedback";
+import { InputState, FormRepresentation, handleInputChange } from "@/lib/form";
+import { register, RegisterUser as User } from "@/lib/authentication";
 import Heading from "@/components/landing/heading";
-import { Input, TextArea } from "@/components/global/form";
+import { Input } from "@/components/global/form";
 import { Notification } from "@/components/global/notification";
 import Button from "@/components/global/button";
 
 function Form (): JSX.Element {
-   const [feedback, setFeedback] = useImmer<Feedback>({ name: "", email: "", message: "" });
-   const [status, setStatus] = useImmer<SubmissionStatus>({ state: "Initial", response: {}, errors: {} });
-
-   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const { id, value } = event.target;
-
-      setFeedback((feedback: Feedback) => {
-         feedback[id] = value;
+   const [user, setUser] = useImmer<FormRepresentation>(
+      {
+         username: {
+            label: "Username *",
+            type: "text",
+            id: "username",
+            value: "",
+            error: null,
+            onChange: (event) => { handleInputChange(event, setUser); },
+         }, password: {
+            label: "Password *",
+            type: "password",
+            isPassword: true,
+            id: "password",
+            value: "",
+            error: null,
+            onChange: (event) => { handleInputChange(event, setUser); }
+         }, confirmPassword: {
+            label: "Confirm Password *",
+            type: "password",
+            isPassword: true,
+            id: "confirmPassword",
+            value: "",
+            error: null,
+            onChange: (event) => { handleInputChange(event, setUser); }
+         }, name: {
+            label: "Name *",
+            type: "text",
+            id: "name",
+            value: "",
+            error: null,
+            onChange: (event) => { handleInputChange(event, setUser); }
+         }, birthday: {
+            label: "Birthday *",
+            type: "date",
+            id: "birthday",
+            value: new Date(),
+            error: null,
+            onChange: (event) => { handleInputChange(event, setUser); }
+         },
+         email: {
+            label: "Email *",
+            type: "email",
+            id: "email",
+            value: "",
+            error: null,
+            onChange: (event) => { handleInputChange(event, setUser); }
+         }, phone: {
+            label: "Phone",
+            type: "tel",
+            id: "phone",
+            value: "",
+            error: null,
+            onChange: (event) => { handleInputChange(event, setUser); }
+         }
       });
 
-      setStatus((status: SubmissionStatus) => {
-         delete status.errors[id];
+   useEffect(() => {
+      setUser((inputs: FormRepresentation) => {
+         inputs["password"].setInput = inputs["confirmPassword"].setInput = setUser;
       });
-   };
+   }, []);
 
    const handleSubmit = async (event: FormEvent) => {
       event.preventDefault();
 
       try {
-         setStatus(await sendFeedback(feedback));
+         // await register(user)
       } catch (error) {
-         console.error("Error updating status:", error);
-         setStatus({ state: "Initial", response: {}, errors: {} });
+         console.log("Error updating status:", error);
       }
    };
 
    return (
-      <div className = "w-full mx-auto my-8">
+      <div className = "w-full mx-auto">
          <form
             className = "w-1/2 mx-auto flex flex-col justify-center align-center gap-3"
             onSubmit = {handleSubmit}
          >
-            <Input
-               label = "Name"
-               id = "name"
-               type = "text"
-               error = {status.errors.name?.[0] ?? null}
-               onChange = {handleChange}
-            />
-            <Input
-               label = "Email"
-               id = "email"
-               type = "email"
-               error = {status.errors.email?.[0] ?? null}
-               onChange = {handleChange}
-            />
-            <TextArea
-               label = "Message"
-               id = "message"
-               error = {status.errors.message?.[0] ?? null}
-               onChange = {handleChange}
-            />
-            {(
-               <Notification
-                  status = {status}
-               />
-            )}
-            {/* status.state !== 'Initial' && status.state !== 'Error' && */}
+            <Input {...user.username} />
+            <Input {...user.password} />
+            <Input {...user.confirmPassword} />
+            <Input {...user.name} />
+            <Input {...user.birthday} />
+            <Input {...user.email} />
+            <Input {...user.phone} />
             <Button
                type = "submit"
                className = "bg-primary text-white"
@@ -78,10 +106,10 @@ function Form (): JSX.Element {
    );
 }
 
-export default function FeedbackForm (): JSX.Element {
+export default function SignUpForm (): JSX.Element {
    return (
       <>
-         <div className = "w-full mx-auto flex items-center justify-center">
+         <div className = "w-full mx-auto flex flex-col items-center justify-center">
             <Heading
                title = "Sign up"
                description = "Create an account to get started"

@@ -1,11 +1,26 @@
 import { ChangeEvent } from "react";
+import { Updater } from "use-immer";
 
 export type InputState = {
    label: string;
-   type?: string;
+   type: string;
+   isPassword?: boolean;
    id: string;
-   error: string | null;
+   value: any;
+   error: any | null;
    onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+   setInput?: Updater<FormRepresentation>;
+};
+
+export type FormRepresentation = { [key: string]: InputState };
+
+export const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, setInputs: Updater<FormRepresentation> ) => {
+   const { id, value } = event.target;
+
+   setInputs((input: { [key: string]: InputState; }) => {
+      input[id].value = value;
+      input[id].error = null;
+   });
 };
 
 export type SubmissionStatus = {

@@ -28,6 +28,9 @@ export async function sendFeedback (feedback: Feedback): Promise<SubmissionStatu
    try {
       await prisma.$connect();
 
+      console.log("PASS");
+      return sendSuccessMessage("Successfully received your feedback!");
+
       // Add new feedback into the database for further improvement of the application
       await prisma.feedback.create({
          data: feedback
