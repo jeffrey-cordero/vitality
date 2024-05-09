@@ -1,5 +1,4 @@
-import { ChangeEvent } from "react";
-import { Updater } from "use-immer";
+export type FormItems = { [key: string]: InputState };
 
 export type InputState = {
    label: string;
@@ -8,10 +7,7 @@ export type InputState = {
    id: string;
    value: any;
    error: any | null;
-   setInputs?: Updater<FormRepresentation>;
 };
-
-export type FormRepresentation = { [key: string]: InputState };
 
 export type SubmissionStatus = {
    state: "Initial" | "Error" | "Success" | "Failure";

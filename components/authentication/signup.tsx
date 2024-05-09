@@ -1,15 +1,14 @@
 "use client";
-import { FormEvent, useEffect } from "react";
+import { FormEvent } from "react";
 import { useImmer } from "use-immer";
-import { FormRepresentation } from "@/lib/form";
-import { register, RegisterUser as User } from "@/lib/authentication";
+import { FormItems } from "@/lib/form";
+import { signUp, Registration } from "@/lib/signup";
 import Heading from "@/components/landing/heading";
 import { Input } from "@/components/global/form";
-import { Notification } from "@/components/global/notification";
 import Button from "@/components/global/button";
 
 function Form (): JSX.Element {
-   const [registration, setRegistration] = useImmer<FormRepresentation>(
+   const [registration, setRegistration] = useImmer<FormItems>(
       {
          username: {
             label: "Username *",
@@ -59,19 +58,11 @@ function Form (): JSX.Element {
          }
       });
 
-   useEffect(() => {
-      setRegistration((inputs: FormRepresentation) => {
-         Object.keys(inputs).forEach((input) => {
-            inputs[input].setInputs = setRegistration;
-         });
-      });
-   }, []);
-
    const handleSubmit = async (event: FormEvent) => {
       event.preventDefault();
 
       try {
-         const payload : User = {
+         const payload : Registration = {
             name: registration.name.value,
             birthday: new Date(registration.birthday.value),
             username: registration.username.value,
@@ -80,8 +71,8 @@ function Form (): JSX.Element {
             email: registration.email.value,
             phone: registration.phone.value,
          };
-         console.log(payload);
-         await register(payload);
+
+         await signUp(payload);
       } catch (error) {
          console.log("Error updating status:", error);
       }
@@ -90,13 +81,13 @@ function Form (): JSX.Element {
    return (
       <div className = "w-full mx-auto">
          <form className = "w-1/2 mx-auto flex flex-col justify-center align-center gap-3" onSubmit = {handleSubmit}>
-            <Input input = {registration.username} />
-            <Input input = {registration.password} />
-            <Input input = {registration.confirmPassword} />
-            <Input input = {registration.name} />
-            <Input input = {registration.birthday} />
-            <Input input = {registration.email} />
-            <Input input = {registration.phone} />
+            <Input input = {registration.username} setInputs = {setRegistration} />
+            <Input input = {registration.password} setInputs = {setRegistration} />
+            <Input input = {registration.confirmPassword} setInputs = {setRegistration} />
+            <Input input = {registration.name} setInputs = {setRegistration} />
+            <Input input = {registration.birthday} setInputs = {setRegistration} />
+            <Input input = {registration.email} setInputs = {setRegistration} />
+            <Input input = {registration.phone} setInputs = {setRegistration} />
             <Button type = "submit" className = "bg-primary text-white">
                Submit
             </Button>

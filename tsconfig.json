@@ -21,7 +21,7 @@
     ],
     "paths": {
       "@/*": ["./*"]
-    }
+    },
   },
   "include": [
     "next-env.d.ts",
@@ -30,6 +30,6 @@
     ".next/types/**/*.ts",
     "scripts/seed/data.js",
     "scripts/seed/seed.js"
-, "babel.config.js", "eslint.config.js"  ],
+, "eslint.config.js"  ],
   "exclude": ["node_modules"]
 }

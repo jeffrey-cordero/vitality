@@ -1,5 +1,4 @@
-import SignUpForm from "@/components/authentication/signup-form";
-import Heading from "@/components/landing/heading";
+import SignUpForm from "@/components/authentication/signup";
 
 export default function SignUpPage () {
    return (

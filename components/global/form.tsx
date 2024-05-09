@@ -1,12 +1,22 @@
 "use client";
 import clsx from "clsx";
 import { ChangeEvent, useRef } from "react";
-import { InputState, FormRepresentation } from "@/lib/form";
+import { InputState, FormItems } from "@/lib/form";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Updater } from "use-immer";
 
-export function Input ({ input } : {input: InputState}): JSX.Element {
+const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, setInputs: Updater<FormItems>) => {
+   const { id, value } = event.target;
+
+   setInputs((input: { [key: string]: InputState; }) => {
+      input[id].value = value;
+      input[id].error = null;
+   });
+};
+
+export function Input ({ input, setInputs } : {input: InputState, setInputs: Updater<FormItems>}): JSX.Element {
    const eyeButton = useRef<SVGSVGElement | null>(null);
 
    return (
@@ -22,14 +32,7 @@ export function Input ({ input } : {input: InputState}): JSX.Element {
                })}
             placeholder = ""
             onChange = {(event: ChangeEvent<HTMLInputElement>) => {
-               if (input.setInputs) {
-                  const { id, value } = event.target;
-
-                  input.setInputs((input: { [key: string]: InputState; }) => {
-                     input[id].value = value;
-                     input[id].error = null;
-                  });
-               }
+               handleChange(event, setInputs);
             }}
          />
          {input.isPassword &&
@@ -39,10 +42,10 @@ export function Input ({ input } : {input: InputState}): JSX.Element {
                   className = "flex-shrink-0 size-3.5"
                   ref = {eyeButton}
                   onClick = {() => {
-                     if (eyeButton.current != null && input.setInputs) {
+                     if (eyeButton.current !== null) {
                         eyeButton.current.style.color = input.type === "password" ? "blue" : "black";
 
-                        input.setInputs( (inputs: FormRepresentation) => {
+                        setInputs( (inputs: FormItems) => {
                            inputs[input.id].type = input.type === "password" ? "text" : "password";
                         });
                      }
@@ -67,7 +70,7 @@ export function Input ({ input } : {input: InputState}): JSX.Element {
    );
 }
 
-export function TextArea (input: InputState): JSX.Element {
+export function TextArea ({ input, setInputs } : {input: InputState, setInputs: Updater<FormItems>}): JSX.Element {
    const textArea = useRef<HTMLTextAreaElement | null>(null);
 
    const handleTextAreaOverflow = () => {
@@ -91,14 +94,8 @@ export function TextArea (input: InputState): JSX.Element {
                })}
             placeholder = ""
             onChange = {(event: ChangeEvent<HTMLTextAreaElement>) => {
-               if (input.setInputs) {
-                  const { id, value } = event.target;
-
-                  input.setInputs((input: { [key: string]: InputState; }) => {
-                     input[id].value = value;
-                     input[id].error = null;
-                  });
-               }
+               handleChange(event, setInputs);
+               handleTextAreaOverflow();
             }}
             ref = {textArea}
          />

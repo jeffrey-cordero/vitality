@@ -17,6 +17,7 @@
     "comma-spacing": "error",
     "spaced-comment": ["error", "always"],
     "space-before-function-paren": ["error", "always"],
-    "object-curly-spacing": ["error", "always"]
+    "object-curly-spacing": ["error", "always"],
+    "eqeqeq": "error"
   }
 }

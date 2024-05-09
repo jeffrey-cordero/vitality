@@ -1,14 +1,13 @@
 "use client";
-
 import { AtSymbolIcon, KeyIcon, ExclamationCircleIcon, } from "@heroicons/react/24/outline";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
 import Button from "@/components/global/button";
 import { useFormState } from "react-dom";
-import { authenticate } from "@/lib/authentication";
+import { logIn } from "@/lib/login";
 import { useEffect } from "react";
 
 export default function LoginForm () {
-   const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+   const [errorMessage, dispatch] = useFormState(logIn, undefined);
 
    useEffect(() => {
       console.log(errorMessage);

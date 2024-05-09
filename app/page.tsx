@@ -1,4 +1,3 @@
-import Header from "@/components/landing/header";
 import Journey from "@/components/landing/journey";
 import Highlights from "@/components/landing/highlights";
 import Services from "@/components/landing/circle";

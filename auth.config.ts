@@ -4,7 +4,6 @@ export const authConfig = {
   pages: {
     signIn: '/login',
   },
-//   This will prevent users from accessing the dashboard pages unless they are logged in.
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
@@ -18,5 +17,5 @@ export const authConfig = {
       return true;
     },
   },
-  providers: [], // Add providers with an empty array for now
+  providers: [],
 } satisfies NextAuthConfig;

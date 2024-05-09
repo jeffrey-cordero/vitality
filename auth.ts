@@ -3,7 +3,7 @@ import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
 import { PrismaClient, User } from '@prisma/client';
 import { z } from 'zod';
-import bcrypt from 'bcryptjs';
+import { bcrypt } from "bcryptjs";
 
 async function getUser(email: string): Promise<User | null> {
   const prisma = new PrismaClient();
@@ -42,11 +42,11 @@ export const { auth, signIn, signOut } = NextAuth({
           
           let hashedPassword : string | null = null;
 
-          bcrypt.hash(user.password, 10, function(error, password) {
+          bcrypt.hash(user.password, 10, function(error : Error, password : string) {
             if (!(error)) {
-              hashedPassword = password;
+               hashedPassword = password;
             }
-          });
+         });
 
           if (hashedPassword === null) {
             return null;
@@ -54,11 +54,11 @@ export const { auth, signIn, signOut } = NextAuth({
 
           let matched : boolean = false
 
-          bcrypt.compare(password, hashedPassword, function(error, match) {
+          bcrypt.compare(password, hashedPassword, function(error: Error, match: boolean) {
             if (!(error)) {
               matched = match;
             }
-        });
+          });
  
           if (matched) {
             return user;
