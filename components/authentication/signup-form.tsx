@@ -1,7 +1,7 @@
 "use client";
 import { FormEvent, useEffect } from "react";
 import { useImmer } from "use-immer";
-import { InputState, FormRepresentation, handleInputChange } from "@/lib/form";
+import { FormRepresentation } from "@/lib/form";
 import { register, RegisterUser as User } from "@/lib/authentication";
 import Heading from "@/components/landing/heading";
 import { Input } from "@/components/global/form";
@@ -17,7 +17,6 @@ function Form (): JSX.Element {
             id: "username",
             value: "",
             error: null,
-            onChange: (event) => { handleInputChange(event, setUser); },
          }, password: {
             label: "Password *",
             type: "password",
@@ -25,7 +24,6 @@ function Form (): JSX.Element {
             id: "password",
             value: "",
             error: null,
-            onChange: (event) => { handleInputChange(event, setUser); }
          }, confirmPassword: {
             label: "Confirm Password *",
             type: "password",
@@ -33,21 +31,18 @@ function Form (): JSX.Element {
             id: "confirmPassword",
             value: "",
             error: null,
-            onChange: (event) => { handleInputChange(event, setUser); }
          }, name: {
             label: "Name *",
             type: "text",
             id: "name",
             value: "",
             error: null,
-            onChange: (event) => { handleInputChange(event, setUser); }
          }, birthday: {
             label: "Birthday *",
             type: "date",
             id: "birthday",
-            value: new Date(),
+            value: "",
             error: null,
-            onChange: (event) => { handleInputChange(event, setUser); }
          },
          email: {
             label: "Email *",
@@ -55,20 +50,20 @@ function Form (): JSX.Element {
             id: "email",
             value: "",
             error: null,
-            onChange: (event) => { handleInputChange(event, setUser); }
          }, phone: {
             label: "Phone",
             type: "tel",
             id: "phone",
             value: "",
             error: null,
-            onChange: (event) => { handleInputChange(event, setUser); }
          }
       });
 
    useEffect(() => {
       setUser((inputs: FormRepresentation) => {
-         inputs["password"].setInput = inputs["confirmPassword"].setInput = setUser;
+         Object.keys(inputs).forEach((input) => {
+            inputs[input].setInputs = setUser;
+         });
       });
    }, []);
 
@@ -76,7 +71,19 @@ function Form (): JSX.Element {
       event.preventDefault();
 
       try {
-         // await register(user)
+         const data : User = {
+            name: "",
+            birthday: "",
+            username: "",
+            password: "",
+            email: "",
+         };
+
+         Object.keys(user).forEach((input) => {
+            data[input] = user[input].value;
+         });
+
+         await register(data);
       } catch (error) {
          console.log("Error updating status:", error);
       }
@@ -88,13 +95,13 @@ function Form (): JSX.Element {
             className = "w-1/2 mx-auto flex flex-col justify-center align-center gap-3"
             onSubmit = {handleSubmit}
          >
-            <Input {...user.username} />
-            <Input {...user.password} />
-            <Input {...user.confirmPassword} />
-            <Input {...user.name} />
-            <Input {...user.birthday} />
-            <Input {...user.email} />
-            <Input {...user.phone} />
+            <Input input = {user.username} />
+            <Input input = {user.password} />
+            <Input input = {user.confirmPassword} />
+            <Input input = {user.name} />
+            <Input input = {user.birthday} />
+            <Input input = {user.email} />
+            <Input input = {user.phone} />
             <Button
                type = "submit"
                className = "bg-primary text-white"

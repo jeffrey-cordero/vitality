@@ -8,20 +8,10 @@ export type InputState = {
    id: string;
    value: any;
    error: any | null;
-   onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-   setInput?: Updater<FormRepresentation>;
+   setInputs?: Updater<FormRepresentation>;
 };
 
 export type FormRepresentation = { [key: string]: InputState };
-
-export const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, setInputs: Updater<FormRepresentation> ) => {
-   const { id, value } = event.target;
-
-   setInputs((input: { [key: string]: InputState; }) => {
-      input[id].value = value;
-      input[id].error = null;
-   });
-};
 
 export type SubmissionStatus = {
    state: "Initial" | "Error" | "Success" | "Failure";
