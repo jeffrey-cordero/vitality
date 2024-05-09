@@ -9,7 +9,7 @@ import { Notification } from "@/components/global/notification";
 import Button from "@/components/global/button";
 
 function Form (): JSX.Element {
-   const [user, setUser] = useImmer<FormRepresentation>(
+   const [registration, setRegistration] = useImmer<FormRepresentation>(
       {
          username: {
             label: "Username *",
@@ -60,9 +60,9 @@ function Form (): JSX.Element {
       });
 
    useEffect(() => {
-      setUser((inputs: FormRepresentation) => {
+      setRegistration((inputs: FormRepresentation) => {
          Object.keys(inputs).forEach((input) => {
-            inputs[input].setInputs = setUser;
+            inputs[input].setInputs = setRegistration;
          });
       });
    }, []);
@@ -71,19 +71,17 @@ function Form (): JSX.Element {
       event.preventDefault();
 
       try {
-         const data : User = {
-            name: "",
-            birthday: "",
-            username: "",
-            password: "",
-            email: "",
+         const payload : User = {
+            name: registration.name.value,
+            birthday: new Date(registration.birthday.value),
+            username: registration.username.value,
+            password: registration.password.value,
+            confirmPassword: registration.confirmPassword.value,
+            email: registration.email.value,
+            phone: registration.phone.value,
          };
-
-         Object.keys(user).forEach((input) => {
-            data[input] = user[input].value;
-         });
-
-         await register(data);
+         console.log(payload);
+         await register(payload);
       } catch (error) {
          console.log("Error updating status:", error);
       }
@@ -91,21 +89,15 @@ function Form (): JSX.Element {
 
    return (
       <div className = "w-full mx-auto">
-         <form
-            className = "w-1/2 mx-auto flex flex-col justify-center align-center gap-3"
-            onSubmit = {handleSubmit}
-         >
-            <Input input = {user.username} />
-            <Input input = {user.password} />
-            <Input input = {user.confirmPassword} />
-            <Input input = {user.name} />
-            <Input input = {user.birthday} />
-            <Input input = {user.email} />
-            <Input input = {user.phone} />
-            <Button
-               type = "submit"
-               className = "bg-primary text-white"
-            >
+         <form className = "w-1/2 mx-auto flex flex-col justify-center align-center gap-3" onSubmit = {handleSubmit}>
+            <Input input = {registration.username} />
+            <Input input = {registration.password} />
+            <Input input = {registration.confirmPassword} />
+            <Input input = {registration.name} />
+            <Input input = {registration.birthday} />
+            <Input input = {registration.email} />
+            <Input input = {registration.phone} />
+            <Button type = "submit" className = "bg-primary text-white">
                Submit
             </Button>
          </form>
@@ -117,10 +109,7 @@ export default function SignUpForm (): JSX.Element {
    return (
       <>
          <div className = "w-full mx-auto flex flex-col items-center justify-center">
-            <Heading
-               title = "Sign up"
-               description = "Create an account to get started"
-            />
+            <Heading title = "Sign up" description = "Create an account to get started"/>
             <Form />
          </div>
       </>

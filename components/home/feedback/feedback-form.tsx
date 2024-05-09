@@ -16,6 +16,7 @@ function Form (): JSX.Element {
       event.preventDefault();
 
       try {
+         // TODO - construct valid payload
          setStatus(await sendFeedback(feedback));
       } catch (error) {
          console.log("Error updating status:", error);
