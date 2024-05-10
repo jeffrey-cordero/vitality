@@ -20,7 +20,6 @@ export type Registration = {
   phone?: string;
 };
 
-//TODO --> Fix password verification for longer passwords and password matching for confirmation
 const registrationSchema = z
    .object({
       name: z
@@ -43,25 +42,17 @@ const registrationSchema = z
          .string()
          .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/, {
             message:
-          "A password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character",
-         }),
-      confirmPassword: z
-         .string()
-         .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/, {
-            message:
-          "A password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character",
+          "A password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character (@$!%*#?&)",
          }),
       email: z.string().trim().email({ message: "A valid email is required" }),
       phone: z
          .string()
+         .trim()
          .refine(validator.isMobilePhone, {
-            message: "A valid phone is required if provided",
+            message:
+              "A valid phone is required if provided",
          })
-         .optional(),
-   })
-   .refine((input) => input.password === input.confirmPassword, {
-      message: "Passwords don't match",
-      path: ["confirmPassword"],
+         .optional()
    });
 
 export async function signup (
@@ -70,11 +61,17 @@ export async function signup (
 ): Promise<SubmissionStatus> {
    const fields = registrationSchema.safeParse(registration);
 
-   if (!fields.success) {
+   if (!(fields.success)) {
       return sendErrorMessage(
          "Error",
          "Invalid user registration fields.",
          fields.error.flatten().fieldErrors,
+      );
+   } else if (!(registration.password === registration.confirmPassword)) {
+      return sendErrorMessage(
+         "Error",
+         "Invalid user registration fields.",
+         { password: ["Passwords do not match"], confirmPassword: ["Passwords do not match"] },
       );
    }
 
@@ -98,7 +95,7 @@ export async function signup (
          userRegistration["phone"] = registration.phone;
       }
 
-      if (!testing) {
+      if (!(testing)) {
          await prisma.$connect();
 
          await prisma.users.create({
@@ -120,6 +117,10 @@ export async function signup (
          return sendErrorMessage("Error", "Internal database conflicts", { phone : ["Phone number already taken"] });
       } else {
          return sendErrorMessage("Failure", error.message);
+      }
+   } finally {
+      if (!(testing)) {
+         prisma.$disconnect();
       }
    }
 }

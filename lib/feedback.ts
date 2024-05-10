@@ -31,6 +31,7 @@ export async function sendFeedback (feedback: Feedback): Promise<SubmissionStatu
       return sendSuccessMessage("Successfully received your feedback!");
 
       // Add new feedback into the database for further improvement of the application
+      // TODO --> Account for testing
       await prisma.feedback.create({
          data: feedback
       });

@@ -2,10 +2,13 @@
 import { FormEvent } from "react";
 import { useImmer } from "use-immer";
 import { FormItems } from "@/lib/form";
+import { login } from "@/lib/login";
 import { signup, Registration } from "@/lib/signup";
 import Heading from "@/components/landing/heading";
 import { Input } from "@/components/global/form";
 import Button from "@/components/global/button";
+
+
 
 function Form (): JSX.Element {
    const [registration, setRegistration] = useImmer<FormItems>(
@@ -72,15 +75,41 @@ function Form (): JSX.Element {
             phone: registration.phone.value,
          };
 
+         if (payload.phone === "") {
+            delete payload.phone;
+         }
+
          const response = await signup(payload);
-         
+
+         const errors = {}
+
+         // Show error inputs
          for (const error of Object.keys(response.errors)) {
+            errors[error] = true;
             setRegistration((registration) => {
                registration[error].error = response.errors[error][0];
             });
          }
 
-         console.error(response.errors);
+         // Hide fixed error inputs
+         for (const input of Object.keys(registration)) {
+            if (!(errors[input]) && registration[input].error !== null) {
+               setRegistration((registration) => {
+                  registration[input].error = null;
+               });
+            }
+         }
+
+         // Login successfully registered users
+         // TODO -> Use props for login and show notification to user
+         const userCredentials = new FormData();
+         userCredentials.append("username", payload.name.trim());
+         userCredentials.append("password", payload.password);
+
+         if (response.state === "Success") {
+            await login("credentials", userCredentials);
+         }
+
       } catch (error) {
          console.error("Error updating status:", error);
       }
