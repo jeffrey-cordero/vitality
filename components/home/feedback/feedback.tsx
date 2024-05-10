@@ -16,10 +16,10 @@ function Form (): JSX.Element {
       event.preventDefault();
 
       try {
-         // TODO - construct valid payload
+         // TODO - construct valid payload and fix handling state
          setStatus(await sendFeedback(feedback));
       } catch (error) {
-         console.log("Error updating status:", error);
+         console.error("Error updating status:", error);
          setStatus({ state: "Initial", response: {}, errors: {} });
       }
    };

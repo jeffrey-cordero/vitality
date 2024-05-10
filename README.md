@@ -71,7 +71,7 @@ docker exec -it vitality_postgres psql -U postgres -d vitality
 Through the Prisma ORM.
 
 ``` bash
-npx prisma studio
+docker exec -it vitality_app npx prisma studio
 ```
 
 ### Database migrations
@@ -81,6 +81,8 @@ npx prisma studio
 
 ``` bash
 docker exec -it vitality_app npx prisma migrate dev --name <migration-name>
+OR
+docker exec -it vitality_app npx prisma db pull 
 ```
 
 ## Testing
@@ -98,7 +100,6 @@ npm run test
 ```bash
 npx cypress open
 ```
-
 
 ## Linting
 

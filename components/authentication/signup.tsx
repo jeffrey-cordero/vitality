@@ -2,7 +2,7 @@
 import { FormEvent } from "react";
 import { useImmer } from "use-immer";
 import { FormItems } from "@/lib/form";
-import { signUp, Registration } from "@/lib/signup";
+import { signup, Registration } from "@/lib/signup";
 import Heading from "@/components/landing/heading";
 import { Input } from "@/components/global/form";
 import Button from "@/components/global/button";
@@ -72,9 +72,17 @@ function Form (): JSX.Element {
             phone: registration.phone.value,
          };
 
-         await signUp(payload);
+         const response = await signup(payload);
+         
+         for (const error of Object.keys(response.errors)) {
+            setRegistration((registration) => {
+               registration[error].error = response.errors[error][0];
+            });
+         }
+
+         console.error(response.errors);
       } catch (error) {
-         console.log("Error updating status:", error);
+         console.error("Error updating status:", error);
       }
    };
 

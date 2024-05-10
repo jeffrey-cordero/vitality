@@ -10,7 +10,7 @@ export default function LoginForm () {
    const [errorMessage, dispatch] = useFormState(logIn, undefined);
 
    useEffect(() => {
-      console.log(errorMessage);
+      console.error(errorMessage);
    }, [errorMessage]);
 
    return (

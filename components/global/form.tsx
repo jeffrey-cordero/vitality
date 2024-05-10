@@ -61,7 +61,7 @@ export function Input ({ input, setInputs } : {input: InputState, setInputs: Upd
             {input.label}
          </label>
          {input.error !== null &&
-            <div className = "flex justify-center align-center gap-2 p-3 opacity-0 animate-fadeIn">
+            <div className = "flex justify-center align-center max-w-[40rem] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
                <ExclamationCircleIcon className = "h-5 w-5 mt-[2px] text-red-500" />
                <p className = "text-red-500"> {input.error} </p>
             </div>

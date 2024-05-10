@@ -23,10 +23,10 @@ export function sendSuccessMessage (message: string, data?: any): SubmissionStat
    };
 }
 
-export function sendErrorMessage (status: "Error" | "Failure", errors?: { [key: string]: string[] }): SubmissionStatus {
+export function sendErrorMessage (status: "Error" | "Failure", message: string, errors?: { [key: string]: string[] }): SubmissionStatus {
    return {
       state: status,
-      response: { message: "Unknown error has occurred when processing your request. Please try again." },
-      errors: errors ? errors : { "system" : ["Unknown error has occurred when processing your request. Please try again."] }
+      response: { message: message },
+      errors: errors ? errors : { "System" : ["Unknown error has occurred when processing your request. Please try again."] }
    };
 }

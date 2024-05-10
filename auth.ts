@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient, Users as User } from '@prisma/client';
 import { z } from 'zod';
 import { bcrypt } from "bcryptjs";
 
@@ -10,7 +10,7 @@ async function getUser(email: string): Promise<User | null> {
 
   try {
     await prisma.$connect();
-    const user = prisma.user.findFirst({
+    const user = prisma.users.findFirst({
       where: {
         email: email
       }
@@ -32,6 +32,7 @@ export const { auth, signIn, signOut } = NextAuth({
           .object({ email: z.string().email(), password: z.string().min(6) })
           .safeParse(credentials);
 
+        // TODO --> Use shared return messages
         if (parsedCredentials.success) {
           const { email, password } = parsedCredentials.data;
           const user = await getUser(email);
@@ -40,32 +41,18 @@ export const { auth, signIn, signOut } = NextAuth({
             return null;
           }
           
-          let hashedPassword : string | null = null;
-
-          bcrypt.hash(user.password, 10, function(error : Error, password : string) {
-            if (!(error)) {
-               hashedPassword = password;
-            }
-         });
+          const hashedPassword =  await bcrypt.hash(user.password, (await bcrypt.genSalt(10)));
 
           if (hashedPassword === null) {
             return null;
           }
-
-          let matched : boolean = false
-
-          bcrypt.compare(password, hashedPassword, function(error: Error, match: boolean) {
-            if (!(error)) {
-              matched = match;
-            }
-          });
  
-          if (matched) {
+          if (password === hashedPassword) {
             return user;
           }
         }
         
-        console.log('Invalid credentials');
+        console.error('Invalid credentials');
         return null;
       },
     }),

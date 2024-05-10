@@ -10,8 +10,6 @@ export function Notification ({ status }: { status: SubmissionStatus }): JSX.Ele
    const color = status.state === "Success" || 1 ? "green-400" : "red-400";
    const icon = status.state === "Success" ? faCircleCheck : faTriangleExclamation;
 
-   console.log(`border-l-${color}`);
-
    return (
       <>
          {
