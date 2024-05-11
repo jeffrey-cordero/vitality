@@ -7,15 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            Int      @id @default(autoincrement())
+model Users {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String   @db.VarChar(255)
   birthday      DateTime @db.Date
   username      String   @unique @db.VarChar(30)
   password      String
   email         String   @unique
   emailverified Boolean  @default(false)
-  phone         String?  @unique @db.VarChar(20)
+  phone         String?  @unique @db.VarChar(22)
   phoneverified Boolean? @default(false)
 }
 
@@ -26,7 +26,7 @@ model VerificationToken {
 }
 
 model Feedback {
-  id      Int    @id @default(autoincrement())
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name    String @db.VarChar(255)
   email   String @db.VarChar(255)
   message String

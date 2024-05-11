@@ -1,4 +1,4 @@
-import Heading from "@/components/landing/heading";
+import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 import Circle from "@/components/landing/spinner";
 

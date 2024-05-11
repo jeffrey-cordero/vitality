@@ -1,9 +1,5 @@
-
-
-
 export default function Footer (): JSX.Element {
    const year = new Date().getFullYear();
-
    return (
       <footer className = "w-full mt-8">
          <div className = "mx-auto w-full max-w-screen-xl">
@@ -115,6 +111,5 @@ export default function Footer (): JSX.Element {
             </div>
          </div>
       </footer>
-
    );
 }

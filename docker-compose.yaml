@@ -6,7 +6,6 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-      - ./.env:/app/.env
     networks:
       - vitality_network
     ports:
@@ -16,7 +15,7 @@ services:
       - postgres
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
-      interval: 30s
+      interval: 60s
       timeout: 10s
       retries: 3
     restart: always
@@ -40,7 +39,7 @@ services:
       - app
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 30s
+      interval: 60s
       timeout: 10s
       retries: 3
     restart: always
@@ -66,7 +65,7 @@ services:
       - "5432:5432"
     healthcheck:
        test: ['CMD', 'pg_isready', '-U', 'postgres', '-d', 'vitality']
-       interval: 5s
+       interval: 60s
        timeout: 5s
        retries: 5
     restart: always

@@ -1,6 +1,6 @@
 # Vitality
 
-Your all-in-one modern fitness tracker for progress and performance to fuel your fitness goals.
+Your all-in-one modern fitness tracker for progress and performance to fuel your fitness goals. A current work in progress. Feel free to use any of the related code for your own projects!
 
 ## Development
 
@@ -25,7 +25,7 @@ To restart completely by clearing all associated containers, networks, and volum
 docker compose down -v --remove-orphans 
 ```
 
-The application can be accessed [http://localhost:3000/](http://localhost:3000/), which represents output from the NextJS container. For a production-like environment, you can visit [http://localhost/](http://localhost/), which represents output from the Nginx container to mimic the Nginx Server on the production machine, crucial for optimized content delivery. The Nginx service can be commented it out in `docker-compose.yaml` to save resources.
+The application can be accessed [http://localhost:3000/](http://localhost:3000/), which represents output from the app container. For a production-like environment, you can visit [http://localhost/](http://localhost/), which represents output from the Nginx container to mimic the Nginx Server on the production machine, crucial for optimized content delivery. The Nginx service can be commented it out in `docker-compose.yaml` to save resources.
 
 ### Logs
 
@@ -60,7 +60,7 @@ services:
             ...
 ```
 
-There are 2 ways to currently access the database for viewing current state or making adjustments to records.
+There are 2 ways to currently access the database for viewing current state or making adjustments to records manually.
 
 Through the docker container.
 
@@ -71,7 +71,7 @@ docker exec -it vitality_postgres psql -U postgres -d vitality
 Through the Prisma ORM.
 
 ``` bash
-npx prisma studio
+docker exec -it vitality_app npx prisma studio
 ```
 
 ### Database migrations
@@ -90,7 +90,7 @@ docker exec -it vitality_app npx prisma migrate dev --name <migration-name>
 Run all unit tests.
 
 ```bash
-npx jest  
+npm run test  
 ```
 
 ### Cypress
@@ -99,9 +99,8 @@ npx jest
 npx cypress open
 ```
 
-
 ## Linting
 
 ```bash
-npx next lint OR npx next lint --fix
+npx next lint --fix
 ```
