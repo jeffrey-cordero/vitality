@@ -34,50 +34,11 @@ const config: Config = {
         to: {
           opacity: "1",
         },
-      },
-      fadeOut: {
-        from: {
-          opacity: "1",
-        },
-        to: {
-          opacity: "0",
-        },
-      },
-      notificationIn: {
-        from: {
-          position: "fixed",
-          top: "-100%", 
-          left: "50%",
-          transform: "translateX(-50%) translateY(-50%)",
-        },
-        to: {
-          position: "fixed",
-          top: "6.5rem", 
-          left: "50%",
-          transform: "translateX(-50%) translateY(-50%)",
-        },
-      },
-    },
-    notificationOut: {
-      from: {
-        position: "fixed",
-        top: "7.5rem", 
-        left: "50%",
-        transform: "translateX(-50%) translateY(-50%)",
-      },
-      to: {
-        position: "fixed",
-        top: "-15rem", 
-        left: "50%",
-        transform: "translateX(-50%) translateY(-50%)",
-      },
+      }
     },
     animation: {
       slideIn: "slideIn 1s ease-in-out 300ms",
       fadeIn: "fadeIn 1s ease-in-out 300ms forwards",
-      fadeOut: "fadeOut 1s ease-in-out 300ms forwards",
-      notificationIn: "notificationIn 1.5s ease-in-out 300ms forwards",
-      notificationOut: "notificationOut 1.5s ease-in-out 300ms forwards",
     }
   },
   plugins: [require('@tailwindcss/forms')],

@@ -1,23 +1,27 @@
-import Heading from "@/components/landing/heading";
+import Heading from "@/components/global/heading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { faPaintbrush, faCode, faChartColumn } from "@fortawesome/free-solid-svg-icons";
 
-function Card ({ icon, title, description }: { icon: IconProp, title: string, description: string }): JSX.Element {
+interface CardProps {
+   icon: IconProp;
+   title: string;
+   description: string;
+}
+
+function Card (props: CardProps): JSX.Element {
    return (
-      <div className = "w-[21rem] h-[35rem] text-center rounded-2xl border border-gray-200 bg-white shadow-md hover:scale-[1.05] transition duration-300 ease-in-out">
+      <div className = "w-[21rem] h-[25rem] text-center rounded-2xl border border-gray-200 bg-white shadow-md hover:scale-[1.05] transition duration-300 ease-in-out">
          <div className = "flex flex-col text-center justify-between align-center gap-8 py-16 px-12 text-black">
             <div>
-               <FontAwesomeIcon icon = {icon} className = "text-4xl text-primary" />
-               <h1 className = "font-semibold text-3xl text-primary mt-8">{title}</h1>
+               <FontAwesomeIcon icon = {props.icon} className = "text-4xl text-primary" />
+               <h1 className = "font-semibold text-3xl text-primary mt-8">{props.title}</h1>
             </div>
             <div>
-               <p className = "font-medium text-slate-500">{description}</p>
+               <p className = "font-medium text-slate-500">{props.description}</p>
             </div>
          </div>
-
       </div>
-
    );
 }
 

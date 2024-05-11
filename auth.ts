@@ -3,16 +3,17 @@ import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
 import { PrismaClient, Users as User } from '@prisma/client';
 import { z } from 'zod';
-import { bcrypt } from "bcryptjs";
+import bcrypt from "bcryptjs";
 
-async function getUser(email: string): Promise<User | null> {
+export async function getUser(username: string): Promise<User | null> {
   const prisma = new PrismaClient();
 
   try {
     await prisma.$connect();
-    const user = prisma.users.findFirst({
+
+    const user = await prisma.users.findFirst({
       where: {
-        email: email
+        username: username
       }
     });
 
@@ -20,6 +21,8 @@ async function getUser(email: string): Promise<User | null> {
   } catch (error) {
     console.error('Failed to fetch user:', error);
     throw new Error('Failed to fetch user.');
+  } finally {
+    prisma.$disconnect();
   }
 }
 
@@ -29,25 +32,20 @@ export const { auth, signIn, signOut } = NextAuth({
     Credentials({
       async authorize(credentials): Promise<any> {
         const parsedCredentials = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
+          .object({ username: z.string().trim(), password: z.string() })
           .safeParse(credentials);
 
-        // TODO --> Use shared return messages
         if (parsedCredentials.success) {
-          const { email, password } = parsedCredentials.data;
-          const user = await getUser(email);
+          const { username, password } = parsedCredentials.data;
+          const user = await getUser(username);
 
           if (!(user)) {
             return null;
           }
-          
-          const hashedPassword =  await bcrypt.hash(user.password, (await bcrypt.genSalt(10)));
 
-          if (hashedPassword === null) {
-            return null;
-          }
- 
-          if (password === hashedPassword) {
+          const validCredentials = await bcrypt.compare(password, user.password);
+
+          if (validCredentials) {
             return user;
           }
         }

@@ -1,16 +1,22 @@
-import { useState } from "react";
+"use client";
 import clsx from "clsx";
+import { useState } from "react";
 
-export default function Carousel ({ items, columns }: { items: JSX.Element[], columns: number }): JSX.Element {
+interface CarouselProps {
+   items: JSX.Element[];
+   columns: number;
+}
+
+export default function Carousel (props: CarouselProps): JSX.Element {
    const [currentIndex, setCurrentIndex] = useState(1);
-   const columnWidth = columns * 100;
+   const columnWidth = props.columns * 100;
 
    const nextSlide = () => {
-      setCurrentIndex((currentIndex + (100 / columnWidth)) % items.length);
+      setCurrentIndex((currentIndex + (100 / columnWidth)) % props.items.length);
    };
 
    const prevSlide = () => {
-      setCurrentIndex((currentIndex - (100 / columnWidth) + items.length) % items.length);
+      setCurrentIndex((currentIndex - (100 / columnWidth) + props.items.length) % props.items.length);
    };
 
    return (
@@ -18,10 +24,10 @@ export default function Carousel ({ items, columns }: { items: JSX.Element[], co
          <div
             className = "carousel-inner flex transition-[opacity,transform] ease-in-out duration-500"
             style = {{
-               transform: `translateX(-${currentIndex * columnWidth}%)`
+               transform: `translateX(-${currentIndex * columnWidth}%)`,
             }}
          >
-            {items.map((slide, index) => (
+            {props.items.map((slide, index) => (
                <div
                   key = {index}
                   className = {clsx("carousel-item flex-shrink-0", {
@@ -34,8 +40,6 @@ export default function Carousel ({ items, columns }: { items: JSX.Element[], co
                </div>
             ))}
          </div>
-
-
          <div className = "carousel-buttons">
             <button type = "button" className = "absolute top-0 -translate-x-1/2 start-0 z-10 flex items-center justify-center h-full px-2 cursor-pointer group focus:outline-none overflow-visible" onClick = {prevSlide}>
                <span className = "inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">

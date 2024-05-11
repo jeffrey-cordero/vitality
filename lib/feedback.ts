@@ -12,7 +12,7 @@ export interface Feedback {
 const feedbackSchema = z.object({
    name: z.string().trim().min(1, { message: "A valid name is required." }),
    email: z.string().trim().email({ message: "A valid email is required." }),
-   message: z.string().trim().min(1, { message: "Message is required." })
+   message: z.string().trim().min(1, { message: "Message is required." }),
 });
 // TODO --> Specific response messages, form field trimming
 export async function sendFeedback (feedback: Feedback): Promise<SubmissionStatus>  {
@@ -33,7 +33,7 @@ export async function sendFeedback (feedback: Feedback): Promise<SubmissionStatu
       // Add new feedback into the database for further improvement of the application
       // TODO --> Account for testing
       await prisma.feedback.create({
-         data: feedback
+         data: fields.data,
       });
 
       return sendSuccessMessage("Successfully received your feedback!");

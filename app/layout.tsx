@@ -1,5 +1,5 @@
 import "./global.css";
-import Header from "@/components/landing/header";
+import Header from "@/components/global/header";
 import { sfPro, inter } from "./fonts";
 import cx from "classnames";
 

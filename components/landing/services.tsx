@@ -1,5 +1,5 @@
 import cx from "classnames";
-import Heading from "@/components/landing/heading";
+import Heading from "@/components/global/heading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { faDumbbell } from "@fortawesome/free-solid-svg-icons";
@@ -9,18 +9,25 @@ import { faBottleWater } from "@fortawesome/free-solid-svg-icons";
 import { faBullseye } from "@fortawesome/free-solid-svg-icons";
 import { faBrain } from "@fortawesome/free-solid-svg-icons";
 
-function Service ({ icon, title, background, color, divider }: { icon: IconProp, title: string, background: string, color: string, divider: string }): JSX.Element {
+interface ServiceProps {
+   icon: IconProp;
+   title: string;
+   background: string;
+   color: string;
+   divider: string;
+}
+
+function Service (props: ServiceProps): JSX.Element {
    return (
-      <div className = {cx(background, color, "flex flex-col align-center justify-center gap-5 text-center rounded-2xl hover:cursor-pointer hover:scale-[1.05] transition duration-300 ease-in-out border border-gray-200 shadow-md p-5 w-[18rem] h-[18rem] mx-auto")}>
-         <FontAwesomeIcon icon = {icon} className = {cx(color, "text-4xl")} />
-         <div className = {cx(divider, "w-1/2 mx-auto my-1")} />
-         <h1 className = "font-semibold text-4xl">{title}</h1>
+      <div className = {cx(props.background, props.color, "flex flex-col align-center justify-center gap-5 text-center rounded-2xl hover:cursor-pointer hover:scale-[1.05] transition duration-300 ease-in-out border border-gray-200 shadow-md p-5 w-[18rem] h-[18rem] mx-auto")}>
+         <FontAwesomeIcon icon = {props.icon} className = {cx(props.color, "text-4xl")} />
+         <div className = {cx(props.divider, "w-1/2 mx-auto my-1")} />
+         <h1 className = "font-semibold text-4xl">{props.title}</h1>
       </div>
    );
 }
 
 export default function Services (): JSX.Element {
-
    return (
       <div className = "w-full mx-auto my-4">
          <Heading

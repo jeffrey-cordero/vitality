@@ -1,11 +1,12 @@
 "use client";
 import { FormEvent } from "react";
 import { useImmer } from "use-immer";
-import { SubmissionStatus, handleFormChange } from "@/lib/form";
+import { SubmissionStatus, update } from "@/lib/form";
 import { sendFeedback, Feedback } from "@/lib/feedback";
-import Heading from "@/components/landing/heading";
-import { Input, TextArea } from "@/components/global/form";
-import { Notification } from "@/components/global/notification";
+import Input from "@/components/global/input";
+import TextArea from "@/components/global/textarea";
+import Notification from "@/components/global/notification";
+import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 
 function Form (): JSX.Element {
@@ -35,20 +36,20 @@ function Form (): JSX.Element {
                id = "name"
                type = "text"
                error = {status.errors.name?.[0] ?? null}
-               onChange = {(event) => {handleFormChange(event, setFeedback, setStatus); } }
+               onChange = {(event) => {update(event, setFeedback, setStatus); } }
             />
             <Input
                label = "Email"
                id = "email"
                type = "email"
                error = {status.errors.email?.[0] ?? null}
-               onChange = {(event) => {handleFormChange(event, setFeedback, setStatus); } }
+               onChange = {(event) => {update(event, setFeedback, setStatus); } }
             />
             <TextArea
                label = "Message"
                id = "message"
                error = {status.errors.message?.[0] ?? null}
-               onChange = {(event) => {handleFormChange(event, setFeedback, setStatus); } }
+               onChange = {(event) => {update(event, setFeedback, setStatus); } }
             />
             {status.state !== "Initial" && status.state !== "Error" && (
                <Notification

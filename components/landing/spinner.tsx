@@ -2,18 +2,15 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-function Counter ({
-   value,
-   className,
-   start = 0,
-   duration = 800,
-}: {
+interface CounterProps {
    value: number;
    className: string;
-   start?: number;
-   duration?: number;
-}) {
-   const [count, setCount] = useState<number>(start);
+   start: number;
+   duration: number;
+}
+
+function Counter (props: CounterProps): JSX.Element {
+   const [count, setCount] = useState<number>(props.start);
    const easeOutQuad = (t: number, b: number, c: number, d: number) => {
       t = t > d ? d : t / d;
       return Math.round(-c * t * (t - 2) + b);
@@ -24,22 +21,22 @@ function Counter ({
       const animateCount = (timestamp: number) => {
          if (!startTime) startTime = timestamp;
          const timePassed = timestamp - startTime;
-         const progress = timePassed / duration;
-         const currentCount = easeOutQuad(progress, 0, value, 1);
-         if (currentCount >= value) {
-            setCount(value);
+         const progress = timePassed / props.duration;
+         const currentCount = easeOutQuad(progress, 0, props.value, 1);
+         if (currentCount >= props.value) {
+            setCount(props.value);
             return;
          }
          setCount(currentCount);
          requestAnimationFrame(animateCount);
       };
       requestAnimationFrame(animateCount);
-   }, [value, duration]);
+   }, [props.value, props.duration]);
 
-   return <p className = {className}>{Intl.NumberFormat().format(count)}</p>;
+   return <p className = {props.className}>{Intl.NumberFormat().format(count)}</p>;
 }
 
-export default function Circle () {
+export default function Circle (): JSX.Element {
    return (
       <div className = "relative h-full w-full my-[5rem] hover:cursor-pointer hover:scale-[1.05] transition duration-300 ease-in-out">
          <motion.svg
@@ -67,6 +64,7 @@ export default function Circle () {
          </motion.svg>
          <Counter
             value = {100}
+            start = {0}
             duration = {3500}
             className = "relative inset-0 mx-auto flex items-center justify-center font-display text-4xl text-green-500"
          />

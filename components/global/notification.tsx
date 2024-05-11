@@ -1,36 +1,55 @@
+"use client";
+import clsx from "clsx";
+import { useState } from "react";
 import { SubmissionStatus } from "@/lib/form";
 import { faCircleCheck, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import clsx from "clsx";
 
+interface NotificationProps extends React.HTMLAttributes<HTMLDivElement> {
+   children: React.ReactNode;
+   status: SubmissionStatus;
+}
 
-export function Notification ({ status }: { status: SubmissionStatus }): JSX.Element {
-   // TODO -- remove ??, add different colors, try to slide up or FADE OUT, make x button red, etc.
-
-   const color = status.state === "Success" || 1 ? "green-400" : "red-400";
-   const icon = status.state === "Success" ? faCircleCheck : faTriangleExclamation;
+export default function Notification (props: NotificationProps): JSX.Element {
+   const [visible, setVisible] = useState<boolean>(true);
+   const icon = props.status.state === "Success" ? faCircleCheck : faTriangleExclamation;
 
    return (
       <>
-         {
-            <div className = "p-6 animate-notificationIn">
+         {visible &&
+            <div
+               className = "fixed top-0 left-1/2 transform -translate-x-1/2 p-12 opacity-0 animate-fadeIn"
+               {...props}
+            >
                <div className = "text-left">
-                  <div className = {clsx("w-[30rem] max-w-10/12 border-stroke mb-11 flex items-center rounded-md border border-l-[8px] bg-white p-5 pl-8", `border-l-${color}`)}>
+                  <div className = {clsx("w-[30rem] max-w-10/12 border-stroke mb-11 flex items-center rounded-md border border-l-[8px] bg-white p-5 pl-8", {
+                     "border-l-green-600": props.status.state === "Success",
+                     "border-l-red-600": props.status.state !== "Success",
+                  })}>
                      <div className = "mr-5 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-full">
-                        <FontAwesomeIcon icon = {icon} className = {`text-2xl text-${color}`}/>
+                        <FontAwesomeIcon icon = {icon} className = {clsx("text-4xl", {
+                           "text-green-600": props.status.state === "Success",
+                           "text-red-600": props.status.state !== "Success",
+                        })} />
                      </div>
-                     <div className = "flex w-full items-start justify-between">
+                     <div className = "flex w-full items-start justify-between pt-4">
                         <div>
-                           <h3 className = "mb-1 text-lg font-bold text-dark">
-                              {status.response.message ?? "N/A"}
-                           </h3>
-                           <p className = "text-body-color text-sm">
-                              {status.response.message ?? "An error occurred. Please try again."}
-                           </p>
+                           <div>
+                              <h3 className = "mb-1 text-lg font-bold text-dark">
+                                 {props.status.response.message ?? "N/A"}
+                              </h3>
+                              <p className = "text-body-color text-sm">
+                                 {props.status.response.message ?? "An error occurred. Please try again."}
+                              </p>
+                           </div>
+                           <div className = "my-2">
+                              {props.children}
+                           </div>
                         </div>
                         <div>
                            <a
                               className = "hover:text-danger hover:cursor-pointer text-red-600"
+                              onClick = {() => { setVisible(false); }}
                            >
                               <svg
                                  width = {24}
