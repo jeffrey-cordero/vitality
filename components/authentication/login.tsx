@@ -4,7 +4,7 @@ import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import { FormEvent } from "react";
 import { useImmer } from "use-immer";
-import { FormItems, SubmissionStatus } from "@/lib/form";
+import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/form";
 import { login, Credentials } from '@/lib/login';
 
 function Form(): JSX.Element {
@@ -36,30 +36,8 @@ function Form(): JSX.Element {
             password: credentials.password.value
          };
 
-
-         const response = await login(payload);
-         const errors = {};
-
-         // Show error inputs
-         for (const error of Object.keys(response.errors)) {
-            errors[error] = true;
-
-            setCredentials((credentials) => {
-               credentials[error].error = response.errors[error][0];
-            });
-         }
-
-         // Hide fixed error inputs
-         for (const input of Object.keys(credentials)) {
-            if (!(errors[input]) && credentials[input].error !== null) {
-               setCredentials((credentials) => {
-                  credentials[input].error = null;
-               });
-            }
-         }
-
-         // Update current status of form to show potential success notification
-         setStatus(response);
+         setStatus((await login(payload)));
+         handleFormErrors(status, setCredentials);
       } catch (error) {
          console.error("Error updating status:", error);
       }
@@ -81,7 +59,7 @@ function Form(): JSX.Element {
 export default function LoginForm (): JSX.Element {
    return (
       <>
-         <div className = "w-full mx-auto flex flex-col items-center justify-center">
+         <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
             <Heading title = "Log in" description = "Enter valid credentials to enter" />
             <Form />
          </div>

@@ -14,7 +14,7 @@ const feedbackSchema = z.object({
    email: z.string().trim().email({ message: "A valid email is required." }),
    message: z.string().trim().min(1, { message: "Message is required." }),
 });
-// TODO --> Specific response messages, form field trimming
+
 export async function sendFeedback (feedback: Feedback): Promise<SubmissionStatus>  {
    // Validate the feedback form first
    const fields = feedbackSchema.safeParse(feedback);
@@ -26,14 +26,12 @@ export async function sendFeedback (feedback: Feedback): Promise<SubmissionStatu
    const prisma = new PrismaClient();
 
    try {
+      const userFeedback = fields.data;
       await prisma.$connect();
-
-      return sendSuccessMessage("Successfully received your feedback!");
-
+      
       // Add new feedback into the database for further improvement of the application
-      // TODO --> Account for testing
       await prisma.feedback.create({
-         data: fields.data,
+         data: userFeedback
       });
 
       return sendSuccessMessage("Successfully received your feedback!");

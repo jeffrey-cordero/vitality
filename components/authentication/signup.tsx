@@ -5,7 +5,7 @@ import Notification from "@/components/global/notification";
 import Button from "@/components/global/button";
 import { FormEvent } from "react";
 import { useImmer } from "use-immer";
-import { FormItems, SubmissionStatus } from "@/lib/form";
+import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/form";
 import { login } from "@/lib/login";
 import { signup, Registration } from "@/lib/signup";
 
@@ -79,29 +79,9 @@ function Form (): JSX.Element {
             delete payload.phone;
          }
 
-         const response = await signup(payload);
-         const errors = {};
-
-         // Show error inputs
-         for (const error of Object.keys(response.errors)) {
-            errors[error] = true;
-
-            setRegistration((registration) => {
-               registration[error].error = response.errors[error][0];
-            });
-         }
-
-         // Hide fixed error inputs
-         for (const input of Object.keys(registration)) {
-            if (!(errors[input]) && registration[input].error !== null) {
-               setRegistration((registration) => {
-                  registration[input].error = null;
-               });
-            }
-         }
-
          // Update current status of form to show potential success notification
-         setStatus(response);
+         setStatus((await signup(payload)));
+         handleFormErrors(status, setRegistration);
       } catch (error) {
          console.error("Error updating status:", error);
       }
@@ -145,7 +125,7 @@ function Form (): JSX.Element {
 export default function SignUpForm (): JSX.Element {
    return (
       <>
-         <div className = "w-full mx-auto flex flex-col items-center justify-center">
+         <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
             <Heading title = "Sign up" description = "Create an account to get started" />
             <Form />
          </div>

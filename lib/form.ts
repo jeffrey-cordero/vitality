@@ -5,7 +5,7 @@ export type FormItems = { [key: string]: InputState };
 
 export type InputState = {
    label: string;
-   type: string;
+   type?: string;
    isPassword?: boolean;
    id: string;
    value: any;
@@ -31,6 +31,28 @@ export function updateFormState(event: ChangeEvent<HTMLInputElement | HTMLTextAr
       input[id].error = null;
    });
 };
+
+export function handleFormErrors(response: SubmissionStatus, updater: Updater<FormItems>) {
+   const errors = {};
+
+   // Show error inputs
+   for (const error of Object.keys(response.errors)) {
+      errors[error] = true;
+
+      updater((inputs) => {
+         inputs[error].error = response.errors[error][0];
+      });
+   }
+
+   // Hide fixed error inputs
+   for (const input of Object.keys(updater)) {
+      if (!(errors[input]) && updater[input].error !== null) {
+         updater((inputs) => {
+            inputs[input].error = null;
+         });
+      }
+   }
+}
 
 export function sendSuccessMessage (message: string, data?: any): SubmissionStatus {
    return {
