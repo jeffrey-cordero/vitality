@@ -1,7 +1,7 @@
 "use server";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
-import { SubmissionStatus, sendSuccessMessage, sendErrorMessage, } from "@/lib/form";
+import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/form";
 
 export type Credentials = {
    username: string;

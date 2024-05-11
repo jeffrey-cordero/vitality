@@ -73,7 +73,7 @@ export async function signup (
    try {
       const userRegistration = fields.data;
 
-      const salt = await bcrypt.genSaltSync(10);     
+      const salt = await bcrypt.genSaltSync(10);
       userRegistration.password = await bcrypt.hash(registration.password, salt);
 
       if (registration.phone) {

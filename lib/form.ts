@@ -23,7 +23,7 @@ export type SubmissionStatus = {
    errors: { [key: string]: string[]; };
 };
 
-export function updateFormState(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, updater: Updater<FormItems>) {
+export function updateFormState (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, updater: Updater<FormItems>) {
    const { id, value } = event.target;
 
    updater((input: { [key: string]: InputState; }) => {
@@ -32,7 +32,7 @@ export function updateFormState(event: ChangeEvent<HTMLInputElement | HTMLTextAr
    });
 };
 
-export function handleFormErrors(response: SubmissionStatus, updater: Updater<FormItems>) {
+export function handleFormErrors (response: SubmissionStatus, updater: Updater<FormItems>) {
    const errors = {};
 
    // Show error inputs
