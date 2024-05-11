@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { ChangeEvent, useRef } from "react";
 import { InputProps, updateFormState } from "@/lib/form";
 
-export default function TextArea ({updater, ...props}: InputProps): JSX.Element {
+export default function TextArea ({ updater, ...props }: InputProps): JSX.Element {
    const textArea = useRef<HTMLTextAreaElement | null>(null);
 
    const handleTextAreaOverflow = () => {

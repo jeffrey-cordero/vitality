@@ -107,10 +107,10 @@ function Form (): JSX.Element {
                   <Button
                      type = "button"
                      className = "bg-green-600 text-white p-4 text-sm h-[2.4rem]"
-                     onClick={async()=> {
+                     onClick = {async () => {
                         await login({
                            username: registration.username.value,
-                           password: registration.password.value
+                           password: registration.password.value,
                         });
                      }}
                   >

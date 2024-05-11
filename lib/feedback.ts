@@ -28,10 +28,10 @@ export async function sendFeedback (feedback: Feedback): Promise<SubmissionStatu
    try {
       const userFeedback = fields.data;
       await prisma.$connect();
-      
+
       // Add new feedback into the database for further improvement of the application
       await prisma.feedback.create({
-         data: userFeedback
+         data: userFeedback,
       });
 
       return sendSuccessMessage("Successfully received your feedback!");

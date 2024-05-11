@@ -19,7 +19,7 @@ function Form (): JSX.Element {
             id: "name",
             value: "",
             error: null,
-         },email: {
+         }, email: {
             label: "Email *",
             type: "email",
             id: "email",
@@ -61,7 +61,7 @@ function Form (): JSX.Element {
             <Input input = {feedback.email} updater = {setFeedback} />
             <TextArea input = {feedback.message} updater = {setFeedback} />
             {status.state === "Success" && (
-               <Notification status = {status} children={""} />
+               <Notification status = {status} children = {""} />
             )}
             <Button
                type = "submit"
