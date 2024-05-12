@@ -1,3 +1,5 @@
+import { PrismaClient } from "@prisma/client";
+import { mockDeep } from "jest-mock-extended";
 import { expect } from "@jest/globals";
 import { signup } from "@/lib/credentials/signup";
 
@@ -5,7 +7,16 @@ import { signup } from "@/lib/credentials/signup";
 let payload;
 
 /** @type {SubmissionStatus} */
-let response;
+let expected;
+
+/** @type DeepMockProxy<PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>> */
+const prismaMock = mockDeep<PrismaClient>({
+   $disconnect: jest.fn()
+});
+
+jest.mock("@prisma/client", () => ({
+   PrismaClient: jest.fn(() => prismaMock)
+}));
 
 test("Test empty required user registration fields", async () => {
    // All empty fields expect for birthday
@@ -19,23 +30,21 @@ test("Test empty required user registration fields", async () => {
       phone: ""
    };
 
-   response = await signup(payload, true);
+   expected = {
+      state: "Error",
+      response: { message: "Invalid user registration fields." },
+      errors: {
+         username: ["A username must be at least 3 characters"],
+         password: [
+            "A password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character (@$!%*#?&)"
+         ],
+         name: ["A name must be at least 2 characters"],
+         email: ["A valid email is required"],
+         phone: ["A valid phone is required if provided"]
+      }
+   };
 
-   expect(response.state).toEqual("Error");
-   expect(response.response.message).toEqual(
-      "Invalid user registration fields.",
-   );
-
-   // Ensure the empty fields are caught as errors
-   expect(response.errors).toMatchObject({
-      username: ["A username must be at least 3 characters"],
-      password: [
-         "A password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character (@$!%*#?&)"
-      ],
-      name: ["A name must be at least 2 characters"],
-      email: ["A valid email is required"],
-      phone: ["A valid phone is required if provided"]
-   });
+   await expect(signup(payload)).resolves.toEqual(expected);
 });
 
 test("Test missing or bad user registration fields", async () => {
@@ -48,42 +57,37 @@ test("Test missing or bad user registration fields", async () => {
       phone: "1234567890"
    };
 
-   response = await signup(payload, true);
+   expected = {
+      state: "Error",
+      response: { message: "Invalid user registration fields." },
+      errors: { birthday: ["Required"], email: ["Required"] }
+   };
 
-   expect(response.state).toEqual("Error");
-   expect(response.response.message).toEqual(
-      "Invalid user registration fields.",
-   );
-
-   // Ensure the missing fields are caught as errors
-   expect(response.errors).toMatchObject({
-      birthday: ["Required"],
-      email: ["Required"]
-   });
+   await expect(signup(payload)).resolves.toEqual(expected);
 
    // Username too long, name too short, birthday too old, phone number too long, but a valid main password
    payload = {
       name: "r",
       birthday: new Date("1600-01-01"),
-      username: "John Doe John Doe John Doe John Doe John Doe John Doe John Doe John Doe John Doe John Doe",
+      username: "Long Username                             Very Long",
       password: "Password$AAd123",
       confirmPassword: "Password$AAd32",
       phone: "12345629313243443243290"
    };
 
-   response = await signup(payload, true);
+   expected = {
+      state: "Error",
+      response: { message: "Invalid user registration fields." },
+      errors: {
+         name: ["A name must be at least 2 characters"],
+         birthday: ["A birthday must not be before 200 years ago"],
+         username: ["A username must be at most 30 characters"],
+         email: ["Required"],
+         phone: ["A valid phone is required if provided"]
+      }
+   };
 
-   expect(response.state).toEqual("Error");
-   expect(response.response.message).toEqual(
-      "Invalid user registration fields.",
-   );
-
-   expect(response.errors).toMatchObject({
-      username: ["A username must be at most 30 characters"],
-      name: ["A name must be at least 2 characters"],
-      email: ["Required"],
-      phone: ["A valid phone is required if provided"]
-   });
+   await expect(signup(payload)).resolves.toEqual(expected);
 
    // Almost perfect user registration fields, but passwords do not match
    payload = {
@@ -96,17 +100,16 @@ test("Test missing or bad user registration fields", async () => {
       phone: "1234567890"
    };
 
-   response = await signup(payload, true);
+   expected = {
+      state: "Error",
+      response: { message: "Invalid user registration fields." },
+      errors: {
+         password: ["Passwords do not match"],
+         confirmPassword: ["Passwords do not match"]
+      }
+   };
 
-   expect(response.state).toEqual("Error");
-   expect(response.response.message).toEqual(
-      "Invalid user registration fields.",
-   );
-
-   expect(response.errors).toMatchObject({
-      password: ["Passwords do not match"],
-      confirmPassword: ["Passwords do not match"]
-   });
+   await expect(signup(payload)).resolves.toEqual(expected);
 });
 
 test("Test valid registration fields", async () => {
@@ -120,12 +123,13 @@ test("Test valid registration fields", async () => {
       phone: "1234567890"
    };
 
-   response = await signup(payload, true);
+   expected = {
+      state: "Success",
+      response: { message: "Successfully registered.", data: undefined },
+      errors: {}
+   };
 
-   expect(response.state).toEqual("Success");
-   expect(response.response.message).toEqual(
-      "Successfully processed user registration for testing purposes.",
-   );
+   await expect(signup(payload)).resolves.toEqual(expected);
 
    // Ensure various phone numbers and dates can be added
    payload = {
@@ -138,12 +142,7 @@ test("Test valid registration fields", async () => {
       phone: "2124567890"
    };
 
-   response = await signup(payload, true);
-
-   expect(response.state).toEqual("Success");
-   expect(response.response.message).toEqual(
-      "Successfully processed user registration for testing purposes.",
-   );
+   await expect(signup(payload)).resolves.toEqual(expected);
 
    payload = {
       name: "Eric Smit",
@@ -155,13 +154,7 @@ test("Test valid registration fields", async () => {
       phone: "+1-212-456-7890"
    };
 
-   response = await signup(payload, true);
-
-   expect(response.state).toEqual("Success");
-   expect(response.response.message).toEqual(
-      "Successfully processed user registration for testing purposes.",
-   );
-
+   await expect(signup(payload)).resolves.toEqual(expected);
 
    payload = {
       name: "John Smith",
@@ -173,10 +166,5 @@ test("Test valid registration fields", async () => {
       phone: "+1-888-555-1234"
    };
 
-   response = await signup(payload, true);
-
-   expect(response.state).toEqual("Success");
-   expect(response.response.message).toEqual(
-      "Successfully processed user registration for testing purposes.",
-   );
+   await expect(signup(payload)).resolves.toEqual(expected);
 });

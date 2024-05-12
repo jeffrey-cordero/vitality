@@ -49,10 +49,7 @@ const registrationSchema = z.object({
       .optional()
 });
 
-export async function signup (
-   registration: Registration,
-   testing: boolean = false,
-): Promise<SubmissionStatus> {
+export async function signup (registration: Registration): Promise<SubmissionStatus> {
    const fields = registrationSchema.safeParse(registration);
 
    if (!fields.success) {
@@ -71,6 +68,8 @@ export async function signup (
    const prisma = new PrismaClient();
 
    try {
+      await prisma.$connect();
+
       const userRegistration = fields.data;
 
       const salt = await bcrypt.genSaltSync(10);
@@ -80,19 +79,11 @@ export async function signup (
          userRegistration["phone"] = registration.phone;
       }
 
-      if (1) {
-         await prisma.$connect();
+      await prisma.users.create({
+         data: userRegistration
+      });
 
-         await prisma.users.create({
-            data: userRegistration
-         });
-
-         return sendSuccessMessage("Successfully registered.");
-      } else {
-         return sendSuccessMessage(
-            "Successfully processed user registration for testing purposes.",
-         );
-      }
+      return sendSuccessMessage("Successfully registered.");
    } catch (error: any) {
       if (error.code === "P2002" && error.meta?.target?.includes("username")) {
          return sendErrorMessage("Error", "Internal database conflicts", {
@@ -116,8 +107,6 @@ export async function signup (
          return sendErrorMessage("Failure", error.message);
       }
    } finally {
-      if (!testing) {
-         prisma.$disconnect();
-      }
+      prisma.$disconnect();
    }
 }
