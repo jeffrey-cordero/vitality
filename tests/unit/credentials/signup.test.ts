@@ -1,5 +1,5 @@
 import { expect } from '@jest/globals';
-import { signup } from '@/lib/signup';
+import { signup } from '@/lib/credentials/signup';
 
 /** @type {Registration} */
 let payload;

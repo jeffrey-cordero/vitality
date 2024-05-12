@@ -3,7 +3,7 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
-import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/form";
+import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
 
 export type Registration = {
   name: string;
@@ -23,10 +23,10 @@ const registrationSchema = z.object({
    birthday: z
       .date()
       .min(new Date(new Date().getFullYear() - 200, 0, 1), {
-         message: "A birthday must not be before 200 years ago",
+         message: "A birthday must not be before 200 years ago"
       })
       .max(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), {
-         message: "A birthday must not be after today",
+         message: "A birthday must not be after today"
       }),
    username: z
       .string()
@@ -37,16 +37,16 @@ const registrationSchema = z.object({
       .string()
       .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/, {
          message:
-        "A password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character (@$!%*#?&)",
+        "A password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character (@$!%*#?&)"
       }),
    email: z.string().trim().email({ message: "A valid email is required" }),
    phone: z
       .string()
       .trim()
       .refine(validator.isMobilePhone, {
-         message: "A valid phone is required if provided",
+         message: "A valid phone is required if provided"
       })
-      .optional(),
+      .optional()
 });
 
 export async function signup (
@@ -64,7 +64,7 @@ export async function signup (
    } else if (!(registration.password === registration.confirmPassword)) {
       return sendErrorMessage("Error", "Invalid user registration fields.", {
          password: ["Passwords do not match"],
-         confirmPassword: ["Passwords do not match"],
+         confirmPassword: ["Passwords do not match"]
       });
    }
 
@@ -84,7 +84,7 @@ export async function signup (
          await prisma.$connect();
 
          await prisma.users.create({
-            data: userRegistration,
+            data: userRegistration
          });
 
          return sendSuccessMessage("Successfully registered.");
@@ -96,21 +96,21 @@ export async function signup (
    } catch (error: any) {
       if (error.code === "P2002" && error.meta?.target?.includes("username")) {
          return sendErrorMessage("Error", "Internal database conflicts", {
-            username: ["Username already taken"],
+            username: ["Username already taken"]
          });
       } else if (
          error.code === "P2002" &&
       error.meta?.target?.includes("email")
       ) {
          return sendErrorMessage("Error", "Internal database conflicts", {
-            email: ["Email already taken"],
+            email: ["Email already taken"]
          });
       } else if (
          error.code === "P2002" &&
       error.meta?.target?.includes("phone")
       ) {
          return sendErrorMessage("Error", "Internal database conflicts", {
-            phone: ["Phone number already taken"],
+            phone: ["Phone number already taken"]
          });
       } else {
          return sendErrorMessage("Failure", error.message);

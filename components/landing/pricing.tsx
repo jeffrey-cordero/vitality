@@ -67,7 +67,6 @@ export default function Pricing (): JSX.Element {
                   <List>Basic analytics</List>
                   <List>Limited support</List>
                </PricingCard>
-
                <PricingCard
                   type = "Member"
                   price = "$99"
@@ -81,7 +80,6 @@ export default function Pricing (): JSX.Element {
                   <List>Enhanced analytics</List>
                   <List>Priority support</List>
                </PricingCard>
-
                <PricingCard
                   type = "Veteran"
                   price = "$199"
@@ -98,7 +96,6 @@ export default function Pricing (): JSX.Element {
             </div>
          </div>
       </div>
-
    );
 };
 

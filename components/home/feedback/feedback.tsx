@@ -6,8 +6,8 @@ import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 import { FormEvent } from "react";
 import { useImmer } from "use-immer";
-import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/form";
-import { Feedback, sendFeedback } from "@/lib/feedback";
+import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/global/form";
+import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
 
 function Form (): JSX.Element {
    const [status, setStatus] = useImmer<SubmissionStatus>({ state: "Initial", response: {}, errors: {} });
@@ -18,19 +18,19 @@ function Form (): JSX.Element {
             type: "text",
             id: "name",
             value: "",
-            error: null,
+            error: null
          }, email: {
             label: "Email *",
             type: "email",
             id: "email",
             value: "",
-            error: null,
+            error: null
          }, message: {
             label: "Message *",
             id: "message",
             value: "",
-            error: null,
-         },
+            error: null
+         }
       });
 
    const handleSubmit = async (event: FormEvent) => {
@@ -40,11 +40,12 @@ function Form (): JSX.Element {
          const payload: Feedback = {
             name: feedback.name.value,
             email: feedback.email.value,
-            message: feedback.message.value,
+            message: feedback.message.value
          };
 
-         setStatus(await sendFeedback(payload));
-         handleFormErrors(status, setFeedback);
+         const response = await sendFeedback(payload);
+         setStatus(response);
+         handleFormErrors(response, setFeedback);
       } catch (error) {
          console.error("Error updating status:", error);
          setStatus({ state: "Initial", response: {}, errors: {} });
@@ -61,7 +62,9 @@ function Form (): JSX.Element {
             <Input input = {feedback.email} updater = {setFeedback} />
             <TextArea input = {feedback.message} updater = {setFeedback} />
             {status.state === "Success" && (
-               <Notification status = {status} children = {""} />
+               <Notification status = {status}>
+                  {""}
+               </Notification>
             )}
             <Button
                type = "submit"
@@ -69,6 +72,13 @@ function Form (): JSX.Element {
             >
                Submit
             </Button>
+            {
+               status.state === "Success" && (
+                  <Notification status = {status}>
+                     {""}
+                  </Notification>
+               )
+            }
          </form>
       </div>
    );

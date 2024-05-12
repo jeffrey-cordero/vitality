@@ -49,18 +49,7 @@ docker logs <container-name>
 
 ## Database
 
-The PostgreSQL database is called `vitality` and can be accessed through the local 5432 port. For any conflicts, you can change the port attached to your local machine in the `docker-compose.yaml` file.
-
-``` yaml
-services:
-      postgres:   
-            ...
-            ports:
-                  - "[X]:5432"
-            ...
-```
-
-There are 2 ways to currently access the database for viewing current state or making adjustments to records manually.
+There are 2 ways to currently access the database for viewing current state or making adjustments to manually records.
 
 Through the docker container.
 
@@ -68,13 +57,15 @@ Through the docker container.
 docker exec -it vitality_postgres psql -U postgres -d vitality
 ```
 
-Through the Prisma ORM.
+Through the Prisma ORM service.
 
 ``` bash
 docker exec -it vitality_app npx prisma studio
 ```
 
 ### Database migrations
+
+Currently all database changes are made via `init.sql`. In the future, we will use Prisma ORM to efficiently make migrations needed while preserving sensitive user information through the following:
 
 - Add the proposed changes to the model located at `prisma/schema.prisma`
 - Run the following command to apply the changes
@@ -95,11 +86,15 @@ npm run test
 
 ### Cypress
 
+Run end-to-end tests.
+
 ```bash
 npx cypress open
 ```
 
 ## Linting
+
+View current potential linting errors / warnings based on `.eslintrc.json` specifications.
 
 ```bash
 npx next lint --fix
