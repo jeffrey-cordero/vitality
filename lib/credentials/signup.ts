@@ -3,7 +3,7 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
-import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/form";
+import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
 
 export type Registration = {
   name: string;

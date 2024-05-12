@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
-import Circle from "@/components/landing/spinner";
+import Ring from "@/components/landing/ring";
 
 export default function Journey (): JSX.Element {
    return (
@@ -17,15 +18,19 @@ export default function Journey (): JSX.Element {
                         <div className = "w-full sm:px-4 xl:w-1/2">
                            <div className = "py-3 sm:py-4">
                               <div className = "relative my-4">
-                                 <img
-                                    src = "/journey.jpg"
+                                 <Image
+                                    width = {2010}
+                                    height = {1441}
+                                    src = "/landing/journey.jpg"
                                     alt = ""
                                     className = "w-full h-full shadow-xl rounded-2xl hover:scale-[1.05] transition duration-300 ease-in-out"
                                  />
                               </div>
                               <div className = "relative my-4">
-                                 <img
-                                    src = "/food.jpg"
+                                 <Image
+                                    width = {640}
+                                    height = {960}
+                                    src = "/landing/food.jpg"
                                     alt = ""
                                     className = "w-full h-full shadow-xl rounded-2xl hover:scale-[1.05] transition duration-300 ease-in-out"
                                  />
@@ -35,8 +40,10 @@ export default function Journey (): JSX.Element {
                         </div>
                         <div className = "w-full px-3 sm:px-4 xl:w-1/2">
                            <div className = "py-3 sm:py-4">
-                              <img
-                                 src = "/mountains.jpg"
+                              <Image
+                                 width = {1920}
+                                 height = {2880}
+                                 src = "/landing/mountains.jpg"
                                  alt = ""
                                  className = "w-full h-full shadow-xl rounded-2xl hover:scale-[1.05] transition duration-300 ease-in-out"
                               />
@@ -45,8 +52,8 @@ export default function Journey (): JSX.Element {
                      </div>
                   </div>
                   <div className = "w-full lg:w-1/2 xl:w-5/12">
-                     <div className = "mt-10 lg:mt-0">
-                        <Circle />
+                     <div className = "flex flex-col items-center justify-center text-center mt-10 lg:mt-0">
+                        <Ring />
                         <span className = "block mb-6 max-w-10/12 text-4xl font-bold text-primary">
                            Level Up Your Fitness
                         </span>

@@ -36,7 +36,7 @@ function Counter (props: CounterProps): JSX.Element {
    return <p className = {props.className}>{Intl.NumberFormat().format(count)}</p>;
 }
 
-export default function Circle (): JSX.Element {
+export default function Ring (): JSX.Element {
    return (
       <div className = "relative h-full w-full my-[5rem] hover:cursor-pointer hover:scale-[1.05] transition duration-300 ease-in-out">
          <motion.svg

@@ -1,7 +1,7 @@
 import "./global.css";
 import Header from "@/components/global/header";
-import { sfPro, inter } from "./fonts";
 import cx from "classnames";
+import { sfPro, inter } from "./fonts";
 
 // Metadata
 import { Metadata } from "next";
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
       template: "%s | Vitality",
       default: "Vitality",
    },
-   description: "TODO",
-   metadataBase: new URL("https://www.google.com/"),
+   description: "A modern fitness tracker to fuel your fitness goals",
+   metadataBase: new URL("https://github.com/jeffrey-asm/vitality"),
 };
 
 

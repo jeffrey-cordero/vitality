@@ -4,8 +4,8 @@ import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import { FormEvent } from "react";
 import { useImmer } from "use-immer";
-import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/form";
-import { login, Credentials } from "@/lib/login";
+import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/global/form";
+import { login, Credentials } from "@/lib/credentials/login";
 
 function Form (): JSX.Element {
    const [status, setStatus] = useImmer<SubmissionStatus>({ state: "Initial", response: {}, errors: {} });
@@ -36,8 +36,9 @@ function Form (): JSX.Element {
             password: credentials.password.value,
          };
 
-         setStatus((await login(payload)));
-         handleFormErrors(status, setCredentials);
+         const response = await login(payload);
+         setStatus(response);
+         handleFormErrors(response, setCredentials);
       } catch (error) {
          console.error("Error updating status:", error);
       }

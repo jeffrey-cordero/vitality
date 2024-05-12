@@ -1,9 +1,9 @@
+import bcrypt from "bcryptjs";
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
 import { PrismaClient, Users as User } from '@prisma/client';
 import { z } from 'zod';
-import bcrypt from "bcryptjs";
 
 export async function getUser(username: string): Promise<User | null> {
   const prisma = new PrismaClient();

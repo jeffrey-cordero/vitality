@@ -1,7 +1,7 @@
 "use server";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
-import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/form";
+import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
 
 export interface Feedback {
    name: string;
@@ -39,6 +39,7 @@ export async function sendFeedback (feedback: Feedback): Promise<SubmissionStatu
       console.error(err);
    } finally {
       prisma.$disconnect();
-      return sendErrorMessage("Failure", "Message.");
    }
+
+   return sendErrorMessage("Failure", "Message.");
 }

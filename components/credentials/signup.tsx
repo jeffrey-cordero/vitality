@@ -5,9 +5,9 @@ import Notification from "@/components/global/notification";
 import Button from "@/components/global/button";
 import { FormEvent } from "react";
 import { useImmer } from "use-immer";
-import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/form";
-import { login } from "@/lib/login";
-import { signup, Registration } from "@/lib/signup";
+import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/global/form";
+import { login } from "@/lib/credentials/login";
+import { signup, Registration } from "@/lib/credentials/signup";
 
 function Form (): JSX.Element {
    const [status, setStatus] = useImmer<SubmissionStatus>({ state: "Initial", response: {}, errors: {} });
@@ -80,8 +80,9 @@ function Form (): JSX.Element {
          }
 
          // Update current status of form to show potential success notification
-         setStatus((await signup(payload)));
-         handleFormErrors(status, setRegistration);
+         const response = await signup(payload);
+         setStatus(response);
+         handleFormErrors(response, setRegistration);
       } catch (error) {
          console.error("Error updating status:", error);
       }
@@ -116,7 +117,8 @@ function Form (): JSX.Element {
                   >
                      Home
                   </Button>
-               </Notification>)
+               </Notification>
+            )
          }
       </div>
    );

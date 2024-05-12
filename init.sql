@@ -19,6 +19,6 @@ CREATE TABLE "VerificationToken" (
 CREATE TABLE "Feedback" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL,
+      email TEXT NOT NULL,
       message TEXT NOT NULL
 );

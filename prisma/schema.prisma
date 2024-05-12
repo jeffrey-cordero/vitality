@@ -28,6 +28,6 @@ model VerificationToken {
 model Feedback {
   id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name    String @db.VarChar(255)
-  email   String @db.VarChar(255)
+  email   String
   message String
 }

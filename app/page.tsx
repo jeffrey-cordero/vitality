@@ -1,6 +1,6 @@
 import Journey from "@/components/landing/journey";
 import Highlights from "@/components/landing/highlights";
-import Services from "@/components/landing/circle";
+import Services from "@/components/landing/services";
 import Pricing from "@/components/landing/pricing";
 import Testimonials from "@/components/landing/testimonials";
 import Footer from "@/components/global/footer";

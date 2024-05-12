@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { ChangeEvent, useRef } from "react";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { InputProps, FormItems, updateFormState } from "@/lib/form";
+import { InputProps, FormItems, updateFormState } from "@/lib/global/form";
 
 export default function Input ({ updater, ...props }: InputProps): JSX.Element {
    const eyeButton = useRef<SVGSVGElement | null>(null);

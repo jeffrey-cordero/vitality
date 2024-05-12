@@ -1,7 +1,7 @@
 "use client";
 import clsx from "clsx";
 import { useState } from "react";
-import { SubmissionStatus } from "@/lib/form";
+import { SubmissionStatus } from "@/lib/global/form";
 import { faCircleCheck, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -18,7 +18,7 @@ export default function Notification (props: NotificationProps): JSX.Element {
       <>
          {visible &&
             <div
-               className = "fixed top-0 left-1/2 transform -translate-x-1/2 p-12 opacity-0 animate-fadeIn"
+               className = "fixed top-0 left-1/2 transform -translate-x-1/2 p-10 opacity-0 animate-fadeIn"
                {...props}
             >
                <div className = "text-left">
@@ -32,7 +32,7 @@ export default function Notification (props: NotificationProps): JSX.Element {
                            "text-red-600": props.status.state !== "Success",
                         })} />
                      </div>
-                     <div className = "flex w-full items-start justify-between pt-4">
+                     <div className = "flex w-full items-start justify-between px-2">
                         <div>
                            <div>
                               <h3 className = "mb-1 text-lg font-bold text-dark">
