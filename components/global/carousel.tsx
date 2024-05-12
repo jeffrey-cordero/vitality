@@ -24,7 +24,7 @@ export default function Carousel (props: CarouselProps): JSX.Element {
          <div
             className = "carousel-inner flex transition-[opacity,transform] ease-in-out duration-500"
             style = {{
-               transform: `translateX(-${currentIndex * columnWidth}%)`,
+               transform: `translateX(-${currentIndex * columnWidth}%)`
             }}
          >
             {props.items.map((slide, index) => (
@@ -32,7 +32,7 @@ export default function Carousel (props: CarouselProps): JSX.Element {
                   key = {index}
                   className = {clsx("carousel-item flex-shrink-0", {
                      "opacity-100": index === currentIndex,
-                     "opacity-20": index !== currentIndex,
+                     "opacity-20": index !== currentIndex
                   })}
                   style = {{ width: `${columnWidth}%` }}
                >

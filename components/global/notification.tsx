@@ -24,12 +24,12 @@ export default function Notification (props: NotificationProps): JSX.Element {
                <div className = "text-left">
                   <div className = {clsx("w-[30rem] max-w-10/12 border-stroke mb-11 flex items-center rounded-md border border-l-[8px] bg-white p-5 pl-8", {
                      "border-l-green-600": props.status.state === "Success",
-                     "border-l-red-600": props.status.state !== "Success",
+                     "border-l-red-600": props.status.state !== "Success"
                   })}>
                      <div className = "mr-5 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-full">
                         <FontAwesomeIcon icon = {icon} className = {clsx("text-4xl", {
                            "text-green-600": props.status.state === "Success",
-                           "text-red-600": props.status.state !== "Success",
+                           "text-red-600": props.status.state !== "Success"
                         })} />
                      </div>
                      <div className = "flex w-full items-start justify-between px-2">

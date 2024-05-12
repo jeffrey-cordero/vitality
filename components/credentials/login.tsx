@@ -16,15 +16,15 @@ function Form (): JSX.Element {
             type: "text",
             id: "username",
             value: "",
-            error: null,
+            error: null
          }, password: {
             label: "Password *",
             type: "password",
             isPassword: true,
             id: "password",
             value: "",
-            error: null,
-         },
+            error: null
+         }
       });
 
    const handleSubmit = async (event: FormEvent) => {
@@ -33,12 +33,13 @@ function Form (): JSX.Element {
       try {
          const payload: Credentials = {
             username: credentials.username.value,
-            password: credentials.password.value,
+            password: credentials.password.value
          };
 
          const response = await login(payload);
          setStatus(response);
          handleFormErrors(response, setCredentials);
+         console.log(status);
       } catch (error) {
          console.error("Error updating status:", error);
       }

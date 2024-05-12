@@ -35,7 +35,7 @@ function Testimonial (props: TestimonialProps): JSX.Element {
                      props.stars.map((rating, index) => {
                         return <FontAwesomeIcon key = {index} icon = {faStar} className = {clsx("text-xl sm:text-sm my-2", {
                            "text-yellow-500": rating,
-                           "text-slate-500": !rating,
+                           "text-slate-500": !rating
                         })} />;
                      })
                   }

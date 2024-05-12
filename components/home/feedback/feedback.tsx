@@ -18,19 +18,19 @@ function Form (): JSX.Element {
             type: "text",
             id: "name",
             value: "",
-            error: null,
+            error: null
          }, email: {
             label: "Email *",
             type: "email",
             id: "email",
             value: "",
-            error: null,
+            error: null
          }, message: {
             label: "Message *",
             id: "message",
             value: "",
-            error: null,
-         },
+            error: null
+         }
       });
 
    const handleSubmit = async (event: FormEvent) => {
@@ -40,7 +40,7 @@ function Form (): JSX.Element {
          const payload: Feedback = {
             name: feedback.name.value,
             email: feedback.email.value,
-            message: feedback.message.value,
+            message: feedback.message.value
          };
 
          const response = await sendFeedback(payload);
@@ -73,12 +73,12 @@ function Form (): JSX.Element {
                Submit
             </Button>
             {
-            status.state === "Success" && (
-               <Notification status = {status}>
-                 {""}
-               </Notification>
-            )
-         }
+               status.state === "Success" && (
+                  <Notification status = {status}>
+                     {""}
+                  </Notification>
+               )
+            }
          </form>
       </div>
    );

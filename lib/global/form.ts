@@ -58,7 +58,7 @@ export function sendSuccessMessage (message: string, data?: any): SubmissionStat
    return {
       state: "Success",
       response: { message: message, data: data },
-      errors: {},
+      errors: {}
    };
 }
 
@@ -66,6 +66,6 @@ export function sendErrorMessage (status: "Error" | "Failure", message: string, 
    return {
       state: status,
       response: { message: message },
-      errors: errors ?? {},
+      errors: errors ?? {}
    };
 }

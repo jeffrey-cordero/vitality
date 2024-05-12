@@ -15,15 +15,15 @@ config.autoAddCss = false;
 export const metadata: Metadata = {
    title: {
       template: "%s | Vitality",
-      default: "Vitality",
+      default: "Vitality"
    },
    description: "A modern fitness tracker to fuel your fitness goals",
-   metadataBase: new URL("https://github.com/jeffrey-asm/vitality"),
+   metadataBase: new URL("https://github.com/jeffrey-asm/vitality")
 };
 
 
 export default function RootLayout ({
-   children,
+   children
 }: {
   children: React.ReactNode;
 }) {
