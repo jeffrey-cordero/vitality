@@ -97,5 +97,5 @@ npx cypress open
 View current potential linting errors / warnings based on `.eslintrc.json` specifications.
 
 ```bash
-npx next lint --fix
+npx eslint . --fix
 ```

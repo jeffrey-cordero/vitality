@@ -80,7 +80,7 @@ export async function signup (
          userRegistration["phone"] = registration.phone;
       }
 
-      if (!testing) {
+      if (1) {
          await prisma.$connect();
 
          await prisma.users.create({

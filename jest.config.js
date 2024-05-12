@@ -1,11 +1,11 @@
 const nextJest = require("next/jest");
 
 const createJestConfig = nextJest({
-  dir: "./",
+   dir: "./"
 });
 
 const customJestConfig = {
-  moduleDirectories: ["node_modules", "<rootDir>/"]
+   moduleDirectories: ["node_modules", "<rootDir>/"]
 };
 
 module.exports = createJestConfig(customJestConfig);
