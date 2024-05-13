@@ -1,5 +1,3 @@
-import { PrismaClient } from "@prisma/client";
-import { mockDeep } from "jest-mock-extended";
 import { expect } from "@jest/globals";
 import { signup } from "@/lib/credentials/signup";
 
@@ -8,15 +6,6 @@ let payload;
 
 /** @type {SubmissionStatus} */
 let expected;
-
-/** @type DeepMockProxy<PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>> */
-const prismaMock = mockDeep<PrismaClient>({
-   $disconnect: jest.fn()
-});
-
-jest.mock("@prisma/client", () => ({
-   PrismaClient: jest.fn(() => prismaMock)
-}));
 
 test("Test empty required user registration fields", async () => {
    // All empty fields expect for birthday
@@ -47,11 +36,11 @@ test("Test empty required user registration fields", async () => {
    await expect(signup(payload)).resolves.toEqual(expected);
 });
 
-test("Test missing or bad user registration fields", async () => {
+test("Test missing or incorrect user registration fields", async () => {
    // No birthday or email provided
    payload = {
       name: "John Doe",
-      username: "johndoe123",
+      username: "johnDoe123",
       password: "password$AAd123",
       confirmPassword: "password$AAd3",
       phone: "1234567890"
@@ -65,10 +54,10 @@ test("Test missing or bad user registration fields", async () => {
 
    await expect(signup(payload)).resolves.toEqual(expected);
 
-   // Username too long, name too short, birthday too old, phone number too long, but a valid main password
+   // Username too long, name too short, user too old, phone number too long, but a valid main password
    payload = {
       name: "r",
-      birthday: new Date("1600-01-01"),
+      birthday: new Date("1776-07-04"),
       username: "Long Username                             Very Long",
       password: "Password$AAd123",
       confirmPassword: "Password$AAd32",
@@ -89,7 +78,7 @@ test("Test missing or bad user registration fields", async () => {
 
    await expect(signup(payload)).resolves.toEqual(expected);
 
-   // Almost perfect user registration fields, but passwords do not match
+   // Almost a perfect user registration fields, but passwords do not match
    payload = {
       name: "John Doe",
       birthday: new Date("1990-01-01"),
@@ -116,7 +105,7 @@ test("Test valid registration fields", async () => {
    payload = {
       name: "John Doe",
       birthday: new Date("1990-01-01"),
-      username: "johndoe123",
+      username: "johnny123",
       password: "0Password123$$AA",
       confirmPassword: "0Password123$$AA",
       email: "john.doe@example.com",
@@ -130,7 +119,7 @@ test("Test valid registration fields", async () => {
    };
 
    await expect(signup(payload)).resolves.toEqual(expected);
-
+   
    // Ensure various phone numbers and dates can be added
    payload = {
       name: "Smith Row",
@@ -145,7 +134,7 @@ test("Test valid registration fields", async () => {
    await expect(signup(payload)).resolves.toEqual(expected);
 
    payload = {
-      name: "Eric Smit",
+      name: "Eric Smith",
       birthday: new Date("2014-12-01"),
       username: "eric192",
       password: "sm&AA1293s$$AA01",

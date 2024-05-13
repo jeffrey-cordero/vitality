@@ -61,8 +61,6 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - vitality_network
-    ports:
-      - "5432:5432"
     healthcheck:
        test: ['CMD', 'pg_isready', '-U', 'postgres', '-d', 'vitality']
        interval: 60s

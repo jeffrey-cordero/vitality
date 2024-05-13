@@ -81,7 +81,7 @@ docker exec -it vitality_app npx prisma migrate dev --name <migration-name>
 Run all unit tests.
 
 ```bash
-npm run test  
+npm run test
 ```
 
 ### Cypress
