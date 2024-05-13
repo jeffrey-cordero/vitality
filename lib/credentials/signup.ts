@@ -86,21 +86,21 @@ export async function signup (registration: Registration): Promise<SubmissionSta
       return sendSuccessMessage("Successfully registered.");
    } catch (error: any) {
       if (error.code === "P2002" && error.meta?.target?.includes("username")) {
-         return sendErrorMessage("Error", "Internal database conflicts", {
+         return sendErrorMessage("Error", "Internal database conflicts.", {
             username: ["Username already taken"]
          });
       } else if (
          error.code === "P2002" &&
       error.meta?.target?.includes("email")
       ) {
-         return sendErrorMessage("Error", "Internal database conflicts", {
+         return sendErrorMessage("Error", "Internal database conflicts.", {
             email: ["Email already taken"]
          });
       } else if (
          error.code === "P2002" &&
       error.meta?.target?.includes("phone")
       ) {
-         return sendErrorMessage("Error", "Internal database conflicts", {
+         return sendErrorMessage("Error", "Internal database conflicts.", {
             phone: ["Phone number already taken"]
          });
       } else {

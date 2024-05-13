@@ -19,7 +19,7 @@ interface ServiceProps {
 
 function Service (props: ServiceProps): JSX.Element {
    return (
-      <div className = {cx(props.background, props.color, "flex flex-col align-center justify-center gap-5 text-center rounded-2xl hover:cursor-pointer hover:scale-[1.05] transition duration-300 ease-in-out border border-gray-200 shadow-md p-5 w-[18rem] h-[18rem] mx-auto")}>
+      <div className = {cx(props.background, props.color, "flex flex-col align-center justify-center gap-5 text-center rounded-2xl hover:scale-[1.05] transition duration-300 ease-in-out border border-gray-200 shadow-md p-5 w-[16rem] h-[16rem] mx-auto")}>
          <FontAwesomeIcon icon = {props.icon} className = {cx(props.color, "text-4xl")} />
          <div className = {cx(props.divider, "w-1/2 mx-auto my-1")} />
          <h1 className = "font-semibold text-4xl">{props.title}</h1>

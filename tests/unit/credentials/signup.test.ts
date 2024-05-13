@@ -119,8 +119,51 @@ test("Test valid registration fields", async () => {
    };
 
    await expect(signup(payload)).resolves.toEqual(expected);
-   
-   // Ensure various phone numbers and dates can be added
+
+   // The following are internal database unique column conflicts caught as insertion time
+
+   // Valid registration fields, but username already taken
+   payload = {
+      name: "John Smith",
+      birthday: new Date("2008-01-01"),
+      username: "johnny123",
+      password: "sm&AA1293s$$AA01",
+      confirmPassword: "sm&AA1293s$$AA01",
+      email: "john.smith@gmail.com",
+      phone: "+1-888-555-1234"
+   };
+
+   expected = {
+      state: "Error",
+      response: { message: "Internal database conflicts." },
+      errors: {
+         username: ["Username already taken"]
+      }
+   };
+   await expect(signup(payload)).resolves.toEqual(expected);
+
+   // Valid registration fields, but email already taken
+   payload = {
+      name: "Eric Smith",
+      birthday: new Date("2014-12-01"),
+      username: "eric192",
+      password: "sm&AA1293s$$AA01",
+      confirmPassword: "sm&AA1293s$$AA01",
+      email: "john.doe@example.com",
+      phone: "+1-212-456-7890"
+   };
+
+   expected = {
+      state: "Error",
+      response: { message: "Internal database conflicts." },
+      errors: {
+         email: ["Email already taken"]
+      }
+   };
+
+   await expect(signup(payload)).resolves.toEqual(expected);
+
+   // Valid registration fields, but phone number already taken
    payload = {
       name: "Smith Row",
       birthday: new Date("2004-01-01"),
@@ -128,31 +171,15 @@ test("Test valid registration fields", async () => {
       password: "sm&AA1293s$$AA01",
       confirmPassword: "sm&AA1293s$$AA01",
       email: "smith.row@example.com",
-      phone: "2124567890"
+      phone: "1234567890"
    };
 
-   await expect(signup(payload)).resolves.toEqual(expected);
-
-   payload = {
-      name: "Eric Smith",
-      birthday: new Date("2014-12-01"),
-      username: "eric192",
-      password: "sm&AA1293s$$AA01",
-      confirmPassword: "sm&AA1293s$$AA01",
-      email: "smith.row@example.com",
-      phone: "+1-212-456-7890"
-   };
-
-   await expect(signup(payload)).resolves.toEqual(expected);
-
-   payload = {
-      name: "John Smith",
-      birthday: new Date("2008-01-01"),
-      username: "smith12",
-      password: "sm&AA1293s$$AA01",
-      confirmPassword: "sm&AA1293s$$AA01",
-      email: "john.smith@gmail.com",
-      phone: "+1-888-555-1234"
+   expected = {
+      state: "Error",
+      response: { message: "Internal database conflicts." },
+      errors: {
+         phone: ["Phone number already taken"]
+      }
    };
 
    await expect(signup(payload)).resolves.toEqual(expected);
