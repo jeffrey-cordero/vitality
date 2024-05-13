@@ -1,6 +1,8 @@
 require("dotenv").config();
 const { execSync } = require("child_process");
 
+let passedTests = false;
+
 try {
    console.log("Setting up tests.");
    // Database will be on localhost:5433
@@ -23,6 +25,8 @@ try {
 
       retries++;
    }
+
+   passedTests = retries <= 3;
 } catch (error) {
    console.error("Error setting up tests:", error);
    process.exit(1);
@@ -34,4 +38,9 @@ try {
    } catch (error) {
       console.error("Error cleaning up tests:", error);
    }
+}
+
+if (!(passedTests)) {
+   console.error("Some unit tests have failed.");
+   process.exit(1);
 }
