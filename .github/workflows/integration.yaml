@@ -3,7 +3,7 @@ name: Integration Tests
 on: [ push, pull_request ]
 
 jobs:
-  test:
+  jest_with_docker:
     runs-on: ubuntu-latest
 
     env:
