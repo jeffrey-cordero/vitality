@@ -78,10 +78,16 @@ docker exec -it vitality_app npx prisma migrate dev --name <migration-name>
 
 ### Jest
 
-Run all unit tests.
+Run unit tests.
 
 ```bash
-npm run test
+npm run unit
+```
+
+Run integration tests.
+
+```bash
+npm run integration
 ```
 
 ### Cypress

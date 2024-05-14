@@ -3,13 +3,14 @@ import Heading from "@/components/global/heading";
 import Input from "@/components/global/input";
 import Notification from "@/components/global/notification";
 import Button from "@/components/global/button";
+import Link from "next/link";
 import { FormEvent } from "react";
 import { useImmer } from "use-immer";
 import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/global/form";
 import { login } from "@/lib/credentials/login";
 import { signup, Registration } from "@/lib/credentials/signup";
 
-function Form (): JSX.Element {
+function Form(): JSX.Element {
    const [status, setStatus] = useImmer<SubmissionStatus>({ state: "Initial", response: {}, errors: {} });
    const [registration, setRegistration] = useImmer<FormItems>(
       {
@@ -89,34 +90,36 @@ function Form (): JSX.Element {
    };
 
    return (
-      <div className = "w-full mx-auto">
-         <form className = "w-1/2 mx-auto flex flex-col justify-center align-center gap-3" onSubmit = {handleSubmit}>
-            <Input input = {registration.username} updater = {setRegistration} />
-            <Input input = {registration.password} updater = {setRegistration} />
-            <Input input = {registration.confirmPassword} updater = {setRegistration} />
-            <Input input = {registration.name} updater = {setRegistration} />
-            <Input input = {registration.birthday} updater = {setRegistration} />
-            <Input input = {registration.email} updater = {setRegistration} />
-            <Input input = {registration.phone} updater = {setRegistration} />
-            <Button type = "submit" className = "bg-primary text-white h-[2.6rem]">
+      <div className="w-full mx-auto">
+         <form className="w-1/2 mx-auto flex flex-col justify-center align-center gap-3" onSubmit={handleSubmit}>
+            <Input input={registration.username} updater={setRegistration} />
+            <Input input={registration.password} updater={setRegistration} />
+            <Input input={registration.confirmPassword} updater={setRegistration} />
+            <Input input={registration.name} updater={setRegistration} />
+            <Input input={registration.birthday} updater={setRegistration} />
+            <Input input={registration.email} updater={setRegistration} />
+            <Input input={registration.phone} updater={setRegistration} />
+            <Button type="submit" className="bg-primary text-white h-[2.6rem]">
                Submit
             </Button>
          </form>
          {
             status.state === "Success" && (
-               <Notification status = {status}>
-                  <Button
-                     type = "button"
-                     className = "bg-green-600 text-white p-4 text-sm h-[2.4rem]"
-                     onClick = {async () => {
-                        await login({
-                           username: registration.username.value,
-                           password: registration.password.value
-                        });
-                     }}
-                  >
-                     Home
-                  </Button>
+               <Notification status={status}>
+                  <Link href="/home">
+                     <Button
+                        type="button"
+                        className="bg-green-600 text-white p-4 text-sm h-[2rem]"
+                        onClick={async () => {
+                           await login({
+                              username: registration.username.value,
+                              password: registration.password.value
+                           });
+                        }}
+                     >
+                        Log In
+                     </Button>
+                  </Link>
                </Notification>
             )
          }
@@ -124,11 +127,11 @@ function Form (): JSX.Element {
    );
 }
 
-export default function SignUpForm (): JSX.Element {
+export default function SignUpForm(): JSX.Element {
    return (
       <>
-         <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
-            <Heading title = "Sign up" description = "Create an account to get started" />
+         <div className="w-full mx-auto flex flex-col items-center justify-center text-center">
+            <Heading title="Sign up" description="Create an account to get started" />
             <Form />
          </div>
       </>

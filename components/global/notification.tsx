@@ -18,7 +18,7 @@ export default function Notification (props: NotificationProps): JSX.Element {
       <>
          {visible &&
             <div
-               className = "fixed top-0 left-1/2 transform -translate-x-1/2 p-10 opacity-0 animate-fadeIn"
+               className = "fixed top-0 left-1/2 transform -translate-x-1/2 max-w-4/5 mx-auto p-10 opacity-0 animate-fadeIn"
                {...props}
             >
                <div className = "text-left">
@@ -52,8 +52,8 @@ export default function Notification (props: NotificationProps): JSX.Element {
                               onClick = {() => { setVisible(false); }}
                            >
                               <svg
-                                 width = {24}
-                                 height = {24}
+                                 width = {25}
+                                 height = {25}
                                  viewBox = "0 0 24 24"
                                  className = "fill-current"
                               >

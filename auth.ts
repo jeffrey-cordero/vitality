@@ -1,30 +1,9 @@
 import bcrypt from "bcryptjs";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { authConfig } from "./auth.config";
-import { PrismaClient, Users as User } from "@prisma/client";
+import { authConfig } from "@/auth.config";
 import { z } from "zod";
-
-export async function getUser (username: string): Promise<User | null> {
-   const prisma = new PrismaClient();
-
-   try {
-      await prisma.$connect();
-
-      const user = await prisma.users.findFirst({
-         where: {
-            username: username
-         }
-      });
-
-      return user;
-   } catch (error) {
-      console.error("Failed to fetch user:", error);
-      throw new Error("Failed to fetch user.");
-   } finally {
-      prisma.$disconnect();
-   }
-}
+import { getUser } from "@/lib/credentials/user";
 
 export const { auth, signIn, signOut } = NextAuth({
    ...authConfig,

@@ -7,7 +7,8 @@
     "prettier:check": "prettier --check --ignore-unknown .",
     "start": "next start",
     "lint": "next lint",
-    "test": "node tests/unit/setup.ts",
+    "unit": "npx jest tests/unit/* --collect-coverage",
+    "integration" : "node tests/integration/setup.ts",
     "cypress:open": "cypress open"
   },
   "dependencies": {

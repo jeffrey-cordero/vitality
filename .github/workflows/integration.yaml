@@ -1,10 +1,14 @@
-name: Unit Tests
+name: Integration Tests
 
 on: [ push, pull_request ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/vitality?schema=public
+      DATABASE_TEST_URL: postgresql://postgres:postgres@127.0.0.1:5431/vitality_test?schema=public
     
     steps:
     - name: Checkout code
@@ -18,7 +22,7 @@ jobs:
     - name: Install dependencies
       run: npm install
       
-    - name: Run unit tests
-      run: npm run unit
+    - name: Run integration tests
+      run: npm run integration
       env:
         CI: true

@@ -1,9 +1,13 @@
+import Header from "@/components/global/header";
 import LoginForm from "@/components/credentials/login";
 
-export default function LoginPage () {
+export default function Page() {
    return (
-      <main className = "animate-slideIn flex min-h-screen w-full flex-col items-center justify-start p-4 text-center">
-         <LoginForm />
-      </main>
+      <>
+         <Header />
+         <main className="w-full mx-auto flex min-h-screen flex-col items-center justify-start p-4 text-center">
+            <LoginForm />
+         </main>
+      </>
    );
 }
