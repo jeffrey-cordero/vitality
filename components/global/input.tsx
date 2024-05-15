@@ -26,7 +26,7 @@ export default function Input ({ updater, ...props }: InputProps): JSX.Element {
             <button type = "button" className = "absolute top-0 end-0 p-3.5 rounded-e-md">
                <FontAwesomeIcon
                   icon = {faEye}
-                  className = "flex-shrink-0 size-3.5"
+                  className = "flex-shrink-0 size-3.5 password-icon"
                   ref = {eyeButton}
                   onClick = {() => {
                      if (eyeButton.current !== null) {
@@ -48,7 +48,7 @@ export default function Input ({ updater, ...props }: InputProps): JSX.Element {
          </label>
          {props.input.error !== null &&
             <div className = "flex justify-center align-center max-w-[40rem] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-               <p className = "text-red-500"> {props.input.error} </p>
+               <p className = "text-red-500 input-error"> {props.input.error} </p>
             </div>
          }
       </div>

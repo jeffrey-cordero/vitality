@@ -84,7 +84,7 @@ Run unit tests.
 npm run unit
 ```
 
-Run integration tests.
+Run integration tests, which include Cypress tests for convenience.
 
 ```bash
 npm run integration
@@ -92,10 +92,10 @@ npm run integration
 
 ### Cypress
 
-Run end-to-end tests.
+Run end-to-end tests locally.
 
 ```bash
-npx cypress open
+npm run cypress:open
 ```
 
 ## Linting

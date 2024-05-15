@@ -3,13 +3,12 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "prettier": "prettier --write --ignore-unknown .",
-    "prettier:check": "prettier --check --ignore-unknown .",
     "start": "next start",
     "lint": "next lint",
     "unit": "npx jest tests/unit/* --collect-coverage",
-    "integration" : "node tests/integration/setup.ts",
-    "cypress:open": "cypress open"
+    "integration": "npx ts-node tests/setup.ts",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
@@ -33,13 +32,14 @@
     "next": "^14.1.3",
     "next-auth": "^5.0.0-beta.15",
     "pg": "^8.11.4",
-    "postcss": "8.4.31",
+    "postcss": "^8.4.38",
+    "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.14",
     "prisma": "^5.13.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "sharp": "^0.33.3",
     "tailwindcss": "3.3.3",
-    "ts-node": "^10.9.2",
     "typescript": "5.2.2",
     "use-debounce": "^10.0.0",
     "use-immer": "^0.9.0",
@@ -57,16 +57,15 @@
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.14",
     "@vercel/style-guide": "^5.0.1",
-    "cypress": "^13.7.3",
+    "cypress": "^13.9.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.0.0",
     "eslint-config-prettier": "9.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-mock-extended": "^3.0.7",
-    "prettier": "^3.0.3",
-    "prettier-plugin-tailwindcss": "0.5.4",
-    "ts-jest": "^29.1.2"
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2"
   },
   "engines": {
     "node": ">=18.17.0"

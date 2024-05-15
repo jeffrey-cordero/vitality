@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
-import { getUser } from "@/lib/credentials/user";
+import { getUser } from "@/lib/authentication/user";
 import { expect } from "@jest/globals";
-import { signup } from "@/lib/credentials/signup";
+import { signup } from "@/lib/authentication/signup";
 
 /** @type {Registration} */
 let payload;

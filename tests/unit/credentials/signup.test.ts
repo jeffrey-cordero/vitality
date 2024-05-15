@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { mockDeep } from "jest-mock-extended";
 import { expect } from "@jest/globals";
-import { signup } from "@/lib/credentials/signup";
+import { signup } from "@/lib/authentication/signup";
 
 /** @type {Registration} */
 let payload;

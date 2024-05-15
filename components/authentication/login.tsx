@@ -5,7 +5,7 @@ import Button from "@/components/global/button";
 import { FormEvent } from "react";
 import { useImmer } from "use-immer";
 import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/global/form";
-import { login, Credentials } from "@/lib/credentials/login";
+import { login, Credentials } from "@/lib/authentication/login";
 
 function Form (): JSX.Element {
    const [status, setStatus] = useImmer<SubmissionStatus>({ state: "Initial", response: {}, errors: {} });
