@@ -6,7 +6,8 @@
 .pnp.js
 
 # testing
-/coverage
+/coverage/
+/cypress
 
 # next.js
 /.next/
@@ -35,4 +36,4 @@ next-env.d.ts
 
 # misc
 .vscode
-.swc/*
+.swc

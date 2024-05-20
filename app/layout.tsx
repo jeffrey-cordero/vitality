@@ -1,5 +1,4 @@
 import "./global.css";
-import Header from "@/components/global/header";
 import cx from "classnames";
 import { sfPro, inter } from "./fonts";
 
@@ -22,15 +21,14 @@ export const metadata: Metadata = {
 };
 
 
-export default function RootLayout ({
+export default function Layout ({
    children
 }: {
   children: React.ReactNode;
 }) {
    return (
       <html lang = "en">
-         <body className = {cx(sfPro.variable, inter.variable, "bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black overflow-x-hidden")}>
-            <Header />
+         <body className = {cx(sfPro.variable, inter.variable, "bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black overflow-x-hidden min-h-screen")}>
             {children}
          </body>
       </html>

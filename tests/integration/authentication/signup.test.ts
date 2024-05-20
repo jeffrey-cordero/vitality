@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { mockDeep } from "jest-mock-extended";
 import { expect } from "@jest/globals";
 import { signup } from "@/lib/authentication/signup";
 
@@ -9,43 +8,15 @@ let payload;
 /** @type {SubmissionStatus} */
 let expected;
 
-/** @type DeepMockProxy<PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>> */
-const prismaMock = mockDeep<PrismaClient>({
-   $disconnect: jest.fn()
-});
+describe("User can be created and conflicts arise when attempting registration with used unique fields", () => {
+   const prisma = new PrismaClient();
 
-jest.mock("@prisma/client", () => ({
-   PrismaClient: jest.fn(() => prismaMock)
-}));
+   beforeAll(async () => {
+      await prisma.$connect();
+   });;
 
-describe("User can be created given valid fields or rejected given invalid fields in isolation", () => {
-   test("Empty required user registration fields", async () => {
-      // All empty fields expect for birthday
-      payload = {
-         name: "",
-         birthday: new Date(),
-         username: "",
-         password: "",
-         confirmPassword: "",
-         email: "",
-         phone: ""
-      };
-
-      expected = {
-         state: "Error",
-         response: { message: "Invalid user registration fields" },
-         errors: {
-            username: ["A username must be at least 3 characters"],
-            password: [
-               "A password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character (@$!%*#?&)"
-            ],
-            name: ["A name must be at least 2 characters"],
-            email: ["A valid email is required"],
-            phone: ["A valid phone is required if provided"]
-         }
-      };
-
-      await expect(signup(payload)).resolves.toEqual(expected);
+   afterAll(async () => {
+      await prisma.$disconnect();
    });
 
    test("Missing or incorrect user registration fields", async () => {
@@ -66,35 +37,20 @@ describe("User can be created given valid fields or rejected given invalid field
 
       await expect(signup(payload)).resolves.toEqual(expected);
 
-      // Username too long, name too short, user too old, phone number too long, but a valid main password
-      payload = {
-         name: "r",
-         birthday: new Date("1776-07-04"),
-         username: "Long Username                             Very Long",
-         password: "Password$AAd123",
-         confirmPassword: "Password$AAd32",
-         phone: "12345629313243443243290"
-      };
-
-      expected = {
-         state: "Error",
-         response: { message: "Invalid user registration fields" },
-         errors: {
-            name: ["A name must be at least 2 characters"],
-            birthday: ["A birthday must not be before 200 years ago"],
-            username: ["A username must be at most 30 characters"],
-            email: ["Required"],
-            phone: ["A valid phone is required if provided"]
+      // Validate that the user was not entered into the database
+      let missing = await prisma.users.findUnique({
+         where: {
+            username: "johnDoe123"
          }
-      };
+      });
 
-      await expect(signup(payload)).resolves.toEqual(expected);
+      expect(missing).toBe(null);
 
       // Almost a perfect user registration fields, but passwords do not match
       payload = {
          name: "John Doe",
          birthday: new Date("1990-01-01"),
-         username: "johndoe123",
+         username: "john123",
          password: "0Password123$$A2A",
          confirmPassword: "0Password123$$AA",
          email: "john.doe@example.com",
@@ -111,9 +67,18 @@ describe("User can be created given valid fields or rejected given invalid field
       };
 
       await expect(signup(payload)).resolves.toEqual(expected);
+
+      missing = await prisma.users.findUnique({
+         where: {
+            username: "john123"
+         }
+      });
+
+      expect(missing).toBe(null);
    });
 
-   test("Valid registration with a variety of parameters", async () => {
+
+   test("Valid registration fields and unique field conflicts", async () => {
       payload = {
          name: "John Doe",
          birthday: new Date("1990-01-01"),
@@ -132,6 +97,23 @@ describe("User can be created given valid fields or rejected given invalid field
 
       await expect(signup(payload)).resolves.toEqual(expected);
 
+      // Validate that the user was entered into the database
+      const user = await prisma.users.findUnique({
+         where: {
+            username: "johnny123"
+         }
+      });
+
+      expect(user).not.toBe(null);
+      expect(user?.username).toBe("johnny123");
+      expect(user?.phone).toBe("1234567890");
+      expect(user?.email).toBe("john.doe@example.com");
+      expect(user?.birthday).toEqual(new Date("1990-01-01T00:00:00.000Z"));
+
+      // Passwords should be hashed for security measures
+      expect(user?.password).not.toBe("0Password123$$AA");
+
+      // Valid registration fields, but username already taken
       payload = {
          name: "John Smith",
          birthday: new Date("2008-01-01"),
@@ -142,8 +124,17 @@ describe("User can be created given valid fields or rejected given invalid field
          phone: "+1-888-555-1234"
       };
 
+      expected = {
+         state: "Error",
+         response: { message: "Internal database conflicts" },
+         errors: {
+            username: ["Username already taken"]
+         }
+      };
+
       await expect(signup(payload)).resolves.toEqual(expected);
 
+      // Valid registration fields, but email already taken
       payload = {
          name: "Eric Smith",
          birthday: new Date("2014-12-01"),
@@ -154,8 +145,17 @@ describe("User can be created given valid fields or rejected given invalid field
          phone: "+1-212-456-7890"
       };
 
+      expected = {
+         state: "Error",
+         response: { message: "Internal database conflicts" },
+         errors: {
+            email: ["Email already taken"]
+         }
+      };
+
       await expect(signup(payload)).resolves.toEqual(expected);
 
+      // Valid registration fields, but phone number already taken
       payload = {
          name: "Smith Row",
          birthday: new Date("2004-01-01"),
@@ -164,6 +164,14 @@ describe("User can be created given valid fields or rejected given invalid field
          confirmPassword: "sm&AA1293s$$AA01",
          email: "smith.row@example.com",
          phone: "1234567890"
+      };
+
+      expected = {
+         state: "Error",
+         response: { message: "Internal database conflicts" },
+         errors: {
+            phone: ["Phone number already taken"]
+         }
       };
 
       await expect(signup(payload)).resolves.toEqual(expected);

@@ -78,18 +78,32 @@ docker exec -it vitality_app npx prisma migrate dev --name <migration-name>
 
 ### Jest
 
-Run all unit tests.
+Run unit tests.
 
 ```bash
-npm run test  
+npm run unit
+```
+
+Run integration tests.
+
+```bash
+npm run integration
 ```
 
 ### Cypress
 
+Pausing the development processes with the steps above is recommended for Cypress testing to save resources. This will create a new instance of the application that can be found at [http://localhost:3001/](http://localhost:3001/)
+
+Test specific end-to-end tests with incrementing changes. Please end tests by closing the Cypress popup window for proper cleanup.
+
+```bash
+npm run e2e:test
+```
+
 Run end-to-end tests.
 
 ```bash
-npx cypress open
+npm run e2e:run
 ```
 
 ## Linting
@@ -97,5 +111,5 @@ npx cypress open
 View current potential linting errors / warnings based on `.eslintrc.json` specifications.
 
 ```bash
-npx next lint --fix
+npx eslint . --fix
 ```

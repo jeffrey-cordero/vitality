@@ -32,25 +32,18 @@ export function updateFormState (event: ChangeEvent<HTMLInputElement | HTMLTextA
    });
 };
 
-export function handleFormErrors (response: SubmissionStatus, updater: Updater<FormItems>) {
-   const errors = {};
+export function handleFormErrors (response: SubmissionStatus, items: FormItems, updater: Updater<FormItems>) {
+   // Show new errors or hide prior errors
+   for (const input of Object.keys(items)) {
+      let error : string | null = null;
 
-   // Show error inputs
-   for (const error of Object.keys(response.errors)) {
-      errors[error] = true;
+      if (response.errors[input]) {
+         error = response.errors[input][0];
+      }
 
       updater((inputs) => {
-         inputs[error].error = response.errors[error][0];
+         inputs[input].error = error;
       });
-   }
-
-   // Hide fixed error inputs
-   for (const input of Object.keys(updater)) {
-      if (!(errors[input]) && updater[input].error !== null) {
-         updater((inputs) => {
-            inputs[input].error = null;
-         });
-      }
    }
 }
 

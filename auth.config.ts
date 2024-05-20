@@ -1,21 +1,22 @@
-import type { NextAuthConfig } from 'next-auth';
- 
+import type { NextAuthConfig } from "next-auth";
+
 export const authConfig = {
-  pages: {
-    signIn: "/login",
-  },
-  callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
-      const isOnHome = nextUrl.pathname.startsWith('/home');
-      if (isOnHome) {
-        if (isLoggedIn) return true;
-        return false;
-      } else if (isLoggedIn) {
-        return Response.redirect(new URL('/home', nextUrl));
+   pages: {
+      signIn: "/login",
+      signOut: "/home/signOut"
+   },
+   callbacks: {
+      authorized ({ auth, request: { nextUrl } }) {
+         const isLoggedIn = !!auth?.user;
+         const isOnHome = nextUrl.pathname.startsWith("/home");
+         if (isOnHome) {
+            if (isLoggedIn) return true;
+            return false;
+         } else if (isLoggedIn) {
+            return Response.redirect(new URL("/home", nextUrl));
+         }
+         return true;
       }
-      return true;
-    },
-  },
-  providers: [],
+   },
+   providers: []
 } satisfies NextAuthConfig;

@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  app_test:
+    image: node:alpine
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres_test:5432/vitality_test?schema=public
+    working_dir: /app
+    volumes:
+      - ../:/app
+    networks:
+      - vitality_test_network
+    ports:
+      - "3001:3000"
+    depends_on:
+      - postgres_test
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3001 || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: sh -c "npx prisma generate && npm run dev"
+    container_name: vitality_app_test
+
+  postgres_test: 
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: vitality_test
+    volumes:
+      - vitality_postgres_test_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - vitality_test_network
+    ports:
+      - "5431:5432"
+    healthcheck:
+       test: ['CMD', 'pg_isready', '-U', 'postgres', '-d', 'vitality_test']
+       interval: 60s
+       timeout: 5s
+       retries: 5
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    container_name: vitality_postgres_test
+
+networks:
+  vitality_test_network:
+    driver: bridge
+
+volumes:
+  vitality_postgres_test_data:
