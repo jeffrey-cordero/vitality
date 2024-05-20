@@ -20,7 +20,7 @@ describe("User registration on signup page", () => {
 
       // Submitting signup form with no provided inputs should show all errors
       cy.get("button[type='submit']").click();
-      
+
       cy.get(".input-error").should("have.length", 5);
       cy.get(".input-error").contains("A username must be at least 3 characters").should("be.visible");
       cy.get(".input-error").contains("A password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character (@$!%*#?&)").should("be.visible");
@@ -81,7 +81,6 @@ describe("User registration on signup page", () => {
       cy.get(".input-error").should("have.length", 2);
       cy.get(".input-error").contains("Passwords do not match").should("be.visible");
 
-
       // Fix the confirm password input
       cy.get("#confirmPassword").clear();
       cy.get("#confirmPassword").type(payload.password);
@@ -122,7 +121,7 @@ describe("User registration on signup page", () => {
 
       cy.get("button[type='submit']").click();
 
-      // Error messages for taken fields show one at a time
+      // Error messages for taken fields should show one at a time
       cy.get(".input-error").should("have.length", 1);
       cy.get(".input-error").contains("Username already taken").should("be.visible");
 
@@ -141,11 +140,12 @@ describe("User registration on signup page", () => {
 
       // Ensure form can be submitted with no phone number
       cy.get("#phone").clear();
+      cy.get(".input-error").should("not.exist");
       cy.get("button[type='submit']").click();
 
       // Submit new valid form, but reloading should not log in user automatically
       cy.get("h3").contains("Successfully registered").should("be.visible");
-      
+
       cy.reload();
       cy.url().should("not.include", "/home");
       cy.url().should("include", "/signup");
@@ -160,14 +160,14 @@ describe("User registration on signup page", () => {
 
       cy.get("button[type='submit']").click();
 
-      cy.get(".input-error").should('have.length', 2);
-      cy.get(".input-error").contains("Invalid credentials").should("be.visible");
-      
-      cy.get("#password").clear().type(payload.password);
-      cy.get(".input-error").should('have.length', 1);
+      cy.get(".input-error").should("have.length", 2);
       cy.get(".input-error").contains("Invalid credentials").should("be.visible");
 
-      cy.get("#username").clear().type(payload.username)
+      cy.get("#password").clear().type(payload.password);
+      cy.get(".input-error").should("have.length", 1);
+      cy.get(".input-error").contains("Invalid credentials").should("be.visible");
+
+      cy.get("#username").clear().type(payload.username);
       cy.get(".input-error").should("not.exist");
 
       // Login with valid credentials

@@ -4,7 +4,6 @@ require("dotenv").config();
 async function runTest (command : string): Promise<boolean> {
    let retries = 1;
 
-   // Run all tests with at most 3 retries
    while (retries <= 3) {
       try {
          execSync(command, { stdio: "inherit" });
@@ -19,52 +18,56 @@ async function runTest (command : string): Promise<boolean> {
    return retries <= 3;
 }
 
-async function main (integrationTesting : boolean, endToEndTesting: "test" | "run"): Promise<void> {
+async function integration (): Promise<boolean> {
+   process.env.DATABASE_URL = "postgresql://postgres:postgres@localhost:5431/vitality_test?schema=public";
+   const integration = await runTest("npx jest --runInBand tests/integration/* --collect-coverage");
+
+   if (!(integration)) {
+      console.error("Some integration tests have failed.");
+      return false;
+   }
+
+   return true;
+}
+
+async function endToEnd (type: "test" | "run"): Promise<boolean> {
+   process.env.BASE_URL = "http://localhost:3001";
+   const endToEndCommand = type === "test" ? "npx cypress open" : "npx cypress run";
+   const endToEnd = await runTest(endToEndCommand);
+
+   if (type === "run" && !(endToEnd)) {
+      console.error("Some end to end tests have failed.");
+      return false;
+   }
+
+   return true;
+}
+
+async function main (): Promise<void> {
    let passed = false;
-   console.log("Setting up docker environment.");
+   console.log("Setting up docker testing environment.");
 
    try {
-      // Build and start the docker integration environment
+      // Setup the docker test environment
       execSync("docker compose -f tests/docker-compose.yaml up -d", { stdio: "inherit" },);
 
-      // Wait for container database to setup
+      // Wait for dock test environment to setup to mitigate database conflicts
       await new Promise(resolve => setTimeout(resolve, 10000));
 
-      if (integrationTesting) {
-         process.env.DATABASE_URL = "postgresql://postgres:postgres@localhost:5431/vitality_test?schema=public";
-         const serverComponents = await runTest("npx jest --runInBand tests/integration/* --collect-coverage");
-
-         if (!(serverComponents)) {
-            console.error("Some server component tests have failed.");
-            passed = false;
-         }
-      }
-
-      process.env.BASE_URL = "http://localhost:3001";
-
-      if (!(integrationTesting)) {
-         let endToEndCommand = "npx cypress run";
-
-         if (endToEndTesting === "test") {
-            endToEndCommand = "npx cypress open";
-         }
-
-         const endToEnd = await runTest(endToEndCommand);
-
-         if (endToEndTesting === "run" && !(endToEnd)) {
-            console.error("Some end to end tests have failed.");
-            passed = false;
-         }
+      if (process.argv.includes("integration")) {
+         passed = await integration();
+      } else {
+         passed = await endToEnd(process.argv.includes("e2e:run") ? "run" : "test");
       }
    } catch (error) {
-      console.error("Error setting up docker environment. Please try again:", error);
+      console.error("Error setting up docker testing environment. Please try again:", error);
    } finally {
-      // Cleanup the docker integration environment
+      // Cleanup the docker test environment
       try {
-         console.log("Cleaning up docker environment.");
+         console.log("Cleaning up docker testing environment.");
          execSync("docker compose -f  tests/docker-compose.yaml down -v --remove-orphans", { stdio: "inherit" },);
       } catch (error) {
-         console.error("Error cleaning up docker environment. Please manually clean up for future testing:", error);
+         console.error("Error cleaning up docker testing environment. Please manually clean up for future testing:", error);
       }
 
       if (!(passed)) {
@@ -73,4 +76,4 @@ async function main (integrationTesting : boolean, endToEndTesting: "test" | "ru
    }
 }
 
-main(process.argv.includes("component"), process.argv.includes("e2e:run") ? "run" : "test");
+main();
