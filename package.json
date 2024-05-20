@@ -6,9 +6,9 @@
     "start": "next start",
     "lint": "next lint",
     "unit": "npx jest tests/unit/* --collect-coverage",
-    "integration": "npx ts-node tests/setup.ts",
-    "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "integration:component": "npx ts-node tests/setup.ts component",
+    "integration:e2e:test" : "npx ts-node tests/setup.ts e2e:test",
+    "integration:e2e:run" : "npx ts-node tests/setup.ts e2e:run"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",

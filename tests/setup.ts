@@ -19,7 +19,7 @@ async function runTest (command : string): Promise<boolean> {
    return retries <= 3;
 }
 
-async function main (): Promise<void> {
+async function main (integrationTesting : boolean, endToEndTesting: "test" | "run"): Promise<void> {
    let passed = false;
    console.log("Setting up docker environment.");
 
@@ -30,23 +30,32 @@ async function main (): Promise<void> {
       // Wait for container database to setup
       await new Promise(resolve => setTimeout(resolve, 10000));
 
-      process.env.DATABASE_URL = "postgresql://postgres:postgres@127.0.0.1:5431/vitality_test?schema=public";
-      const serverComponents = await runTest("npx jest --runInBand tests/integration/* --collect-coverage");
+      if (integrationTesting) {
+         process.env.DATABASE_URL = "postgresql://postgres:postgres@localhost:5431/vitality_test?schema=public";
+         const serverComponents = await runTest("npx jest --runInBand tests/integration/* --collect-coverage");
 
-      if (!(serverComponents)) {
-         console.error("Some server component tests have failed.");
-         passed = false;
+         if (!(serverComponents)) {
+            console.error("Some server component tests have failed.");
+            passed = false;
+         }
       }
 
       process.env.BASE_URL = "http://localhost:3001";
 
-      const e2e = await runTest("npx cypress run");
+      if (!(integrationTesting)) {
+         let endToEndCommand = "npx cypress run";
 
-      if (!(e2e)) {
-         console.error("Some end to end tests have failed.");
-         passed = false;
+         if (endToEndTesting === "test") {
+            endToEndCommand = "npx cypress open";
+         }
+
+         const endToEnd = await runTest(endToEndCommand);
+
+         if (endToEndTesting === "run" && !(endToEnd)) {
+            console.error("Some end to end tests have failed.");
+            passed = false;
+         }
       }
-
    } catch (error) {
       console.error("Error setting up docker environment. Please try again:", error);
    } finally {
@@ -64,4 +73,4 @@ async function main (): Promise<void> {
    }
 }
 
-main();
+main(process.argv.includes("component"), process.argv.includes("e2e:run") ? "run" : "test");

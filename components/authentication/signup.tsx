@@ -83,7 +83,7 @@ function Form (): JSX.Element {
          // Update current status of form to show potential success notification
          const response = await signup(payload);
          setStatus(response);
-         handleFormErrors(response, setRegistration);
+         handleFormErrors(response, registration, setRegistration);
       } catch (error) {
          console.error("Error updating status:", error);
       }

@@ -38,7 +38,7 @@ function Form (): JSX.Element {
 
          const response = await login(payload);
          setStatus(response);
-         handleFormErrors(response, setCredentials);
+         handleFormErrors(response, credentials, setCredentials);
          console.log(status);
       } catch (error) {
          console.error("Error updating status:", error);

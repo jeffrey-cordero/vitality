@@ -84,18 +84,26 @@ Run unit tests.
 npm run unit
 ```
 
-Run integration tests, which include Cypress tests for convenience.
+Run component integration tests.
 
 ```bash
-npm run integration
+npm run integration:component
 ```
 
 ### Cypress
 
-Run end-to-end tests locally.
+Pausing the development processes with the steps above is recommended for Cypress testing to save resources. This will create a new instance of the application that can be found at [http://localhost:3001/](http://localhost:3001/)
+
+Test specific end-to-end integration tests with incrementing changes. Please end tests by closing the Cypress popup window for proper cleanup.
 
 ```bash
-npm run cypress:open
+npm run integration:e2e:test
+```
+
+Run end-to-end integration tests.
+
+```bash
+npm run integration:e2e:run
 ```
 
 ## Linting
