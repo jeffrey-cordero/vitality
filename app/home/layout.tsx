@@ -1,16 +1,20 @@
-import Footer from "@/components/global/footer";
-import Header from "@/components/global/header";
+"use client";
+import SideBar from "@/components/global/sidebar";
 
 export default function Layout ({
    children
 }: {
-  children: React.ReactNode;
+   children: React.ReactNode;
 }) {
+
    return (
       <>
-         <Header />
-         {children}
-         <Footer />
+         <div className = "flex h-screen flex-col">
+            <SideBar />
+            <div className = "flex-grow p-6 md:overflow-y-auto md:p-12">
+               {children}
+            </div>
+         </div>
       </>
    );
 }
