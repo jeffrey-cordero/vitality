@@ -2,12 +2,7 @@ import cx from "classnames";
 import Heading from "@/components/global/heading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faDumbbell } from "@fortawesome/free-solid-svg-icons";
-import { faMugHot } from "@fortawesome/free-solid-svg-icons";
-import { faWeightScale } from "@fortawesome/free-solid-svg-icons";
-import { faBottleWater } from "@fortawesome/free-solid-svg-icons";
-import { faBullseye } from "@fortawesome/free-solid-svg-icons";
-import { faBrain } from "@fortawesome/free-solid-svg-icons";
+import { faPersonRunning, faUtensils, faBullseye, faWeightScale, faBottleWater, faBrain } from "@fortawesome/free-solid-svg-icons";
 
 interface ServiceProps {
    icon: IconProp;
@@ -38,14 +33,14 @@ export default function Services (): JSX.Element {
             <Service
                background = "bg-white"
                color = "text-primary"
-               icon = {faDumbbell}
+               icon = {faPersonRunning}
                title = "Workouts"
                divider = "bg-primary"
             />
             <Service
                background = "bg-primary"
                color = "text-white"
-               icon = {faMugHot}
+               icon = {faUtensils}
                title = "Nutrition"
                divider = "bg-white"
             />

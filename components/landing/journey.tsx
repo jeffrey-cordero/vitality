@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
@@ -60,11 +61,11 @@ export default function Journey (): JSX.Element {
                         <p className = "w-3/4 mx-auto mb-8 text-semibold text-body-color">
                            Discover the power of tracking your fitness journey as you strive towards your goals. By monitoring your progress, you gain valuable insights, stay accountable, and fuel your motivation.
                         </p>
-                        <a href = "login">
+                        <Link href = "login">
                            <Button className = "text-white text-md bg-primary whitespace-nowrap w-[9rem] h-[3.2rem] text-lg">
                               Start Today
                            </Button>
-                        </a>
+                        </Link>
                      </div>
                   </div>
                </div>
