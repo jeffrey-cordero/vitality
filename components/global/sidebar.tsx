@@ -45,7 +45,6 @@ function SideBarLinks (): JSX.Element {
    );
 }
 
-
 export default function SideBar (): JSX.Element {
    const [visibleSideBar, setVisibleSideBar] = useState<boolean>(false);
 
@@ -60,7 +59,7 @@ export default function SideBar (): JSX.Element {
                }}
             />
          </div>
-         <div className = {clsx("relative m-0 top-1/2 w-[4.5rem] hover:w-64 transition-all duration-1000 ease-in-out", {
+         <div className = {clsx("relative m-0 top-[-40px] w-[4.5rem] hover:w-64 transition-all duration-1000 ease-in-out", {
             "left-[-5rem]": !(visibleSideBar),
             "left-[10px]" : visibleSideBar
          })}>
