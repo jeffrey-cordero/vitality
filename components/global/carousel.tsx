@@ -20,7 +20,7 @@ export default function Carousel (props: CarouselProps): JSX.Element {
    };
 
    return (
-      <div className = "relative w-full mx-auto bg-white rounded-2xl my-6">
+      <div className = "relative w-full mx-auto bg-white rounded-2xl p-2 sm:p-0 shadow-lg">
          <div
             className = "carousel-inner flex transition-[opacity,transform] ease-in-out duration-500"
             style = {{
@@ -30,7 +30,7 @@ export default function Carousel (props: CarouselProps): JSX.Element {
             {props.items.map((slide, index) => (
                <div
                   key = {index}
-                  className = {clsx("carousel-item flex-shrink-0 rounded-2xl", {
+                  className = {clsx("flex justify-center items-center p-2 md:p-4 flex-shrink-0 rounded-2xl", {
                      "opacity-100": index === currentIndex,
                      "opacity-30": index !== currentIndex
                   })}

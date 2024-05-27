@@ -7,6 +7,7 @@ import { FormEvent } from "react";
 import { useImmer } from "use-immer";
 import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/global/form";
 import { login, Credentials } from "@/lib/authentication/login";
+import Link from "next/link";
 
 function Form (): JSX.Element {
    const [status, setStatus] = useImmer<SubmissionStatus>({ state: "Initial", response: {}, errors: {} });
@@ -47,16 +48,19 @@ function Form (): JSX.Element {
    };
 
    return (
-      <div className = "w-full mx-auto">
-         <form className = "w-1/2 mx-auto flex flex-col justify-center align-center gap-3" onSubmit = {handleSubmit}>
+      <div className = "w-10/12 lg:w-1/2 mx-auto">
+         <form className = "w-full flex flex-col justify-center align-center gap-3" onSubmit = {handleSubmit}>
             <Input input = {credentials.username} updater = {setCredentials} />
             <Input input = {credentials.password} updater = {setCredentials} />
             <Button type = "submit" className = "bg-primary text-white h-[2.6rem]">
                Submit
             </Button>
          </form>
+         <p className="mt-4"><Link href = "/forgot" className="text-primary font-bold underline">Forgot Username /  Password</Link></p>
+         <p className="mt-2">Don't have an account? <Link href = "/signup" className="text-primary font-bold underline">Register</Link></p>
+        
          {
-            (status.state === "Failure") && (
+            (status && status.state === "Failure") && (
                <Notification status = {status} />
             )
          }
@@ -68,7 +72,7 @@ export default function LoginForm (): JSX.Element {
    return (
       <>
          <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
-            <Heading title = "Log in" description = "Enter valid credentials to enter" />
+            <Heading title = "Log In" description = "Enter valid credentials to enter" />
             <Form />
          </div>
       </>

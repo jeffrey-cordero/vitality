@@ -1,13 +1,9 @@
-// Import Font Awesome CSS
 import "./global.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import { config } from "@fortawesome/fontawesome-svg-core";
-config.autoAddCss = false;
-
 import cx from "classnames";
 import Head from "next/head";
 import SideBar from "@/components/global/sidebar";
-
+import Footer from "@/components/global/footer";
 import { sfPro, inter } from "./fonts";
 import { Metadata } from "next";
 
@@ -29,9 +25,10 @@ export default function Layout ({
    return (
       <html lang = "en">
          <Head>
+            <link rel = "icon" href = "favicon.ico" />
             <meta name = "viewport" content = "width=device-width, initial-scale=1.0" />
          </Head>
-         <body className = {cx(sfPro.variable, inter.variable, "w-screen h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black overflow-x-hidden min-h-screen")}>
+         <body className = {cx(sfPro.variable, inter.variable, "min-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black overflow-x-hidden")}>
             <SideBar />
             {children}
          </body>

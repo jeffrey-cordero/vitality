@@ -7,7 +7,7 @@ export default function Heading (props: HeadingProps): JSX.Element {
    return (
       <div className = "w-full mx-auto my-6">
          <h1
-            className = "text-primary text-4xl md:text-5xl w-full md:w-3/4 xl:w-1/2 font-bold mx-auto px-2"
+            className = "text-primary text-5xl w-full md:w-3/4 xl:w-1/2 font-bold mx-auto px-2"
          >
             {props.title}
          </h1>

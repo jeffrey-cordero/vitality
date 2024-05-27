@@ -47,7 +47,7 @@ export default function Input ({ updater, ...props }: InputProps): JSX.Element {
             {props.input.label}
          </label>
          {props.input.error !== null &&
-            <div className = "flex justify-center align-center max-w-[40rem] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
+            <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
                <p className = "text-red-500 input-error"> {props.input.error} </p>
             </div>
          }

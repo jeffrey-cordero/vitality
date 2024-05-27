@@ -42,6 +42,7 @@ export default function Journey (): JSX.Element {
                         <div className = "w-full px-3 sm:px-4 xl:w-1/2">
                            <div className = "py-3 sm:py-4">
                               <Image
+                                 priority = {true}
                                  width = {1920}
                                  height = {2880}
                                  src = "/landing/mountains.jpg"

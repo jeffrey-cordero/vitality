@@ -90,8 +90,8 @@ function Form (): JSX.Element {
    };
 
    return (
-      <div className = "w-full mx-auto">
-         <form className = "w-1/2 mx-auto flex flex-col justify-center align-center gap-3" onSubmit = {handleSubmit}>
+      <div className = "w-10/12 lg:w-1/2 mx-auto">
+         <form className = "w-full mx-auto flex flex-col justify-center align-center gap-3" onSubmit = {handleSubmit}>
             <Input input = {registration.username} updater = {setRegistration} />
             <Input input = {registration.password} updater = {setRegistration} />
             <Input input = {registration.confirmPassword} updater = {setRegistration} />
@@ -103,6 +103,7 @@ function Form (): JSX.Element {
                Submit
             </Button>
          </form>
+         <p className="mt-4">Already have an account? <Link href = "/login" className="text-primary font-bold underline">Log In</Link></p>
          {
             (status.state === "Success" || status.state === "Failure") && (
                <Notification status = {status}>
@@ -133,7 +134,7 @@ export default function SignUpForm (): JSX.Element {
    return (
       <>
          <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
-            <Heading title = "Sign up" description = "Create an account to get started" />
+            <Heading title = "Sign Up" description = "Create an account to get started" />
             <Form />
          </div>
       </>

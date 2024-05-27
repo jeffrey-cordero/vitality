@@ -56,7 +56,7 @@ export default function Pricing (): JSX.Element {
             title = "Choose Your Plan"
             description = "Select a plan that best suits your needs and goals"
          />
-         <div className = "w-full mx-auto flex flex-wrap justify-center items-center py-6">
+         <div className = "w-full mx-auto flex flex-wrap justify-center items-center">
             <div className = "flex justify-center items-center flex-wrap">
                <PricingCard
                   type = "Regular"
