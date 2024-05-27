@@ -104,7 +104,7 @@ export async function signup (registration: Registration): Promise<SubmissionSta
             phone: ["Phone number already taken"]
          });
       } else {
-         return sendErrorMessage("Failure", error.message);
+         return sendErrorMessage("Failure");
       }
    } finally {
       prisma.$disconnect();

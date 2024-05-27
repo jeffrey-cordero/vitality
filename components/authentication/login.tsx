@@ -2,6 +2,7 @@
 import Heading from "@/components/global/heading";
 import Input from "@/components/global/input";
 import Button from "@/components/global/button";
+import Notification from "@/components/global/notification";
 import { FormEvent } from "react";
 import { useImmer } from "use-immer";
 import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/global/form";
@@ -54,6 +55,11 @@ function Form (): JSX.Element {
                Submit
             </Button>
          </form>
+         {
+            (status.state === "Failure") && (
+               <Notification status = {status} />
+            )
+         }
       </div>
    );
 }

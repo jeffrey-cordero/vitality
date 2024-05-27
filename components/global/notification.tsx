@@ -6,7 +6,7 @@ import { faCircleCheck, faTriangleExclamation } from "@fortawesome/free-solid-sv
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface NotificationProps extends React.HTMLAttributes<HTMLDivElement> {
-   children: React.ReactNode;
+   children?: React.ReactNode;
    status: SubmissionStatus;
 }
 
@@ -18,7 +18,7 @@ export default function Notification (props: NotificationProps): JSX.Element {
       <>
          {visible &&
             <div
-               className = "fixed top-0 left-1/2 transform -translate-x-1/2 max-w-4/5 mx-auto p-10 opacity-0 notification animate-fadeIn"
+               className = "fixed top-0 left-1/2 transform -translate-x-1/2 max-w-4/5 mx-auto p-8 opacity-0 notification animate-fadeIn"
                {...props}
             >
                <div className = "text-left">

@@ -104,22 +104,24 @@ function Form (): JSX.Element {
             </Button>
          </form>
          {
-            status.state === "Success" && (
+            (status.state === "Success" || status.state === "Failure") && (
                <Notification status = {status}>
-                  <Link href = "/home">
-                     <Button
-                        type = "button"
-                        className = "bg-green-600 text-white p-4 text-sm h-[2rem]"
-                        onClick = {async () => {
-                           await login({
-                              username: registration.username.value,
-                              password: registration.password.value
-                           });
-                        }}
-                     >
-                        Log In
-                     </Button>
-                  </Link>
+                  {(status.state === "Success") &&
+                     <Link href = "/home">
+                        <Button
+                           type = "button"
+                           className = "bg-green-600 text-white p-4 text-sm h-[2rem]"
+                           onClick = {async () => {
+                              await login({
+                                 username: registration.username.value,
+                                 password: registration.password.value
+                              });
+                           }}
+                        >
+                           Log In
+                        </Button>
+                     </Link>
+                  }
                </Notification>
             )
          }

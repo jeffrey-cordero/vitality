@@ -38,12 +38,11 @@ function Counter (props: CounterProps): JSX.Element {
 
 export default function Ring (): JSX.Element {
    return (
-      <div className = "relative h-full w-full my-[5rem] hover:cursor-pointer hover:scale-[1.05] transition duration-300 ease-in-out">
+      <div className = "relative h-full w-full my-[4rem] hover:cursor-pointer hover:scale-[1.05] transition duration-300 ease-in-out">
          <motion.svg
-            className = "absolute inset-0 m-auto"
+            className = "absolute inset-0 m-auto w-[80px] sm:w-[100px] h-[80px] sm:h-[100px]"
             viewBox = "0 0 100 100"
-            width = {120}
-            height = {120}
+
          >
             <motion.circle
                initial = {{ pathLength: 0 }}
@@ -66,7 +65,7 @@ export default function Ring (): JSX.Element {
             value = {100}
             start = {0}
             duration = {3500}
-            className = "relative inset-0 mx-auto flex items-center justify-center font-display text-4xl text-green-500"
+            className = "relative inset-0 mx-auto flex items-center justify-center font-display text-3xl sm:text-4xl text-green-500"
          />
       </div>
    );

@@ -1,5 +1,6 @@
 import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
+import Link from "next/link";
 
 interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
    children: React.ReactNode;
@@ -13,9 +14,9 @@ interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
 function PricingCard (props: PricingCardProps): JSX.Element {
    return (
       <>
-         <div className = "w-full px-2 md:w-1/2 lg:w-1/3 hover:scale-[1.05] transition duration-300 ease-in-out">
-            <div className = "relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md p-10 min-h-[38rem]">
-               <span className = "mb-3 block text-2xl font-bold text-primary">
+         <div className = "w-11/12 sm:1/4 lg:w-1/3 max-w-full px-2 mx-auto my-6 hover:scale-[1.05] transition duration-300 ease-in-out">
+            <div className = "relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md p-8 min-h-[38rem]">
+               <span className = "mb-3 block text-2xl font-extrabold text-primary">
                   {props.type}
                </span>
                <h2 className = "mb-5 text-[42px] font-bold text-dark">
@@ -24,15 +25,18 @@ function PricingCard (props: PricingCardProps): JSX.Element {
                      / {props.subscription}
                   </span>
                </h2>
-               <p className = "border-b-2 border-b-slate-400 border-stroke pb-6 h-[4.5rem] text-semibold text-body-color">
+               <p className = "border-b-[2px] border-b-slate-400 border-stroke pb-6 h-[4.5rem] font-semibold">
                   {props.description}
                </p>
-               <div className = "my-8 flex flex-col justify-center gap-[14px] h-[12.5rem]">{props.children}</div>
-               <Button
-                  className = "block w-full rounded-md border border-primary bg-primary p-3 text-center text-white"
-               >
-                  {props.text}
-               </Button>
+               <div className = "my-8 flex flex-col justify-center gap-[14px] h-[12.5rem] font-medium">{props.children}</div>
+               <Link href = "/signup">
+                  <Button
+                     className = "block w-full rounded-md border border-primary bg-primary p-3 text-center text-white"
+                  >
+                     {props.text}
+                  </Button>
+               </Link>
+
             </div>
          </div>
       </>
@@ -52,8 +56,8 @@ export default function Pricing (): JSX.Element {
             title = "Choose Your Plan"
             description = "Select a plan that best suits your needs and goals"
          />
-         <div className = "w-full mx-4 flex flex-wrap justify-center items-center gap-6">
-            <div className = "flex justify-center flex-wrap">
+         <div className = "w-full mx-auto flex flex-wrap justify-center items-center py-6">
+            <div className = "flex justify-center items-center flex-wrap">
                <PricingCard
                   type = "Regular"
                   price = "$0"

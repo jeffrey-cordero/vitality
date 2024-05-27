@@ -55,10 +55,10 @@ export function sendSuccessMessage (message: string, data?: any): SubmissionStat
    };
 }
 
-export function sendErrorMessage (status: "Error" | "Failure", message: string, errors?: { [key: string]: string[] }): SubmissionStatus {
+export function sendErrorMessage (status: "Error" | "Failure", message?: string, errors?: { [key: string]: string[] }): SubmissionStatus {
    return {
       state: status,
-      response: { message: message },
+      response: { message: message ?? "Internal Server Error. Please try again later." },
       errors: errors ?? {}
    };
 }
