@@ -28,7 +28,7 @@ export default function Layout ({
             <link rel = "icon" href = "favicon.ico" />
             <meta name = "viewport" content = "width=device-width, initial-scale=1.0" />
          </Head>
-         <body className = {cx(sfPro.variable, inter.variable, "w-full max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black overflow-x-hidden")}>
+         <body className = {cx(sfPro.variable, inter.variable, "box-border m-0 p-0 w-full max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black overflow-x-hidden")}>
             <SideBar />
             {children}
             <Footer />
