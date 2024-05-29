@@ -1,15 +1,11 @@
 import "./global.css";
-import cx from "classnames";
-import { sfPro, inter } from "./fonts";
-
-// Metadata
-import { Metadata } from "next";
-
-// Import Font Awesome CSS
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import { config } from "@fortawesome/fontawesome-svg-core";
-
-config.autoAddCss = false;
+import cx from "classnames";
+import Head from "next/head";
+import SideBar from "@/components/global/sidebar";
+import Footer from "@/components/global/footer";
+import { sfPro, inter } from "./fonts";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
    title: {
@@ -28,8 +24,14 @@ export default function Layout ({
 }) {
    return (
       <html lang = "en">
-         <body className = {cx(sfPro.variable, inter.variable, "bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black overflow-x-hidden min-h-screen")}>
+         <Head>
+            <link rel = "icon" href = "favicon.ico" />
+            <meta name = "viewport" content = "width=device-width, initial-scale=1.0" />
+         </Head>
+         <body className = {cx(sfPro.variable, inter.variable, "box-border m-0 p-0 w-full max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black overflow-x-hidden")}>
+            <SideBar />
             {children}
+            <Footer />
          </body>
       </html>
    );

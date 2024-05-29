@@ -22,7 +22,7 @@ export async function login (credentials: Credentials): Promise<SubmissionStatus
          case "CredentialsSignin":
             return sendErrorMessage("Error", "Invalid credentials", { username : ["Invalid credentials"], password: ["Invalid credentials"] });
          default:
-            return sendErrorMessage("Failure", error.message);
+            return sendErrorMessage("Failure");
          }
       }
       throw error;

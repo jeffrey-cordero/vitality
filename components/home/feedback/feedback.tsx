@@ -45,7 +45,7 @@ function Form (): JSX.Element {
 
          const response = await sendFeedback(payload);
          setStatus(response);
-         handleFormErrors(response, setFeedback);
+         handleFormErrors(response, feedback, setFeedback);
       } catch (error) {
          console.error("Error updating status:", error);
          setStatus({ state: "Initial", response: {}, errors: {} });
