@@ -4,9 +4,7 @@ Your all-in-one modern fitness tracker for progress and performance to fuel your
 
 ## Development
 
-Docker is the cornerstone of the current development process. Services currently used to mimic to production environment include containers for NextJS, PostgreSQL, and Nginx all detailed in `docker-compose.yaml` file from root of project.
-
-To start the development processes.
+To start development processes.
 
 ``` bash
 docker compose up 
@@ -25,7 +23,7 @@ To restart completely by clearing all associated containers, networks, and volum
 docker compose down -v --remove-orphans 
 ```
 
-The application can be accessed [http://localhost:3000/](http://localhost:3000/), which represents output from the app container. For a production-like environment, you can visit [http://localhost/](http://localhost/), which represents output from the Nginx container to mimic the Nginx Server on the production machine, crucial for optimized content delivery. The Nginx service can be commented it out in `docker-compose.yaml` to save resources.
+The application can be accessed [http://localhost:3000/](http://localhost:3000/), which represents output from the app container.
 
 ### Logs
 
@@ -62,8 +60,6 @@ Through the Prisma ORM service.
 ``` bash
 docker exec -it vitality_app npx prisma studio
 ```
-
-### Database migrations
 
 Currently all database changes are made via `init.sql`. In the future, we will use Prisma ORM to efficiently make migrations needed while preserving sensitive user information through the following:
 

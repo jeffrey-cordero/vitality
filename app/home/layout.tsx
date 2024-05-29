@@ -5,7 +5,7 @@ export default function Layout ({
 }) {
    return (
       <>
-         <div className = "flex h-screen flex-col">
+         <div className = "flex flex-col mt-6">
             <div className = "flex-grow p-6 md:overflow-y-auto md:p-12">
                {children}
             </div>

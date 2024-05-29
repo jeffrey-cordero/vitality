@@ -17,7 +17,7 @@ const people: TestimonialProps[] = testimonialData;
 
 function Testimonial (props: TestimonialProps): JSX.Element {
    return (
-      <div className = "flex flex-col box-border gap-1 justify-center align-center w-full min-h-[25rem] max-h-full mx-auto">
+      <div className = "flex flex-col box-border gap-1 justify-center align-center w-full min-h-[25rem] max-h-full mx-auto hover:scale-[1.05] transition duration-300 ease-in-out">
          <FontAwesomeIcon icon = {faQuoteLeft} className = "text-4xl text-blue-700" />
          <p className = "font-semibold text-md w-3/4 mx-auto my-4">{props.testimonial}</p>
          <div>
@@ -59,7 +59,7 @@ export default function Testimonials (): JSX.Element {
             title = "Testimonials"
             description = "Discover the firsthand experiences of our valued users as they share insights into their fitness journey with our app"
          />
-         <div className = "w-11/12 md:w-8/12 mx-auto">
+         <div className = "w-10/12 md:w-8/12 mx-auto">
             <Carousel items = {testimonialElements} columns = {1} />
          </div>
       </div>

@@ -3,19 +3,17 @@ import Highlights from "@/components/landing/highlights";
 import Services from "@/components/landing/services";
 import Pricing from "@/components/landing/pricing";
 import Testimonials from "@/components/landing/testimonials";
-import Footer from "@/components/global/footer";
 
 export default function Page () {
    return (
       <>
-         <main className = "animate-slideIn w-full mx-auto flex min-h-screen flex-col items-center justify-start px-2 md:px-4 py-12 text-center overflow-hidden">
+         <main className = "box-border max-w-full flex min-h-screen flex-col items-center justify-start mx-2 md:px-4 py-12 text-center overflow-hidden">
             <Journey />
             <Highlights />
             <Services />
             <Pricing />
             <Testimonials />
          </main>
-         <Footer />
       </>
    );
 }

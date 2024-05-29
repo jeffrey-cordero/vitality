@@ -56,9 +56,8 @@ function Form (): JSX.Element {
                Submit
             </Button>
          </form>
-         <p className="mt-4"><Link href = "/forgot" className="text-primary font-bold underline">Forgot Username /  Password</Link></p>
-         <p className="mt-2">Don't have an account? <Link href = "/signup" className="text-primary font-bold underline">Register</Link></p>
-        
+         <p className = "mt-4">Don&apos;t have an account? <Link href = "/signup" className = "text-primary font-bold underline">Register</Link></p>
+         <p className = "mt-2"><Link href = "/forgot" className = "text-primary font-bold underline">Forgot Password</Link></p>
          {
             (status && status.state === "Failure") && (
                <Notification status = {status} />

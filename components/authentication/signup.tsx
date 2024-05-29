@@ -103,7 +103,7 @@ function Form (): JSX.Element {
                Submit
             </Button>
          </form>
-         <p className="mt-4">Already have an account? <Link href = "/login" className="text-primary font-bold underline">Log In</Link></p>
+         <p className = "mt-4">Already have an account? <Link href = "/login" className = "text-primary font-bold underline">Log In</Link></p>
          {
             (status.state === "Success" || status.state === "Failure") && (
                <Notification status = {status}>

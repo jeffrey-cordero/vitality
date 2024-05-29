@@ -19,7 +19,7 @@ services:
       interval: 60s
       timeout: 10s
       retries: 3
-    restart: always
+    restart: "on-failure"
     logging:
       driver: "json-file"
       options:
@@ -46,7 +46,7 @@ services:
        interval: 60s
        timeout: 5s
        retries: 5
-    restart: always
+    restart: "on-failure"
     logging:
       driver: "json-file"
       options:

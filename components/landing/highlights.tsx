@@ -11,11 +11,11 @@ interface CardProps {
 
 function Card (props: CardProps): JSX.Element {
    return (
-      <div className = "flex justify-center w-[19.5rem] h-[26rem] text-center rounded-2xl border border-gray-200 bg-white shadow-md hover:scale-[1.05] transition duration-300 ease-in-out">
+      <div className = "flex justify-center w-[23rem] h-[28rem] max-w-[90%] text-center rounded-2xl border border-gray-200 bg-white shadow-md hover:scale-[1.05] transition duration-300 ease-in-out">
          <div className = "flex flex-col text-center justify-center items-center gap-8 px-8 text-black">
             <div>
-               <FontAwesomeIcon icon = {props.icon} className = "text-4xl text-primary" />
-               <h1 className = "font-semibold text-3xl text-primary mt-8">{props.title}</h1>
+               <FontAwesomeIcon icon = {props.icon} className = "text-5xl text-primary" />
+               <h1 className = "font-bold text-4xl text-primary mt-8">{props.title}</h1>
             </div>
             <div>
                <p className = "font-medium text-slate-500">{props.description}</p>
@@ -27,12 +27,12 @@ function Card (props: CardProps): JSX.Element {
 
 export default function Highlights (): JSX.Element {
    return (
-      <div className = "w-10/12 sm:w-full mx-auto mt-8">
+      <div className = "w-full mx-auto mt-8">
          <Heading
             title = "Optimized Fitness Tracking"
             description = "We've developed a cutting-edge fitness tracker that empowers users to effortlessly monitor their progress, set goals, and achieve optimal fitness levels"
          />
-         <div className = "flex flex-row flex-wrap gap-20 justify-center align-center my-12">
+         <div className = "w-full mx-auto flex flex-row flex-wrap justify-center align-center gap-16">
             <Card
                icon = {faPaintbrush}
                title = "Modern Design"

@@ -4,7 +4,6 @@ import Link from "next/link";
 
 interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
    children: React.ReactNode;
-   description: string;
    price: string;
    type: string;
    subscription: string;
@@ -14,21 +13,18 @@ interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
 function PricingCard (props: PricingCardProps): JSX.Element {
    return (
       <>
-         <div className = "w-11/12 sm:1/4 lg:w-1/3 max-w-full px-2 mx-auto my-6 hover:scale-[1.05] transition duration-300 ease-in-out">
-            <div className = "relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md p-8 min-h-[38rem]">
-               <span className = "mb-3 block text-2xl font-extrabold text-primary">
+         <div className = "flex justify-center w-[23rem] h-[34rem] max-w-[90%] text-center rounded-2xl border border-gray-200 bg-white shadow-md hover:scale-[1.05] transition duration-300 ease-in-out px-4">
+            <div className = "relative flex flex-col justify-center align-center overflow-hidden">
+               <span className = "mb-3 block text-3xl font-extrabold text-primary">
                   {props.type}
                </span>
-               <h2 className = "mb-5 text-[42px] font-bold text-dark">
+               <h2 className = "w-11/12 mx-auto text-4xl font-bold text-dark pb-6 border-b-[2px] border-b-slate-400">
                   {props.price}
                   <span className = "text-base font-medium text-body-color">
                      / {props.subscription}
                   </span>
                </h2>
-               <p className = "border-b-[2px] border-b-slate-400 border-stroke pb-6 h-[4.5rem] font-semibold">
-                  {props.description}
-               </p>
-               <div className = "my-8 flex flex-col justify-center gap-[14px] h-[12.5rem] font-medium">{props.children}</div>
+               <div className = "my-6 flex flex-col justify-center gap-[14px] h-[12.5rem] font-medium">{props.children}</div>
                <Link href = "/signup">
                   <Button
                      className = "block w-full rounded-md border border-primary bg-primary p-3 text-center text-white"
@@ -56,13 +52,12 @@ export default function Pricing (): JSX.Element {
             title = "Choose Your Plan"
             description = "Select a plan that best suits your needs and goals"
          />
-         <div className = "w-full mx-auto flex flex-wrap justify-center items-center">
-            <div className = "flex justify-center items-center flex-wrap">
+         <div className = "w-full mx-auto">
+            <div className = "w-full mx-auto flex flex-row flex-wrap justify-center align-center gap-16">
                <PricingCard
                   type = "Regular"
                   price = "$0"
                   subscription = "year"
-                  description = "Basic features to guide you on your fitness journey."
                   text = "Choose Regular"
                >
                   <List>Access to basic features</List>
@@ -75,7 +70,6 @@ export default function Pricing (): JSX.Element {
                   type = "Member"
                   price = "$99"
                   subscription = "year"
-                  description = "Premium features and personalized guidance."
                   text = "Choose Member"
                >
                   <List>All Regular features</List>
@@ -88,7 +82,6 @@ export default function Pricing (): JSX.Element {
                   type = "Veteran"
                   price = "$199"
                   subscription = "year"
-                  description = "Get exclusive access to VIP perks and elite support."
                   text = "Choose Veteran"
                >
                   <List>All Member features</List>
