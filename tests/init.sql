@@ -16,6 +16,14 @@ CREATE TABLE "VerificationToken" (
     expires TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
+
+CREATE TABLE "Workouts" (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      title VARCHAR(255) NOT NULL,
+      image TEXT,
+      user_id UUID REFERENCES Users(name)
+);
+
 CREATE TABLE "Feedback" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name VARCHAR(255) NOT NULL,

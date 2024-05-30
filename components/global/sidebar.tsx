@@ -61,7 +61,7 @@ function SideBarLinks (): JSX.Element {
    );
 }
 
-export default function SideBar (): JSX.Element {
+export function SideBar (): JSX.Element {
    const [visibleSideBar, setVisibleSideBar] = useState<boolean>(false);
 
    return (

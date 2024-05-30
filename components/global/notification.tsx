@@ -18,7 +18,7 @@ export default function Notification (props: NotificationProps): JSX.Element {
       <>
          {visible &&
             <div
-               className = "absolute w-[30rem] max-w-[90%] min-h-[4.5rem] top-0 left-1/2 transform -translate-x-1/2 max-w-4/5 mx-auto mt-4 opacity-0 notification animate-fadeIn z-50"
+               className = "fixed w-[30rem] max-w-[90%] min-h-[4.5rem] top-0 left-1/2 transform -translate-x-1/2 max-w-4/5 mx-auto mt-4 opacity-0 notification animate-fadeIn z-50"
                {...props}
             >
                <div className = "text-left">
