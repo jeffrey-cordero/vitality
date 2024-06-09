@@ -4,7 +4,7 @@ import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 import Ring from "@/components/landing/ring";
 
-export default function Journey (): JSX.Element {
+export default function Journey(): JSX.Element {
    return (
       <div className = "w-full mx-auto">
          <Heading

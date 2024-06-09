@@ -15,7 +15,7 @@ interface TestimonialProps {
 
 const people: TestimonialProps[] = testimonialData;
 
-function Testimonial (props: TestimonialProps): JSX.Element {
+function Testimonial(props: TestimonialProps): JSX.Element {
    return (
       <div className = "flex flex-col box-border gap-1 justify-center align-center w-full min-h-[25rem] max-h-full mx-auto hover:scale-[1.05] transition duration-300 ease-in-out">
          <FontAwesomeIcon icon = {faQuoteLeft} className = "text-4xl text-blue-700" />
@@ -46,7 +46,7 @@ function Testimonial (props: TestimonialProps): JSX.Element {
    );
 }
 
-export default function Testimonials (): JSX.Element {
+export default function Testimonials(): JSX.Element {
    const testimonialElements: JSX.Element[] = people.map((person, index) => {
       return (
          <Testimonial {...person} key = {index} />

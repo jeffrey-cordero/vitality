@@ -9,7 +9,7 @@ export const { auth, signIn, signOut } = NextAuth({
    ...authConfig,
    providers: [
       Credentials({
-         async authorize (credentials): Promise<any> {
+         async authorize(credentials): Promise<any> {
             const parsedCredentials = z
                .object({ username: z.string().trim(), password: z.string() })
                .safeParse(credentials);

@@ -9,7 +9,7 @@ import { useImmer } from "use-immer";
 import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/global/form";
 import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
 
-function Form (): JSX.Element {
+function Form(): JSX.Element {
    const [status, setStatus] = useImmer<SubmissionStatus>({ state: "Initial", response: {}, errors: {} });
    const [feedback, setFeedback] = useImmer<FormItems>(
       {
@@ -33,7 +33,7 @@ function Form (): JSX.Element {
          }
       });
 
-   const handleSubmit = async (event: FormEvent) => {
+   const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();
 
       try {
@@ -84,7 +84,7 @@ function Form (): JSX.Element {
    );
 }
 
-export default function FeedbackForm (): JSX.Element {
+export default function FeedbackForm(): JSX.Element {
    return (
       <>
          <div className = "w-full mx-auto flex flex-col items-center justify-center">

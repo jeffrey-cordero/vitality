@@ -9,7 +9,7 @@ import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/global/form
 import { login, Credentials } from "@/lib/authentication/login";
 import Link from "next/link";
 
-function Form (): JSX.Element {
+function Form(): JSX.Element {
    const [status, setStatus] = useImmer<SubmissionStatus>({ state: "Initial", response: {}, errors: {} });
    const [credentials, setCredentials] = useImmer<FormItems>(
       {
@@ -29,7 +29,7 @@ function Form (): JSX.Element {
          }
       });
 
-   const handleSubmit = async (event: FormEvent) => {
+   const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();
 
       try {
@@ -67,7 +67,7 @@ function Form (): JSX.Element {
    );
 }
 
-export default function LoginForm (): JSX.Element {
+export default function LoginForm(): JSX.Element {
    return (
       <>
          <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">

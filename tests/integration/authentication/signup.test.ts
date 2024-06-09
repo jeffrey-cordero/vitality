@@ -11,15 +11,15 @@ let expected;
 describe("User can be created and conflicts arise when attempting registration with used unique fields", () => {
    const prisma = new PrismaClient();
 
-   beforeAll(async () => {
+   beforeAll(async() => {
       await prisma.$connect();
    });;
 
-   afterAll(async () => {
+   afterAll(async() => {
       await prisma.$disconnect();
    });
 
-   test("Missing or incorrect user registration fields", async () => {
+   test("Missing or incorrect user registration fields", async() => {
       // No birthday or email provided
       payload = {
          name: "John Doe",
@@ -78,7 +78,7 @@ describe("User can be created and conflicts arise when attempting registration w
    });
 
 
-   test("Valid registration fields and unique field conflicts", async () => {
+   test("Valid registration fields and unique field conflicts", async() => {
       payload = {
          name: "John Doe",
          birthday: new Date("1990-01-01"),

@@ -4,7 +4,7 @@ import { signOut } from "@/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRightFromBracket, faEnvelopeOpenText } from "@fortawesome/free-solid-svg-icons";
 
-export default function Page () {
+export default function Page() {
    return (
       <main className = "w-full mx-auto flex min-h-screen flex-col items-center justify-start p-4 text-center">
          <Link href = "/home/feedback">
@@ -14,7 +14,7 @@ export default function Page () {
             </Button>
          </Link>
          <form
-            action = {async () => {
+            action = {async() => {
                "use server";
                await signOut();
             }}
