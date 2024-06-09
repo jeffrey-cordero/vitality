@@ -1,8 +1,8 @@
 "use client";
+
 import { usePathname } from "next/navigation";
 
-// URL issues due to next-auth redirect handler after signIn usage
-function validateHomeURL (): void {
+function useValidateHomeURL(): void {
    const pathname = usePathname();
 
    if (!(pathname.startsWith("/home"))) {
@@ -10,12 +10,12 @@ function validateHomeURL (): void {
    }
 }
 
-export default function Layout ({
+export default function Layout({
    children
 }: {
    children: React.ReactNode;
 }) {
-   validateHomeURL();
+   useValidateHomeURL();
 
    return (
       <>

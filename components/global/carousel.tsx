@@ -7,7 +7,7 @@ interface CarouselProps {
    columns: number;
 }
 
-export default function Carousel (props: CarouselProps): JSX.Element {
+export default function Carousel(props: CarouselProps): JSX.Element {
    const [currentIndex, setCurrentIndex] = useState(1);
    const columnWidth = props.columns * 100;
 

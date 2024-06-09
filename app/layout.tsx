@@ -3,9 +3,9 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import cx from "classnames";
 import Head from "next/head";
 import Footer from "@/components/global/footer";
-import { SideBar } from "@/components/global/sidebar";
 import { sfPro, inter } from "./fonts";
 import { Metadata } from "next";
+import { SideBar } from "@/components/global/sidebar";
 
 export const metadata: Metadata = {
    title: {
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 
-export default function Layout ({
+export default function Layout({
    children
 }: {
   children: React.ReactNode;

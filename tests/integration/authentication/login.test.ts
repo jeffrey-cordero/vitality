@@ -13,15 +13,15 @@ let expected;
 describe("User can be created and conflicts arise when attempting login with invalid credentials", () => {
    const prisma = new PrismaClient();
 
-   beforeAll(async () => {
+   beforeAll(async() => {
       await prisma.$connect();
    });;
 
-   afterAll(async () => {
+   afterAll(async() => {
       await prisma.$disconnect();
    });
 
-   test("Valid and invalid user credentials", async () => {
+   test("Valid and invalid user credentials", async() => {
       // End to end tests will cover the implementation of authentication in @/auth.ts
       payload = {
          name: "John Doe",

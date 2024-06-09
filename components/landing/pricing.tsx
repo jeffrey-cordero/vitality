@@ -10,7 +10,7 @@ interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
    text: string;
 }
 
-function PricingCard (props: PricingCardProps): JSX.Element {
+function PricingCard(props: PricingCardProps): JSX.Element {
    return (
       <>
          <div className = "flex justify-center w-[23rem] h-[34rem] max-w-[90%] text-center rounded-2xl border border-gray-200 bg-white shadow-md hover:scale-[1.05] transition duration-300 ease-in-out px-4">
@@ -39,13 +39,13 @@ function PricingCard (props: PricingCardProps): JSX.Element {
    );
 };
 
-function List ({ children }: { children: React.ReactNode }): JSX.Element {
+function List({ children }: { children: React.ReactNode }): JSX.Element {
    return (
       <p className = "text-base text-body-color">{children}</p>
    );
 };
 
-export default function Pricing (): JSX.Element {
+export default function Pricing(): JSX.Element {
    return (
       <div className = "w-full mx-auto">
          <Heading

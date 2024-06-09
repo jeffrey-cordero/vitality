@@ -1,8 +1,8 @@
 "use server";
 import validator from "validator";
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
+import { PrismaClient } from "@prisma/client";
 import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
 
 export type Registration = {
@@ -49,7 +49,7 @@ const registrationSchema = z.object({
       .optional()
 });
 
-export async function signup (registration: Registration): Promise<SubmissionStatus> {
+export async function signup(registration: Registration): Promise<SubmissionStatus> {
    const fields = registrationSchema.safeParse(registration);
 
    if (!fields.success) {

@@ -1,12 +1,7 @@
-import Modal from "@/components/global/modal";
-
-export default function Page () {
+export default function Page() {
    return (
       <main className = "w-full mx-auto flex min-h-screen flex-col items-center justify-start p-4 text-center">
-         <h1>WORKOUTS</h1>
-         <Modal>
-            <h1>HELLO</h1>
-         </Modal>
+         <h1>Workouts</h1>
       </main >
    );
 }

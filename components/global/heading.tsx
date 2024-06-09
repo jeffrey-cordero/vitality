@@ -3,7 +3,7 @@ interface HeadingProps {
    description?: string;
 }
 
-export default function Heading (props: HeadingProps): JSX.Element {
+export default function Heading(props: HeadingProps): JSX.Element {
    return (
       <div className = "w-full mx-auto my-14">
          <h1

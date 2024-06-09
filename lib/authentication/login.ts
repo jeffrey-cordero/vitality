@@ -8,7 +8,7 @@ export type Credentials = {
    password: string;
 }
 
-export async function login (credentials: Credentials): Promise<SubmissionStatus> {
+export async function login(credentials: Credentials): Promise<SubmissionStatus> {
    try {
       const userCredentials = new FormData();
       userCredentials.append("username", credentials.username.trim());

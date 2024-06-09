@@ -9,7 +9,7 @@ interface CounterProps {
    duration: number;
 }
 
-function Counter (props: CounterProps): JSX.Element {
+function Counter(props: CounterProps): JSX.Element {
    const [count, setCount] = useState<number>(props.start);
    const easeOutQuad = (t: number, b: number, c: number, d: number) => {
       t = t > d ? d : t / d;
@@ -36,7 +36,7 @@ function Counter (props: CounterProps): JSX.Element {
    return <p className = {props.className}>{Intl.NumberFormat().format(count)}</p>;
 }
 
-export default function Ring (): JSX.Element {
+export default function Ring(): JSX.Element {
    return (
       <div className = "relative h-full w-full my-[4rem] hover:cursor-pointer hover:scale-[1.05] transition duration-300 ease-in-out">
          <motion.svg

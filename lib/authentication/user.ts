@@ -1,7 +1,7 @@
 "use server";
 import { PrismaClient, Users as User } from "@prisma/client";
 
-export async function getUser (username: string): Promise<User | null> {
+export async function getUser(username: string): Promise<User | null> {
    const prisma = new PrismaClient();
 
    try {

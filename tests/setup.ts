@@ -1,7 +1,7 @@
 const { execSync } = require("child_process");
 require("dotenv").config();
 
-async function runTest (command : string): Promise<boolean> {
+async function runTest(command : string): Promise<boolean> {
    let retries = 1;
 
    while (retries <= 3) {
@@ -18,7 +18,7 @@ async function runTest (command : string): Promise<boolean> {
    return retries <= 3;
 }
 
-async function integration (): Promise<boolean> {
+async function integration(): Promise<boolean> {
    process.env.DATABASE_URL = "postgresql://postgres:postgres@localhost:5431/vitality_test?schema=public";
    const integration = await runTest("npx jest --runInBand tests/integration/* --collect-coverage");
 
@@ -30,7 +30,7 @@ async function integration (): Promise<boolean> {
    return true;
 }
 
-async function endToEnd (type: "test" | "run"): Promise<boolean> {
+async function endToEnd(type: "test" | "run"): Promise<boolean> {
    process.env.BASE_URL = "http://localhost:3001";
    const endToEndCommand = type === "test" ? "npx cypress open" : "npx cypress run";
    const endToEnd = await runTest(endToEndCommand);
@@ -43,7 +43,7 @@ async function endToEnd (type: "test" | "run"): Promise<boolean> {
    return true;
 }
 
-async function main (): Promise<void> {
+async function main(): Promise<void> {
    let passed = false;
    console.log("Setting up docker testing environment.");
 

@@ -34,7 +34,7 @@ const userLinks: SideBarProps[] = [
    { name: "Settings", href: "/home/settings", icon: faGears }
 ];
 
-function SideBarLinks (): JSX.Element {
+function SideBarLinks(): JSX.Element {
    const pathname = usePathname();
    const links = pathname.startsWith("/home") ? userLinks : landingLinks;
 
@@ -46,13 +46,14 @@ function SideBarLinks (): JSX.Element {
                   key = {link.name}
                   href = {link.href}
                   className = {clsx(
-                     "flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-black bg-gray-50 pl-[10px] text-sm font-medium hover:text-blue-600 z-40 sideBarLink",
+                     "flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-black bg-gray-50 text-sm font-medium hover:text-blue-600 z-40 sideBarLink",
                      {
                         "bg-sky-100 text-blue-600": pathname === link.href
                      },
-                  )}
-               >
-                  <FontAwesomeIcon icon = {link.icon} className = "text-2xl" />
+                  )}>
+                  <div className = "w-[30px] pl-[10px]">
+                     <FontAwesomeIcon icon = {link.icon} className = "text-2xl" />
+                  </div>
                   <p className = "whitespace-nowrap">{link.name}</p>
                </Link>
             );
@@ -61,7 +62,7 @@ function SideBarLinks (): JSX.Element {
    );
 }
 
-export function SideBar (): JSX.Element {
+export function SideBar(): JSX.Element {
    const [visibleSideBar, setVisibleSideBar] = useState<boolean>(false);
 
    return (
@@ -92,7 +93,7 @@ export function SideBar (): JSX.Element {
          <div className = "absolute z-20">
             <div
                id = "sideBarLinks"
-               className = {clsx("relative m-0 top-[-10px] w-[4.5rem] hover:w-64 focus:w-64 transition-all duration-1000 ease-in-out", {
+               className = {clsx("relative m-0 top-[10px] w-[4.5rem] hover:w-64 focus:w-64 transition-all duration-1000 ease-in-out", {
                   "left-[-5rem]": !(visibleSideBar),
                   "left-[10px]": visibleSideBar
                })}>
@@ -105,7 +106,6 @@ export function SideBar (): JSX.Element {
                </div>
             </div>
          </div>
-
       </>
    );
 }

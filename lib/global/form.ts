@@ -23,7 +23,7 @@ export type SubmissionStatus = {
    errors: { [key: string]: string[]; };
 };
 
-export function updateFormState (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, updater: Updater<FormItems>) {
+export function updateFormState(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, updater: Updater<FormItems>) {
    const { id, value } = event.target;
 
    updater((input: { [key: string]: InputState; }) => {
@@ -32,7 +32,7 @@ export function updateFormState (event: ChangeEvent<HTMLInputElement | HTMLTextA
    });
 };
 
-export function handleFormErrors (response: SubmissionStatus, items: FormItems, updater: Updater<FormItems>) {
+export function handleFormErrors(response: SubmissionStatus, items: FormItems, updater: Updater<FormItems>) {
    // Show new errors or hide prior errors
    for (const input of Object.keys(items)) {
       let error : string | null = null;
@@ -47,7 +47,7 @@ export function handleFormErrors (response: SubmissionStatus, items: FormItems, 
    }
 }
 
-export function sendSuccessMessage (message: string, data?: any): SubmissionStatus {
+export function sendSuccessMessage(message: string, data?: any): SubmissionStatus {
    return {
       state: "Success",
       response: { message: message, data: data },
@@ -55,7 +55,7 @@ export function sendSuccessMessage (message: string, data?: any): SubmissionStat
    };
 }
 
-export function sendErrorMessage (status: "Error" | "Failure", message?: string, errors?: { [key: string]: string[] }): SubmissionStatus {
+export function sendErrorMessage(status: "Error" | "Failure", message?: string, errors?: { [key: string]: string[] }): SubmissionStatus {
    return {
       state: status,
       response: { message: message ?? "Internal Server Error. Please try again later." },

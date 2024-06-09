@@ -10,7 +10,7 @@ import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/global/form
 import { login } from "@/lib/authentication/login";
 import { signup, Registration } from "@/lib/authentication/signup";
 
-function Form (): JSX.Element {
+function Form(): JSX.Element {
    const [status, setStatus] = useImmer<SubmissionStatus>({ state: "Initial", response: {}, errors: {} });
    const [registration, setRegistration] = useImmer<FormItems>(
       {
@@ -62,7 +62,7 @@ function Form (): JSX.Element {
          }
       });
 
-   const handleSubmit = async (event: FormEvent) => {
+   const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();
 
       try {
@@ -112,7 +112,7 @@ function Form (): JSX.Element {
                         <Button
                            type = "button"
                            className = "bg-green-600 text-white p-4 text-sm h-[2rem]"
-                           onClick = {async () => {
+                           onClick = {async() => {
                               await login({
                                  username: registration.username.value,
                                  password: registration.password.value
@@ -130,7 +130,7 @@ function Form (): JSX.Element {
    );
 }
 
-export default function SignUpForm (): JSX.Element {
+export default function SignUpForm(): JSX.Element {
    return (
       <>
          <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">

@@ -19,7 +19,7 @@ jest.mock("@prisma/client", () => ({
 }));
 
 describe("User can be created given valid fields or rejected given invalid fields in isolation", () => {
-   test("Empty required user registration fields", async () => {
+   test("Empty required user registration fields", async() => {
       // All empty fields expect for birthday
       payload = {
          name: "",
@@ -48,7 +48,7 @@ describe("User can be created given valid fields or rejected given invalid field
       await expect(signup(payload)).resolves.toEqual(expected);
    });
 
-   test("Missing or incorrect user registration fields", async () => {
+   test("Missing or incorrect user registration fields", async() => {
       // No birthday or email provided
       payload = {
          name: "John Doe",
@@ -113,7 +113,7 @@ describe("User can be created given valid fields or rejected given invalid field
       await expect(signup(payload)).resolves.toEqual(expected);
    });
 
-   test("Valid registration with a variety of parameters", async () => {
+   test("Valid registration with a variety of parameters", async() => {
       payload = {
          name: "John Doe",
          birthday: new Date("1990-01-01"),

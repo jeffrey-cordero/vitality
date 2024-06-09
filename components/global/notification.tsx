@@ -10,7 +10,7 @@ interface NotificationProps extends React.HTMLAttributes<HTMLDivElement> {
    status: SubmissionStatus;
 }
 
-export default function Notification (props: NotificationProps): JSX.Element {
+export default function Notification(props: NotificationProps): JSX.Element {
    const [visible, setVisible] = useState<boolean>(true);
    const icon = props.status.state === "Success" ? faCircleCheck : faTriangleExclamation;
 
