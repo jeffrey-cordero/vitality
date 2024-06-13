@@ -17,8 +17,8 @@ const people: TestimonialProps[] = testimonialData;
 
 function Testimonial(props: TestimonialProps): JSX.Element {
    return (
-      <div className = "flex flex-col box-border gap-1 justify-center align-center w-full min-h-[25rem] max-h-full mx-auto hover:scale-[1.05] transition duration-300 ease-in-out">
-         <FontAwesomeIcon icon = {faQuoteLeft} className = "text-4xl text-blue-700" />
+      <div className = "flex flex-col box-border gap-1 justify-center align-center w-full min-h-[25rem] max-h-full mx-auto">
+         <FontAwesomeIcon icon = {faQuoteLeft} className = "text-4xl text-primary" />
          <p className = "font-semibold text-md w-3/4 mx-auto my-4">{props.testimonial}</p>
          <div>
             <div className = "flex flex-row flex-wrap gap-3 justify-center items-center w-full mx-auto p-5">

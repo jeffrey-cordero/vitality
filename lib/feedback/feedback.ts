@@ -1,6 +1,6 @@
 "use server";
+import prisma from "@/lib/database/client";
 import { z } from "zod";
-import { PrismaClient } from "@prisma/client";
 import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
 
 export interface Feedback {
@@ -23,11 +23,8 @@ export async function sendFeedback(feedback: Feedback): Promise<SubmissionStatus
       return sendErrorMessage("Error", "Message.", fields.error.flatten().fieldErrors);
    }
 
-   const prisma = new PrismaClient();
-
    try {
       const userFeedback = fields.data;
-      await prisma.$connect();
 
       // Add new feedback into the database for further improvement of the application
       await prisma.feedback.create({
@@ -37,8 +34,6 @@ export async function sendFeedback(feedback: Feedback): Promise<SubmissionStatus
       return sendSuccessMessage("Successfully received your feedback!");
    } catch (err) {
       console.error(err);
-   } finally {
-      prisma.$disconnect();
    }
 
    return sendErrorMessage("Failure", "Message.");
