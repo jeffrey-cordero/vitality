@@ -1,8 +1,8 @@
 "use server";
 import validator from "validator";
 import bcrypt from "bcryptjs";
+import prisma from "@/lib/database/client";
 import { z } from "zod";
-import { PrismaClient } from "@prisma/client";
 import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
 
 export type Registration = {
@@ -65,11 +65,7 @@ export async function signup(registration: Registration): Promise<SubmissionStat
       });
    }
 
-   const prisma = new PrismaClient();
-
    try {
-      await prisma.$connect();
-
       const userRegistration = fields.data;
 
       const salt = await bcrypt.genSaltSync(10);
@@ -106,7 +102,5 @@ export async function signup(registration: Registration): Promise<SubmissionStat
       } else {
          return sendErrorMessage("Failure");
       }
-   } finally {
-      prisma.$disconnect();
    }
 }

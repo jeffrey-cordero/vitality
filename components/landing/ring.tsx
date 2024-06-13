@@ -38,7 +38,7 @@ function Counter(props: CounterProps): JSX.Element {
 
 export default function Ring(): JSX.Element {
    return (
-      <div className = "relative h-full w-full my-[4rem] hover:cursor-pointer hover:scale-[1.05] transition duration-300 ease-in-out">
+      <div className = "relative h-full w-full my-[4rem]">
          <motion.svg
             className = "absolute inset-0 m-auto w-[90px] md:w-[120px] h-[90px] md:h-[120px]"
             viewBox = "0 0 100 100"

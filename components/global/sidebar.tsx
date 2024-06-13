@@ -1,5 +1,4 @@
-"use client";
-import Image from "next/image";
+"use client";;
 import Link from "next/link";
 import clsx from "clsx";
 import { useState } from "react";
@@ -7,7 +6,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname } from "next/navigation";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faBars, faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faPersonRunning, faUtensils, faBrain, faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears } from "@fortawesome/free-solid-svg-icons";
-
 
 interface SideBarProps {
    name: string;
@@ -67,30 +65,19 @@ export function SideBar(): JSX.Element {
 
    return (
       <>
-         <div className = "absolute top-0 left-0 w-full z-30">
+         <div className = "fixed top-0 left-0 w-full z-30">
             <div className = "relative top-0 left-0 transform translate-x-[20px] translate-y-[30px] z-30">
                <FontAwesomeIcon
                   id = "sideBarButton"
                   icon = {visibleSideBar ? faAnglesRight : faBars}
-                  className = "text-3xl hover:cursor-pointer hover:shadow-sm"
+                  className = "text-3xl text-black font-extrabold hover:cursor-pointer hover:shadow-sm"
                   onClick = {() => {
                      setVisibleSideBar(!(visibleSideBar));
                   }}
                />
             </div>
-            <div className = "absolute top-0 left-1/2 transform -translate-x-1/2 translate-y-[2px] hover:cursor-pointer z-40">
-               <Link href = "/">
-                  <Image
-                     src = "/global/logo.png"
-                     alt = ""
-                     width = {100}
-                     height = {100}
-                  />
-               </Link>
-            </div>
          </div>
-
-         <div className = "absolute z-20">
+         <div className = "fixed z-20">
             <div
                id = "sideBarLinks"
                className = {clsx("relative m-0 top-[10px] w-[4.5rem] hover:w-64 focus:w-64 transition-all duration-1000 ease-in-out", {
