@@ -74,11 +74,20 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Setup testing environment
+        run: docker-compose up -d
+
+      - name: Wait for services
+        run: sleep 30
+
       - name: Run Cypress e2e tests
-        run: npm run e2e:run
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://127.0.0.1:3000'
+          wait-on-timeout: 120000 
         env:
           run_area: CI
-          BASE_URL: http://127.0.0.1:3001
+          BASE_URL: http://127.0.0.1:3000
 
       - name: Upload Cypress screenshots
         if: failure()
@@ -86,3 +95,6 @@ jobs:
         with:
           name: cypress-screenshots
           path: cypress/screenshots
+      
+      - name: Shut down testing environment
+        run: docker-compose down
