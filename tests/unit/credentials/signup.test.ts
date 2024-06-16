@@ -3,20 +3,17 @@ import { mockDeep } from "jest-mock-extended";
 import { expect } from "@jest/globals";
 import { signup } from "@/lib/authentication/signup";
 
+jest.mock("@prisma/client", () => ({
+   PrismaClient: function() {
+      return mockDeep<PrismaClient>();
+   }
+}));
+
 /** @type {Registration} */
 let payload;
 
 /** @type {SubmissionStatus} */
 let expected;
-
-/** @type DeepMockProxy<PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>> */
-const prismaMock = mockDeep<PrismaClient>({
-   $disconnect: jest.fn()
-});
-
-jest.mock("@prisma/client", () => ({
-   PrismaClient: jest.fn(() => prismaMock)
-}));
 
 describe("User can be created given valid fields or rejected given invalid fields in isolation", () => {
    test("Empty required user registration fields", async() => {
@@ -129,6 +126,10 @@ describe("User can be created given valid fields or rejected given invalid field
          response: { message: "Successfully registered", data: undefined },
          errors: {}
       };
+
+      const response = await signup(payload);
+
+      console.log(response);
 
       await expect(signup(payload)).resolves.toEqual(expected);
 
