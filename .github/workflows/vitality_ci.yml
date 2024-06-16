@@ -65,6 +65,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@3
+
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose -y
+          docker compose -f tests/docker-compose.yaml up -d
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -74,13 +83,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run Cypress tests
-        run: npm run e2e:run
-        env:
-          CI: true
-        
+      - name: Run cypress e2e tests
+        uses: cypress-io/github-action@v6
+        with:
+          browser: chrome
+          env: |
+            run_area=CI
+            BASE_URL=http://127.0.0.1:3001
+
       - name: Upload Cypress screenshots
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: cypress-screenshots
