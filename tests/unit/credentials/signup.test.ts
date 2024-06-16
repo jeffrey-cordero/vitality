@@ -122,7 +122,7 @@ describe("User can be created given valid fields or rejected given invalid field
       };
 
       expected = {
-         state: "Succes",
+         state: "Success",
          response: { message: "Successfully registered", data: undefined },
          errors: {}
       };
