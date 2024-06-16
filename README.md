@@ -82,22 +82,6 @@ Run integration tests
 npm run integration
 ```
 
-### Cypress
-
-Pausing the development processes with the steps above is recommended for Cypress testing to save resources as this will create a new instance of the application that can be found at [http://localhost:3001/](http://localhost:3001/) as a separate docker compose
-
-Test specific end-to-end tests with incrementing changes
-
-```bash
-npm run e2e:test
-```
-
-Run end-to-end tests
-
-```bash
-npm run e2e:run
-```
-
 ## Linting
 
 View current potential linting errors / warnings based on `.eslintrc.json` specifications
