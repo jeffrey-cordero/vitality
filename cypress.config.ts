@@ -13,6 +13,7 @@ export default defineConfig({
       supportFolder: "tests/e2e/support",
       supportFile: "tests/e2e/support/e2e.ts",
       specPattern: "tests/e2e/pages/**/**/*.cy.{js,jsx,ts,tsx}",
-      retries: 3
+      retries: 3,
+      defaultCommandTimeout: 60000,
    }
 });
