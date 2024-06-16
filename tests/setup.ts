@@ -1,28 +1,18 @@
-const { execSync } = require("child_process");
 require("dotenv").config();
+const { execSync } = require("child_process");
 
 async function runTest(command : string): Promise<boolean> {
-   let retries = 1;
-
-   while (retries <= 3) {
-      try {
-         execSync(command, { stdio: "inherit" });
-         break;
-      } catch (error) {
-         console.error(`Error running tests (Attempt #${retries}):`, error);
-      }
-
-      retries++;
+   try {
+      execSync(command, { stdio: "inherit" });
+      return true;
+   } catch (error) {
+      console.error("Error running tests", error);
+      return false;
    }
-
-   return retries <= 3;
 }
 
 async function integration(): Promise<boolean> {
-   process.env.DATABASE_URL = "postgresql://postgres:postgres@localhost:5431/vitality_test?schema=public";
-   const integration = await runTest("npx jest --runInBand tests/integration/* --collect-coverage");
-
-   if (!(integration)) {
+   if (!(await runTest("npx jest --runInBand --bail=3 tests/integration/* --collect-coverage"))) {
       console.error("Some integration tests have failed.");
       return false;
    }
@@ -31,11 +21,9 @@ async function integration(): Promise<boolean> {
 }
 
 async function endToEnd(type: "test" | "run"): Promise<boolean> {
-   process.env.BASE_URL = "http://localhost:3001";
-   const endToEndCommand = type === "test" ? "npx cypress open" : "npx cypress run";
-   const endToEnd = await runTest(endToEndCommand);
+   const endToEndTestingType: string = type === "test" ? "npx cypress open" : "npx cypress run";
 
-   if (type === "run" && !(endToEnd)) {
+   if (!(await runTest(endToEndTestingType)) && type === "run") {
       console.error("Some end to end tests have failed.");
       return false;
    }
@@ -44,14 +32,16 @@ async function endToEnd(type: "test" | "run"): Promise<boolean> {
 }
 
 async function main(): Promise<void> {
-   let passed = false;
    console.log("Setting up docker testing environment.");
+   let passed: boolean = false;
 
    try {
       // Setup the docker test environment
       execSync("docker compose -f tests/docker-compose.yaml up -d", { stdio: "inherit" },);
+      process.env.DATABASE_URL = "postgresql://postgres:postgres@127.0.0.1:5431/vitality_test?schema=public";
+      process.env.BASE_URL = "http://127.0.0.1:3001";
 
-      // Wait for dock test environment to setup to mitigate database conflicts
+      // Wait for dock test environment to setup to mitigate time-based conflicts
       await new Promise(resolve => setTimeout(resolve, 10000));
 
       if (process.argv.includes("integration")) {
@@ -70,9 +60,7 @@ async function main(): Promise<void> {
          console.error("Error cleaning up docker testing environment. Please manually clean up for future testing:", error);
       }
 
-      if (!(passed)) {
-         process.exit(1);
-      }
+      process.exit(passed ? 0 : 1);
    }
 }
 

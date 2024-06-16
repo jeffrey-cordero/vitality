@@ -127,10 +127,6 @@ describe("User can be created given valid fields or rejected given invalid field
          errors: {}
       };
 
-      const response = await signup(payload);
-
-      console.log(response);
-
       await expect(signup(payload)).resolves.toEqual(expected);
 
       payload = {

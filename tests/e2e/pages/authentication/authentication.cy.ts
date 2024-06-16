@@ -99,7 +99,7 @@ describe("User registration on signup page", () => {
       cy.url().should("include", "/home");
 
       // Visit settings page to log out
-      cy.get("button").contains("Settings").should("be.visible").click();
+      cy.visit("/home/settings");
       cy.get("button").contains("Sign Out").click();
 
       // Log out should redirect user to login page

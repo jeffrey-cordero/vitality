@@ -20,8 +20,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run ESLint
+      - name: Run ESLint tests
         run: npx eslint . --max-warnings 0
+
   Unit:
     runs-on: ubuntu-22.04
     steps:
@@ -37,11 +38,41 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run Unit Tests
+      - name: Run Unit tests
         run: npx jest tests/unit/* --collect-coverage
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+  Integration:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: coverage-report
-          path: coverage/
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Integration tests
+        run: npm run integration
+
+  Cypress:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Cypress tests
+        run: npm run e2e:run

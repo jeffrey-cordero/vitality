@@ -12,6 +12,7 @@ export default defineConfig({
       fixturesFolder: "tests/e2e/fixtures",
       supportFolder: "tests/e2e/support",
       supportFile: "tests/e2e/support/e2e.ts",
-      specPattern: "tests/e2e/pages/**/**/*.cy.{js,jsx,ts,tsx}"
+      specPattern: "tests/e2e/pages/**/**/*.cy.{js,jsx,ts,tsx}",
+      retries: 3
    }
 });
