@@ -6,9 +6,7 @@
     "start": "next start",
     "lint": "next lint",
     "unit": "npx jest tests/unit/* --collect-coverage",
-    "integration": "npx ts-node tests/setup.ts integration",
-    "e2e:test": "npx ts-node tests/setup.ts e2e:test",
-    "e2e:run": "npx ts-node tests/setup.ts e2e:run"
+    "integration": "npx ts-node tests/setup.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
@@ -50,7 +48,6 @@
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.14",
     "@vercel/style-guide": "^5.0.1",
-    "cypress": "^13.9.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.0.0",
     "eslint-config-prettier": "9.0.0",

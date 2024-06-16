@@ -2,7 +2,6 @@ name: Vitality CI
 
 on:
   pull_request:
-  push:
 
 jobs:
   ESLint:
