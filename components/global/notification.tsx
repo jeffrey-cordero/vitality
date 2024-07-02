@@ -1,18 +1,18 @@
 "use client";
 import clsx from "clsx";
 import { useState } from "react";
-import { SubmissionStatus } from "@/lib/global/form";
+import { FormState } from "@/lib/global/form";
 import { faCircleCheck, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface NotificationProps extends React.HTMLAttributes<HTMLDivElement> {
    children?: React.ReactNode;
-   status: SubmissionStatus;
+   state: FormState;
 }
 
 export default function Notification(props: NotificationProps): JSX.Element {
    const [visible, setVisible] = useState<boolean>(true);
-   const icon = props.status.state === "Success" ? faCircleCheck : faTriangleExclamation;
+   const icon = props.state.status === "Success" ? faCircleCheck : faTriangleExclamation;
 
    return (
       <>
@@ -23,20 +23,20 @@ export default function Notification(props: NotificationProps): JSX.Element {
             >
                <div className = "text-left">
                   <div className = {clsx("w-full border-stroke flex items-center rounded-lg border border-l-[8px] bg-white pl-4", {
-                     "border-l-green-600": props.status.state === "Success",
-                     "border-l-red-600": props.status.state !== "Success"
+                     "border-l-green-600": props.state.status === "Success",
+                     "border-l-red-600": props.state.status !== "Success"
                   })}>
                      <div className = "flex items-center justify-center rounded-full">
                         <FontAwesomeIcon icon = {icon} className = {clsx("text-3xl", {
-                           "text-green-600": props.status.state === "Success",
-                           "text-red-600": props.status.state !== "Success"
+                           "text-green-600": props.state.status === "Success",
+                           "text-red-600": props.state.status !== "Success"
                         })} />
                      </div>
                      <div className = "flex w-full items-center justify-between p-4">
                         <div>
                            <div>
                               <h3 className = "mt-4 text-md font-bold text-dark">
-                                 {props.status.response.message ?? "N/A"}
+                                 {props.state.status ?? "N/A"}
                               </h3>
                            </div>
                            <div className = "my-2">

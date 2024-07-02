@@ -1,64 +1,115 @@
-import { ChangeEvent } from "react";
-import { Updater } from "use-immer";
+import { produce } from "immer";
+import { Dispatch } from "react";
 
-export type FormItems = { [key: string]: InputState };
-
-export type InputState = {
-   label: string;
-   type?: string;
-   isPassword?: boolean;
-   id: string;
-   value: any;
-   error: any | null;
-};
-
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
-   input: InputState;
-   updater: Updater<FormItems>;
+export interface InputState {
+  id: string;
+  value: any;
+  error: any | null;
+  type?: string;
 }
 
-export type SubmissionStatus = {
-   state: "Initial" | "Error" | "Success" | "Failure";
-   response: { message?: string, data?: any };
-   errors: { [key: string]: string[]; };
-};
-
-export function updateFormState(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, updater: Updater<FormItems>) {
-   const { id, value } = event.target;
-
-   updater((input: { [key: string]: InputState; }) => {
-      input[id].value = value;
-      input[id].error = null;
-   });
-};
-
-export function handleFormErrors(response: SubmissionStatus, items: FormItems, updater: Updater<FormItems>) {
-   // Show new errors or hide prior errors
-   for (const input of Object.keys(items)) {
-      let error : string | null = null;
-
-      if (response.errors[input]) {
-         error = response.errors[input][0];
-      }
-
-      updater((inputs) => {
-         inputs[input].error = error;
-      });
-   }
+export type InputStates = { [key: string]: InputState };
+export type FormPayload = { [key: string]: string };
+export interface FormResponse {
+  state: "Success" | "Error" | "Failure";
+  response: { message: string; data: any; errors: { [key: string]: string } };
 }
 
-export function sendSuccessMessage(message: string, data?: any): SubmissionStatus {
-   return {
-      state: "Success",
-      response: { message: message, data: data },
-      errors: {}
-   };
+export interface FormAction {
+  type:
+    | "updateInput"
+    | "updateStatus"
+    | "constructPayload"
+    | "updatePayload"
+    | "resetForm";
+  value: InputState | FormResponse | FormPayload | null;
 }
 
-export function sendErrorMessage(status: "Error" | "Failure", message?: string, errors?: { [key: string]: string[] }): SubmissionStatus {
-   return {
-      state: status,
-      response: { message: message ?? "Internal Server Error. Please try again later." },
-      errors: errors ?? {}
-   };
+export interface FormState {
+  status: "Initial" | "Success" | "Error" | "Failure";
+  inputs: InputStates;
+  response: FormResponse | null;
+  payload: FormPayload | null;
+}
+
+export interface InputProps extends React.InputHTMLAttributes<any> {
+  label: string;
+  input: InputState;
+  dispatch: Dispatch<FormAction>;
+}
+
+export const initialFormState: FormState = {
+  status: "Initial",
+  inputs: {},
+  response: null,
+  payload: null,
+};
+
+export function formReducer(state: FormState, action: FormAction): FormState {
+  return produce(state, (draft) => {
+    switch (action.type) {
+      case "updateInput":
+        const input = action.value as InputState;
+        draft.inputs[input.id] = input;
+
+        break;
+      case "updateStatus":
+        const response = action.value as FormResponse;
+        draft.response = response;
+
+        for (const key in state.inputs) {
+          draft.inputs[key].error = response.response.errors[key] ?? null;
+        }
+
+        break;
+      case "resetForm":
+        for (const key in state.inputs) {
+          draft.inputs[key] = {
+            ...state.inputs[key],
+            value: "",
+            error: null,
+          };
+        }
+
+        break;
+      case "constructPayload":
+        const payload: FormPayload = {};
+
+        for (const key in state.inputs) {
+          payload[key] = state.inputs[key].value;
+        }
+
+        draft.payload = payload;
+
+        break;
+      case "updatePayload":
+        draft.payload = action.value as FormPayload;
+
+        break;
+      default:
+        return state;
+    }
+  });
+}
+
+export function sendSuccessMessage(message: string, data?: any): FormResponse {
+  return {
+    state: "Success",
+    response: { message: message, data: data, errors: {} },
+  };
+}
+
+export function sendErrorMessage(
+  status: "Error" | "Failure",
+  message: string,
+  errors: { [key: string]: string }
+): FormResponse {
+  return {
+    state: status,
+    response: {
+      message: message,
+      data: null,
+      errors: errors ?? {},
+    },
+  };
 }

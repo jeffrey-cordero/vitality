@@ -1,9 +1,8 @@
 "use server";
-import { PrismaClient, Users as User } from "@prisma/client";
+import prisma from "@/lib/database/client";
+import { Users as User } from "@prisma/client";
 
 export async function getUser(username: string): Promise<User | null> {
-   const prisma = new PrismaClient();
-
    try {
       const user = await prisma.users.findFirst({
          where: {

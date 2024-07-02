@@ -3,7 +3,7 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/database/client";
 import { z } from "zod";
-import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
+import { FormResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
 
 export type Registration = {
   name: string;
@@ -49,19 +49,27 @@ const registrationSchema = z.object({
       .optional()
 });
 
-export async function signup(registration: Registration): Promise<SubmissionStatus> {
+export async function signup(registration: Registration): Promise<FormResponse> {
    const fields = registrationSchema.safeParse(registration);
 
    if (!fields.success) {
+      const errors = {};
+
+      for (const error in Object.keys(fields.error.flatten().fieldErrors)) {
+         if (fields.error.flatten().fieldErrors[error] !== undefined) {
+            errors[error] = fields.error.flatten().fieldErrors[error][0];
+         }
+      }
+
       return sendErrorMessage(
          "Error",
          "Invalid user registration fields",
-         fields.error.flatten().fieldErrors,
+         errors,
       );
    } else if (!(registration.password === registration.confirmPassword)) {
       return sendErrorMessage("Error", "Invalid user registration fields", {
-         password: ["Passwords do not match"],
-         confirmPassword: ["Passwords do not match"]
+         password: "Passwords do not match",
+         confirmPassword: "Passwords do not match"
       });
    }
 
@@ -83,24 +91,24 @@ export async function signup(registration: Registration): Promise<SubmissionStat
    } catch (error: any) {
       if (error.code === "P2002" && error.meta?.target?.includes("username")) {
          return sendErrorMessage("Error", "Internal database conflicts", {
-            username: ["Username already taken"]
+            username: "Username already taken"
          });
       } else if (
          error.code === "P2002" &&
       error.meta?.target?.includes("email")
       ) {
          return sendErrorMessage("Error", "Internal database conflicts", {
-            email: ["Email already taken"]
+            email: "Email already taken"
          });
       } else if (
          error.code === "P2002" &&
       error.meta?.target?.includes("phone")
       ) {
          return sendErrorMessage("Error", "Internal database conflicts", {
-            phone: ["Phone number already taken"]
+            phone: "Phone number already taken"
          });
       } else {
-         return sendErrorMessage("Failure");
+         return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
       }
    }
 }

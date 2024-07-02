@@ -40,7 +40,7 @@ export default function Ring(): JSX.Element {
    return (
       <div className = "relative h-full w-full my-[4rem]">
          <motion.svg
-            className = "absolute inset-0 m-auto w-[90px] md:w-[120px] h-[90px] md:h-[120px]"
+            className = "absolute inset-0 m-auto w-[90px] md:w-[110px] h-[90px] md:h-[110px]"
             viewBox = "0 0 100 100"
 
          >
