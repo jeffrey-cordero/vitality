@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { InputProps } from "@/lib/global/form";
 
 export default function Input({ ...props }: InputProps): JSX.Element {
+   const input = useRef<HTMLInputElement>(null);
    const eyeButton = useRef<SVGSVGElement | null>(null);
 
    return (
@@ -13,6 +14,7 @@ export default function Input({ ...props }: InputProps): JSX.Element {
             type={props.input.type}
             id={props.input.id}
             value={props.input.value}
+            ref={input}
             className={clsx("peer p-4 block w-full rounded-lg text-sm font-semibold border-1 placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2",
                {
                   "border-gray-200": props.input.error === null,
@@ -37,7 +39,15 @@ export default function Input({ ...props }: InputProps): JSX.Element {
                   ref={eyeButton}
                   onClick={() => {
                      if (eyeButton.current !== null) {
-                        eyeButton.current.style.color = props.input.type === "password" ? "blue" : "black";
+                        input.current?.focus();
+                        
+                        if (props.input.type === "password") {
+                           eyeButton.current.classList.add("text-primary");
+                        } else {
+                           eyeButton.current.classList.remove("text-primary");
+
+                        }
+                        // eyeButton.current.style.color = props.input.type === "password" ? "blue" : "black";
 
                         props.dispatch({
                            type: 'updateInput',
@@ -59,7 +69,7 @@ export default function Input({ ...props }: InputProps): JSX.Element {
          </label>
          {props.input.error !== null &&
             <div className="flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-               <p className="text-red-500 input-error"> {props.input.error} </p>
+               <p className="text-red-500 input-error"> {props.input.error[0]} </p>
             </div>
          }
       </div>

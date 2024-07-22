@@ -18,12 +18,11 @@ export async function login(credentials: Credentials): Promise<FormResponse> {
       return sendSuccessMessage("Successfully logged in");
    } catch (error) {
       if (error instanceof AuthError) {
-         console.log(error.type);
          switch (error.type) {
-         case "CallbackRouteError":
-            return sendErrorMessage("Error", "Invalid credentials", { username : "Invalid credentials", password: "Invalid credentials" });
-         default:
-            return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
+            case "CallbackRouteError":
+               return sendErrorMessage("Error", "Invalid credentials", { username : ["Invalid credentials"], password: ["Invalid credentials"] });
+            default:
+               return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
          }
       }
       throw error;

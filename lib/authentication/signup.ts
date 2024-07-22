@@ -50,26 +50,24 @@ const registrationSchema = z.object({
 });
 
 export async function signup(registration: Registration): Promise<FormResponse> {
+   registration.birthday = new Date(registration.birthday);
+
+   if (registration.phone?.trim().length === 0) {
+      delete registration.phone;
+   }
+
    const fields = registrationSchema.safeParse(registration);
 
    if (!fields.success) {
-      const errors = {};
-
-      for (const error in Object.keys(fields.error.flatten().fieldErrors)) {
-         if (fields.error.flatten().fieldErrors[error] !== undefined) {
-            errors[error] = fields.error.flatten().fieldErrors[error][0];
-         }
-      }
-
       return sendErrorMessage(
          "Error",
          "Invalid user registration fields",
-         errors,
+         fields.error.flatten().fieldErrors,
       );
    } else if (!(registration.password === registration.confirmPassword)) {
       return sendErrorMessage("Error", "Invalid user registration fields", {
-         password: "Passwords do not match",
-         confirmPassword: "Passwords do not match"
+         password: ["Passwords do not match"],
+         confirmPassword: ["Passwords do not match"]
       });
    }
 
@@ -91,21 +89,21 @@ export async function signup(registration: Registration): Promise<FormResponse> 
    } catch (error: any) {
       if (error.code === "P2002" && error.meta?.target?.includes("username")) {
          return sendErrorMessage("Error", "Internal database conflicts", {
-            username: "Username already taken"
+            username: ["Username already taken"]
          });
       } else if (
          error.code === "P2002" &&
       error.meta?.target?.includes("email")
       ) {
          return sendErrorMessage("Error", "Internal database conflicts", {
-            email: "Email already taken"
+            email: ["Email already taken"]
          });
       } else if (
          error.code === "P2002" &&
       error.meta?.target?.includes("phone")
       ) {
          return sendErrorMessage("Error", "Internal database conflicts", {
-            phone: "Phone number already taken"
+         phone: ["Phone number already taken"]
          });
       } else {
          return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});

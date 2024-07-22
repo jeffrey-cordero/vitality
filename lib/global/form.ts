@@ -12,7 +12,7 @@ export type InputStates = { [key: string]: InputState };
 export type FormPayload = { [key: string]: string };
 export interface FormResponse {
   state: "Success" | "Error" | "Failure";
-  response: { message: string; data: any; errors: { [key: string]: string } };
+  response: { message: string; data: any; errors: { [key: string]: string[] | undefined } };
 }
 
 export interface FormAction {
@@ -58,7 +58,7 @@ export function formReducer(state: FormState, action: FormAction): FormState {
         draft.response = response;
 
         for (const key in state.inputs) {
-          draft.inputs[key].error = response.response.errors[key] ?? null;
+          draft.inputs[key].error = response?.response.errors[key] ?? null;
         }
 
         break;
@@ -102,7 +102,7 @@ export function sendSuccessMessage(message: string, data?: any): FormResponse {
 export function sendErrorMessage(
   status: "Error" | "Failure",
   message: string,
-  errors: { [key: string]: string }
+  errors: { [key: string]: string[] }
 ): FormResponse {
   return {
     state: status,
