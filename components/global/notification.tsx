@@ -35,11 +35,12 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      <div className = "flex w-full items-center justify-between p-4">
                         <div>
                            <div>
-                              <h3 className = "mt-4 text-md font-bold text-dark">
+                              <h3 className = "mt-2 text-md font-bold text-dark">
                                  {props.state.status ?? "N/A"}
                               </h3>
                            </div>
-                           <div className = "my-2">
+                           <div className = "my-2 flex flex-col gap-2">
+                              <p>{props.state.response?.body.message}</p>
                               {props.children}
                            </div>
                         </div>

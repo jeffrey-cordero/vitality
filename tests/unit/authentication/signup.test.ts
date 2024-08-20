@@ -30,7 +30,7 @@ describe("User can be created given valid fields or rejected given invalid field
 
       expected = {
          state: "Error",
-         response: { message: "Invalid user registration fields" },
+         body: { message: "Invalid user registration fields" },
          errors: {
             username: ["A username must be at least 3 characters"],
             password: [
@@ -57,7 +57,7 @@ describe("User can be created given valid fields or rejected given invalid field
 
       expected = {
          state: "Error",
-         response: { message: "Invalid user registration fields" },
+         body: { message: "Invalid user registration fields" },
          errors: { birthday: ["Required"], email: ["Required"] }
       };
 
@@ -75,7 +75,7 @@ describe("User can be created given valid fields or rejected given invalid field
 
       expected = {
          state: "Error",
-         response: { message: "Invalid user registration fields" },
+         body: { message: "Invalid user registration fields" },
          errors: {
             name: ["A name must be at least 2 characters"],
             birthday: ["A birthday must not be before 200 years ago"],
@@ -100,7 +100,7 @@ describe("User can be created given valid fields or rejected given invalid field
 
       expected = {
          state: "Error",
-         response: { message: "Invalid user registration fields" },
+         body: { message: "Invalid user registration fields" },
          errors: {
             password: ["Passwords do not match"],
             confirmPassword: ["Passwords do not match"]
@@ -123,7 +123,7 @@ describe("User can be created given valid fields or rejected given invalid field
 
       expected = {
          state: "Success",
-         response: { message: "Successfully registered", data: undefined },
+         body: { message: "Successfully registered", data: undefined },
          errors: {}
       };
 

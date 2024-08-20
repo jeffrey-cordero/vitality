@@ -19,8 +19,8 @@ export default function Layout({
 
    return (
       <>
-         <div className = "flex flex-col mt-6">
-            <div className = "flex-grow md:overflow-y-auto p-4">
+         <div className = "flex flex-col">
+            <div className = "flex-grow md:overflow-y-auto p-2sig">
                {children}
             </div>
          </div>

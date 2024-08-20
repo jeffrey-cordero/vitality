@@ -4,79 +4,80 @@ import TextArea from "@/components/global/textarea";
 import Notification from "@/components/global/notification";
 import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
-import { FormEvent } from "react";
-import { useImmer } from "use-immer";
-import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/global/form";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import { FormEvent, useEffect, useReducer } from "react";
+import { initialFormState, FormState, formReducer, constructPayload, FormPayload, FormResponse } from "@/lib/global/form";
 import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
 
+const formState: FormState = {
+   ...initialFormState,
+   inputs: {
+      name: {
+         type: "text",
+         id: "name",
+         value: "",
+         error: null
+      },
+      email: {
+         type: "email",
+         id: "email",
+         value: "",
+         error: null
+      },
+      message: {
+         type: "text",
+         id: "message",
+         value: "",
+         error: null
+      }
+   }
+};
+
 function Form(): JSX.Element {
-   const [status, setStatus] = useImmer<SubmissionStatus>({ state: "Initial", response: {}, errors: {} });
-   const [feedback, setFeedback] = useImmer<FormItems>(
-      {
-         name: {
-            label: "Name *",
-            type: "text",
-            id: "name",
-            value: "",
-            error: null
-         }, email: {
-            label: "Email *",
-            type: "email",
-            id: "email",
-            value: "",
-            error: null
-         }, message: {
-            label: "Message *",
-            id: "message",
-            value: "",
-            error: null
-         }
-      });
+   const [state, dispatch] = useReducer(formReducer, formState);
+
+   useEffect(() => {
+      console.log(state);
+   }, [state]);
 
    const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();
 
       try {
-         const payload: Feedback = {
-            name: feedback.name.value,
-            email: feedback.email.value,
-            message: feedback.message.value
-         };
+         const payload: FormPayload = constructPayload(state);
+         const response: FormResponse = await sendFeedback(payload as Feedback);
 
-         const response = await sendFeedback(payload);
-         setStatus(response);
-         handleFormErrors(response, feedback, setFeedback);
+         dispatch({
+            type: "updateStatus",
+            value: response
+         });
       } catch (error) {
          console.error("Error updating status:", error);
-         setStatus({ state: "Initial", response: {}, errors: {} });
       }
    };
 
    return (
       <div className = "w-full mx-auto">
          <form
-            className = "w-1/2 mx-auto flex flex-col justify-center align-center gap-3"
+            className = "relative w-1/2 mx-auto flex flex-col justify-center align-center gap-3"
             onSubmit = {handleSubmit}
          >
-            <Input input = {feedback.name} updater = {setFeedback} />
-            <Input input = {feedback.email} updater = {setFeedback} />
-            <TextArea input = {feedback.message} updater = {setFeedback} />
-            {status.state === "Success" && (
-               <Notification status = {status}>
-                  {""}
-               </Notification>
-            )}
-            <Button
-               type = "submit"
-               className = "bg-primary text-white h-[2.5rem]"
-            >
+            <FontAwesomeIcon
+               icon = {faArrowRotateLeft}
+               onClick = {() => dispatch({
+                  type: "resetForm", value: null
+               })}
+               className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer" />
+            <Input input = {state.inputs.name} label = "Name *" dispatch = {dispatch} />
+            <Input input = {state.inputs.email} label = "Email *" dispatch = {dispatch} />
+            <TextArea input = {state.inputs.message} label = "Message *" dispatch = {dispatch} />
+            <Button type = "submit" className = "bg-primary text-white h-[2.6rem]">
                Submit
             </Button>
             {
-               status.state === "Success" && (
-                  <Notification status = {status}>
-                     {""}
-                  </Notification>
+               state.status != "Initial" && state.status != "Error" && (
+                  <Notification state = {state} />
                )
             }
          </form>

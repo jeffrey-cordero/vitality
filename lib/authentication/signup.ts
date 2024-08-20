@@ -7,7 +7,7 @@ import { FormResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global
 
 export type Registration = {
   name: string;
-  birthday: string | Date;
+  birthday: Date;
   username: string;
   password: string;
   confirmPassword: string;
@@ -50,15 +50,14 @@ const registrationSchema = z.object({
 });
 
 export async function signup(registration: Registration): Promise<FormResponse> {
-   registration.birthday = new Date(registration.birthday);
-
-   if (registration.phone?.trim().length === 0) {
+   if (registration?.phone?.trim().length === 0) {
       delete registration.phone;
    }
 
    const fields = registrationSchema.safeParse(registration);
 
    if (!fields.success) {
+      console.log(fields.error.flatten().fieldErrors);
       return sendErrorMessage(
          "Error",
          "Invalid user registration fields",
@@ -103,7 +102,7 @@ export async function signup(registration: Registration): Promise<FormResponse> 
       error.meta?.target?.includes("phone")
       ) {
          return sendErrorMessage("Error", "Internal database conflicts", {
-         phone: ["Phone number already taken"]
+            phone: ["Phone number already taken"]
          });
       } else {
          return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});

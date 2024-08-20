@@ -44,7 +44,7 @@ function SideBarLinks(): JSX.Element {
                   key = {link.name}
                   href = {link.href}
                   className = {clsx(
-                     "flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-black bg-gray-50 text-sm font-medium hover:text-blue-600 z-40 sideBarLink",
+                     "flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-black bg-gray-50 text-sm font-medium hover:text-blue-600 z-40",
                      {
                         "bg-sky-100 text-blue-600": pathname === link.href
                      },
@@ -65,12 +65,13 @@ export function SideBar(): JSX.Element {
 
    return (
       <>
-         <div className = "fixed top-0 left-0 w-full z-30">
-            <div className = "relative top-0 left-0 transform translate-x-[20px] translate-y-[30px] z-30">
+         <div 
+            className = "fixed top-0 left-0 w-full z-30">
+            <div className = "relative top-0 left-0 transform translate-x-[15px] translate-y-[15px] z-30">
                <FontAwesomeIcon
                   id = "sideBarButton"
                   icon = {visibleSideBar ? faAnglesRight : faBars}
-                  className = "text-3xl text-black font-extrabold hover:cursor-pointer hover:shadow-sm"
+                  className = "text-3xl text-black font-extrabold hover:cursor-pointer"
                   onClick = {() => {
                      setVisibleSideBar(!(visibleSideBar));
                   }}
@@ -86,7 +87,12 @@ export function SideBar(): JSX.Element {
                })}>
                <div className = "flex h-auto mt-20 flex-col px-3 py-4 bg-gray-50 shadow-md rounded-2xl overflow-hidden">
                   <div className = "flex flex-col space-x-2 space-y-2 justify-center text-center">
-                     <div className = "flex flex-col w-full h-full items-center justify-between text-center">
+                     <div 
+                        className = "flex flex-col w-full h-full items-center justify-between text-center"
+                        onMouseLeave={() => {
+                           setVisibleSideBar(false);
+                        }}
+                        >
                         <SideBarLinks />
                      </div>
                   </div>

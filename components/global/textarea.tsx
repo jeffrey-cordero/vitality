@@ -1,13 +1,14 @@
 "use client";
 import clsx from "clsx";
 import { ChangeEvent, useRef } from "react";
-import { InputProps, updateFormState } from "@/lib/global/form";
+import { InputProps } from "@/lib/global/form";
 
-export default function TextArea({ updater, ...props }: InputProps): JSX.Element {
+export default function TextArea({ ...props }: InputProps): JSX.Element {
    const textArea = useRef<HTMLTextAreaElement | null>(null);
 
    const handleTextAreaOverflow = () => {
       const textarea = textArea.current;
+
       if (textarea) {
          textarea.style.height = "auto";
          textarea.style.height = `${textarea.scrollHeight}px`;
@@ -25,7 +26,14 @@ export default function TextArea({ updater, ...props }: InputProps): JSX.Element
                   "border-red-500 ": props.input.error !== null
                })}
             onChange = {(event: ChangeEvent<HTMLTextAreaElement>) => {
-               updateFormState(event, updater);
+               props.dispatch({
+                  type: "updateInput",
+                  value: {
+                     ...props.input,
+                     value: event.target.value,
+                     error: null
+                  }
+               });
                handleTextAreaOverflow();
             }}
             ref = {textArea}
@@ -33,13 +41,13 @@ export default function TextArea({ updater, ...props }: InputProps): JSX.Element
          <label
             htmlFor = {props.input.id}
             className = {clsx("absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-gray-500 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500", {
-               "font-bold": props.input.label.includes("*")
+               "font-bold": props.label.includes("*")
             })}>
-            {props.input.label}
+            {props.label}
          </label>
          {props.input.error !== null &&
             <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-               <p className = "text-red-500 input-error"> {props.input.error} </p>
+               <p className = "text-red-500 font-bold input-error"> {props.input.error} </p>
             </div>
          }
       </div>

@@ -1,9 +1,9 @@
 "use server";
 import prisma from "@/lib/database/client";
 import { z } from "zod";
-import { SubmissionStatus, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
+import { FormResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
 
-export interface Feedback {
+export type Feedback = {
    name: string;
    email: string;
    message: string;
@@ -15,7 +15,7 @@ const feedbackSchema = z.object({
    message: z.string().trim().min(1, { message: "Message is required." })
 });
 
-export async function sendFeedback(feedback: Feedback): Promise<SubmissionStatus>  {
+export async function sendFeedback(feedback: Feedback): Promise<FormResponse>  {
    // Validate the feedback form first
    const fields = feedbackSchema.safeParse(feedback);
 
@@ -36,5 +36,5 @@ export async function sendFeedback(feedback: Feedback): Promise<SubmissionStatus
       console.error(err);
    }
 
-   return sendErrorMessage("Failure", "Message.");
+   return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
 }

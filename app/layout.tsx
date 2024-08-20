@@ -16,7 +16,6 @@ export const metadata: Metadata = {
    metadataBase: new URL("https://github.com/jeffrey-asm/vitality")
 };
 
-
 export default function Layout({
    children
 }: {
@@ -25,12 +24,14 @@ export default function Layout({
    return (
       <html lang = "en" className = "m-0 p-0 overflow-x-hidden w-full ">
          <Head>
-            <link rel = "icon" href = "favicon.ico" />
+            <link rel = "icon" href = "favcon.ico" />
             <meta name = "viewport" content = "width=device-width, initial-scale=1.0" />
          </Head>
          <body className = {cx(sfPro.variable, inter.variable, "box-border m-0 p-0  overflow-x-hidden w-full max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black")}>
             <SideBar />
-            {children}
+            <div className="main w-full h-full mt-4 mb-20">
+               {children}
+            </div>
             <Footer />
          </body>
       </html>

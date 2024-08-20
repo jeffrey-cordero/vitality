@@ -35,7 +35,7 @@ describe("User can be created and conflicts arise when attempting login with inv
 
       expected = {
          state: "Success",
-         response: { message: "Successfully registered", data: undefined },
+         body: { message: "Successfully registered", data: undefined },
          errors: {}
       };
 

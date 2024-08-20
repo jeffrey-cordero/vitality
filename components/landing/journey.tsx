@@ -56,10 +56,10 @@ export default function Journey(): JSX.Element {
                   <div className = "w-full lg:w-5/12">
                      <div className = "flex flex-col items-center justify-center text-center">
                         <Ring />
-                        <span className = "block mb-6 mx-6 w-11/12 sm:w-4/5 text-4xl font-bold text-primary">
+                        <span className = "block mb-6 mx-6 w-11/12 sm:w-4/5 text-2xl md:text-3xl font-bold text-primary">
                            Level Up Your Fitness
                         </span>
-                        <p className = "w-10/12 sm:w-2/3 mx-auto mb-8 font-medium text-base sm:text-lg text-slate-500">
+                        <p className = "w-10/12 sm:w-2/3 mx-auto mb-8 font-medium text-sm md:text-md text-slate-500">
                            Discover the power of tracking your fitness journey as you strive towards your goals. By monitoring your progress, you gain valuable insights, stay accountable, and fuel your motivation.
                         </p>
                         <Link href = "/signup">

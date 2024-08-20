@@ -26,7 +26,7 @@ describe("User can be created given valid fields or rejected given invalid field
 
       expected = {
          state: "Success",
-         response: { message: "Missing implementation", data: undefined },
+         body: { message: "Missing implementation", data: undefined },
          errors: {}
       };
 

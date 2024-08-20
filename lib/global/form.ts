@@ -9,17 +9,16 @@ export interface InputState {
 }
 
 export type InputStates = { [key: string]: InputState };
-export type FormPayload = { [key: string]: string };
+export type FormPayload = { [key: string]: string | Date };
 export interface FormResponse {
-  state: "Success" | "Error" | "Failure";
-  response: { message: string; data: any; errors: { [key: string]: string[] | undefined } };
+  status: "Success" | "Error" | "Failure";
+  body: { message: string; data: any; errors: { [key: string]: string[] | undefined } };
 }
 
 export interface FormAction {
   type:
     | "updateInput"
     | "updateStatus"
-    | "constructPayload"
     | "updatePayload"
     | "resetForm";
   value: InputState | FormResponse | FormPayload | null;
@@ -29,7 +28,6 @@ export interface FormState {
   status: "Initial" | "Success" | "Error" | "Failure";
   inputs: InputStates;
   response: FormResponse | null;
-  payload: FormPayload | null;
 }
 
 export interface InputProps extends React.InputHTMLAttributes<any> {
@@ -39,77 +37,73 @@ export interface InputProps extends React.InputHTMLAttributes<any> {
 }
 
 export const initialFormState: FormState = {
-  status: "Initial",
-  inputs: {},
-  response: null,
-  payload: null,
+   status: "Initial",
+   inputs: {},
+   response: null
 };
 
+export function constructPayload(state: FormState): FormPayload {
+   const payload: FormPayload = {};
+
+   for (const key in state.inputs) {
+      payload[key] = state.inputs[key].value;
+   }
+
+   return payload;
+}
+
 export function formReducer(state: FormState, action: FormAction): FormState {
-  return produce(state, (draft) => {
-    switch (action.type) {
+   return produce(state, (draft) => {
+      switch (action.type) {
       case "updateInput":
-        const input = action.value as InputState;
-        draft.inputs[input.id] = input;
+         const input = action.value as InputState;
+         draft.inputs[input.id] = input;
 
-        break;
+         break;
       case "updateStatus":
-        const response = action.value as FormResponse;
-        draft.response = response;
+         const response = action.value as FormResponse;
+         draft.status = response.status;
+         draft.response = response;
 
-        for (const key in state.inputs) {
-          draft.inputs[key].error = response?.response.errors[key] ?? null;
-        }
+         for (const key in state.inputs) {
+            draft.inputs[key].error = response?.body.errors[key] ?? null;
+         }
 
-        break;
+         break;
       case "resetForm":
-        for (const key in state.inputs) {
-          draft.inputs[key] = {
-            ...state.inputs[key],
-            value: "",
-            error: null,
-          };
-        }
+         for (const key in state.inputs) {
+            draft.inputs[key] = {
+               ...state.inputs[key],
+               value: "",
+               error: null
+            };
+         }
 
-        break;
-      case "constructPayload":
-        const payload: FormPayload = {};
-
-        for (const key in state.inputs) {
-          payload[key] = state.inputs[key].value;
-        }
-
-        draft.payload = payload;
-
-        break;
-      case "updatePayload":
-        draft.payload = action.value as FormPayload;
-
-        break;
+         break;
       default:
-        return state;
-    }
-  });
+         return state;
+      }
+   });
 }
 
 export function sendSuccessMessage(message: string, data?: any): FormResponse {
-  return {
-    state: "Success",
-    response: { message: message, data: data, errors: {} },
-  };
+   return {
+      status: "Success",
+      body: { message: message, data: data, errors: {} }
+   };
 }
 
 export function sendErrorMessage(
-  status: "Error" | "Failure",
-  message: string,
-  errors: { [key: string]: string[] }
+   status: "Error" | "Failure",
+   message: string,
+   errors: { [key: string]: string[] }
 ): FormResponse {
-  return {
-    state: status,
-    response: {
-      message: message,
-      data: null,
-      errors: errors ?? {},
-    },
-  };
+   return {
+      status: status,
+      body: {
+         message: message,
+         data: null,
+         errors: errors ?? {}
+      }
+   };
 }
