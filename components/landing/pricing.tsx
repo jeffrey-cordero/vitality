@@ -14,7 +14,7 @@ function PricingCard(props: PricingCardProps): JSX.Element {
    return (
       <>
          <div className = "flex justify-center w-[23rem] h-[34rem] max-w-[90%] text-center rounded-2xl border border-gray-200 bg-white shadow-md px-4">
-            <div className = "relative flex flex-col justify-center align-center overflow-hidden">
+            <div className = "relative flex flex-col justify-center align-center">
                <span className = "mb-3 block text-3xl font-extrabold text-primary">
                   {props.type}
                </span>
@@ -27,7 +27,7 @@ function PricingCard(props: PricingCardProps): JSX.Element {
                <div className = "my-6 flex flex-col justify-center gap-[14px] h-[12.5rem] font-medium">{props.children}</div>
                <Link href = "/signup">
                   <Button
-                     className = "block w-full rounded-md border border-primary bg-primary p-3 text-center text-white"
+                     className = "block w-full rounded-md border border-primary bg-primary p-3 text-center text-white hover:scale-[1.05] transition duration-300 ease-in-out"
                   >
                      {props.text}
                   </Button>

@@ -10,6 +10,8 @@ CREATE TABLE "Users" (
       phoneVerified BOOLEAN DEFAULT FALSE
 );
 
+CREATE index "usersEmailIndex" ON "Users" (email);
+
 CREATE TABLE "VerificationToken" (
       identifier TEXT PRIMARY KEY NOT NULL,
       token TEXT UNIQUE NOT NULL,

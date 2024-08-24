@@ -7,7 +7,7 @@ import Testimonials from "@/components/landing/testimonials";
 export default function Page() {
    return (
       <>
-         <main className = "w-full flex min-h-screen flex-col items-center justify-start md:px-4 text-center overflow-hidden">
+         <main className = "w-full h-screen flex overflow-y-auto flex-col items-center justify-start md:px-4 text-center overflow-x-hidden">
             <Journey />
             <Highlights />
             <Services />

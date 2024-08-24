@@ -1,16 +1,18 @@
-"use client";;
+"use client";
 import Link from "next/link";
 import clsx from "clsx";
-import { useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname } from "next/navigation";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faBars, faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faPersonRunning, faUtensils, faBrain, faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears } from "@fortawesome/free-solid-svg-icons";
+import { AuthenticationContext } from "@/app/layout";
 
 interface SideBarProps {
    name: string;
    href: string;
-   icon: IconDefinition
+   icon: IconDefinition;
+   logout?: boolean;
 }
 
 const landingLinks: SideBarProps[] = [
@@ -19,7 +21,7 @@ const landingLinks: SideBarProps[] = [
    { name: "Sign Up", href: "/signup", icon: faUserPlus }
 ];
 
-const userLinks: SideBarProps[] = [
+const homeLinks: SideBarProps[] = [
    { name: "Home", href: "/home", icon: faHouse },
    { name: "Workouts", href: "/home/workouts", icon: faPersonRunning },
    { name: "Nutrition", href: "/home/nutrition", icon: faUtensils },
@@ -34,7 +36,14 @@ const userLinks: SideBarProps[] = [
 
 function SideBarLinks(): JSX.Element {
    const pathname = usePathname();
-   const links = pathname.startsWith("/home") ? userLinks : landingLinks;
+   const { user } = useContext(AuthenticationContext);
+   const [links, setLinks] = useState<SideBarProps[]>(pathname.startsWith("/home") ? homeLinks : landingLinks);
+
+   useEffect(() => {
+      setLinks(user !== null ? homeLinks : landingLinks);
+      console.log("Updated links:");
+      console.log(user);
+   }, [user]);
 
    return (
       <>
@@ -48,9 +57,18 @@ function SideBarLinks(): JSX.Element {
                      {
                         "bg-sky-100 text-blue-600": pathname === link.href
                      },
+                     {
+                        "text-red-600 hover:text-blue-600": link.logout
+                     }
                   )}>
-                  <div className = "w-[30px] pl-[10px]">
-                     <FontAwesomeIcon icon = {link.icon} className = "text-2xl" />
+                  <div
+                     className = "w-[30px] pl-[10px]"
+                  >
+                     <FontAwesomeIcon
+                        icon = {link.icon}
+                        className = "text-2xl"
+                     />
+
                   </div>
                   <p className = "whitespace-nowrap">{link.name}</p>
                </Link>
@@ -65,9 +83,9 @@ export function SideBar(): JSX.Element {
 
    return (
       <>
-         <div 
+         <div
             className = "fixed top-0 left-0 w-full z-30">
-            <div className = "relative top-0 left-0 transform translate-x-[15px] translate-y-[15px] z-30">
+            <div className = "relative top-0 left-0 transform translate-x-[15px] translate-y-[25px] z-30">
                <FontAwesomeIcon
                   id = "sideBarButton"
                   icon = {visibleSideBar ? faAnglesRight : faBars}
@@ -85,14 +103,19 @@ export function SideBar(): JSX.Element {
                   "left-[-5rem]": !(visibleSideBar),
                   "left-[10px]": visibleSideBar
                })}>
-               <div className = "flex h-auto mt-20 flex-col px-3 py-4 bg-gray-50 shadow-md rounded-2xl overflow-hidden">
+               <div
+                  className = "flex h-auto mt-20 flex-col px-3 py-4 bg-gray-50 shadow-md rounded-2xl overflow-hidden"
+                  onMouseEnter = {() => {
+                     setVisibleSideBar(true);
+                  }}
+                  onMouseLeave = {() => {
+                     setVisibleSideBar(false);
+                  }}
+               >
                   <div className = "flex flex-col space-x-2 space-y-2 justify-center text-center">
-                     <div 
+                     <div
                         className = "flex flex-col w-full h-full items-center justify-between text-center"
-                        onMouseLeave={() => {
-                           setVisibleSideBar(false);
-                        }}
-                        >
+                     >
                         <SideBarLinks />
                      </div>
                   </div>
