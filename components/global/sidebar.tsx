@@ -40,9 +40,7 @@ function SideBarLinks(): JSX.Element {
    const [links, setLinks] = useState<SideBarProps[]>(pathname.startsWith("/home") ? homeLinks : landingLinks);
 
    useEffect(() => {
-      setLinks(user !== null ? homeLinks : landingLinks);
-      console.log("Updated links:");
-      console.log(user);
+      setLinks(user !== undefined ? homeLinks : landingLinks);
    }, [user]);
 
    return (

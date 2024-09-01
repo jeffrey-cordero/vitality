@@ -68,7 +68,8 @@ function Form(): JSX.Element {
                onClick = {() => dispatch({
                   type: "resetForm", value: null
                })}
-               className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer" />
+               className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer" 
+            />
             <Input input = {state.inputs.name} label = "Name *" dispatch = {dispatch} />
             <Input input = {state.inputs.email} label = "Email *" dispatch = {dispatch} />
             <TextArea input = {state.inputs.message} label = "Message *" dispatch = {dispatch} />

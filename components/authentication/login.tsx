@@ -54,7 +54,8 @@ function Form(): JSX.Element {
                onClick = {() => dispatch({
                   type: "resetForm", value: null
                })}
-               className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer" />
+               className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer" 
+            />
             <Input input = {state.inputs.username} label = "Username *" dispatch = {dispatch} />
             <Input input = {state.inputs.password} label = "Password *" dispatch = {dispatch} />
             <Button type = "submit" className = "bg-primary text-white h-[2.6rem]">

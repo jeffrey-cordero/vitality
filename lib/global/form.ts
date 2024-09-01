@@ -6,6 +6,7 @@ export interface InputState {
   value: any;
   error: any | null;
   type?: string;
+  options?: string[];
 }
 
 export type InputStates = { [key: string]: InputState };
@@ -55,34 +56,37 @@ export function constructPayload(state: FormState): FormPayload {
 export function formReducer(state: FormState, action: FormAction): FormState {
    return produce(state, (draft) => {
       switch (action.type) {
-      case "updateInput":
-         const input = action.value as InputState;
-         draft.inputs[input.id] = input;
+         case "updateInput":
+            const input = action.value as InputState;
+            draft.inputs[input.id] = input;
 
-         break;
-      case "updateStatus":
-         const response = action.value as FormResponse;
-         draft.status = response.status;
-         draft.response = response;
+            break;
+         case "updateStatus":
+            const response = action.value as FormResponse;
 
-         for (const key in state.inputs) {
-            draft.inputs[key].error = response?.body.errors[key] ?? null;
+            if (response) {
+               draft.status = response.status;
+               draft.response = response;
+
+               for (const key in state.inputs) {
+                  draft.inputs[key].error = response?.body.errors[key] ?? null;
+               }
+            }
+
+            break;
+         case "resetForm":
+            for (const key in state.inputs) {
+               draft.inputs[key] = {
+                  ...state.inputs[key],
+                  value: "",
+                  error: null
+               };
+            }
+
+            break;
+         default:
+            return state;
          }
-
-         break;
-      case "resetForm":
-         for (const key in state.inputs) {
-            draft.inputs[key] = {
-               ...state.inputs[key],
-               value: "",
-               error: null
-            };
-         }
-
-         break;
-      default:
-         return state;
-      }
    });
 }
 

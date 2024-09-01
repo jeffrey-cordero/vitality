@@ -56,7 +56,7 @@ export async function signup(registration: Registration): Promise<FormResponse> 
 
    const fields = registrationSchema.safeParse(registration);
 
-   if (!fields.success) {
+   if (!(fields.success)) {
       console.log(fields.error.flatten().fieldErrors);
       return sendErrorMessage(
          "Error",

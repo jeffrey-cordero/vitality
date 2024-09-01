@@ -1,55 +1,74 @@
-CREATE TABLE "Users" (
+CREATE TABLE "users" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name VARCHAR(255) NOT NULL,
       birthday DATE NOT NULL,
       username VARCHAR(30) UNIQUE NOT NULL,
       password TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
-      emailVerified BOOLEAN NOT NULL DEFAULT FALSE,
+      email_verified BOOLEAN NOT NULL DEFAULT FALSE,
       phone VARCHAR(22) UNIQUE,
-      phoneVerified BOOLEAN DEFAULT FALSE
+      phone_verified BOOLEAN DEFAULT FALSE
 );
 
-CREATE index "usersEmailIndex" ON "Users" (email);
+CREATE index "users_email_index" ON "users" (email);
 
-CREATE TABLE "VerificationToken" (
+CREATE TABLE "verification_token" (
       identifier TEXT PRIMARY KEY NOT NULL,
       token TEXT UNIQUE NOT NULL,
       expires TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
-CREATE TABLE "Workouts" (
+CREATE TABLE "workouts" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      user_id UUID NOT NULL REFERENCES "Users"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+      user_id UUID NOT NULL REFERENCES "users"(id) ON DELETE CASCADE ON UPDATE CASCADE,
       title VARCHAR(50) NOT NULL, 
       date DATE NOT NULL,
-      reflection TEXT,
-      image TEXT DEFAULT 'DEFAULT'
+      description TEXT,
+      image TEXT
 );
 
-CREATE TABLE "Exercises" (
+CREATE index "workouts_user_index" ON "workouts" (user_id);
+
+CREATE TABLE "exercises" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      workout_id UUID NOT NULL REFERENCES "Workouts"(id) ON DELETE CASCADE ON UPDATE CASCADE,
-      title VARCHAR(50),
+      workout_id UUID NOT NULL REFERENCES "workouts"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+      name VARCHAR(50) NOT NULL
+);
+
+CREATE INDEX "exercises_workout_index" ON "exercises" (workout_id);
+
+CREATE TABLE "sets" (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      exercise_id UUID NOT NULL REFERENCES "exercises"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+      set_order INTEGER,
       weight INTEGER,
-      duration INTERVAL
+      duration INTERVAL,
+      repetitions INTEGER
 );
 
-CREATE TABLE "Tags" (
+CREATE INDEX "sets_exercise_index" ON "sets" (exercise_id);
+
+CREATE TABLE "tags" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      user_id UUID NOT NULL REFERENCES "Users"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+      user_id UUID NOT NULL REFERENCES "users"(id) ON DELETE CASCADE ON UPDATE CASCADE,
       page VARCHAR(15) NOT NULL,
       title VARCHAR(30) NOT NULL,
       color VARCHAR(7) DEFAULT '#D6DBDF'
 );
 
-CREATE TABLE "Workout_Tags" (
-      workout_id UUID NOT NULL REFERENCES "Workouts"(id) ON DELETE CASCADE ON UPDATE CASCADE,
-      tag_id UUID NOT NULL REFERENCES "Tags"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+CREATE INDEX "tags_user_index" ON "tags" (user_id);
+CREATE INDEX "tags_page_index" ON "tags" (page);
+
+CREATE TABLE "workout_tags" (
+      workout_id UUID NOT NULL REFERENCES "workouts"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+      tag_id UUID NOT NULL REFERENCES "tags"(id) ON DELETE CASCADE ON UPDATE CASCADE,
       PRIMARY KEY (workout_id, tag_id)
 );
 
-CREATE TABLE "Feedback" (
+CREATE INDEX "workout_tags_workout_index" ON "workout_tags" (workout_id);
+CREATE INDEX "workout_tags_tag_index" ON "workout_tags" (tag_id);
+
+CREATE TABLE "feedback" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name VARCHAR(255) NOT NULL,
       email TEXT NOT NULL,

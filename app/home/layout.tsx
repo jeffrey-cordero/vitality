@@ -20,7 +20,7 @@ export default function Layout({
    return (
       <>
          <div className = "flex flex-col">
-            <div className = "flex-grow md:overflow-y-auto p-2sig">
+            <div className = "flex-grow p-2">
                {children}
             </div>
          </div>

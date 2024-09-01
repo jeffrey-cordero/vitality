@@ -15,10 +15,10 @@ function Card(props: CardProps): JSX.Element {
          <div className = "flex flex-col text-center justify-center items-center gap-8 px-8 text-black">
             <div>
                <FontAwesomeIcon icon = {props.icon} className = "text-4xl text-primary" />
-               <h1 className = "font-bold text-3xl text-primary mt-8">{props.title}</h1>
+               <h1 className = "font-bold text-2xl md:text-3xl text-primary mt-8">{props.title}</h1>
             </div>
             <div>
-               <p className = "font-medium text-slate-500">{props.description}</p>
+               <p className = "text-sm md:text-md font-medium text-slate-500">{props.description}</p>
             </div>
          </div>
       </div>

@@ -29,7 +29,7 @@ export default function Services(): JSX.Element {
             title = "Our Services"
             description = "With a commitment to innovation, we're constantly exploring new avenues to enhance your wellness experience"
          />
-         <div className = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 justify-center content-center gap-x-[60px] gap-y-[60px] md:gap-y-[60px] w-full sm:w-10/12 mx-auto">
+         <div className = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 justify-center content-center gap-x-[60px] gap-y-[60px] md:gap-y-[60px] w-full md:w-8/12 sm:w-11/12 mx-auto">
             <Service
                background = "bg-white"
                color = "text-primary"

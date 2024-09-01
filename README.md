@@ -57,7 +57,17 @@ Access database  through the Prisma ORM
 docker exec -it vitality_app npx prisma studio
 ```
 
-Currently all database changes are made in the starter file `tests/init.sql`. For production, we will use Prisma ORM to efficiently make migrations while preserving sensitive user information through the following steps
+Make changes to the default database schema in a development environment through the following steps
+
+- Make changes in the starter file `tests/init.sql`
+- Run the following command to apply the changes
+
+```bash
+docker exec -it vitality_app npx prisma db pull
+docker exec -it vitality_app npx prisma db push
+```
+
+Use Prisma ORM to efficiently make migrations while preserving sensitive user information through the following steps
 
 - Add the proposed changes to the model located at `prisma/schema.prisma`
 - Run the following command to apply the changes

@@ -15,16 +15,19 @@ export async function login(credentials: Credentials): Promise<FormResponse> {
       userCredentials.append("password", credentials.password);
 
       await signIn("credentials", userCredentials);
-      return sendSuccessMessage("Successfully logged in");
    } catch (error) {
       if (error instanceof AuthError) {
          switch (error.type) {
-         case "CallbackRouteError":
-            return sendErrorMessage("Error", "Invalid credentials", { username : ["Invalid credentials"], password: ["Invalid credentials"] });
-         default:
-            return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
+            case "CallbackRouteError":
+            case "CredentialsSignin":
+               return sendErrorMessage("Error", "Invalid credentials", { username : ["Invalid credentials"], password: ["Invalid credentials"] });
+            default:
+               return sendErrorMessage("Failure", "Internal Server Authentication Error. Please try again later.", {});
          }
       }
+
       throw error;
    }
+
+   return sendSuccessMessage("Successfully logged in");
 }

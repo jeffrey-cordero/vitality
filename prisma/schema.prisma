@@ -7,69 +7,91 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String     @db.VarChar(255)
-  birthday      DateTime   @db.Date
-  username      String     @unique @db.VarChar(30)
-  password      String
-  email         String     @unique
-  emailverified Boolean    @default(false)
-  phone         String?    @unique @db.VarChar(22)
-  phoneverified Boolean?   @default(false)
-  Tags          Tags[]
-  Workouts      Workouts[]
+model exercises {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workout_id String   @db.Uuid
+  name       String   @db.VarChar(50)
+  workouts   workouts @relation(fields: [workout_id], references: [id], onDelete: Cascade)
+  sets       sets[]
+
+  @@index([workout_id], map: "exercises_workout_index")
 }
 
-model VerificationToken {
-  identifier String   @id
-  token      String   @unique
-  expires    DateTime @db.Timestamp(6)
-}
-
-model Feedback {
+model feedback {
   id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name    String @db.VarChar(255)
   email   String
   message String
 }
 
-model Exercises {
-  id         String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  workout_id String                   @db.Uuid
-  title      String?                  @db.VarChar(50)
-  weight     Int?
-  duration   Unsupported("interval")?
-  Workouts   Workouts                 @relation(fields: [workout_id], references: [id], onDelete: Cascade)
+model sets {
+  id          String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  exercise_id String                   @db.Uuid
+  set_order   Int?
+  weight      Int?
+  duration    Unsupported("interval")?
+  repetitions Int?
+  exercises   exercises                @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
+
+  @@index([exercise_id], map: "sets_exercise_index")
 }
 
-model Tags {
+model tags {
   id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id      String         @db.Uuid
   page         String         @db.VarChar(15)
   title        String         @db.VarChar(30)
   color        String?        @default("#D6DBDF") @db.VarChar(7)
-  Users        Users          @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  Workout_Tags Workout_Tags[]
+  users        users          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  workout_tags workout_tags[]
+
+  @@index([page], map: "tags_page_index")
+  @@index([user_id], map: "tags_user_index")
 }
 
-model Workout_Tags {
+model users {
+  id             String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String     @db.VarChar(255)
+  birthday       DateTime   @db.Date
+  username       String     @unique @db.VarChar(30)
+  password       String
+  email          String     @unique
+  email_verified Boolean    @default(false)
+  phone          String?    @unique @db.VarChar(22)
+  phone_verified Boolean?   @default(false)
+  tags           tags[]
+  workouts       workouts[]
+
+  @@index([email], map: "users_email_index")
+}
+
+model verification_token {
+  identifier String   @id
+  token      String   @unique
+  expires    DateTime @db.Timestamp(6)
+}
+
+model workout_tags {
   workout_id String   @db.Uuid
   tag_id     String   @db.Uuid
-  Tags       Tags     @relation(fields: [tag_id], references: [id], onDelete: Cascade)
-  Workouts   Workouts @relation(fields: [workout_id], references: [id], onDelete: Cascade)
+  tags       tags     @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+  workouts   workouts @relation(fields: [workout_id], references: [id], onDelete: Cascade)
 
   @@id([workout_id, tag_id])
+  @@index([tag_id], map: "workout_tags_tag_index")
+  @@index([workout_id], map: "workout_tags_workout_index")
 }
 
-model Workouts {
+model workouts {
   id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id      String         @db.Uuid
   title        String         @db.VarChar(50)
   date         DateTime       @db.Date
-  reflection   String?
-  image        String?        @default("DEFAULT")
-  Exercises    Exercises[]
-  Workout_Tags Workout_Tags[]
-  Users        Users          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  description  String?
+  image        String?
+  exercises    exercises[]
+  workout_tags workout_tags[]
+  users        users          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id], map: "workouts_user_index")
 }
