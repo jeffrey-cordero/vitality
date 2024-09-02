@@ -1,7 +1,7 @@
 "use client";
 import clsx from "clsx";
 import { ChangeEvent, useRef } from "react";
-import { InputProps } from "@/lib/global/form";
+import { InputProps } from "./input";
 
 export default function TextArea({ ...props }: InputProps): JSX.Element {
    const textArea = useRef<HTMLTextAreaElement | null>(null);
@@ -20,6 +20,7 @@ export default function TextArea({ ...props }: InputProps): JSX.Element {
          <textarea
             id = {props.input.id}
             value = {props.input.value}
+            placeholder={props.placeholder ?? ""}
             className = {clsx("peer p-4 block w-full bg-white border-1 border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2 min-h-[12rem] h-auto bg-transparent resize-none",
                {
                   "border-gray-200": props.input.error === null,

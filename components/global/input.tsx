@@ -1,8 +1,14 @@
 import clsx from "clsx";
-import { ChangeEvent, useRef } from "react";
+import { ChangeEvent, Dispatch, useRef } from "react";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { InputProps } from "@/lib/global/form";
+import { FormAction, InputState } from "@/lib/global/form";
+
+export interface InputProps extends React.InputHTMLAttributes<any> {
+   label: string;
+   input: InputState;
+   dispatch: Dispatch<FormAction>;
+ }
 
 export default function Input({ ...props }: InputProps): JSX.Element {
    const input = useRef<HTMLInputElement>(null);
@@ -15,6 +21,7 @@ export default function Input({ ...props }: InputProps): JSX.Element {
             id = {props.input.id}
             value = {props.input.value}
             ref = {input}
+            placeholder = {props.placeholder ?? ""}
             className = {clsx("peer p-4 block w-full rounded-lg text-sm font-semibold border-1 placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2",
                {
                   "border-gray-200 border-[1.5px]": props.input.error === null,

@@ -3,21 +3,21 @@ import clsx from "clsx";
 
 function Options(): JSX.Element {
    return (
-     <div>
+      <div>
       OPTIONS
-     </div> 
-   )
+      </div>
+   );
 }
 
 export default function Select({ ...props }: InputProps): JSX.Element {
    return (
-      
-      <div className="mt-2 p-2 w-full">
+
+      <div className = "mt-2 p-2 w-full">
          <Options />
-         <select name="" id="">
+         <select name = "" id = "">
             {
                props.input.options?.map((option, index) => (
-                  <option value = {option}>Option - {index}</option>
+                  <option key = {index} value = {option}>Option - {index}</option>
                ))
             }
          </select>
@@ -34,5 +34,5 @@ export default function Select({ ...props }: InputProps): JSX.Element {
             </div>
          }
       </div>
-   )
+   );
 }

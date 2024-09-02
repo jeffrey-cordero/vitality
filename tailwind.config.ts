@@ -12,7 +12,7 @@ const config: Config = {
             "13": "repeat(13, minmax(0, 1fr))"
          },
          colors: {
-            primary: "#2947A9"
+            primary: "#2563EB"
          }
       },
       keyframes: {

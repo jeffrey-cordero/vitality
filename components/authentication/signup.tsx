@@ -5,7 +5,7 @@ import Notification from "@/components/global/notification";
 import Button from "@/components/global/button";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faIdCard, faDoorOpen } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useReducer } from "react";
 import { initialFormState, FormState, formReducer, constructPayload, FormPayload, FormResponse } from "@/lib/global/form";
 import { login } from "@/lib/authentication/login";
@@ -86,7 +86,7 @@ function Form(): JSX.Element {
                onClick = {() => dispatch({
                   type: "resetForm", value: null
                })}
-               className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer" 
+               className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
             <Input input = {state.inputs.username} label = "Username *" dispatch = {dispatch} />
             <Input input = {state.inputs.password} label = "Password *" dispatch = {dispatch} />
@@ -95,7 +95,7 @@ function Form(): JSX.Element {
             <Input input = {state.inputs.birthday} label = "Birthday *" dispatch = {dispatch} />
             <Input input = {state.inputs.email} label = "Email *" dispatch = {dispatch} />
             <Input input = {state.inputs.phone} label = "Phone *" dispatch = {dispatch} />
-            <Button type = "submit" className = "bg-primary text-white h-[2.6rem]">
+            <Button type = "submit" className = "bg-primary text-white h-[2.6rem]" icon = {faIdCard}>
                Submit
             </Button>
          </form>
@@ -108,11 +108,14 @@ function Form(): JSX.Element {
                         <Button
                            type = "button"
                            className = "bg-green-600 text-white p-4 text-sm h-[2rem]"
+                           icon = {faDoorOpen}
                            onClick = {async() => {
                               await login({
                                  username: state.inputs.username.value,
                                  password: state.inputs.password.value
                               });
+
+                              window.location.reload();
                            }}
                         >
                            Log In

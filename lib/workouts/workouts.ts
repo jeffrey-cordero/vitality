@@ -23,12 +23,12 @@ const workoutsSchema = z.object({
    description: z
       .string()
       .optional()
-      .or(z.literal('')),
+      .or(z.literal("")),
    // TODO - localhost default
    image: z
-     .string()
-     .url()
-     .optional().or(z.literal("")),
+      .string()
+      .url()
+      .optional().or(z.literal("")),
    tags: z
       .array(z.string())
 });
@@ -67,5 +67,5 @@ export async function addWorkout(workout: Workout): Promise<FormResponse> {
       console.error(error);
    }
 
-   return sendErrorMessage("Failure", "Missing implementation", { system: ["Under construction"]});
+   return sendErrorMessage("Failure", "Missing implementation", { system: ["Under construction"] });
 }

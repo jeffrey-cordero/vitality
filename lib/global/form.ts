@@ -18,23 +18,18 @@ export interface FormResponse {
 
 export interface FormAction {
   type:
+    | "updateSpecificInput"
     | "updateInput"
     | "updateStatus"
     | "updatePayload"
     | "resetForm";
-  value: InputState | FormResponse | FormPayload | null;
+  value: InputState | FormResponse | FormPayload | { id: string, value: any} | null;
 }
 
 export interface FormState {
   status: "Initial" | "Success" | "Error" | "Failure";
   inputs: InputStates;
   response: FormResponse | null;
-}
-
-export interface InputProps extends React.InputHTMLAttributes<any> {
-  label: string;
-  input: InputState;
-  dispatch: Dispatch<FormAction>;
 }
 
 export const initialFormState: FormState = {
@@ -86,7 +81,7 @@ export function formReducer(state: FormState, action: FormAction): FormState {
             break;
          default:
             return state;
-         }
+      }
    });
 }
 

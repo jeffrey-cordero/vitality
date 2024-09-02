@@ -1,6 +1,6 @@
 "use server";
 import prisma from "@/lib/database/client";
-import { Users as User } from "@prisma/client";
+import { users as User } from "@prisma/client";
 import { auth } from "@/auth";
 
 export async function getUserByUsername(username: string, authentication: boolean): Promise<User | null> {

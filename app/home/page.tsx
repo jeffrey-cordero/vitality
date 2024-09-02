@@ -1,21 +1,22 @@
 "use client";
 import { useContext } from "react";
-import { AuthenticationContext } from "../layout";
+import { AuthenticationContext } from "@/app/layout";
 
-export default function Home() {
+export default function Home(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-
-   const id = user !== undefined ? user.id : "";
-   const name = user !== undefined ? user.name : "";
-   const email = user !== undefined ? user.email : "";
-
 
    return (
       <main className = "w-full mx-auto flex min-h-screen flex-col items-center justify-start text-center">
-         <h1>Home</h1>
-         <p>Your user ID is: {id}</p>
-         <p>Welcome back, {name}!</p>
-         <p>Your email is: {email}</p>
+         {
+            user !== undefined && (
+               <div>
+                  <p>Welcome back {user.name}!</p>
+                  <p>Username - {user.username}</p>
+                  <p>Email - {user.email}</p>
+               </div>
+            )
+         }
+
       </main>
    );
 }

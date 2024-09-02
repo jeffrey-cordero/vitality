@@ -5,7 +5,7 @@ import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import Notification from "@/components/global/notification";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faUnlockKeyhole } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useReducer } from "react";
 import { initialFormState, FormState, formReducer, FormResponse, constructPayload, FormPayload } from "@/lib/global/form";
 import { login, Credentials } from "@/lib/authentication/login";
@@ -54,11 +54,11 @@ function Form(): JSX.Element {
                onClick = {() => dispatch({
                   type: "resetForm", value: null
                })}
-               className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer" 
+               className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
             <Input input = {state.inputs.username} label = "Username *" dispatch = {dispatch} />
             <Input input = {state.inputs.password} label = "Password *" dispatch = {dispatch} />
-            <Button type = "submit" className = "bg-primary text-white h-[2.6rem]">
+            <Button type = "submit" className = "bg-primary text-white h-[2.6rem]" icon = {faUnlockKeyhole}>
                Submit
             </Button>
          </form>

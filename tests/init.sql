@@ -48,25 +48,24 @@ CREATE TABLE "sets" (
 
 CREATE INDEX "sets_exercise_index" ON "sets" (exercise_id);
 
-CREATE TABLE "tags" (
+CREATE TABLE "workout_tags" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       user_id UUID NOT NULL REFERENCES "users"(id) ON DELETE CASCADE ON UPDATE CASCADE,
-      page VARCHAR(15) NOT NULL,
       title VARCHAR(30) NOT NULL,
       color VARCHAR(7) DEFAULT '#D6DBDF'
 );
 
-CREATE INDEX "tags_user_index" ON "tags" (user_id);
-CREATE INDEX "tags_page_index" ON "tags" (page);
+CREATE INDEX "tags_user_index" ON "workout_tags" (user_id);
+CREATE INDEX "tags_title_index" ON "workout_tags" (title);
 
-CREATE TABLE "workout_tags" (
+CREATE TABLE "workout_applied_tags" (
       workout_id UUID NOT NULL REFERENCES "workouts"(id) ON DELETE CASCADE ON UPDATE CASCADE,
-      tag_id UUID NOT NULL REFERENCES "tags"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+      tag_id UUID NOT NULL REFERENCES "workout_tags"(id) ON DELETE CASCADE ON UPDATE CASCADE,
       PRIMARY KEY (workout_id, tag_id)
 );
 
-CREATE INDEX "workout_tags_workout_index" ON "workout_tags" (workout_id);
-CREATE INDEX "workout_tags_tag_index" ON "workout_tags" (tag_id);
+CREATE INDEX "workout_tags_workout_index" ON "workout_applied_tags" (workout_id);
+CREATE INDEX "workout_tags_tag_index" ON "workout_applied_tags" (tag_id);
 
 CREATE TABLE "feedback" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import clsx from "clsx";
-import { createContext, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname } from "next/navigation";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -51,12 +51,12 @@ function SideBarLinks(): JSX.Element {
                   key = {link.name}
                   href = {link.href}
                   className = {clsx(
-                     "flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-black bg-gray-50 text-sm font-medium hover:text-blue-600 z-40",
+                     "flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-black bg-gray-50 text-sm font-medium hover:text-primary z-40",
                      {
-                        "bg-sky-100 text-blue-600": pathname === link.href
+                        "bg-sky-100 text-primary": pathname === link.href
                      },
                      {
-                        "text-red-600 hover:text-blue-600": link.logout
+                        "text-red-600 hover:text-primary": link.logout
                      }
                   )}>
                   <div

@@ -6,18 +6,19 @@ import Head from "next/head";
 import Footer from "@/components/global/footer";
 import { sfPro, inter } from "./fonts";
 import { SideBar } from "@/components/global/sidebar";
-import { createContext, useEffect, useState } from "react";
-import { Users as User } from "@prisma/client";
+import { createContext, SetStateAction, useEffect, useState } from "react";
+import { users as User } from "@prisma/client";
 import { getAuthentication } from "@/lib/authentication/user";
 
 interface AuthenticationContextType {
    user: User | undefined;
-   updateUser: (user: User | undefined) => void;
+   // eslint-disable-next-line no-unused-vars
+   updateUser: (user: SetStateAction<User | undefined>) => void;
 }
 
 export const AuthenticationContext = createContext<AuthenticationContextType>({
    user: undefined,
-   updateUser: (user: User | undefined) => {}
+   updateUser: () => {}
 });
 
 export default function Layout({
@@ -25,9 +26,9 @@ export default function Layout({
 }: {
   children: React.ReactNode;
 }) {
-   const [user, setUser] = useState(undefined);
+   const [user, setUser] = useState<User | undefined>(undefined);
 
-   const updateUser = (user) => {
+   const updateUser = (user: SetStateAction<User | undefined>) => {
       setUser(user);
    };
 
