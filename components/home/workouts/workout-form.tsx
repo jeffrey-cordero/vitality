@@ -2,6 +2,7 @@ import Button from "@/components/global/button";
 import Input from "@/components/global/input";
 import TextArea from "@/components/global/textarea";
 import ImageSelection from "@/components/home/workouts/image-selection";
+import Tags from "@/components/home/workouts/tag-selection";
 import { initialFormState, FormState, formReducer, constructPayload, FormPayload, FormResponse } from "@/lib/global/form";
 import { faArrowRotateLeft, faPersonRunning, faSquarePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -32,14 +33,16 @@ const form: FormState = {
          type: "text",
          id: "image",
          value: "",
-         error: null
+         error: null,
+         handlesChanges: true
       },
       tags: {
          type: "tags",
-         id: "image",
-         value: [],
-         options: [],
-         error: null
+         id: "tags",
+         value: "",
+         options: new Set(["test1", "test2"]),
+         error: null,
+         handlesChanges: true
       }
    }
 };
@@ -49,7 +52,6 @@ export default function WorkoutForm(): JSX.Element {
 
    const handleSubmit = (event: FormEvent) => {
       event.preventDefault();
-      console.log("TODO");
       return;
    };
 
@@ -60,9 +62,9 @@ export default function WorkoutForm(): JSX.Element {
          <div className = "flex flex-col justify-center align-center text-center gap-3">
             <FontAwesomeIcon
                icon = {faPersonRunning}
-               className = "text-4xl text-primary mt-1"
+               className = "text-5xl text-primary mt-1"
             />
-            <h1 className = "text-3xl font-bold text-primary mb-2">
+            <h1 className = "text-3xl font-bold text-black mb-2">
                New Workout
             </h1>
          </div>
@@ -78,6 +80,7 @@ export default function WorkoutForm(): JSX.Element {
             <Input input = {state.inputs.title} label = "Title *" dispatch = {dispatch} />
             <Input input = {state.inputs.date} label = "Date *" dispatch = {dispatch} />
             <ImageSelection input = {state.inputs.image} label = "URL *" dispatch = {dispatch} />
+            <Tags input = {state.inputs.tags} label = "URL *" dispatch = {dispatch} />
             <TextArea input = {state.inputs.description} label = "Description" dispatch = {dispatch} />
             <Button type = "submit" className = "bg-primary text-white h-[2.6rem]" icon = {faSquarePlus}>
                Create

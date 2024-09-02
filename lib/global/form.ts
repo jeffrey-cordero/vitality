@@ -1,12 +1,13 @@
 import { produce } from "immer";
-import { Dispatch } from "react";
 
 export interface InputState {
   id: string;
   value: any;
   error: any | null;
   type?: string;
-  options?: string[];
+  validIcon?: boolean;
+  handlesChanges?: boolean;
+  options?: Set<any>;
 }
 
 export type InputStates = { [key: string]: InputState };
@@ -18,12 +19,11 @@ export interface FormResponse {
 
 export interface FormAction {
   type:
-    | "updateSpecificInput"
     | "updateInput"
     | "updateStatus"
     | "updatePayload"
     | "resetForm";
-  value: InputState | FormResponse | FormPayload | { id: string, value: any} | null;
+  value: InputState | FormResponse | FormPayload | null;
 }
 
 export interface FormState {

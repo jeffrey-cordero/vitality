@@ -1,14 +1,15 @@
 import clsx from "clsx";
 import { ChangeEvent, Dispatch, useRef } from "react";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormAction, InputState } from "@/lib/global/form";
+import Button from "./button";
 
 export interface InputProps extends React.InputHTMLAttributes<any> {
    label: string;
    input: InputState;
    dispatch: Dispatch<FormAction>;
- }
+}
 
 export default function Input({ ...props }: InputProps): JSX.Element {
    const input = useRef<HTMLInputElement>(null);
@@ -28,18 +29,24 @@ export default function Input({ ...props }: InputProps): JSX.Element {
                   "border-red-500 border-[1.5px]": props.input.error !== null
                })}
             onChange = {(event: ChangeEvent<HTMLInputElement>) => {
-               props.dispatch({
-                  type: "updateInput",
-                  value: {
-                     ...props.input,
-                     value: event.target.value,
-                     error: null
-                  }
-               });
+               if (props.input.handlesChanges !== undefined) {
+                  // Call the user-defined event handler (complex state)
+                  props.onChange?.call(null, event);
+               } else {
+                  // Simple state
+                  props.dispatch({
+                     type: "updateInput",
+                     value: {
+                        ...props.input,
+                        value: event.target.value,
+                        error: null
+                     }
+                  });
+               }
             }}
          />
          {(props.input.type === "password" || passwordButton.current !== null) &&
-            <button type = "button" className = "absolute top-0 end-0 p-3.5 rounded-e-md">
+            <Button type = "button" className = "absolute top-0 end-0 p-3.5 rounded-e-md">
                <FontAwesomeIcon
                   icon = {props.input.type == "password" ? faEye : faEyeSlash}
                   className = "flex-shrink-0 size-3.5 password-icon"
@@ -64,7 +71,21 @@ export default function Input({ ...props }: InputProps): JSX.Element {
                         });
                      }
                   }} />
-            </button>
+            </Button>
+         }
+
+         {
+            (props.input.validIcon || !(props.input.validIcon) && props.input.error != null) && (
+               <Button type = "button" className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
+                  <FontAwesomeIcon
+                     icon = {props.input.validIcon ? faCircleCheck : faCircleXmark}
+                     className = {clsx("flex-shrink-0 size-3.5 password-icon", {
+                        "text-green-500" : props.input.validIcon,
+                        "text-red-500": !(props.input.validIcon)
+                     })}
+                  />
+               </Button>
+            )
          }
          <label
             htmlFor = {props.input.id}

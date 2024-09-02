@@ -1,56 +1,119 @@
 import Image from "next/image";
 import Input, { InputProps } from "@/components/global/input";
 import PopUp from "@/components/global/popup";
-import { FormEvent, useRef, useState } from "react";
-import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
+import { faPaperclip, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";
 import Button from "@/components/global/button";
 
+const defaultImages = ["bike.jpg", "cardio.jpg", "default.jpg", "hike.jpg", "legs.jpg", "lift.jpg", "machine.jpg", "run.jpg", "swim.jpg", "weights.jpg"]
+
 function ImageSelectionForm(props: InputProps): React.ReactElement {
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(true);
-   const urlInputRef = useRef<HTMLInputElement>(null);
 
-   const handleURLSubmission = () => {
+   const handleURLSubmission = (submission: boolean) => {
+      // URL may be relative to WWW or NextJS Static Media
       const urlRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
+      const nextMediaRegex = /\/_next\/static\/media\/[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+/
+      const isValidURL = urlRegex.test(props.input.value) || nextMediaRegex.test(props.input.value);
 
-      // Use dispatch.updateSpecificInput to show error, if any
+      props.dispatch({
+         type: "updateInput",
+         value: {
+            ...props.input,
+            error: submission === false || isValidURL ? null : ["Invalid image URL"],
+            validIcon: isValidURL
+         }
+      });
 
       return;
    }
 
    return (
-      <div className = "flex flex-col gap-3">
-         <div className = "flex gap-8 font-bold">
+      <div className="flex flex-col gap-3">
+         <div className="flex gap-8 font-bold">
             <h3
-               onClick = {() => {
+               onClick={() => {
                   setIsDefaultImage(true);
                }}
-               className = {clsx("cursor-pointer", {
-                  "border-b-[2.5px] border-primary text-red" : isDefaultImage
+               className={clsx("cursor-pointer", {
+                  "border-b-[2.5px] border-primary text-red": isDefaultImage
                })}>
-                  Defaults
+               Defaults
             </h3>
             <h3
-               onClick = {() => {
+               onClick={() => {
                   setIsDefaultImage(false);
                }}
-               className = {clsx("cursor-pointer", {
-                  "border-b-[2.5px] border-primary text-red" : !(isDefaultImage)
+               className={clsx("cursor-pointer", {
+                  "border-b-[2.5px] border-primary text-red": !(isDefaultImage)
                })}>
-                  URL
+               URL
             </h3>
          </div>
          {
-            isDefaultImage ? 
-               <h2>HELLO</h2> 
-               : 
-               <div>
-                  <Input {...props} />
-                  <Button 
+            isDefaultImage ?
+               <div className="flex flex-wrap gap-6 justify-center items-center p-6">
+                  {
+                     defaultImages.map((image) => {
+                        const source = require(`@/public/workouts/${image}`).default.src;
+
+                        return (
+                           <Image
+                              width={1000}
+                              height={1000}
+                              src={source}
+                              alt="run"
+                              className={clsx("w-[12rem] h-[12rem] object-cover object-center shadow-inner rounded-xl cursor-pointer", {
+                                 "border-[4px] border-primary shadow-2xl scale-[1.05] transition duration-300 ease-in-out": props.input.value === source,
+                              })}
+                              onClick={() => {
+                                 props.dispatch({
+                                    type: "updateInput",
+                                    value: {
+                                       ...props.input,
+                                       value: source,
+                                       error: null,
+                                       validIcon: true
+                                    }
+                                 });
+                              }}
+                           />
+                        )
+                     })
+                  }
+               </div>
+               :
+               <div
+                  className="p-6"
+                  onKeyDown={(event: React.KeyboardEvent) => {
+                     if (event.key === "Enter") {
+                        handleURLSubmission(true);
+                     }
+                  }}>
+                  <Input
+                     {...props}
+                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {   
+                        props.dispatch({
+                           type: "updateInput",
+                           value: {
+                              ...props.input,
+                              value: event.target.value,
+                              error: null,
+                              validIcon: true
+                           }
+                        });
+
+                        handleURLSubmission(false);
+                     }}
+                  />
+                  <Button
                      type="button"
-                     onClick={handleURLSubmission}
-                     className = "w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] min-h-[2.5rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
-                     icon = {faPaperclip}
+                     onClick={()=> {
+                        handleURLSubmission(true);
+                     }}
+                     className="w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] min-h-[2.5rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
+                     icon={faPaperclip}
                   >
                      Link
                   </Button>
@@ -60,44 +123,17 @@ function ImageSelectionForm(props: InputProps): React.ReactElement {
    );
 }
 
-function CreateImageSelection(props: InputProps): JSX.Element {
+export default function ImageSelection(props: InputProps): JSX.Element {
+   const selected = props.input.value !== "";
    return (
       <div>
          <PopUp
-            text = {"Add Image"}
-            icon = {faPaperclip}
-            buttonClassName = "w-full text-black font-semibold border-gray-200 border-[1.5px] min-h-[2.5rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500">
+            text={selected ? "Edit Image" : "Add Image"}
+            icon={selected ? faPenToSquare : faPaperclip}
+            className="max-w-[80%]"
+            buttonClassName="w-full text-black font-semibold border-gray-200 border-[1.5px] min-h-[3.2rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500">
             <ImageSelectionForm {...props} />
          </PopUp>
       </div>
    );
 }
-
-export default function ImageSelection(props: InputProps): JSX.Element {
-   const [isImageSelected, setIsImageSelected] = useState<boolean>(false);
-
-   return (
-      <div>
-         {
-            isImageSelected ?
-               null
-               : <CreateImageSelection {...props} />
-         }
-      </div>
-   );
-}
-
-
-/*
-<Image
-   width = {500}
-   height = {300}
-   src = {require(`@/public/workouts/${props.image}.jpg`)}
-   alt = "run"
-   className = "w-full h-full object-cover object-center shadow-inner"
-   onClick = {(e) => {
-      const image = e.target as HTMLImageElement;
-      console.log(image.src);
-   }}
-/>
-*/

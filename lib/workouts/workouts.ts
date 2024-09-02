@@ -24,7 +24,6 @@ const workoutsSchema = z.object({
       .string()
       .optional()
       .or(z.literal("")),
-   // TODO - localhost default
    image: z
       .string()
       .url()
@@ -47,8 +46,6 @@ export type Exercise = {
 
 -- Zone 2 Cardio
       -- #1 (order) 01:00:00 (interval) 10lbs (weight ~ optional)
-
-
 */
 // HH:MM:SS
 const intervalRegex: RegExp = /^\d{1,}:\d{2}:\d{2}(\.\d+)?\s*$/;

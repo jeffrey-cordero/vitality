@@ -10,7 +10,7 @@ export default function Page() {
             <p className = "text-lg text-gray-700 mt-4">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
          </div>
          <div>
-            <PopUp text = "New Workout">
+            <PopUp text = "New Workout" className="w-[50rem]">
                <WorkoutForm />
             </PopUp>
          </div>
