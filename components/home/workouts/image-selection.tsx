@@ -10,23 +10,31 @@ const defaultImages = ["bike.jpg", "cardio.jpg", "default.jpg", "hike.jpg", "leg
 
 function ImageSelectionForm(props: InputProps): React.ReactElement {
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(true);
+   const [isValidImage, setIsValidImage] = useState<boolean>(true);
 
-   const handleURLSubmission = (submission: boolean) => {
+   const verifyURL = (): boolean => {
       // URL may be relative to WWW or NextJS Static Media
       const urlRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
       const nextMediaRegex = /\/_next\/static\/media\/[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+/
-      const isValidURL = urlRegex.test(props.input.value) || nextMediaRegex.test(props.input.value);
+
+      return (urlRegex.test(props.input.value) || nextMediaRegex.test(props.input.value));
+   }
+
+  const handleURLSubmission = () => {
+      const isValidURL = verifyURL();
+
+      if (isValidURL) {
+         setIsValidImage(true);
+      }
 
       props.dispatch({
          type: "updateInput",
          value: {
             ...props.input,
-            error: submission === false || isValidURL ? null : ["Invalid image URL"],
+            error: isValidURL ? null : ["Invalid image URL"],
             validIcon: isValidURL
          }
       });
-
-      return;
    }
 
    return (
@@ -63,6 +71,7 @@ function ImageSelectionForm(props: InputProps): React.ReactElement {
                               width={1000}
                               height={1000}
                               src={source}
+                              key={source}
                               alt="run"
                               className={clsx("w-[12rem] h-[12rem] object-cover object-center shadow-inner rounded-xl cursor-pointer", {
                                  "border-[4px] border-primary shadow-2xl scale-[1.05] transition duration-300 ease-in-out": props.input.value === source,
@@ -88,31 +97,49 @@ function ImageSelectionForm(props: InputProps): React.ReactElement {
                   className="p-6"
                   onKeyDown={(event: React.KeyboardEvent) => {
                      if (event.key === "Enter") {
-                        handleURLSubmission(true);
+                        handleURLSubmission();
                      }
                   }}>
+                  {
+                     verifyURL() && isValidImage && (
+                        <div className="flex justify-center m-6">
+                           <Image
+                              width={1000}
+                              height={1000}
+                              src={props.input.value}
+                              onError={() => {
+                                 setIsValidImage(false)
+                              }}
+                              alt="run"
+                              className={clsx("w-[12rem] h-[12rem] object-cover object-center rounded-xl cursor-pointer border-[4px] border-primary scale-[1.05] transition duration-300 ease-in-out")}
+                           />
+                        </div>
+                     )
+                  }
                   <Input
                      {...props}
-                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {   
+                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        if (isValidImage) {
+                           setIsDefaultImage(false);
+                        }
+
                         props.dispatch({
                            type: "updateInput",
                            value: {
                               ...props.input,
                               value: event.target.value,
                               error: null,
-                              validIcon: true
+                              validIcon: false
                            }
                         });
-
-                        handleURLSubmission(false);
                      }}
                   />
                   <Button
                      type="button"
                      onClick={()=> {
-                        handleURLSubmission(true);
+                        handleURLSubmission();
                      }}
-                     className="w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] min-h-[2.5rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
+                     className="w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] min-h-[2.6rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
                      icon={faPaperclip}
                   >
                      Link
