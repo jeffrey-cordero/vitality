@@ -1,6 +1,7 @@
 "use client";
 import PopUp from "@/components/global/popup";
 import WorkoutForm from "@/components/home/workouts/workout-form";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 export default function Page() {
    return (
@@ -9,8 +10,10 @@ export default function Page() {
             <h1 className = "text-4xl font-bold mt-8">Welcome Back, Champion!</h1>
             <p className = "text-lg text-gray-700 mt-4">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
          </div>
-         <div>
-            <PopUp text = "New Workout" className="w-[50rem]">
+         <div className="flex justify-center w-full mx-auto">
+            <PopUp text = "New Workout" 
+               className="max-w-4xl"
+               buttonClassName="w-[10rem] text-white font-semibold bg-primary min-h-[3rem] hover:scale-[1.05] transition duration-300 ease-in-out" icon={faPlus}>
                <WorkoutForm />
             </PopUp>
          </div>

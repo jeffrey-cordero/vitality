@@ -62,7 +62,7 @@ export default function WorkoutForm(): JSX.Element {
          <div className = "flex flex-col justify-center align-center text-center gap-3">
             <FontAwesomeIcon
                icon = {faPersonRunning}
-               className = "text-5xl text-primary mt-1"
+               className = "text-6xl text-primary mt-1"
             />
             <h1 className = "text-3xl font-bold text-black mb-2">
                New Workout

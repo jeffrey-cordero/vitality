@@ -86,7 +86,6 @@ export default function Tags(props: InputProps): JSX.Element {
    return (
       <div>
          <TagsForm {...props} />
-         <h2>HELLO</h2>
       </div>
    )
 }

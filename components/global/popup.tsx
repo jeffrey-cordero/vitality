@@ -16,7 +16,7 @@ export default function PopUp(props: PopUpProps): JSX.Element {
    const [open, setOpen] = useState(false);
 
    return (
-      <div className = "relative overflow-y-auto">
+      <div className = "relative">
          <div>
             <Button
                className = {props.buttonClassName}
