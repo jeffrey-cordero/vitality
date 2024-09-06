@@ -5,9 +5,7 @@ export interface InputState {
   value: any;
   error: any | null;
   type?: string;
-  validIcon?: boolean;
-  handlesChanges?: boolean;
-  options?: Set<any>;
+  data?: { [key: string]: any };
 }
 
 export type InputStates = { [key: string]: InputState };

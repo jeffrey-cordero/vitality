@@ -1,6 +1,8 @@
 "use server";
 import { z } from "zod";
 import { FormResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
+import prisma from "@/lib/database/client";
+import { title } from "process";
 
 export type Workout = {
    id?: string;
@@ -66,3 +68,41 @@ export async function addWorkout(workout: Workout): Promise<FormResponse> {
 
    return sendErrorMessage("Failure", "Missing implementation", { system: ["Under construction"] });
 }
+
+export type Tag = {
+   userId: string;
+   title: string;
+   color: string;
+}
+
+const colorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+
+const workoutTagSchema = z.object({
+   id: z.string(),
+   title: z.string().min(1, {
+      message: "Workout tag must be at least 1 character"
+   }).max(30, {
+      message: "Workout tag must be less than 30 characters"
+   }),
+   color: z.string().regex(colorRegex, {
+      message: "A valid color is required"
+   })
+});
+
+export async function fetchWorkoutTags(userId: string): Promise<FormResponse> {
+   try {
+      const tags = await prisma.workout_tags.findMany({
+         where: {
+            user_id: userId
+         }
+      });
+
+      return sendSuccessMessage("Workout Tags", tags);
+   } catch (error) {
+      return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
+   }
+}
+
+// export async function addWorkoutTag(userId: string, title: string, color: string): Promise<FormResponse> {
+
+// }

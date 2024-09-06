@@ -9,6 +9,7 @@ export interface InputProps extends React.InputHTMLAttributes<any> {
    label: string;
    input: InputState;
    dispatch: Dispatch<FormAction>;
+   data?: { [key: string]: any };
 }
 
 export default function Input({ ...props }: InputProps): JSX.Element {
@@ -29,7 +30,7 @@ export default function Input({ ...props }: InputProps): JSX.Element {
                   "border-red-500 border-[1.5px]": props.input.error !== null
                })}
             onChange = {(event: ChangeEvent<HTMLInputElement>) => {
-               if (props.input.handlesChanges !== undefined) {
+               if (props.input.data?.handlesChanges !== undefined) {
                   // Call the user-defined event handler (complex state)
                   props.onChange?.call(null, event);
                } else {
@@ -75,13 +76,13 @@ export default function Input({ ...props }: InputProps): JSX.Element {
          }
 
          {
-            (props.input.validIcon || !(props.input.validIcon) && props.input.error != null) && (
+            (props.input.data?.validIcon || !(props.input.data?.validIcon) && props.input.error != null) && (
                <Button type = "button" className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
                   <FontAwesomeIcon
-                     icon = {props.input.validIcon ? faCircleCheck : faCircleXmark}
+                     icon = {props.input.data?.validIcon ? faCircleCheck : faCircleXmark}
                      className = {clsx("flex-shrink-0 size-3.5 password-icon", {
-                        "text-green-500" : props.input.validIcon,
-                        "text-red-500": !(props.input.validIcon)
+                        "text-green-500" : props.input.data?.validIcon,
+                        "text-red-500": !(props.input.data?.validIcon)
                      })}
                   />
                </Button>

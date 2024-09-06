@@ -53,6 +53,7 @@ CREATE TABLE "workout_tags" (
       user_id UUID NOT NULL REFERENCES "users"(id) ON DELETE CASCADE ON UPDATE CASCADE,
       title VARCHAR(30) NOT NULL,
       color VARCHAR(7) DEFAULT '#D6DBDF'
+      CONSTRAINT unique_user_title UNIQUE (user_id, title)
 );
 
 CREATE INDEX "tags_user_index" ON "workout_tags" (user_id);
