@@ -17,13 +17,6 @@ model exercises {
   @@index([workout_id], map: "exercises_workout_index")
 }
 
-model feedback {
-  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name    String @db.VarChar(255)
-  email   String
-  message String
-}
-
 model sets {
   id          String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   exercise_id String                   @db.Uuid
@@ -58,18 +51,6 @@ model verification_token {
   expires    DateTime @db.Timestamp(6)
 }
 
-model workout_tags {
-  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id              String                 @db.Uuid
-  title                String                 @db.VarChar(30)
-  color                String?                @default("#D6DBDF") @db.VarChar(7)
-  workout_applied_tags workout_applied_tags[]
-  users                users                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([title], map: "tags_title_index")
-  @@index([user_id], map: "tags_user_index")
-}
-
 model workouts {
   id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id              String                 @db.Uuid
@@ -84,6 +65,13 @@ model workouts {
   @@index([user_id], map: "workouts_user_index")
 }
 
+model feedback {
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name    String @db.VarChar(255)
+  email   String
+  message String
+}
+
 model workout_applied_tags {
   workout_id   String       @db.Uuid
   tag_id       String       @db.Uuid
@@ -93,4 +81,17 @@ model workout_applied_tags {
   @@id([workout_id, tag_id])
   @@index([tag_id], map: "workout_tags_tag_index")
   @@index([workout_id], map: "workout_tags_workout_index")
+}
+
+model workout_tags {
+  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id              String                 @db.Uuid
+  title                String                 @db.VarChar(30)
+  color                String                 @default("#e5e7eb") @db.VarChar(7)
+  workout_applied_tags workout_applied_tags[]
+  users                users                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, title], map: "unique_user_title")
+  @@index([title], map: "tags_title_index")
+  @@index([user_id], map: "tags_user_index")
 }

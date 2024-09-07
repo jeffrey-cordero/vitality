@@ -2,7 +2,6 @@
 import { z } from "zod";
 import { FormResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
 import prisma from "@/lib/database/client";
-import { title } from "process";
 
 export type Workout = {
    id?: string;
@@ -78,7 +77,7 @@ export type Tag = {
 const colorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 
 const workoutTagSchema = z.object({
-   id: z.string(),
+   userId: z.string(),
    title: z.string().min(1, {
       message: "Workout tag must be at least 1 character"
    }).max(30, {
@@ -97,12 +96,57 @@ export async function fetchWorkoutTags(userId: string): Promise<FormResponse> {
          }
       });
 
-      return sendSuccessMessage("Workout Tags", tags);
+      const result: Tag[] = [];
+
+      for (let i = 0; i < tags.length; i++) {
+         result.push({
+            userId,
+            title: tags[i].title,
+            color: tags[i].color,
+         })
+      }
+
+      return sendSuccessMessage("Workout Tags", {
+         tags: result,
+      });
    } catch (error) {
       return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
    }
 }
 
-// export async function addWorkoutTag(userId: string, title: string, color: string): Promise<FormResponse> {
+export async function addWorkoutTag(tag: Tag): Promise<FormResponse> {
+   const fields = workoutTagSchema.safeParse(tag);
 
-// }
+  
+
+   if (!(fields.success)) {
+      console.log(fields.error.flatten());
+
+      return sendErrorMessage(
+         "Error",
+         "Invalid workout tag fields", {
+            search: fields.error.flatten().fieldErrors.title ?? [],
+         },
+      );
+   }
+
+   try {
+      await prisma.workout_tags.create({
+         data: {
+            user_id: tag.userId,
+            title: tag.title.trim(),
+            color: tag.color.trim()
+         }
+      })
+
+      return sendSuccessMessage("Successfully added workout tag");
+   } catch (error: any) {
+      if (error.code === "P2002" && error.meta?.modelName === "workout_tags" 
+            && error.meta?.target?.includes("user_id") && error.meta?.target?.includes("title")) {
+         // Workout tags must be unique
+         return sendErrorMessage("Error", "Workout tag already exists", { search: ["Workout tag already exists"] });
+      } else {
+         return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
+      }
+   }
+}

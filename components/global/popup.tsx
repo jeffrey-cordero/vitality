@@ -5,27 +5,37 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import clsx from "clsx";
 
+// A popup can use a default button a cover element where te onClick will display the pop up
 interface PopUpProps extends React.HTMLAttributes<HTMLDivElement> {
    children?: React.ReactNode;
-   icon?: IconProp;
+   cover?: React.ReactNode;
    buttonClassName?: string;
-   text: string;
+   icon?: IconProp;
+   text?: string;
 }
 
 export default function PopUp(props: PopUpProps): JSX.Element {
    const [open, setOpen] = useState(false);
 
    return (
-      <div className = "relative">
-         <div>
-            <Button
-               className = {props.buttonClassName}
-               onClick = {() => setOpen(true)}
-               icon = {props.icon}
-            >
-               {props.text}
-            </Button>
-         </div>
+      <div
+         className="relative"
+         onClick = {(event) => {
+            // Ensure the onClick does that propagate to parent component
+            event.stopPropagation();
+            setOpen(true)
+         }}
+      >
+         {
+            props.cover ?? (
+               <Button
+                  className = {props.buttonClassName}
+                  icon = {props.icon}
+               >
+                  {props.text}
+               </Button>
+            )
+         }
          {
             open && (
                <div className = {clsx("fixed w-full mx-auto inset-0 flex items-center justify-center align-center p-6 z-50", props.className)}>
@@ -33,7 +43,11 @@ export default function PopUp(props: PopUpProps): JSX.Element {
                   <div className = "relative bg-white rounded-lg shadow-lg p-16 w-full max-h-[90%] overflow-y-auto">
                      <Button
                         className = "absolute top-3 right-3"
-                        onClick = {() => setOpen(false)}
+                        onClick = {(event) => {
+                           // Ensure the onClick does that propagate to parent cover component
+                           event.stopPropagation();
+                           setOpen(false);
+                        }}
                      >
                         <FontAwesomeIcon
                            icon = {faXmark}

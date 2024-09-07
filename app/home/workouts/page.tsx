@@ -13,7 +13,8 @@ export default function Page() {
          <div className="flex justify-center w-full mx-auto">
             <PopUp text = "New Workout" 
                className="max-w-4xl"
-               buttonClassName="w-[10rem] text-white font-semibold bg-primary min-h-[3rem] hover:scale-[1.05] transition duration-300 ease-in-out" icon={faPlus}>
+               buttonClassName="min-w-[9rem] min-h-[2.8rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out" 
+               icon={faPlus}>
                <WorkoutForm />
             </PopUp>
          </div>

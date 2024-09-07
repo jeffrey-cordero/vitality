@@ -5,6 +5,7 @@ import TextArea from "@/components/global/textarea";
 import ImageSelection from "@/components/home/workouts/image-selection";
 import TagSelection from "@/components/home/workouts/tag-selection";
 import { initialFormState, FormState, formReducer } from "@/lib/global/form";
+import { fetchWorkoutTags, Tag } from "@/lib/workouts/workouts";
 import { faArrowRotateLeft, faPersonRunning, faSquarePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormEvent, useContext, useEffect, useReducer } from "react";
@@ -52,9 +53,16 @@ const form: FormState = {
          error: null,
          data: {
             options: [],
+            selected: [],
             handlesChanges: true,
             fetchedOptions: false
          }
+      },
+      editTag: {
+         type: "color",
+         id: "color",
+         value: "",
+         error: null
       }
    }
 };
@@ -65,22 +73,27 @@ export default function WorkoutForm(): JSX.Element {
 
    useEffect(() => {
       if (state.inputs.tags.data?.fetchedOptions === false) {
-         // Fetch the user workout tag options, if any
-         dispatch({
-            type: "updateInput",
-            value: {
-               ...state.inputs.tags,
-               data: {
-                  options: [{
-                     userId: user?.id,
-                     title: "HELLO",
-                     color: "#829dda"
-                  }],
-                  handlesChanges: true,
-                  fetchedOptions: true,
-               }
-            }
-         });
+         const fetchTags = async() => {
+            // Fetch the user workout tag options, if any
+            if (user !== undefined) {
+               const options: Tag[] = (await fetchWorkoutTags(user.id)).body.data.tags;
+               
+               dispatch({
+                  type: "updateInput",
+                  value: {
+                     ...state.inputs.tags,
+                     data: {
+                        options: options,
+                        selected: [],
+                        handlesChanges: true,
+                        fetchedOptions: true,
+                     }
+                  }
+               });
+            }  
+         }
+
+         fetchTags();
       }
    });
 

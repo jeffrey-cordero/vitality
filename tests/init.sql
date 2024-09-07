@@ -52,7 +52,7 @@ CREATE TABLE "workout_tags" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       user_id UUID NOT NULL REFERENCES "users"(id) ON DELETE CASCADE ON UPDATE CASCADE,
       title VARCHAR(30) NOT NULL,
-      color VARCHAR(7) DEFAULT '#D6DBDF'
+      color VARCHAR(7) NOT NULL DEFAULT '#e5e7eb',
       CONSTRAINT unique_user_title UNIQUE (user_id, title)
 );
 
