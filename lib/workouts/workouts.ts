@@ -74,7 +74,7 @@ export type Tag = {
    color: string;
 }
 
-const colorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+const colorRegex = /rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/;
 
 const workoutTagSchema = z.object({
    userId: z.string(),

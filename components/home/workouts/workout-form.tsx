@@ -52,8 +52,8 @@ const form: FormState = {
          value: "",
          error: null,
          data: {
-            options: [],
-            selected: [],
+            options: Set<Tag>,
+            selected: Set<Tag>,
             handlesChanges: true,
             fetchedOptions: false
          }
@@ -76,7 +76,7 @@ export default function WorkoutForm(): JSX.Element {
          const fetchTags = async() => {
             // Fetch the user workout tag options, if any
             if (user !== undefined) {
-               const options: Tag[] = (await fetchWorkoutTags(user.id)).body.data.tags;
+               const options: Set<Tag> = new Set((await fetchWorkoutTags(user.id)).body.data.tags);
                
                dispatch({
                   type: "updateInput",
@@ -84,7 +84,7 @@ export default function WorkoutForm(): JSX.Element {
                      ...state.inputs.tags,
                      data: {
                         options: options,
-                        selected: [],
+                        selected: new Set<Tag>(),
                         handlesChanges: true,
                         fetchedOptions: true,
                      }

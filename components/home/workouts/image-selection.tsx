@@ -86,6 +86,7 @@ function ImageSelectionForm(props: InputProps, isValidImage: boolean, setIsValid
                                  if(!(isValidImage)) {
                                     setIsValidImage(true);
                                  }
+                                 
                                  props.dispatch({
                                     type: "updateInput",
                                     value: {

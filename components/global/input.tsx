@@ -47,7 +47,7 @@ export default function Input({ ...props }: InputProps): JSX.Element {
             }}
          />
          {(props.input.type === "password" || passwordButton.current !== null) &&
-            <Button type = "button" className = "absolute top-0 end-0 p-3.5 rounded-e-md">
+            <Button type = "button" className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
                <FontAwesomeIcon
                   icon = {props.input.type == "password" ? faEye : faEyeSlash}
                   className = "flex-shrink-0 size-3.5 password-icon"
@@ -74,19 +74,19 @@ export default function Input({ ...props }: InputProps): JSX.Element {
                   }} />
             </Button>
          }
-
          {
-            (props.input.data?.validIcon || !(props.input.data?.validIcon) && props.input.error != null) && (
-               <Button type = "button" className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
-                  <FontAwesomeIcon
-                     icon = {props.input.data?.validIcon ? faCircleCheck : faCircleXmark}
-                     className = {clsx("flex-shrink-0 size-3.5 password-icon", {
-                        "text-green-500" : props.input.data?.validIcon,
-                        "text-red-500": !(props.input.data?.validIcon)
-                     })}
-                  />
-               </Button>
-            )
+            props.input.data?.validIcon !== undefined &&
+               (props.input.data?.validIcon || !(props.input.data?.validIcon !== undefined) && props.input.error != null) && (
+                  <Button type = "button" className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
+                     <FontAwesomeIcon
+                        icon = {props.input.data?.validIcon ? faCircleCheck : faCircleXmark}
+                        className = {clsx("flex-shrink-0 size-3.5 password-icon", {
+                           "text-green-500" : props.input.data?.validIcon,
+                           "text-red-500": !(props.input.data?.validIcon)
+                        })}
+                     />
+                  </Button>
+               )
          }
          <label
             htmlFor = {props.input.id}
