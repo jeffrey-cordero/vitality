@@ -6,7 +6,7 @@ import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
-import { FormEvent, useEffect, useReducer } from "react";
+import { FormEvent, useReducer } from "react";
 import { initialFormState, FormState, formReducer, constructPayload, FormPayload, FormResponse } from "@/lib/global/form";
 import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
 
@@ -17,29 +17,28 @@ const formState: FormState = {
          type: "text",
          id: "name",
          value: "",
-         error: null
+         error: null,
+         data: {}
       },
       email: {
          type: "email",
          id: "email",
          value: "",
-         error: null
+         error: null,
+         data: {}
       },
       message: {
          type: "text",
          id: "message",
          value: "",
-         error: null
+         error: null,
+         data: {}
       }
    }
 };
 
 function Form(): JSX.Element {
    const [state, dispatch] = useReducer(formReducer, formState);
-
-   useEffect(() => {
-      console.log(state);
-   }, [state]);
 
    const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();

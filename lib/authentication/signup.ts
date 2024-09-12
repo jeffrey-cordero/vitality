@@ -85,7 +85,7 @@ export async function signup(registration: Registration): Promise<FormResponse> 
 
       return sendSuccessMessage("Successfully registered");
    } catch (error: any) {
-   if (error.code === "P2002" && error.meta?.target?.includes("username")) {
+      if (error.code === "P2002" && error.meta?.target?.includes("username")) {
          return sendErrorMessage("Error", "Internal database conflicts", {
             username: ["Username already taken"]
          });

@@ -70,6 +70,7 @@ export async function addWorkout(workout: Workout): Promise<FormResponse> {
 
 export type Tag = {
    userId: string;
+   id?: string;
    title: string;
    color: string;
 }
@@ -101,13 +102,14 @@ export async function fetchWorkoutTags(userId: string): Promise<FormResponse> {
       for (let i = 0; i < tags.length; i++) {
          result.push({
             userId,
+            id: tags[i].id,
             title: tags[i].title,
-            color: tags[i].color,
-         })
+            color: tags[i].color
+         });
       }
 
       return sendSuccessMessage("Workout Tags", {
-         tags: result,
+         tags: result
       });
    } catch (error) {
       return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
@@ -117,7 +119,7 @@ export async function fetchWorkoutTags(userId: string): Promise<FormResponse> {
 export async function addWorkoutTag(tag: Tag): Promise<FormResponse> {
    const fields = workoutTagSchema.safeParse(tag);
 
-  
+
 
    if (!(fields.success)) {
       console.log(fields.error.flatten());
@@ -125,7 +127,7 @@ export async function addWorkoutTag(tag: Tag): Promise<FormResponse> {
       return sendErrorMessage(
          "Error",
          "Invalid workout tag fields", {
-            search: fields.error.flatten().fieldErrors.title ?? [],
+            search: fields.error.flatten().fieldErrors.title ?? []
          },
       );
    }
@@ -137,14 +139,47 @@ export async function addWorkoutTag(tag: Tag): Promise<FormResponse> {
             title: tag.title.trim(),
             color: tag.color.trim()
          }
-      })
+      });
 
       return sendSuccessMessage("Successfully added workout tag");
    } catch (error: any) {
-      if (error.code === "P2002" && error.meta?.modelName === "workout_tags" 
+      if (error.code === "P2002" && error.meta?.modelName === "workout_tags"
             && error.meta?.target?.includes("user_id") && error.meta?.target?.includes("title")) {
          // Workout tags must be unique
          return sendErrorMessage("Error", "Workout tag already exists", { search: ["Workout tag already exists"] });
+      } else {
+         return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
+      }
+   }
+}
+
+export async function updateWorkoutTag(tag: Tag): Promise<FormResponse> {
+   const fields = workoutTagSchema.safeParse(tag);
+
+   if (tag.id === undefined) {
+      return sendErrorMessage("Failure", "Missing Workout Tag ID", {});
+   }
+
+   if (!(fields.success)) {
+      console.log(fields.error.flatten());
+
+      return sendErrorMessage("Error", "Invalid workout tag fields", fields.error.flatten().fieldErrors);
+   }
+
+   try {
+      await prisma.workout_tags.update({
+         where: {
+            id: tag.id,
+         },
+         data: tag
+      })
+
+      return sendSuccessMessage("Successfully updated workout tag");
+   } catch (error: any) {
+      if (error.code === "P2002" && error.meta?.modelName === "workout_tags"
+            && error.meta?.target?.includes("user_id") && error.meta?.target?.includes("title")) {
+         // Workout tags must be unique
+         return sendErrorMessage("Error", "Workout tag title already exists", { editTitle: ["Workout tag title already exists"] });
       } else {
          return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
       }

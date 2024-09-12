@@ -15,15 +15,15 @@ interface PopUpProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export default function PopUp(props: PopUpProps): JSX.Element {
-   const [open, setOpen] = useState(false);
+   const [open, setOpen] = useState<boolean>(false);
 
    return (
       <div
-         className="relative"
+         className = "relative"
          onClick = {(event) => {
             // Ensure the onClick does that propagate to parent component
             event.stopPropagation();
-            setOpen(true)
+            setOpen(true);
          }}
       >
          {

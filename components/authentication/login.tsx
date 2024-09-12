@@ -14,15 +14,17 @@ const form: FormState = {
    ...initialFormState,
    inputs: {
       username: {
+         type: "text",
          id: "username",
          value: "",
          error: null,
-         type: "text"
+         data: {}
       }, password: {
+         type: "password",
          id: "password",
          value: "",
          error: null,
-         type: "password"
+         data: {}
       }
    }
 };

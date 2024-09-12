@@ -18,42 +18,49 @@ const form: FormState = {
          type: "text",
          id: "username",
          value: "",
-         error: null
+         error: null,
+         data: {}
       },
       password: {
          type: "password",
          id: "password",
          value: "",
-         error: null
+         error: null,
+         data: {}
       },
       confirmPassword: {
          type: "password",
          id: "confirmPassword",
          value: "",
-         error: null
+         error: null,
+         data: {}
       },
       name: {
          type: "text",
          id: "name",
          value: "",
-         error: null
+         error: null,
+         data: {}
       },
       birthday: {
          type: "date",
          id: "birthday",
          value: "",
-         error: null
+         error: null,
+         data: {}
       },
       email: {
          type: "email",
          id: "email",
          value: "",
-         error: null
+         error: null,
+         data: {}
       }, phone: {
          type: "tel",
          id: "phone",
          value: "",
-         error: null
+         error: null,
+         data: {}
       }
    }
 };

@@ -1,9 +1,9 @@
-import { AuthenticationContext } from "@/app/layout";
 import Button from "@/components/global/button";
 import Input from "@/components/global/input";
 import TextArea from "@/components/global/textarea";
 import ImageSelection from "@/components/home/workouts/image-selection";
 import TagSelection from "@/components/home/workouts/tag-selection";
+import { AuthenticationContext } from "@/app/layout";
 import { initialFormState, FormState, formReducer } from "@/lib/global/form";
 import { fetchWorkoutTags, Tag } from "@/lib/workouts/workouts";
 import { faArrowRotateLeft, faPersonRunning, faSquarePlus } from "@fortawesome/free-solid-svg-icons";
@@ -17,19 +17,22 @@ const form: FormState = {
          type: "text",
          id: "title",
          value: "",
-         error: null
+         error: null,
+         data: {}
       },
       date: {
          type: "date",
          id: "date",
          value: "",
-         error: null
+         error: null,
+         data: {}
       },
       description: {
          type: "text",
          id: "description",
          value: "",
-         error: null
+         error: null,
+         data: {}
       },
       image: {
          type: "text",
@@ -45,24 +48,37 @@ const form: FormState = {
          id: "search",
          value: "",
          error: null,
+         data: {}
       },
       tags: {
-         type: "tags",
+         type: null,
          id: "tags",
-         value: "",
+         value: null,
          error: null,
          data: {
-            options: Set<Tag>,
-            selected: Set<Tag>,
+            options: [],
+            selected: [],
+            editTitle: {
+               type: "text",
+               id: "editTitle",
+               value: "",
+               error: null,
+               data: {
+                  handlesChanges: true,
+               }
+            },
+            editColor: {
+               type: "text",
+               id: "colors",
+               value: null,
+               error: null,
+               data: {
+                  handlesChanges: true,
+               }
+            },
             handlesChanges: true,
-            fetchedOptions: false
+            fetchedInfo: false
          }
-      },
-      editTag: {
-         type: "color",
-         id: "color",
-         value: "",
-         error: null
       }
    }
 };
@@ -72,26 +88,25 @@ export default function WorkoutForm(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
 
    useEffect(() => {
-      if (state.inputs.tags.data?.fetchedOptions === false) {
+      if (state.inputs.tags.data?.fetchedInfo === false) {
          const fetchTags = async() => {
             // Fetch the user workout tag options, if any
             if (user !== undefined) {
-               const options: Set<Tag> = new Set((await fetchWorkoutTags(user.id)).body.data.tags);
-               
+               const options: Tag[] = (await fetchWorkoutTags(user.id)).body.data.tags;
+
                dispatch({
                   type: "updateInput",
                   value: {
                      ...state.inputs.tags,
                      data: {
+                        ...state.inputs.tags.data,
                         options: options,
-                        selected: new Set<Tag>(),
-                        handlesChanges: true,
-                        fetchedOptions: true,
+                        fetchedInfo: true
                      }
                   }
                });
-            }  
-         }
+            }
+         };
 
          fetchTags();
       }
@@ -127,7 +142,7 @@ export default function WorkoutForm(): JSX.Element {
             <Input input = {state.inputs.title} label = "&#x1F58A; Title" dispatch = {dispatch} />
             <Input input = {state.inputs.date} label = "&#x1F4C5; Date" dispatch = {dispatch} />
             <Input input = {state.inputs.search} label = "&#x1F50E; Tags" dispatch = {dispatch} />
-            <TagSelection input = {state.inputs.tags} label = "Tags " dispatch = {dispatch} data={{search: state.inputs.search.value as string}} />
+            <TagSelection input = {state.inputs.tags} label = "Tags " dispatch = {dispatch} data = {{ search: state.inputs.search.value as string }} />
             <TextArea input = {state.inputs.description} label = "&#x1F5DE; Description" dispatch = {dispatch} />
             <ImageSelection input = {state.inputs.image} label = "&#x1F587; URL" dispatch = {dispatch} />
             <Button type = "submit" className = "bg-primary text-white h-[2.6rem]" icon = {faSquarePlus}>

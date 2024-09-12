@@ -4,8 +4,8 @@ export interface InputState {
   id: string;
   value: any;
   error: any | null;
-  type?: string;
-  data?: { [key: string]: any };
+  type: string | null;
+  data: { [key: string]: any };
 }
 
 export type InputStates = { [key: string]: InputState };
@@ -49,36 +49,36 @@ export function constructPayload(state: FormState): FormPayload {
 export function formReducer(state: FormState, action: FormAction): FormState {
    return produce(state, (draft) => {
       switch (action.type) {
-         case "updateInput":
-            const input = action.value as InputState;
-            draft.inputs[input.id] = input;
+      case "updateInput":
+         const input = action.value as InputState;
+         draft.inputs[input.id] = input;
 
-            break;
-         case "updateStatus":
-            const response = action.value as FormResponse;
+         break;
+      case "updateStatus":
+         const response = action.value as FormResponse;
 
-            if (response) {
-               draft.status = response.status;
-               draft.response = response;
+         if (response) {
+            draft.status = response.status;
+            draft.response = response;
 
-               for (const key in state.inputs) {
-                  draft.inputs[key].error = response?.body.errors[key] ?? null;
-               }
-            }
-
-            break;
-         case "resetForm":
             for (const key in state.inputs) {
-               draft.inputs[key] = {
-                  ...state.inputs[key],
-                  value: "",
-                  error: null
-               };
+               draft.inputs[key].error = response?.body.errors[key] ?? null;
             }
+         }
 
-            break;
-         default:
-            return state;
+         break;
+      case "resetForm":
+         for (const key in state.inputs) {
+            draft.inputs[key] = {
+               ...state.inputs[key],
+               value: "",
+               error: null
+            };
+         }
+
+         break;
+      default:
+         return state;
       }
    });
 }
