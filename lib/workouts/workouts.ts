@@ -69,22 +69,25 @@ export async function addWorkout(workout: Workout): Promise<FormResponse> {
 }
 
 export type Tag = {
-   userId: string;
+   user_id: string;
    id?: string;
    title: string;
    color: string;
 }
 
-const colorRegex = /rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/;
-
 const workoutTagSchema = z.object({
-   userId: z.string(),
+   user_id: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/, {
+      message: "Invalid UUID format",
+   }),
+   id: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/, {
+      message: "Invalid UUID format",
+   }),
    title: z.string().min(1, {
       message: "Workout tag must be at least 1 character"
    }).max(30, {
       message: "Workout tag must be less than 30 characters"
    }),
-   color: z.string().regex(colorRegex, {
+   color: z.string().regex(/^rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)$/, {
       message: "A valid color is required"
    })
 });
@@ -101,7 +104,7 @@ export async function fetchWorkoutTags(userId: string): Promise<FormResponse> {
 
       for (let i = 0; i < tags.length; i++) {
          result.push({
-            userId,
+            user_id: tags[i].user_id,
             id: tags[i].id,
             title: tags[i].title,
             color: tags[i].color
@@ -119,11 +122,7 @@ export async function fetchWorkoutTags(userId: string): Promise<FormResponse> {
 export async function addWorkoutTag(tag: Tag): Promise<FormResponse> {
    const fields = workoutTagSchema.safeParse(tag);
 
-
-
    if (!(fields.success)) {
-      console.log(fields.error.flatten());
-
       return sendErrorMessage(
          "Error",
          "Invalid workout tag fields", {
@@ -135,7 +134,7 @@ export async function addWorkoutTag(tag: Tag): Promise<FormResponse> {
    try {
       await prisma.workout_tags.create({
          data: {
-            user_id: tag.userId,
+            user_id: tag.user_id,
             title: tag.title.trim(),
             color: tag.color.trim()
          }
@@ -161,8 +160,6 @@ export async function updateWorkoutTag(tag: Tag): Promise<FormResponse> {
    }
 
    if (!(fields.success)) {
-      console.log(fields.error.flatten());
-
       return sendErrorMessage("Error", "Invalid workout tag fields", fields.error.flatten().fieldErrors);
    }
 
@@ -171,15 +168,19 @@ export async function updateWorkoutTag(tag: Tag): Promise<FormResponse> {
          where: {
             id: tag.id,
          },
-         data: tag
-      })
+         data: {
+            user_id: tag.user_id,
+            title: tag.title.trim(),
+            color: tag.color.trim()
+         }
+      });
 
       return sendSuccessMessage("Successfully updated workout tag");
    } catch (error: any) {
       if (error.code === "P2002" && error.meta?.modelName === "workout_tags"
             && error.meta?.target?.includes("user_id") && error.meta?.target?.includes("title")) {
-         // Workout tags must be unique
-         return sendErrorMessage("Error", "Workout tag title already exists", { editTitle: ["Workout tag title already exists"] });
+         // Workout tags must be unique by their title
+         return sendErrorMessage("Error", "Workout tag title already exists", { title: ["Workout tag title already exists"] });
       } else {
          return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
       }

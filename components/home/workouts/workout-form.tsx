@@ -89,7 +89,7 @@ export default function WorkoutForm(): JSX.Element {
 
    useEffect(() => {
       if (state.inputs.tags.data?.fetchedInfo === false) {
-         const fetchTags = async() => {
+         const fetchTags = async () => {
             // Fetch the user workout tag options, if any
             if (user !== undefined) {
                const options: Tag[] = (await fetchWorkoutTags(user.id)).body.data.tags;
@@ -119,33 +119,33 @@ export default function WorkoutForm(): JSX.Element {
 
    return (
       <form
-         className = "relative"
-         onSubmit = {handleSubmit}>
-         <div className = "flex flex-col justify-center align-center text-center gap-3">
+         className="relative"
+         onSubmit={handleSubmit}>
+         <div className="flex flex-col justify-center align-center text-center gap-3">
             <FontAwesomeIcon
-               icon = {faPersonRunning}
-               className = "text-6xl text-primary mt-1"
+               icon={faPersonRunning}
+               className="text-6xl text-primary mt-1"
             />
-            <h1 className = "text-3xl font-bold text-black mb-2">
+            <h1 className="text-3xl font-bold text-black mb-2">
                New Workout
             </h1>
          </div>
 
-         <div className = "relative mt-2 w-full flex flex-col justify-center align-center text-left gap-3">
+         <div className="relative mt-2 w-full flex flex-col justify-center align-center text-left gap-3">
             <FontAwesomeIcon
-               icon = {faArrowRotateLeft}
-               onClick = {() => dispatch({
+               icon={faArrowRotateLeft}
+               onClick={() => dispatch({
                   type: "resetForm", value: null
                })}
-               className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+               className="absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
-            <Input input = {state.inputs.title} label = "&#x1F58A; Title" dispatch = {dispatch} />
-            <Input input = {state.inputs.date} label = "&#x1F4C5; Date" dispatch = {dispatch} />
-            <Input input = {state.inputs.search} label = "&#x1F50E; Tags" dispatch = {dispatch} />
-            <TagSelection input = {state.inputs.tags} label = "Tags " dispatch = {dispatch} data = {{ search: state.inputs.search.value as string }} />
-            <TextArea input = {state.inputs.description} label = "&#x1F5DE; Description" dispatch = {dispatch} />
-            <ImageSelection input = {state.inputs.image} label = "&#x1F587; URL" dispatch = {dispatch} />
-            <Button type = "submit" className = "bg-primary text-white h-[2.6rem]" icon = {faSquarePlus}>
+            <Input input={state.inputs.title} label="&#x1F58A; Title" dispatch={dispatch} />
+            <Input input={state.inputs.date} label="&#x1F4C5; Date" dispatch={dispatch} />
+            <Input input={state.inputs.search} label="&#x1F50E; Tags" dispatch={dispatch} />
+            <TagSelection input={state.inputs.tags} label="Tags " dispatch={dispatch} state={state} />
+            <TextArea input={state.inputs.description} label="&#x1F5DE; Description" dispatch={dispatch} />
+            <ImageSelection input={state.inputs.image} label="&#x1F587; URL" dispatch={dispatch} />
+            <Button type="submit" className="bg-primary text-white h-[2.6rem]" icon={faSquarePlus}>
                Create
             </Button>
          </div>

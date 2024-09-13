@@ -2,13 +2,14 @@ import clsx from "clsx";
 import { ChangeEvent, Dispatch, useRef } from "react";
 import { faEye, faEyeSlash, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FormAction, InputState } from "@/lib/global/form";
+import { FormAction, FormState, InputState } from "@/lib/global/form";
 import Button from "./button";
 
 export interface InputProps extends React.InputHTMLAttributes<any> {
    label: string;
    input: InputState;
    dispatch: Dispatch<FormAction>;
+   state?: FormState;
    data?: { [key: string]: any };
 }
 
