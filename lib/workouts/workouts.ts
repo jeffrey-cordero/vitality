@@ -70,7 +70,7 @@ export async function addWorkout(workout: Workout): Promise<FormResponse> {
 
 export type Tag = {
    user_id: string;
-   id?: string;
+   id: string;
    title: string;
    color: string;
 }
@@ -122,7 +122,8 @@ export async function fetchWorkoutTags(userId: string): Promise<FormResponse> {
 export async function addWorkoutTag(tag: Tag): Promise<FormResponse> {
    const fields = workoutTagSchema.safeParse(tag);
 
-   if (!(fields.success)) {
+   if (tag.id !== "" && !(fields.success)) {
+      // Empty ID is valid on workout tag creation
       return sendErrorMessage(
          "Error",
          "Invalid workout tag fields", {
@@ -152,30 +153,43 @@ export async function addWorkoutTag(tag: Tag): Promise<FormResponse> {
    }
 }
 
-export async function updateWorkoutTag(tag: Tag): Promise<FormResponse> {
+export async function updateWorkoutTag(tag: Tag, method: "update" | "delete"): Promise<FormResponse> {
    const fields = workoutTagSchema.safeParse(tag);
 
+   // Handle invalid tag id's and user fields
    if (tag.id === undefined) {
       return sendErrorMessage("Failure", "Missing Workout Tag ID", {});
-   }
-
-   if (!(fields.success)) {
+   } else if (!(fields.success)) {
       return sendErrorMessage("Error", "Invalid workout tag fields", fields.error.flatten().fieldErrors);
    }
 
    try {
-      await prisma.workout_tags.update({
-         where: {
-            id: tag.id,
-         },
-         data: {
-            user_id: tag.user_id,
-            title: tag.title.trim(),
-            color: tag.color.trim()
-         }
-      });
+      // Handle update/delete workout tags
+      switch (method) {
+         case "update":
+            await prisma.workout_tags.update({
+               where: {
+                  id: tag.id,
+               },
+               data: {
+                  user_id: tag.user_id,
+                  title: tag.title.trim(),
+                  color: tag.color.trim()
+               }
+            });
 
-      return sendSuccessMessage("Successfully updated workout tag");
+            return sendSuccessMessage("Successfully updated workout tag");
+         case "delete":
+               await prisma.workout_tags.delete({
+                  where: {
+                     id: tag.id,
+                  }
+               });
+
+               return sendSuccessMessage("Successfully deleted workout tag");
+         default:
+            return sendErrorMessage("Failure", "Invalid Workout Tag Update Method", {});
+      }
    } catch (error: any) {
       if (error.code === "P2002" && error.meta?.modelName === "workout_tags"
             && error.meta?.target?.includes("user_id") && error.meta?.target?.includes("title")) {

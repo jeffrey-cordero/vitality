@@ -15,13 +15,17 @@ export interface FormResponse {
   body: { message: string; data: any; errors: { [key: string]: string[] | undefined } };
 }
 
+export interface FormResetData {
+   [key: string]: any;
+}
+
 export interface FormAction {
   type:
     | "updateInput"
     | "updateStatus"
     | "updateFormState"
     | "resetForm";
-  value: InputState | FormResponse | FormState | FormPayload | null;
+  value: InputState | FormResponse | FormState | FormPayload | FormResetData | null;
 }
 
 export interface FormState {
@@ -30,17 +34,11 @@ export interface FormState {
   response: FormResponse | null;
 }
 
-export const initialFormState: FormState = {
-   status: "Initial",
-   inputs: {},
-   response: null
-};
-
-export function constructPayload(state: FormState): FormPayload {
+export function constructPayload(inputs: {[key: string]: InputState}): FormPayload {
    const payload: FormPayload = {};
 
-   for (const key in state.inputs) {
-      payload[key] = state.inputs[key].value;
+   for (const key in inputs) {
+      payload[key] = inputs[key].value;
    }
 
    return payload;
@@ -68,15 +66,18 @@ export function formReducer(state: FormState, action: FormAction): FormState {
 
             break;
          case "updateFormState":
-            // Handling update status, inputs, and/or response manually for complex components
-            draft = action.value as FormState;
+            // Manually update properties of draft (complex state)
+            Object.assign(draft, action.value);
             break;
          case "resetForm":
+            const reset = action.value as FormResetData;
+            
             for (const key in state.inputs) {
                draft.inputs[key] = {
                   ...state.inputs[key],
                   value: "",
-                  error: null
+                  error: null,
+                  data: reset[key] ?? state.inputs[key].data
                };
             }
 

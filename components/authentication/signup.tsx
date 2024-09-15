@@ -7,12 +7,12 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faIdCard, faDoorOpen } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useReducer } from "react";
-import { initialFormState, FormState, formReducer, constructPayload, FormPayload, FormResponse } from "@/lib/global/form";
+import { FormState, formReducer, constructPayload, FormPayload, FormResponse } from "@/lib/global/form";
 import { login } from "@/lib/authentication/login";
 import { signup, Registration } from "@/lib/authentication/signup";
 
 const form: FormState = {
-   ...initialFormState,
+   status: "Initial",
    inputs: {
       username: {
          type: "text",
@@ -62,7 +62,8 @@ const form: FormState = {
          error: null,
          data: {}
       }
-   }
+   },
+   response: null
 };
 
 function Form(): JSX.Element {
@@ -72,7 +73,7 @@ function Form(): JSX.Element {
       event.preventDefault();
 
       try {
-         const payload: FormPayload = constructPayload(state);
+         const payload: FormPayload = constructPayload(state.inputs);
          payload.birthday = new Date(payload.birthday);
          const response: FormResponse = await signup(payload as Registration);
 

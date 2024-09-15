@@ -7,11 +7,11 @@ import Button from "@/components/global/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useReducer } from "react";
-import { initialFormState, FormState, formReducer, constructPayload, FormPayload, FormResponse } from "@/lib/global/form";
+import { FormState, formReducer, constructPayload, FormPayload, FormResponse } from "@/lib/global/form";
 import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
 
 const formState: FormState = {
-   ...initialFormState,
+   status: "Initial",
    inputs: {
       name: {
          type: "text",
@@ -34,7 +34,8 @@ const formState: FormState = {
          error: null,
          data: {}
       }
-   }
+   },
+   response: null
 };
 
 function Form(): JSX.Element {
@@ -44,7 +45,7 @@ function Form(): JSX.Element {
       event.preventDefault();
 
       try {
-         const payload: FormPayload = constructPayload(state);
+         const payload: FormPayload = constructPayload(state.inputs);
          const response: FormResponse = await sendFeedback(payload as Feedback);
 
          dispatch({

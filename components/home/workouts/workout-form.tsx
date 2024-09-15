@@ -4,14 +4,14 @@ import TextArea from "@/components/global/textarea";
 import ImageSelection from "@/components/home/workouts/image-selection";
 import TagSelection from "@/components/home/workouts/tag-selection";
 import { AuthenticationContext } from "@/app/layout";
-import { initialFormState, FormState, formReducer } from "@/lib/global/form";
+import { FormState, formReducer } from "@/lib/global/form";
 import { fetchWorkoutTags, Tag } from "@/lib/workouts/workouts";
 import { faArrowRotateLeft, faPersonRunning, faSquarePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormEvent, useContext, useEffect, useReducer } from "react";
 
 const form: FormState = {
-   ...initialFormState,
+   status: "Initial",
    inputs: {
       title: {
          type: "text",
@@ -58,56 +58,60 @@ const form: FormState = {
          data: {
             options: [],
             selected: [],
-            editTitle: {
-               type: "text",
-               id: "editTitle",
-               value: "",
-               error: null,
-               data: {
-                  handlesChanges: true,
-               }
-            },
-            editColor: {
-               type: "text",
-               id: "colors",
-               value: null,
-               error: null,
-               data: {
-                  handlesChanges: true,
-               }
+            inputs: {
+               editTitle: {
+                  type: "text",
+                  id: "editTitle",
+                  value: "",
+                  error: null,
+                  data: {
+                     handlesChanges: true,
+                  }
+               },
+               editColor: {
+                  type: "text",
+                  id: "colors",
+                  value: null,
+                  error: null,
+                  data: {
+                     handlesChanges: true,
+                  }
+               },
             },
             handlesChanges: true,
             fetchedInfo: false
          }
       }
-   }
+   },
+   response: null
 };
 
 export default function WorkoutForm(): JSX.Element {
    const [state, dispatch] = useReducer(formReducer, form);
    const { user } = useContext(AuthenticationContext);
 
+   const fetchTags = async() => {
+       // Fetch the user workout tag options, if any
+       if (user !== undefined) {
+         const options: Tag[] = (await fetchWorkoutTags(user.id)).body.data.tags;
+
+         dispatch({
+            type: "updateInput",
+            value: {
+               ...state.inputs.tags,
+               data: {
+                  ...state.inputs.tags.data,
+                  options: options,
+                  selected: [],
+                  fetchedInfo: true
+               }
+            }
+         });
+      }
+   }
+
    useEffect(() => {
       if (state.inputs.tags.data?.fetchedInfo === false) {
-         const fetchTags = async () => {
-            // Fetch the user workout tag options, if any
-            if (user !== undefined) {
-               const options: Tag[] = (await fetchWorkoutTags(user.id)).body.data.tags;
-
-               dispatch({
-                  type: "updateInput",
-                  value: {
-                     ...state.inputs.tags,
-                     data: {
-                        ...state.inputs.tags.data,
-                        options: options,
-                        fetchedInfo: true
-                     }
-                  }
-               });
-            }
-         };
-
          fetchTags();
       }
    });
@@ -135,7 +139,13 @@ export default function WorkoutForm(): JSX.Element {
             <FontAwesomeIcon
                icon={faArrowRotateLeft}
                onClick={() => dispatch({
-                  type: "resetForm", value: null
+                  type: "resetForm", value: {
+                     // Reset selected tags data
+                     tags: {
+                        ...state.inputs.tags.data,
+                        selected: []
+                     }
+                  }
                })}
                className="absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />

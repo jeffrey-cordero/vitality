@@ -7,11 +7,11 @@ import Notification from "@/components/global/notification";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faUnlockKeyhole } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useReducer } from "react";
-import { initialFormState, FormState, formReducer, FormResponse, constructPayload, FormPayload } from "@/lib/global/form";
+import { FormState, formReducer, FormResponse, constructPayload, FormPayload } from "@/lib/global/form";
 import { login, Credentials } from "@/lib/authentication/login";
 
 const form: FormState = {
-   ...initialFormState,
+   status: "Initial",
    inputs: {
       username: {
          type: "text",
@@ -26,7 +26,8 @@ const form: FormState = {
          error: null,
          data: {}
       }
-   }
+   },
+   response: null
 };
 
 function Form(): JSX.Element {
@@ -36,7 +37,7 @@ function Form(): JSX.Element {
       event.preventDefault();
 
       try {
-         const payload: FormPayload = constructPayload(state);
+         const payload: FormPayload = constructPayload(state.inputs);
          const response: FormResponse = await login(payload as Credentials);
 
          dispatch({
