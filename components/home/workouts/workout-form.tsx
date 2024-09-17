@@ -2,10 +2,10 @@ import Button from "@/components/global/button";
 import Input from "@/components/global/input";
 import TextArea from "@/components/global/textarea";
 import ImageSelection from "@/components/home/workouts/image-selection";
-import TagSelection from "@/components/home/workouts/tag-selection";
-import { AuthenticationContext } from "@/app/layout";
+import { TagSelection, WorkoutTag } from "@/components/home/workouts/tag-selection";
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { FormState, formReducer } from "@/lib/global/form";
-import { fetchWorkoutTags, Tag } from "@/lib/workouts/workouts";
+import { addWorkout, fetchWorkoutTags, Tag, Workout } from "@/lib/workouts/workouts";
 import { faArrowRotateLeft, faPersonRunning, faSquarePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormEvent, useContext, useEffect, useReducer } from "react";
@@ -96,12 +96,13 @@ const form: FormState = {
 
 export default function WorkoutForm(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
+   const { updateNotification } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, form);
    
    const fetchTags = async() => {
        // Fetch the user workout tag options, if any
        if (user !== undefined) {
-         const options: Tag[] = (await fetchWorkoutTags(user.id)).body.data.tags;
+         const options: Tag[] = await fetchWorkoutTags(user.id);
 
          dispatch({
             type: "updateInput",
@@ -124,15 +125,42 @@ export default function WorkoutForm(): JSX.Element {
       }
    }, [state.inputs.tags.data?.fetchedInfo, user]);
 
-   const handleSubmit = (event: FormEvent) => {
+   const handleSubmission = async(event: FormEvent) => {
       event.preventDefault();
-      return;
+
+      if (user !== undefined) {
+         const payload: Workout = {
+            user_id: user.id,
+            id: "",
+            title: state.inputs.title.value.trim(),
+            date: new Date(state.inputs.date.value),
+            image: state.inputs.image.value,
+            tags: state.inputs.tags.data.selected
+         }
+
+         const response = await addWorkout(payload);
+
+         console.log(response);
+
+         dispatch({
+            type: "updateStatus",
+            value: response
+         });
+
+         if (response.status !== "Error") {
+            // Display the success or failure notification to the user
+            updateNotification({
+               status: response.status,
+               message: response.body.message
+            });
+         }
+      }
    };
 
    return (
       <form
          className="relative"
-         onSubmit={handleSubmit}>
+         onSubmit={handleSubmission}>
          <div className="flex flex-col justify-center align-center text-center gap-3">
             <FontAwesomeIcon
                icon={faPersonRunning}
@@ -142,7 +170,6 @@ export default function WorkoutForm(): JSX.Element {
                New Workout
             </h1>
          </div>
-
          <div className="relative mt-2 w-full flex flex-col justify-center align-center text-left gap-3">
             <FontAwesomeIcon
                icon={faArrowRotateLeft}
@@ -159,6 +186,18 @@ export default function WorkoutForm(): JSX.Element {
             />
             <Input input={state.inputs.title} label="&#x1F58A; Title" dispatch={dispatch} />
             <Input input={state.inputs.date} label="&#x1F4C5; Date" dispatch={dispatch} />
+            <ul className="flex flex-row flex-wrap justify-center items-center">
+               {
+                  state.inputs.tags.data.selected.map((selected: Tag) => {
+                     return WorkoutTag({
+                        input: state.inputs.tags,
+                        label: "Tags",
+                        dispatch: dispatch,
+                        state: state
+                     }, selected, true);
+                  })
+               }
+            </ul>
             <Input input={state.inputs.search} label="&#x1F50E; Tags" dispatch={dispatch} />
             <TagSelection input={state.inputs.tags} label="Tags " dispatch={dispatch} state={state} />
             <TextArea input={state.inputs.description} label="&#x1F5DE; Description" dispatch={dispatch} />

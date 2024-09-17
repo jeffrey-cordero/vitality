@@ -43,7 +43,7 @@ export async function getUserByEmail(email: string): Promise<User | undefined> {
    }
 }
 
-export async function getAuthentication(): Promise<any> {
+export async function getAuthentication(): Promise<User | undefined> {
    const result = await auth();
    return result?.user ? getUserByEmail(result.user.email as string) : undefined;
 }

@@ -7,7 +7,7 @@ import Footer from "@/components/global/footer";
 import Notification from "@/components/global/notification";
 import { sfPro, inter } from "./fonts";
 import { SideBar } from "@/components/global/sidebar";
-import { createContext, SetStateAction, useEffect, useState } from "react";
+import { createContext, SetStateAction, use, useEffect, useState } from "react";
 import { users as User } from "@prisma/client";
 import { getAuthentication } from "@/lib/authentication/user";
 import { NotificationProps } from "@/components/global/notification";
@@ -52,7 +52,8 @@ export default function Layout({
 
    const handleAuthentication = async () => {
       try {
-         setUser(await getAuthentication());
+         const user = await getAuthentication();
+         setUser(user);
       } catch (error) {
          setUser(undefined);
       }
@@ -67,7 +68,7 @@ export default function Layout({
    }, []);
 
    return (
-      <html lang="en" className="m-0 p-0 overflow-x-hidden w-full ">
+      <html lang="en" className="m-0 p-0 overflow-x-hidden w-full">
          <Head>
             <title>Vitality</title>
             <meta name="description" content="A modern fitness tracker to fuel your fitness goals" />
@@ -77,7 +78,9 @@ export default function Layout({
             <link rel="icon" href="favcon.ico" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
          </Head>
-         <body className={cx(sfPro.variable, inter.variable, "box-border m-0 p-0  overflow-x-hidden w-full max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black")}>
+         <body 
+            className={cx(sfPro.variable, inter.variable, "box-border m-0 p-0  overflow-x-hidden w-full max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black")}
+            suppressHydrationWarning={true}>
             <AuthenticationContext.Provider value={{ user, updateUser }}>
                <SideBar />
                <NotificationContext.Provider value={{ notification, updateNotification }}>

@@ -1,9 +1,27 @@
 "use client";
 import PopUp from "@/components/global/popup";
 import WorkoutForm from "@/components/home/workouts/workout-form";
+import { AuthenticationContext } from "@/app/layout";
+import { fetchWorkoutsInformation, Workout } from "@/lib/workouts/workouts";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { useContext, useEffect, useState } from "react";
+import WorkoutCard from "@/components/home/workouts/workout-card";
 
 export default function Page() {
+   const { user } = useContext(AuthenticationContext);
+   const [workouts, setWorkouts] = useState<Workout[]>();
+
+   const fetchWorkouts = async () => {
+      if (user !== undefined) {
+         const workouts = await fetchWorkoutsInformation(user.id);
+         setWorkouts(workouts);
+      }
+   }
+
+   useEffect(() => {
+      fetchWorkouts();
+   }, [user]);
+   
    return (
       <main className = "w-full mx-auto flex gap-2 min-h-screen flex-col items-center justify-start text-center">
          <div>
@@ -18,6 +36,11 @@ export default function Page() {
                <WorkoutForm />
             </PopUp>
          </div>
+         {
+            workouts && workouts.map((workout)=> {
+               return WorkoutCard(workout);
+            })
+         }
       </main >
    );
 }

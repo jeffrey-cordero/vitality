@@ -29,6 +29,7 @@ export default function PopUp(props: PopUpProps): JSX.Element {
          {
             props.cover ?? (
                <Button
+                  type="button"
                   className = {props.buttonClassName}
                   icon = {props.icon}
                >

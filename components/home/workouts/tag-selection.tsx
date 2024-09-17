@@ -6,7 +6,7 @@ import { faGear, faXmark, faCloudArrowUp, faTrash } from "@fortawesome/free-soli
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/workouts/workouts";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useRef } from "react";
 import { FormResponse } from "@/lib/global/form";
 
 const colors = {
@@ -86,14 +86,12 @@ function NewTagForm(props: InputProps, search: string, userId: string) {
 }
 
 function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
-   const { updateNotification } = useContext(NotificationContext);
-
    const handleSubmission = async (method: "update" | "delete") => {
       const payload: Tag = {
          user_id: tag.user_id,
          id: tag.id,
-         title: props.input.data.inputs.editTitle.value,
-         color: props.input.data.inputs.editColor.value,
+         title: props.input.data.inputs.editTitle.value.trim(),
+         color: props.input.data.inputs.editColor.value.trim(),
       };
 
       const response: FormResponse = await updateWorkoutTag(payload, method);
@@ -154,6 +152,8 @@ function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
 
       if (response.status !== "Error") {
          // Display the success or failure notification to the user
+         const { updateNotification } = useContext(NotificationContext);
+         
          updateNotification({
             status: response.status,
             message: response.body.message
@@ -262,7 +262,7 @@ function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
    );
 }
 
-function TagsItem(props: InputProps, tag: Tag, isSelected: boolean): JSX.Element {
+export function WorkoutTag(props: InputProps, tag: Tag, isSelected: boolean): JSX.Element {
    // Handle adding or removing a selected tag
    const handleOnClick = (adding: boolean) => {
       props.dispatch({
@@ -331,7 +331,7 @@ function TagsItem(props: InputProps, tag: Tag, isSelected: boolean): JSX.Element
                      />
                   }
                >
-                  {EditTagForm(props, tag)}
+                  { EditTagForm(props, tag) }
                </PopUp>
             }
             {
@@ -347,7 +347,7 @@ function TagsItem(props: InputProps, tag: Tag, isSelected: boolean): JSX.Element
    );
 };
 
-export default function TagSelection(props: InputProps): JSX.Element {
+export function TagSelection(props: InputProps): JSX.Element {
    // Fetch user information from context
    const { user } = useContext(AuthenticationContext);
 
@@ -356,7 +356,7 @@ export default function TagSelection(props: InputProps): JSX.Element {
 
    // Convert search string to lower case for case-insensitive comparison
    const search = useMemo(() => {
-      return props.state?.inputs.search.value.toLowerCase();
+      return props.state?.inputs.search.value.trim().toLowerCase();
    }, [props.state?.inputs.search]);
 
    // Differentiate between selected and unselected options
@@ -387,18 +387,11 @@ export default function TagSelection(props: InputProps): JSX.Element {
 
    return (
       <div>
-         <div className="flex flex-col flex-wrap justify-center items-center gap-8">
-            <ul className="flex flex-row flex-wrap justify-center items-center">
-               {
-                  selected.map((tag: Tag) => {
-                     return TagsItem(props, tag, true);
-                  })
-               }
-            </ul>
+         <div className="flex flex-col flex-wrap justify-center items-center">
             <ul className="flex flex-col flex-wrap justify-center items-center">
                {
                   results.length > 0 ? results.map((tag: Tag) => {
-                     return TagsItem(props, tag, false);
+                     return WorkoutTag(props, tag, false);
                   }) : search.trim().length > 0 && user !== undefined && tagsByTitle[search] === undefined && NewTagForm(props, search, user.id)
                }
             </ul>

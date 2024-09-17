@@ -16,7 +16,7 @@ export interface InputProps extends React.InputHTMLAttributes<any> {
 export default function Input({ ...props }: InputProps): JSX.Element {
    const input = useRef<HTMLInputElement>(null);
    const passwordButton = useRef<SVGSVGElement | null>(null);
-
+   
    return (
       <div className = "relative">
          <input
