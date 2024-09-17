@@ -37,8 +37,8 @@ const config: Config = {
          }
       },
       animation: {
-         slideIn: "slideIn 1s ease-in-out 300ms",
-         fadeIn: "fadeIn 1s ease-in-out 300ms forwards"
+         slideIn: "slideIn 1s ease-in-out 100ms",
+         fadeIn: "fadeIn 1s ease-in-out 100ms forwards"
       }
    },
    plugins: [require("@tailwindcss/forms")]

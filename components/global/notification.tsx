@@ -1,18 +1,21 @@
 "use client";
 import clsx from "clsx";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { FormState } from "@/lib/global/form";
 import { faCircleCheck, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { NotificationContext } from "@/app/layout";
 
-interface NotificationProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface NotificationProps extends React.HTMLAttributes<any> {
    children?: React.ReactNode;
-   state: FormState;
+   status: "Initial" | "Success" | "Error" | "Failure";
+   message: string;
 }
 
 export default function Notification(props: NotificationProps): JSX.Element {
+   const { updateNotification } = useContext(NotificationContext);
    const [visible, setVisible] = useState<boolean>(true);
-   const icon = props.state.status === "Success" ? faCircleCheck : faTriangleExclamation;
+   const icon = props.status === "Success" ? faCircleCheck : faTriangleExclamation;
 
    return (
       <>
@@ -23,19 +26,19 @@ export default function Notification(props: NotificationProps): JSX.Element {
             >
                <div className = "text-left">
                   <div className = {clsx("w-full border-stroke flex items-center rounded-lg border border-l-[8px] bg-white pl-4", {
-                     "border-l-green-600": props.state.status === "Success",
-                     "border-l-red-600": props.state.status !== "Success"
+                     "border-l-green-600": props.status === "Success",
+                     "border-l-red-600": props.status !== "Success"
                   })}>
                      <div className = "flex items-center justify-center rounded-full">
                         <FontAwesomeIcon icon = {icon} className = {clsx("text-3xl", {
-                           "text-green-600": props.state.status === "Success",
-                           "text-red-600": props.state.status !== "Success"
+                           "text-green-600": props.status === "Success",
+                           "text-red-600": props.status !== "Success"
                         })} />
                      </div>
                      <div className = "flex w-full items-center justify-between p-4">
                         <div>
                            <div className = "my-2 flex flex-col gap-2 font-bold">
-                              <p>{props.state.response?.body.message}</p>
+                              <p>{props.message}</p>
                               {props.children}
                            </div>
                         </div>
@@ -45,7 +48,14 @@ export default function Notification(props: NotificationProps): JSX.Element {
                <div className = "absolute top-0 right-0 m-[10px]">
                   <a
                      className = "hover:text-danger hover:cursor-pointer text-red-600"
-                     onClick = {() => { setVisible(false); }}
+                     onClick = {() => { 
+                        // Remove from the DOM and reset notification context
+                        setVisible(false); 
+                        updateNotification({
+                           status: "Initial",
+                           message: ""
+                        });
+                     }}
                   >
                      <svg
                         width = {25}

@@ -6,10 +6,11 @@ import Button from "@/components/global/button";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faIdCard, faDoorOpen } from "@fortawesome/free-solid-svg-icons";
-import { FormEvent, useReducer } from "react";
+import { FormEvent, useContext, useReducer } from "react";
 import { FormState, formReducer, constructPayload, FormPayload, FormResponse } from "@/lib/global/form";
 import { login } from "@/lib/authentication/login";
 import { signup, Registration } from "@/lib/authentication/signup";
+import { NotificationContext } from "@/app/layout";
 
 const form: FormState = {
    status: "Initial",
@@ -18,6 +19,7 @@ const form: FormState = {
          type: "text",
          id: "username",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       },
@@ -25,6 +27,7 @@ const form: FormState = {
          type: "password",
          id: "password",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       },
@@ -32,6 +35,7 @@ const form: FormState = {
          type: "password",
          id: "confirmPassword",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       },
@@ -39,6 +43,7 @@ const form: FormState = {
          type: "text",
          id: "name",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       },
@@ -46,6 +51,7 @@ const form: FormState = {
          type: "date",
          id: "birthday",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       },
@@ -53,12 +59,14 @@ const form: FormState = {
          type: "email",
          id: "email",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       }, phone: {
          type: "tel",
          id: "phone",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       }
@@ -67,6 +75,7 @@ const form: FormState = {
 };
 
 function Form(): JSX.Element {
+   const { updateNotification } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, form);
 
    const handleSubmit = async(event: FormEvent) => {
@@ -81,6 +90,33 @@ function Form(): JSX.Element {
             type: "updateStatus",
             value: response
          });
+
+         if (response.status !== "Error") {
+            // Display the success or failure notification to the user
+            updateNotification({
+               status: response.status,
+               message: response.body.message,
+               children: (
+                  <Link href = "/home">
+                     <Button
+                        type = "button"
+                        className = "bg-green-600 text-white p-4 text-sm h-[2rem]"
+                        icon = {faDoorOpen}
+                        onClick = {async() => {
+                           await login({
+                              username: state.inputs.username.value,
+                              password: state.inputs.password.value
+                           });
+
+                           window.location.reload();
+                        }}
+                     >
+                        Log In
+                     </Button>
+                  </Link>
+               )
+            });
+         }
       } catch (error) {
          console.error("Error updating status:", error);
       }
@@ -108,31 +144,6 @@ function Form(): JSX.Element {
             </Button>
          </form>
          <p className = "mt-4">Already have an account? <Link href = "/login" className = "text-primary font-bold">Log In</Link></p>
-         {
-            (state.status === "Success" || state.status === "Failure") && (
-               <Notification state = {state}>
-                  {(state.status === "Success") &&
-                     <Link href = "/home">
-                        <Button
-                           type = "button"
-                           className = "bg-green-600 text-white p-4 text-sm h-[2rem]"
-                           icon = {faDoorOpen}
-                           onClick = {async() => {
-                              await login({
-                                 username: state.inputs.username.value,
-                                 password: state.inputs.password.value
-                              });
-
-                              window.location.reload();
-                           }}
-                        >
-                           Log In
-                        </Button>
-                     </Link>
-                  }
-               </Notification>
-            )
-         }
       </div>
    );
 }

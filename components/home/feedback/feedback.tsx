@@ -1,14 +1,14 @@
 "use client";
 import Input from "@/components/global/input";
 import TextArea from "@/components/global/textarea";
-import Notification from "@/components/global/notification";
 import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
-import { FormEvent, useReducer } from "react";
+import { FormEvent, useContext, useReducer } from "react";
 import { FormState, formReducer, constructPayload, FormPayload, FormResponse } from "@/lib/global/form";
 import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
+import { NotificationContext } from "@/app/layout";
 
 const formState: FormState = {
    status: "Initial",
@@ -17,6 +17,7 @@ const formState: FormState = {
          type: "text",
          id: "name",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       },
@@ -24,6 +25,7 @@ const formState: FormState = {
          type: "email",
          id: "email",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       },
@@ -31,6 +33,7 @@ const formState: FormState = {
          type: "text",
          id: "message",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       }
@@ -39,6 +42,7 @@ const formState: FormState = {
 };
 
 function Form(): JSX.Element {
+   const { updateNotification } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, formState);
 
    const handleSubmit = async(event: FormEvent) => {
@@ -52,6 +56,14 @@ function Form(): JSX.Element {
             type: "updateStatus",
             value: response
          });
+
+         if (response.status !== "Error") {
+            // Display the success or failure notification to the user
+            updateNotification({
+               status: response.status,
+               message: response.body.message,
+            });
+         }
       } catch (error) {
          console.error("Error updating status:", error);
       }
@@ -76,11 +88,6 @@ function Form(): JSX.Element {
             <Button type = "submit" className = "bg-primary text-white h-[2.6rem]">
                Submit
             </Button>
-            {
-               state.status != "Initial" && state.status != "Error" && (
-                  <Notification state = {state} />
-               )
-            }
          </form>
       </div>
    );

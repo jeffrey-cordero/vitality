@@ -2,12 +2,11 @@ import clsx from "clsx";
 import PopUp from "@/components/global/popup";
 import Input, { InputProps } from "@/components/global/input";
 import Button from "@/components/global/button";
-import Notification from "@/components/global/notification";
 import { faGear, faXmark, faCloudArrowUp, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/workouts/workouts";
-import { AuthenticationContext } from "@/app/layout";
-import { useContext, useEffect, useMemo } from "react";
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import { useContext, useMemo } from "react";
 import { FormResponse } from "@/lib/global/form";
 
 const colors = {
@@ -22,9 +21,6 @@ const colors = {
    "Pink": "rgb(105, 49, 76)",
    "Red": "rgb(110, 54, 48)"
 };
-
-// Store selected based on title's and id's
-const tagsByTitle: { [title: string]: Tag } = {};
 
 function searchForTag(tags: Tag[], search: string): Tag[] {
    // Handle no input for tag search
@@ -61,8 +57,9 @@ function NewTagForm(props: InputProps, search: string, userId: string) {
                ...props.input,
                data: {
                   ...props.input.data,
-                  options: [...props.input.data.options, tag],
-                  selected: [...props.input.data.selected, tag]
+                  // Resulting data from backend is the tag with the unique ID in UUID format
+                  options: [...props.input.data.options, response.body.data],
+                  selected: [...props.input.data.selected, response.body.data]
                }
             }
          });
@@ -77,10 +74,10 @@ function NewTagForm(props: InputProps, search: string, userId: string) {
             handleSubmission();
          }}
          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-               handleSubmission();
+               if (event.key === "Enter") {
+                  handleSubmission();
+               }
             }
-         }
          }
       >
          <h1>Create <span className="inline-block px-3 py-1 rounded-full text-sm font-bold text-white" style={{ backgroundColor: "rgb(90, 90, 90)" }}>{search}</span></h1>
@@ -88,7 +85,9 @@ function NewTagForm(props: InputProps, search: string, userId: string) {
    );
 }
 
-function EditTagForm(props: InputProps, tag: Tag, colorsList: JSX.Element[]): JSX.Element {
+function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
+   const { updateNotification } = useContext(NotificationContext);
+
    const handleSubmission = async (method: "update" | "delete") => {
       const payload: Tag = {
          user_id: tag.user_id,
@@ -152,6 +151,14 @@ function EditTagForm(props: InputProps, tag: Tag, colorsList: JSX.Element[]): JS
             });
          }
       }
+
+      if (response.status !== "Error") {
+         // Display the success or failure notification to the user
+         updateNotification({
+            status: response.status,
+            message: response.body.message
+         });
+      }
    };
 
    return (
@@ -191,7 +198,42 @@ function EditTagForm(props: InputProps, tag: Tag, colorsList: JSX.Element[]): JS
          />
          <div className="flex flex-col justify-center items-center gap-2">
             {
-               colorsList
+               Object.keys(colors).map((name: string) => {
+                  const color: string = colors[name];
+         
+                  const changeColor = () => {
+                     // Update editing color value
+                     props.dispatch({
+                        type: "updateInput",
+                        value: {
+                           ...props.input,
+                           data: {
+                              ...props.input.data,
+                              inputs: {
+                                 ...props.input.data.inputs,
+                                 editColor: {
+                                    ...props.input.data.inputs.editColor,
+                                    value: color
+                                 }
+                              }
+                           }
+                        }
+                     });
+                  };
+         
+                  return (
+                     <div
+                        style={{ backgroundColor: color }}
+                        className={clsx("cursor-pointer w-full h-[3rem] border-[3px] rounded-sm p-3 text-white text-center", {
+                           "border-primary scale-[1.02]": props.input.data.inputs.editColor.value === color,
+                           "border-white": props.input.data.inputs.editColor.value !== color
+                        })}
+                        onClick={changeColor}
+                        key={color}>
+                        {name}
+                     </div>
+                  )
+               })
             }
             {/* Potential error message for invalid color in payload */}
             {props.input.data.inputs.editColor.error !== null &&
@@ -220,7 +262,7 @@ function EditTagForm(props: InputProps, tag: Tag, colorsList: JSX.Element[]): JS
    );
 }
 
-function TagsItem(props: InputProps, tag: Tag, colorsList: JSX.Element[], isSelected: boolean): JSX.Element {
+function TagsItem(props: InputProps, tag: Tag, isSelected: boolean): JSX.Element {
    // Handle adding or removing a selected tag
    const handleOnClick = (adding: boolean) => {
       props.dispatch({
@@ -237,7 +279,7 @@ function TagsItem(props: InputProps, tag: Tag, colorsList: JSX.Element[], isSele
    };
 
    return (
-      <div
+      <li
          className={clsx("px-3 py-1 m-2 rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
          style={{
             backgroundColor: tag.color
@@ -252,19 +294,9 @@ function TagsItem(props: InputProps, tag: Tag, colorsList: JSX.Element[], isSele
                }
             }}
          >
-            {/* Display pop up displaying entire title for readability */}
             <div className="cursor-pointer">
                {tag.title}
-               {
-                  isSelected &&
-                  <FontAwesomeIcon
-                     onMouseDown={() => handleOnClick(false)}
-                     icon={faXmark}
-                     className="cursor-pointer text-xs transition duration-300 ease-in-out hover:scale-125 hover:text-red-500"
-                  />
-               }
             </div>
-
             {
                <PopUp
                   className="max-w-2xl"
@@ -282,11 +314,13 @@ function TagsItem(props: InputProps, tag: Tag, colorsList: JSX.Element[], isSele
                                     inputs: {
                                        editTitle: {
                                           ...props.input.data.inputs.editTitle,
-                                          value: tag.title
+                                          value: tag.title,
+                                          error: null
                                        },
                                        editColor: {
                                           ...props.input.data.inputs.editColor,
-                                          value: tag.color
+                                          value: tag.color,
+                                          error: null
                                        }
                                     }
                                  }
@@ -297,16 +331,24 @@ function TagsItem(props: InputProps, tag: Tag, colorsList: JSX.Element[], isSele
                      />
                   }
                >
-                  {EditTagForm(props, tag, colorsList)}
+                  {EditTagForm(props, tag)}
                </PopUp>
             }
+            {
+               isSelected &&
+                  <FontAwesomeIcon
+                     onMouseDown={() => handleOnClick(false)}
+                     icon={faXmark}
+                     className="cursor-pointer text-md transition duration-300 ease-in-out hover:scale-125 hover:text-red-500"
+               />
+            }
          </div>
-      </div>
+      </li>
    );
 };
 
 export default function TagSelection(props: InputProps): JSX.Element {
-   // Store user and search pattern
+   // Fetch user information from context
    const { user } = useContext(AuthenticationContext);
 
    // Store overall and selected tags
@@ -331,59 +373,32 @@ export default function TagSelection(props: InputProps): JSX.Element {
       return searchForTag(searchOptions, search);
    }, [searchOptions, search]);
 
-   // Colors list within edit form pop up
-   const colorsList: JSX.Element[] = useMemo(() => {
-      return Object.keys(colors).map((name: string) => {
-         const color: string = colors[name];
 
-         return (
-            <div
-               style={{ backgroundColor: color }}
-               className={clsx("cursor-pointer w-full h-[3rem]  border-[3px] rounded-sm p-3 text-white text-center", {
-                  "border-primary scale-[1.02]": props.input.data.inputs.editColor.value === color,
-                  "border-white": props.input.data.inputs.editColor.value !== color
-               })}
-               onClick={() => {
-                  // Update editing color value
-                  props.dispatch({
-                     type: "updateInput",
-                     value: {
-                        ...props.input,
-                        data: {
-                           ...props.input.data,
-                           inputs: {
-                              ...props.input.data.inputs,
-                              editColor: {
-                                 ...props.input.data.inputs.editColor,
-                                 value: color
-                              }
-                           }
-                        }
-                     }
-                  });
-               }}
-               key={color}>
-               {name}
-            </div>
-         )
-      })
-   }, [props.input.data.inputs.editColor.value]);
+   // Tags by title
+   const tagsByTitle: { [title: string]: Tag } = useMemo(() => {
+      const titles = {};
+
+      for (const tag of options) {
+         titles[tag.title] = tag;
+      }
+
+      return titles;
+   }, [options]);
 
    return (
       <div>
-         <div id="search-results" className="flex flex-col flex-wrap justify-center items-center gap-8">
-            <ul className="flex flex-wrap justify-center items-center">
+         <div className="flex flex-col flex-wrap justify-center items-center gap-8">
+            <ul className="flex flex-row flex-wrap justify-center items-center">
                {
                   selected.map((tag: Tag) => {
-                     tagsByTitle[tag.title] = tag;
-                     return TagsItem(props, tag, colorsList, true);
+                     return TagsItem(props, tag, true);
                   })
                }
             </ul>
             <ul className="flex flex-col flex-wrap justify-center items-center">
                {
                   results.length > 0 ? results.map((tag: Tag) => {
-                     return TagsItem(props, tag, colorsList, false);
+                     return TagsItem(props, tag, false);
                   }) : search.trim().length > 0 && user !== undefined && tagsByTitle[search] === undefined && NewTagForm(props, search, user.id)
                }
             </ul>

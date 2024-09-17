@@ -6,9 +6,10 @@ import Button from "@/components/global/button";
 import Notification from "@/components/global/notification";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faUnlockKeyhole } from "@fortawesome/free-solid-svg-icons";
-import { FormEvent, useReducer } from "react";
+import { FormEvent, useContext, useReducer } from "react";
 import { FormState, formReducer, FormResponse, constructPayload, FormPayload } from "@/lib/global/form";
 import { login, Credentials } from "@/lib/authentication/login";
+import { NotificationContext } from "@/app/layout";
 
 const form: FormState = {
    status: "Initial",
@@ -17,12 +18,14 @@ const form: FormState = {
          type: "text",
          id: "username",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       }, password: {
          type: "password",
          id: "password",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       }
@@ -31,6 +34,7 @@ const form: FormState = {
 };
 
 function Form(): JSX.Element {
+   const { updateNotification } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, form);
 
    const handleSubmit = async(event: FormEvent) => {
@@ -44,6 +48,14 @@ function Form(): JSX.Element {
             type: "updateStatus",
             value: response
          });
+
+         if (response.status === "Failure") {
+            // Display the failure notification to the user
+            updateNotification({
+               status: response.status,
+               message: response.body.message
+            });
+         }
       } catch (error) {
          console.error("Error updating status:", error);
       }
@@ -66,11 +78,6 @@ function Form(): JSX.Element {
             </Button>
          </form>
          <p className = "mt-4">Don&apos;t have an account? <Link href = "/signup" className = "text-primary font-bold">Register</Link></p>
-         { state.status === "Failure"
-            && (
-               <Notification state = {form} />
-            )
-         }
       </div>
    );
 }

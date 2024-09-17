@@ -1,11 +1,11 @@
+import clsx from "clsx";
 import Button from "@/components/global/button";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import clsx from "clsx";
 
-// A popup can use a default button a cover element where te onClick will display the pop up
+// A popup can use a default button or a cover element where the onClick will display the pop up
 interface PopUpProps extends React.HTMLAttributes<HTMLDivElement> {
    children?: React.ReactNode;
    cover?: React.ReactNode;
@@ -19,7 +19,7 @@ export default function PopUp(props: PopUpProps): JSX.Element {
 
    return (
       <div
-         className = "relative"
+         className = "relative popup"
          onClick = {(event) => {
             // Ensure the onClick does that propagate to parent component
             event.stopPropagation();
@@ -54,7 +54,26 @@ export default function PopUp(props: PopUpProps): JSX.Element {
                            className = "text-2xl text-red-500"
                         />
                      </Button>
-                     {props.children}
+                     <div 
+                        tabIndex={0}
+                        className="popup"
+                        onKeyDown={(event)=> {
+                           // Close the active popup in the DOM via the escape key
+                           const target = event.target as HTMLElement;
+
+                           if (event.key === "Escape"
+                                 && target.tagName !== "INPUT" 
+                                 && target.tagName !== "TEXTAREA" 
+                                 && !(target.isContentEditable)
+                                 && target.classList.contains("popup")) {
+                              event.stopPropagation();
+                              setOpen(false);
+                           }
+                        }}
+                     >
+                        {props.children}
+                     </div>
+                     
                   </div>
                </div>
             )

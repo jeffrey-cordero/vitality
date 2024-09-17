@@ -122,8 +122,8 @@ export async function fetchWorkoutTags(userId: string): Promise<FormResponse> {
 export async function addWorkoutTag(tag: Tag): Promise<FormResponse> {
    const fields = workoutTagSchema.safeParse(tag);
 
-   if (tag.id !== "" && !(fields.success)) {
-      // Empty ID is valid on workout tag creation
+   if (!(fields.success) && (tag.id !== "")) {
+      // Return the field errors
       return sendErrorMessage(
          "Error",
          "Invalid workout tag fields", {
@@ -133,7 +133,7 @@ export async function addWorkoutTag(tag: Tag): Promise<FormResponse> {
    }
 
    try {
-      await prisma.workout_tags.create({
+      const newTag: Tag = await prisma.workout_tags.create({
          data: {
             user_id: tag.user_id,
             title: tag.title.trim(),
@@ -141,7 +141,7 @@ export async function addWorkoutTag(tag: Tag): Promise<FormResponse> {
          }
       });
 
-      return sendSuccessMessage("Successfully added workout tag");
+      return sendSuccessMessage("Successfully added workout tag", newTag);
    } catch (error: any) {
       if (error.code === "P2002" && error.meta?.modelName === "workout_tags"
             && error.meta?.target?.includes("user_id") && error.meta?.target?.includes("title")) {

@@ -17,6 +17,7 @@ const form: FormState = {
          type: "text",
          id: "title",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       },
@@ -24,6 +25,7 @@ const form: FormState = {
          type: "date",
          id: "date",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       },
@@ -31,6 +33,7 @@ const form: FormState = {
          type: "text",
          id: "description",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       },
@@ -38,6 +41,7 @@ const form: FormState = {
          type: "text",
          id: "image",
          value: "",
+         defaultValue: "",
          error: null,
          data: {
             handlesChanges: true
@@ -47,6 +51,7 @@ const form: FormState = {
          type: "text",
          id: "search",
          value: "",
+         defaultValue: "",
          error: null,
          data: {}
       },
@@ -54,6 +59,7 @@ const form: FormState = {
          type: null,
          id: "tags",
          value: null,
+         defaultValue: null,
          error: null,
          data: {
             options: [],
@@ -63,6 +69,7 @@ const form: FormState = {
                   type: "text",
                   id: "editTitle",
                   value: "",
+                  defaultValue: "",
                   error: null,
                   data: {
                      handlesChanges: true,
@@ -72,6 +79,7 @@ const form: FormState = {
                   type: "text",
                   id: "colors",
                   value: null,
+                  defaultValue: "",
                   error: null,
                   data: {
                      handlesChanges: true,
@@ -87,9 +95,9 @@ const form: FormState = {
 };
 
 export default function WorkoutForm(): JSX.Element {
-   const [state, dispatch] = useReducer(formReducer, form);
    const { user } = useContext(AuthenticationContext);
-
+   const [state, dispatch] = useReducer(formReducer, form);
+   
    const fetchTags = async() => {
        // Fetch the user workout tag options, if any
        if (user !== undefined) {
@@ -114,7 +122,7 @@ export default function WorkoutForm(): JSX.Element {
       if (state.inputs.tags.data?.fetchedInfo === false) {
          fetchTags();
       }
-   });
+   }, [state.inputs.tags.data?.fetchedInfo, user]);
 
    const handleSubmit = (event: FormEvent) => {
       event.preventDefault();
