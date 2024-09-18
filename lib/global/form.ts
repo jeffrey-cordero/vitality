@@ -21,12 +21,13 @@ export interface FormResponse {
 }
 
 export interface ResetInputState {
-   [key: string]: any;
+  [key: string]: any;
 }
 
 export interface FormAction {
-  type: "updateInput" | "updateStatus" | "updateFormState" | "resetForm";
+  type: "initializeInputs"| "updateInput" | "updateStatus" | "updateFormState" | "resetForm";
   value:
+    | InputStates
     | InputState
     | FormResponse
     | FormState
@@ -56,9 +57,17 @@ export function constructPayload(inputs: {
 export function formReducer(state: FormState, action: FormAction): FormState {
   return produce(state, (draft) => {
     switch (action.type) {
+      case "initializeInputs":
+        const inputStates = action.value as InputStates;
+
+        for (const key of Object.keys(inputStates)) {
+          draft.inputs[key] = inputStates[key];
+        }
+
+        break;
       case "updateInput":
         const input = action.value as InputState;
-        draft.inputs[input.id] = input;
+        draft.inputs[input.id] = input; 
 
         break;
       case "updateStatus":
@@ -76,7 +85,7 @@ export function formReducer(state: FormState, action: FormAction): FormState {
         break;
       case "updateFormState":
         // Manually update properties of draft (complex state)
-        Object.assign(draft, action.value);
+        Object.assign(draft, action.value as FormState);
         break;
       case "resetForm":
         const reset = action.value as ResetInputState;

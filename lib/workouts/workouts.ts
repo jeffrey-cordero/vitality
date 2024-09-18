@@ -13,6 +13,7 @@ export type Workout = {
   title: string;
   date: string | Date;
   image: string;
+  description: string;
   tags: Tag[];
 };
 
@@ -104,6 +105,9 @@ export async function addWorkout(workout: Workout): Promise<FormResponse> {
   }
 }
 
+export async function editWorkout(workout: Workout, method: "update" | "delete"): Promise<FormResponse> {
+  return sendSuccessMessage("Missing implementation");
+}
 
 export type Tag = {
   user_id: string;
@@ -149,6 +153,9 @@ export async function fetchWorkoutsInformation(userId: string): Promise<Workout[
       where: {
         user_id: userId,
       },
+      orderBy: {
+        date: 'desc'
+      }
     });
 
     const formattedWorkouts = workoutsWithTags.map((workout) => {

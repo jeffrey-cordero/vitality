@@ -23,7 +23,12 @@ export default function PopUp(props: PopUpProps): JSX.Element {
          onClick = {(event) => {
             // Ensure the onClick does that propagate to parent component
             event.stopPropagation();
-            setOpen(true);
+
+            if (open === false) {
+               setOpen(true);
+               // Trigger defined onClick on display, if any
+               props.onClick?.call(null, event);
+            }            
          }}
       >
          {

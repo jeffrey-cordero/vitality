@@ -1,26 +1,128 @@
-import { Tag, Workout } from "@/lib/workouts/workouts";
+import Button from "@/components/global/button";
+import Input from "@/components/global/input";
+import TextArea from "@/components/global/textarea";
+import ImageSelection from "@/components/home/workouts/image-selection";
+import { TagSelection, WorkoutTag } from "@/components/home/workouts/tag-selection";
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import { FormAction, FormState } from "@/lib/global/form";
+import { addWorkout, editWorkout, Tag, Workout } from "@/lib/workouts/workouts";
+import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Dispatch, FormEvent, useContext } from "react";
 
-export default function WorkoutCard(props: Workout) {
+export default function WorkoutCard(props: Workout | undefined, state: FormState, dispatch: Dispatch<FormAction>): JSX.Element {
+   const { user } = useContext(AuthenticationContext);
+   const { updateNotification } = useContext(NotificationContext);
+
+   const handleSubmission = async (event: FormEvent) => {
+      event.preventDefault();
+
+      if (user !== undefined) {
+         const payload: Workout = {
+            user_id: user.id,
+            id: props !== undefined ? props.id : "",
+            title: state.inputs.title.value.trim(),
+            date: new Date(state.inputs.date.value),
+            image: state.inputs.image.value,
+            description: state.inputs.description.value.trim(),
+            tags: state.inputs.tags.data.selected
+         }
+
+         const response = props !== undefined ? await editWorkout(payload, "update") : await addWorkout(payload);
+
+         // Add new workout to state and display notification message
+         if (response.status === "Success") {
+            alert(1);
+            
+            dispatch({
+               type: "updateFormState",
+               value: {
+                  ...state,
+                  inputs: {
+                     ...state.inputs,
+                     workouts: {
+                        ...state.inputs.workouts,
+                        value: [...state.inputs.workouts.value, response.body.data]
+                     }
+                  }
+               }
+            });
+         }
+
+         if (response.status !== "Error") {
+            // Display the success or failure notification to the user
+            updateNotification({
+               status: response.status,
+               message: response.body.message
+            });
+         } else {
+            // Display errors
+            dispatch({
+               type: "updateStatus",
+               value: response
+            })
+         }
+      }
+   };
+
    return (
-      <div className="w-[10rem] h-[10rem] bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden">
-         <img src={props.image} alt={props.title} className="w-full h-48 object-cover" />
-         <div className="p-4">
-            <h2 className="text-xl font-semibold mb-2">{props.title}</h2>
-            <p className="text-gray-600 mb-2">
-               {new Date(props.date).toLocaleDateString()}
-            </p>
-            <div className="flex flex-wrap gap-2 mt-2">
-               {props.tags.map((tag: Tag) => (
-                  <span
-                     key={tag.id}
-                     className="px-2 py-1 text-xs font-semibold text-white rounded"
-                     style={{ backgroundColor: tag.color }}
-                  >
-                     {tag.title}
-                  </span>
-               ))}
-            </div>
+      <form
+         className="relative"
+         onSubmit={handleSubmission}>
+         <div className="flex flex-col justify-center align-center text-center gap-3">
+            <FontAwesomeIcon
+               icon={faPersonRunning}
+               className="text-6xl text-primary mt-1"
+            />
+            <h1 className="text-3xl font-bold text-black mb-2">
+               {props !== undefined ? "Edit" : "New"} Workout
+            </h1>
          </div>
-      </div>
+         <div className="relative mt-2 w-full flex flex-col justify-center align-center text-left gap-3">
+            <FontAwesomeIcon
+               icon={faArrowRotateLeft}
+               onClick={() => dispatch({
+                  type: "resetForm", value: {
+                     // Reset selected tags data
+                     tags: {
+                        ...state.inputs.tags.data,
+                        selected: []
+                     }
+                  }
+               })}
+               className="absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+            />
+            <Input input={state.inputs.title} label="&#x1F58A; Title" dispatch={dispatch} />
+            <Input input={state.inputs.date} label="&#x1F4C5; Date" dispatch={dispatch} />
+            <ul className="flex flex-row flex-wrap justify-center items-center">
+               {
+                  state.inputs.tags.data.selected.map((selected: Tag) => {
+                     return WorkoutTag({
+                        input: state.inputs.tags,
+                        label: "Tags",
+                        dispatch: dispatch,
+                        state: state
+                     }, selected, true);
+                  })
+               }
+            </ul>
+            <Input input={state.inputs.search} label="&#x1F50E; Tags" dispatch={dispatch} />
+            <TagSelection input={state.inputs.tags} label="Tags " dispatch={dispatch} state={state} />
+            <TextArea input={state.inputs.description} label="&#x1F5DE; Description" dispatch={dispatch} />
+            <ImageSelection input={state.inputs.image} label="&#x1F587; URL" dispatch={dispatch} />
+            {
+               props !== undefined && (
+                  <Button type="submit" className="bg-red-500  text-white h-[2.6rem]" icon={faTrash}>
+                     Delete
+                  </Button>
+               )
+            }
+            <Button type="submit" className="bg-primary text-white h-[2.6rem]" icon={props !== undefined ? faCloudArrowUp : faSquarePlus}>
+               {
+                  props !== undefined ? "Save" : "Create"
+               }
+            </Button>
+         </div>
+      </form>
    );
 }
