@@ -42,22 +42,22 @@ function ImageSelectionForm(props: InputProps, isValidImage: boolean, setIsValid
    };
 
    return (
-      <div className="flex flex-col gap-3">
-         <div className="flex gap-8 font-bold">
+      <div className = "flex flex-col gap-3">
+         <div className = "flex gap-8 font-bold">
             <h3
-               onClick={() => {
+               onClick = {() => {
                   setIsDefaultImage(true);
                }}
-               className={clsx("cursor-pointer", {
+               className = {clsx("cursor-pointer", {
                   "border-b-[2.5px] border-primary text-red": isDefaultImage
                })}>
                Defaults
             </h3>
             <h3
-               onClick={() => {
+               onClick = {() => {
                   setIsDefaultImage(false);
                }}
-               className={clsx("cursor-pointer", {
+               className = {clsx("cursor-pointer", {
                   "border-b-[2.5px] border-primary text-red": !(isDefaultImage)
                })}>
                URL
@@ -65,22 +65,22 @@ function ImageSelectionForm(props: InputProps, isValidImage: boolean, setIsValid
          </div>
          {
             isDefaultImage ?
-               <div className="flex flex-wrap gap-6 justify-center items-center p-6">
+               <div className = "flex flex-wrap gap-6 justify-center items-center p-6">
                   {
                      defaultImages.map((image) => {
                         const source = require(`@/public/workouts/${image}`).default.src;
 
                         return (
                            <Image
-                              width={1000}
-                              height={1000}
-                              src={source}
-                              key={source}
-                              alt="workout-image"
-                              className={clsx("w-[12rem] h-[12rem] object-cover object-center shadow-inner rounded-xl cursor-pointer", {
+                              width = {1000}
+                              height = {1000}
+                              src = {source}
+                              key = {source}
+                              alt = "workout-image"
+                              className = {clsx("w-[12rem] h-[12rem] object-cover object-center shadow-inner rounded-xl cursor-pointer", {
                                  "border-[4px] border-primary shadow-2xl scale-[1.05] transition duration-300 ease-in-out": props.input.value === source
                               })}
-                              onClick={() => {
+                              onClick = {() => {
                                  // All default images are valid images
                                  if (!(isValidImage)) {
                                     setIsValidImage(true);
@@ -105,37 +105,37 @@ function ImageSelectionForm(props: InputProps, isValidImage: boolean, setIsValid
                </div>
                :
                <div
-                  className="p-6"
-                  onKeyDown={(event: React.KeyboardEvent) => {
+                  className = "p-6"
+                  onKeyDown = {(event: React.KeyboardEvent) => {
                      if (event.key === "Enter") {
                         handleURLSubmission();
                      }
                   }}>
                   {
                      isValidImage ? (
-                        <div className="flex justify-center m-6">
+                        <div className = "flex justify-center m-6">
                            <Image
-                              width={1000}
-                              height={1000}
-                              src={props.input.value}
-                              onError={() => {
+                              width = {1000}
+                              height = {1000}
+                              src = {props.input.value}
+                              onError = {() => {
                                  setIsValidImage(false);
                               }}
-                              alt="workout-image"
-                              className={clsx("w-[12rem] h-[12rem] object-cover object-center rounded-xl cursor-pointer transition duration-300 ease-in-out")}
+                              alt = "workout-image"
+                              className = {clsx("w-[12rem] h-[12rem] object-cover object-center rounded-xl cursor-pointer transition duration-300 ease-in-out")}
                            />
                         </div>
                      ) :
                         // Show resource error on a valid image URL
                         verifyURL(props.input.value) &&
-                        <div className="flex flex-col justify-center items-center text-center gap-4 m-6 font-bold">
-                           <FontAwesomeIcon className="text-red-500 text-4xl" icon={faTriangleExclamation} />
+                        <div className = "flex flex-col justify-center items-center text-center gap-4 m-6 font-bold">
+                           <FontAwesomeIcon className = "text-red-500 text-4xl" icon = {faTriangleExclamation} />
                            <h2>Failed to fetch the desired image resource. Please try again.</h2>
                         </div>
                   }
                   <Input
                      {...props}
-                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                     onChange = {(event: React.ChangeEvent<HTMLInputElement>) => {
                         // Ensure any changes to URL are verified on a new submission
                         if (isValidImage) {
                            setIsValidImage(false);
@@ -155,12 +155,12 @@ function ImageSelectionForm(props: InputProps, isValidImage: boolean, setIsValid
                      }}
                   />
                   <Button
-                     type="button"
-                     onClick={() => {
+                     type = "button"
+                     onClick = {() => {
                         handleURLSubmission();
                      }}
-                     className="w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] min-h-[2.7rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
-                     icon={faPaperclip}
+                     className = "w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] min-h-[2.7rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
+                     icon = {faPaperclip}
                   >
                      Link
                   </Button>
@@ -177,37 +177,37 @@ export default function ImageSelection(props: InputProps): JSX.Element {
    return (
       <div>
          <ToolTip
-            tooltipContent={
+            tooltipContent = {
                verifyURL(props.input.value) && isValidImage ?
                   <Image
-                     width={1000}
-                     height={1000}
-                     src={props.input.value}
-                     onError={() => {
+                     width = {1000}
+                     height = {1000}
+                     src = {props.input.value}
+                     onError = {() => {
                         setIsValidImage(false);
                      }}
-                     alt="workout-image"
-                     className={clsx("w-[12rem] h-[12rem] object-cover object-center rounded-2xl")}
+                     alt = "workout-image"
+                     className = {clsx("w-[12rem] h-[12rem] object-cover object-center rounded-2xl")}
                   />
                   : null}
          >
             <PopUp
-               cover={
+               cover = {
                   <div>
-                     <Button className={clsx("w-full text-black font-semibold border-[1.5px] min-h-[3.2rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500", {
+                     <Button className = {clsx("w-full text-black font-semibold border-[1.5px] min-h-[3.2rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500", {
                         "border-[1.5px] border-red-500": !(isValidImage) && selected
                      })}>
                         {selected ? "Edit Image" : "Add Image"}
-                        <FontAwesomeIcon icon={selected ? faPenToSquare : faPaperclip} />
+                        <FontAwesomeIcon icon = {selected ? faPenToSquare : faPaperclip} />
                      </Button>
                      {props.input.error !== null &&
-                        <div className="flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                           <p className="text-red-500 font-bold input-error"> {props.input.error[0]} </p>
+                        <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
+                           <p className = "text-red-500 font-bold input-error"> {props.input.error[0]} </p>
                         </div>
                      }
                   </div>
                }
-               className="max-w-[80%]">
+               className = "max-w-[80%]">
                {ImageSelectionForm(props, isValidImage, setIsValidImage)}
             </PopUp>
          </ToolTip>

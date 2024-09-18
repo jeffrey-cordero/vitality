@@ -28,13 +28,13 @@ export default function PopUp(props: PopUpProps): JSX.Element {
                setOpen(true);
                // Trigger defined onClick on display, if any
                props.onClick?.call(null, event);
-            }            
+            }
          }}
       >
          {
             props.cover ?? (
                <Button
-                  type="button"
+                  type = "button"
                   className = {props.buttonClassName}
                   icon = {props.icon}
                >
@@ -60,16 +60,16 @@ export default function PopUp(props: PopUpProps): JSX.Element {
                            className = "text-2xl text-red-500"
                         />
                      </Button>
-                     <div 
-                        tabIndex={0}
-                        className="popup"
-                        onKeyDown={(event)=> {
+                     <div
+                        tabIndex = {0}
+                        className = "popup"
+                        onKeyDown = {(event) => {
                            // Close the active popup in the DOM via the escape key
                            const target = event.target as HTMLElement;
 
                            if (event.key === "Escape"
-                                 && target.tagName !== "INPUT" 
-                                 && target.tagName !== "TEXTAREA" 
+                                 && target.tagName !== "INPUT"
+                                 && target.tagName !== "TEXTAREA"
                                  && !(target.isContentEditable)
                                  && target.classList.contains("popup")) {
                               event.stopPropagation();
@@ -79,7 +79,7 @@ export default function PopUp(props: PopUpProps): JSX.Element {
                      >
                         {props.children}
                      </div>
-                     
+
                   </div>
                </div>
             )

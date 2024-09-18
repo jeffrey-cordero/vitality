@@ -1,7 +1,6 @@
 "use client";
 import clsx from "clsx";
 import { useContext, useState } from "react";
-import { FormState } from "@/lib/global/form";
 import { faCircleCheck, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NotificationContext } from "@/app/layout";
@@ -48,9 +47,9 @@ export default function Notification(props: NotificationProps): JSX.Element {
                <div className = "absolute top-0 right-0 m-[10px]">
                   <a
                      className = "hover:text-danger hover:cursor-pointer text-red-600"
-                     onClick = {() => { 
+                     onClick = {() => {
                         // Remove from the DOM and reset notification context
-                        setVisible(false); 
+                        setVisible(false);
                         updateNotification({
                            status: "Initial",
                            message: ""

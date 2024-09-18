@@ -6,11 +6,11 @@ import Button from "@/components/global/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { FormState, formReducer, constructPayload, FormPayload, FormResponse } from "@/lib/global/form";
+import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/form";
 import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
 import { NotificationContext } from "@/app/layout";
 
-const formState: FormState = {
+const feedback: VitalityState = {
    status: "Initial",
    inputs: {
       name: {
@@ -43,14 +43,18 @@ const formState: FormState = {
 
 function Form(): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
-   const [state, dispatch] = useReducer(formReducer, formState);
+   const [state, dispatch] = useReducer(formReducer, feedback);
 
    const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();
 
       try {
-         const payload: FormPayload = constructPayload(state.inputs);
-         const response: FormResponse = await sendFeedback(payload as Feedback);
+         const payload: Feedback = {
+            name: state.inputs.name.value.trim(),
+            email: state.inputs.email.value.trim(),
+            message: state.inputs.message.value.trim()
+         };
+         const response: VitalityResponse = await sendFeedback(payload);
 
          dispatch({
             type: "updateStatus",
@@ -61,7 +65,7 @@ function Form(): JSX.Element {
             // Display the success or failure notification to the user
             updateNotification({
                status: response.status,
-               message: response.body.message,
+               message: response.body.message
             });
          }
       } catch (error) {
@@ -78,7 +82,7 @@ function Form(): JSX.Element {
             <FontAwesomeIcon
                icon = {faArrowRotateLeft}
                onClick = {() => dispatch({
-                  type: "resetForm", value: null
+                  type: "resetState", value: {}
                })}
                className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />

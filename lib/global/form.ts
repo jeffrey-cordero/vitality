@@ -1,6 +1,6 @@
 import { produce } from "immer";
 
-export interface InputState {
+export interface VitalityInputState {
   id: string;
   value: any;
   defaultValue: any;
@@ -9,121 +9,106 @@ export interface InputState {
   data: { [key: string]: any };
 }
 
-export type InputStates = { [key: string]: InputState };
-export type FormPayload = { [key: string]: string | Date };
-export interface FormResponse {
+export type VitalityInputStates = { [key: string]: VitalityInputState };
+export interface VitalityResponse {
   status: "Success" | "Error" | "Failure";
   body: {
     message: string;
-    data: any;
+    data: any | null;
     errors: { [key: string]: string[] | undefined };
   };
 }
 
-export interface ResetInputState {
+export interface VitalityResetState {
   [key: string]: any;
 }
 
-export interface FormAction {
-  type: "initializeInputs"| "updateInput" | "updateStatus" | "updateFormState" | "resetForm";
+export interface VitalityAction {
+  type: "initializeState"| "updateInput" | "updateStatus" | "updateState" | "resetState";
   value:
-    | InputStates
-    | InputState
-    | FormResponse
-    | FormState
-    | FormPayload
-    | ResetInputState
-    | null;
+    | VitalityInputStates
+    | VitalityInputState
+    | VitalityResponse
+    | VitalityState
+    | VitalityResetState;
 }
 
-export interface FormState {
+export interface VitalityState {
   status: "Initial" | "Success" | "Error" | "Failure";
-  inputs: InputStates;
-  response: FormResponse | null;
+  inputs: VitalityInputStates;
+  response: VitalityResponse | null;
 }
 
-export function constructPayload(inputs: {
-  [key: string]: InputState;
-}): FormPayload {
-  const payload: FormPayload = {};
+export function formReducer(state: VitalityState, action: VitalityAction): VitalityState {
+   return produce(state, (draft) => {
+      switch (action.type) {
+      case "initializeState":
+         const VitalityInputStates = action.value as VitalityInputStates;
 
-  for (const key in inputs) {
-    payload[key] = inputs[key].value;
-  }
+         for (const key of Object.keys(VitalityInputStates)) {
+            draft.inputs[key] = VitalityInputStates[key];
+         }
 
-  return payload;
-}
-
-export function formReducer(state: FormState, action: FormAction): FormState {
-  return produce(state, (draft) => {
-    switch (action.type) {
-      case "initializeInputs":
-        const inputStates = action.value as InputStates;
-
-        for (const key of Object.keys(inputStates)) {
-          draft.inputs[key] = inputStates[key];
-        }
-
-        break;
+         break;
       case "updateInput":
-        const input = action.value as InputState;
-        draft.inputs[input.id] = input; 
+         const input = action.value as VitalityInputState;
+         draft.inputs[input.id] = input;
 
-        break;
+         break;
       case "updateStatus":
-        const response = action.value as FormResponse;
+         const response = action.value as VitalityResponse;
 
-        if (response) {
-          draft.status = response.status;
-          draft.response = response;
+         if (response) {
+            draft.status = response.status;
+            draft.response = response;
 
-          for (const key in state.inputs) {
-            draft.inputs[key].error = response?.body.errors[key] ?? null;
-          }
-        }
+            for (const key in state.inputs) {
+               draft.inputs[key].error = response?.body.errors[key] ?? null;
+            }
+         }
 
-        break;
-      case "updateFormState":
-        // Manually update properties of draft (complex state)
-        Object.assign(draft, action.value as FormState);
-        break;
-      case "resetForm":
-        const reset = action.value as ResetInputState;
+         break;
+      case "updateState":
+         // Manually update properties of draft (complex state)
+         Object.assign(draft, action.value as VitalityState);
+         break;
+      case "resetState":
+         const reset = action.value as VitalityResetState;
 
-        for (const key in state.inputs) {
-          draft.inputs[key] = {
-            ...state.inputs[key],
-            value: state.inputs[key].defaultValue,
-            error: null,
-            data: reset[key] ?? state.inputs[key].data,
-          };
-        }
+         for (const key in state.inputs) {
+            draft.inputs[key] = {
+               ...state.inputs[key],
+               value: state.inputs[key].defaultValue,
+               error: null,
+               data: reset[key] ?? state.inputs[key].data
+            };
+         }
 
-        break;
+         break;
       default:
-        return state;
-    }
-  });
+         return state;
+      }
+   });
 }
 
-export function sendSuccessMessage(message: string, data?: any): FormResponse {
-  return {
-    status: "Success",
-    body: { message: message, data: data, errors: {} },
-  };
+export function sendSuccessMessage(message: string, data?: any): VitalityResponse {
+   return {
+      status: "Success",
+      body: { message: message, data: data, errors: {} }
+   };
 }
 
 export function sendErrorMessage(
-  status: "Error" | "Failure",
-  message: string,
-  errors: { [key: string]: string[] }
-): FormResponse {
-  return {
-    status: status,
-    body: {
-      message: message,
-      data: null,
-      errors: errors ?? {},
-    },
-  };
+   status: "Error" | "Failure",
+   message: string,
+   errors: { [key: string]: string[] }
+): VitalityResponse {
+   return {
+      status: status,
+      body: {
+         message: message,
+         data: null,
+         errors: errors ?? {}
+      }
+   };
 }

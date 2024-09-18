@@ -3,15 +3,14 @@ import Link from "next/link";
 import Heading from "@/components/global/heading";
 import Input from "@/components/global/input";
 import Button from "@/components/global/button";
-import Notification from "@/components/global/notification";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faUnlockKeyhole } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { FormState, formReducer, FormResponse, constructPayload, FormPayload } from "@/lib/global/form";
+import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/form";
 import { login, Credentials } from "@/lib/authentication/login";
 import { NotificationContext } from "@/app/layout";
 
-const form: FormState = {
+const credentials: VitalityState = {
    status: "Initial",
    inputs: {
       username: {
@@ -35,14 +34,17 @@ const form: FormState = {
 
 function Form(): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
-   const [state, dispatch] = useReducer(formReducer, form);
+   const [state, dispatch] = useReducer(formReducer, credentials);
 
    const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();
 
       try {
-         const payload: FormPayload = constructPayload(state.inputs);
-         const response: FormResponse = await login(payload as Credentials);
+         const payload: Credentials = {
+            username: state.inputs.username.value.trim(),
+            password: state.inputs.password.value.trim()
+         };
+         const response: VitalityResponse = await login(payload);
 
          dispatch({
             type: "updateStatus",
@@ -67,7 +69,7 @@ function Form(): JSX.Element {
             <FontAwesomeIcon
                icon = {faArrowRotateLeft}
                onClick = {() => dispatch({
-                  type: "resetForm", value: null
+                  type: "resetState", value: {}
                })}
                className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />

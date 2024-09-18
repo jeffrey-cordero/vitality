@@ -3,7 +3,7 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/database/client";
 import { z } from "zod";
-import { FormResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
+import { VitalityResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
 
 export type Registration = {
   name: string;
@@ -49,7 +49,7 @@ const registrationSchema = z.object({
       .optional()
 });
 
-export async function signup(registration: Registration): Promise<FormResponse> {
+export async function signup(registration: Registration): Promise<VitalityResponse> {
    if (registration?.phone?.trim().length === 0) {
       delete registration.phone;
    }

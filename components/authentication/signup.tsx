@@ -1,18 +1,17 @@
 "use client";
 import Heading from "@/components/global/heading";
 import Input from "@/components/global/input";
-import Notification from "@/components/global/notification";
 import Button from "@/components/global/button";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faIdCard, faDoorOpen } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { FormState, formReducer, constructPayload, FormPayload, FormResponse } from "@/lib/global/form";
+import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/form";
 import { login } from "@/lib/authentication/login";
 import { signup, Registration } from "@/lib/authentication/signup";
 import { NotificationContext } from "@/app/layout";
 
-const form: FormState = {
+const registration: VitalityState = {
    status: "Initial",
    inputs: {
       username: {
@@ -76,15 +75,22 @@ const form: FormState = {
 
 function Form(): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
-   const [state, dispatch] = useReducer(formReducer, form);
+   const [state, dispatch] = useReducer(formReducer, registration);
 
    const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();
 
       try {
-         const payload: FormPayload = constructPayload(state.inputs);
-         payload.birthday = new Date(payload.birthday);
-         const response: FormResponse = await signup(payload as Registration);
+         const payload: Registration = {
+            name: state.inputs.name.value.trim(),
+            username: state.inputs.username.value.trim(),
+            password: state.inputs.password.value.trim(),
+            confirmPassword: state.inputs.confirmPassword.value.trim(),
+            email: state.inputs.email.value.trim(),
+            birthday: new Date(state.inputs.birthday.value),
+            phone: state.inputs.phone.value.trim()
+         };
+         const response: VitalityResponse = await signup(payload as Registration);
 
          dispatch({
             type: "updateStatus",
@@ -128,7 +134,7 @@ function Form(): JSX.Element {
             <FontAwesomeIcon
                icon = {faArrowRotateLeft}
                onClick = {() => dispatch({
-                  type: "resetForm", value: null
+                  type: "resetState", value: {}
                })}
                className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />

@@ -2,21 +2,21 @@ import clsx from "clsx";
 import { ChangeEvent, Dispatch, useRef } from "react";
 import { faEye, faEyeSlash, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FormAction, FormState, InputState } from "@/lib/global/form";
+import { VitalityAction, VitalityState, VitalityInputState } from "@/lib/global/form";
 import Button from "./button";
 
 export interface InputProps extends React.InputHTMLAttributes<any> {
    label: string;
-   input: InputState;
-   dispatch: Dispatch<FormAction>;
-   state?: FormState;
+   input: VitalityInputState;
+   dispatch: Dispatch<VitalityAction>;
+   state?: VitalityState;
    data?: { [key: string]: any };
 }
 
 export default function Input({ ...props }: InputProps): JSX.Element {
    const input = useRef<HTMLInputElement>(null);
    const passwordButton = useRef<SVGSVGElement | null>(null);
-   
+
    return (
       <div className = "relative">
          <input

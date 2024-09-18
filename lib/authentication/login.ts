@@ -1,14 +1,14 @@
 "use server";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
-import { FormResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
+import { VitalityResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
 
 export type Credentials = {
    username: string;
    password: string;
 }
 
-export async function login(credentials: Credentials): Promise<FormResponse> {
+export async function login(credentials: Credentials): Promise<VitalityResponse> {
    try {
       const userCredentials = new FormData();
       userCredentials.append("username", credentials.username.trim());

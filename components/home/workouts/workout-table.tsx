@@ -1,17 +1,23 @@
-import clsx from "clsx"
-import PopUp from "@/components/global/popup"
-import WorkoutCard from "@/components/home/workouts/workout-card"
-import { FormAction, FormState } from "@/lib/global/form"
-import { faPencil, faTrashCan } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Tag, Workout } from "@/lib/workouts/workouts"
-import { Dispatch } from "react"
+import clsx from "clsx";
+import PopUp from "@/components/global/popup";
+import WorkoutCard from "@/components/home/workouts/workout-card";
+import { VitalityAction, VitalityState } from "@/lib/global/form";
+import { faPencil, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Tag, Workout } from "@/lib/workouts/workouts";
+import { Dispatch } from "react";
 
-function WorkoutRow(props: Workout, state: FormState, dispatch: Dispatch<FormAction>) {
+interface WorkoutRowProps {
+   workout: Workout;
+   state: VitalityState;
+   dispatch: Dispatch<VitalityAction>;
+}
+
+function WorkoutRow(props: WorkoutRowProps) {
    return (
-      <tr 
+      <tr
          className="bg-white border-b hover:bg-gray-50 0"
-         key={props.id}>
+         key={props.workout.id}>
          <td className="w-4 p-4">
             <div className="flex items-center">
                <input id="checkbox-table-search-1" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" />
@@ -19,15 +25,15 @@ function WorkoutRow(props: Workout, state: FormState, dispatch: Dispatch<FormAct
             </div>
          </td>
          <th scope="row" className="px-6 py-4 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[5rem]">
-            {props.title}
+            {props.workout.title}
          </th>
          <td className="px-6 py-4">
-            { props.date.toString() }
+            {props.workout.date.toString()}
          </td>
          <td className="px-6 py-4">
             <div className="flex flex-wrap justify-center items-center gap-2">
                {
-                  props.tags.map((tag: Tag) => {
+                  props.workout.tags.map((tag: Tag) => {
                      return (
                         <div
                            className={clsx("px-3 py-1 m-2 rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
@@ -36,42 +42,42 @@ function WorkoutRow(props: Workout, state: FormState, dispatch: Dispatch<FormAct
                            }}
                            key={tag.id}
                         >
-                           { tag.title }
+                           {tag.title}
                         </div>
-                     )
+                     );
                   })
                }
             </div>
          </td>
          <td className="px-6 py-4">
-            <div className="flex justify-start items-center gap-2">
+            <div className="flex justify-start items-center gap-4">
                <PopUp
                   onClick={() => {
-                     dispatch({
-                        type: "initializeInputs",
+                     props.dispatch({
+                        type: "initializeState",
                         value: {
                            title: {
-                              ...state.inputs.title,
-                              value: props.title
+                              ...props.state.inputs.title,
+                              value: props.workout.title
                            },
                            date: {
-                              ...state.inputs.date,
-                              value: props.date
+                              ...props.state.inputs.date,
+                              value: props.workout.date
                            },
                            image: {
-                              ...state.inputs.image,
-                              value: props.image
+                              ...props.state.inputs.image,
+                              value: props.workout.image
                            },
                            description: {
-                              ...state.inputs.description,
-                              value: props.description
+                              ...props.state.inputs.description,
+                              value: props.workout.description
                            },
                            tags: {
-                              ...state.inputs.tags,
+                              ...props.state.inputs.tags,
                               data: {
-                                 ...state.inputs.tags.data,
+                                 ...props.state.inputs.tags.data,
                                  // Display all selected tags, if any
-                                 selected: props.tags
+                                 selected: props.workout.tags
                               }
                            }
                         }
@@ -81,7 +87,7 @@ function WorkoutRow(props: Workout, state: FormState, dispatch: Dispatch<FormAct
                      <FontAwesomeIcon icon={faPencil} className="text-primary cursor-pointer text-md hover:scale-125 transition duration-300 ease-in-out" />
                   }
                >
-                  { WorkoutCard(props, state, dispatch) }
+                  { WorkoutCard(props.workout, props.state, props.dispatch)}
                </PopUp>
                <FontAwesomeIcon icon={faTrashCan} className="text-red-500 cursor-pointer text-md hover:scale-125 transition duration-300 ease-in-out" />
             </div>
@@ -90,18 +96,13 @@ function WorkoutRow(props: Workout, state: FormState, dispatch: Dispatch<FormAct
    );
 }
 
+interface WorkoutTableProps {
+   workouts: Workout[];
+   state: VitalityState;
+   dispatch: Dispatch<VitalityAction>;
+}
 
-export default function WorkoutTable(workouts: Workout[], state: FormState, dispatch: Dispatch<FormAction>): JSX.Element {
-   const workout: Workout = {
-      id: "asdasd",
-      user_id: "",
-      tags: [],
-      title: "AAAASSSSSsaasd",
-      date: new Date(new Date().getTime() - 1000),
-      image: "",
-      description: "HELLO"
-   }
-
+export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
    return (
       <div className="relative w-10/12 m-6 overflow-x-auto shadow-md sm:rounded-lg">
          <table className="w-full text-sm text-left rtl:text-right">
@@ -128,13 +129,11 @@ export default function WorkoutTable(workouts: Workout[], state: FormState, disp
                </tr>
             </thead>
             <tbody>
-               {
-                  workouts.map((workout: Workout) => {
-                     return WorkoutRow(workout, state, dispatch);
-                  })
-               }
+               {props.workouts.map((workout: Workout) => (
+                  <WorkoutRow workout={workout} state={props.state} dispatch={props.dispatch} />
+               ))}
             </tbody>
          </table>
       </div>
-   )
+   );
 }

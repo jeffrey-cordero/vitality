@@ -6,8 +6,8 @@ import { faGear, faXmark, faCloudArrowUp, faTrash } from "@fortawesome/free-soli
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/workouts/workouts";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { useContext, useMemo, useRef } from "react";
-import { FormResponse } from "@/lib/global/form";
+import { useContext, useMemo } from "react";
+import { VitalityResponse } from "@/lib/global/form";
 
 const colors = {
    "Light gray": "rgb(55, 55, 55)",
@@ -33,7 +33,7 @@ function searchForTag(tags: Tag[], search: string): Tag[] {
 }
 
 function NewTagForm(props: InputProps, search: string, userId: string) {
-   const handleSubmission = async () => {
+   const handleSubmission = async() => {
       const tag: Tag = {
          user_id: userId,
          id: "",
@@ -68,33 +68,35 @@ function NewTagForm(props: InputProps, search: string, userId: string) {
 
    return (
       <div
-         tabIndex={0}
-         className="cursor-pointer transition duration-300 ease-in-out hover:bg-gray-100 p-3 rounded-2xl"
-         onClick={() => {
+         tabIndex = {0}
+         className = "cursor-pointer transition duration-300 ease-in-out hover:bg-gray-100 p-3 rounded-2xl"
+         onClick = {() => {
             handleSubmission();
          }}
-         onKeyDown={(event) => {
-               if (event.key === "Enter") {
-                  handleSubmission();
-               }
+         onKeyDown = {(event) => {
+            if (event.key === "Enter") {
+               handleSubmission();
             }
          }
+         }
       >
-         <h1>Create <span className="inline-block px-3 py-1 rounded-full text-sm font-bold text-white" style={{ backgroundColor: "rgb(90, 90, 90)" }}>{search}</span></h1>
+         <h1>Create <span className = "inline-block px-3 py-1 rounded-full text-sm font-bold text-white" style = {{ backgroundColor: "rgb(90, 90, 90)" }}>{search}</span></h1>
       </div>
    );
 }
 
 function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
-   const handleSubmission = async (method: "update" | "delete") => {
+   const { updateNotification } = useContext(NotificationContext);
+
+   const handleSubmission = async(method: "update" | "delete") => {
       const payload: Tag = {
          user_id: tag.user_id,
          id: tag.id,
          title: props.input.data.inputs.editTitle.value.trim(),
-         color: props.input.data.inputs.editColor.value.trim(),
+         color: props.input.data.inputs.editColor.value.trim()
       };
 
-      const response: FormResponse = await updateWorkoutTag(payload, method);
+      const response: VitalityResponse = await updateWorkoutTag(payload, method);
 
       if (response.status !== "Success") {
          // Add respective errors, if any
@@ -130,7 +132,7 @@ function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
             const newSelected: Tag[] = method === "update" ? [...selected.map(mapOrFilter)] : [...selected.filter(mapOrFilter)];
 
             props.dispatch({
-               type: "updateFormState",
+               type: "updateState",
                value: {
                   status: "Success",
                   inputs: {
@@ -140,7 +142,7 @@ function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
                         data: {
                            ...props.state.inputs.tags.data,
                            options: newOptions,
-                           selected: newSelected,
+                           selected: newSelected
                         }
                      }
                   },
@@ -152,8 +154,6 @@ function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
 
       if (response.status !== "Error") {
          // Display the success or failure notification to the user
-         const { updateNotification } = useContext(NotificationContext);
-         
          updateNotification({
             status: response.status,
             message: response.body.message
@@ -162,20 +162,20 @@ function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
    };
 
    return (
-      <div className="flex flex-col justify-center align-center text-center gap-3 text-black">
-         <div className="flex flex-col justify-center align-center text-center gap-3">
+      <div className = "flex flex-col justify-center align-center text-center gap-3 text-black">
+         <div className = "flex flex-col justify-center align-center text-center gap-3">
             <FontAwesomeIcon
-               icon={faGear}
-               className="text-6xl text-primary mt-1"
+               icon = {faGear}
+               className = "text-6xl text-primary mt-1"
             />
-            <h1 className="text-3xl font-bold text-black mb-2">
+            <h1 className = "text-3xl font-bold text-black mb-2">
                Edit Workout Tag
             </h1>
          </div>
          {/* Nested input props */}
          <Input
-            input={props.input.data.inputs.editTitle} label="&#x1F58A; Title" dispatch={props.dispatch}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            input = {props.input.data.inputs.editTitle} label = "&#x1F58A; Title" dispatch = {props.dispatch}
+            onChange = {(event: React.ChangeEvent<HTMLInputElement>) => {
                // Update editing title value
                props.dispatch({
                   type: "updateInput",
@@ -196,11 +196,11 @@ function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
                });
             }}
          />
-         <div className="flex flex-col justify-center items-center gap-2">
+         <div className = "flex flex-col justify-center items-center gap-2">
             {
                Object.keys(colors).map((name: string) => {
                   const color: string = colors[name];
-         
+
                   const changeColor = () => {
                      // Update editing color value
                      props.dispatch({
@@ -220,40 +220,40 @@ function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
                         }
                      });
                   };
-         
+
                   return (
                      <div
-                        style={{ backgroundColor: color }}
-                        className={clsx("cursor-pointer w-full h-[3rem] border-[3px] rounded-sm p-3 text-white text-center", {
+                        style = {{ backgroundColor: color }}
+                        className = {clsx("cursor-pointer w-full h-[3rem] border-[3px] rounded-sm p-3 text-white text-center", {
                            "border-primary scale-[1.02]": props.input.data.inputs.editColor.value === color,
                            "border-white": props.input.data.inputs.editColor.value !== color
                         })}
-                        onClick={changeColor}
-                        key={color}>
+                        onClick = {changeColor}
+                        key = {color}>
                         {name}
                      </div>
-                  )
+                  );
                })
             }
             {/* Potential error message for invalid color in payload */}
             {props.input.data.inputs.editColor.error !== null &&
-               <div className="flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                  <p className="text-red-500 font-bold input-error"> {props.input.data.inputs.editColor.error[0]} </p>
+               <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
+                  <p className = "text-red-500 font-bold input-error"> {props.input.data.inputs.editColor.error[0]} </p>
                </div>
             }
          </div>
          <div>
             <Button
-               type="submit" className="bg-red-500 text-white w-full" icon={faTrash}
-               onClick={() => handleSubmission("delete")}
+               type = "submit" className = "bg-red-500 text-white w-full" icon = {faTrash}
+               onClick = {() => handleSubmission("delete")}
             >
                Delete
             </Button>
          </div>
          <div>
             <Button
-               type="submit" className="bg-primary text-white w-full" icon={faCloudArrowUp}
-               onClick={() => handleSubmission("update")}
+               type = "submit" className = "bg-primary text-white w-full" icon = {faCloudArrowUp}
+               onClick = {() => handleSubmission("update")}
             >
                Save
             </Button>
@@ -280,30 +280,30 @@ export function WorkoutTag(props: InputProps, tag: Tag, isSelected: boolean): JS
 
    return (
       <li
-         className={clsx("px-3 py-1 m-2 rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
-         style={{
+         className = {clsx("px-3 py-1 m-2 rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
+         style = {{
             backgroundColor: tag.color
          }}
-         key={tag.id}
+         key = {tag.id}
       >
          <div
-            className="flex justify-center items-center gap-3 p-1"
-            onClick={() => {
+            className = "flex justify-center items-center gap-3 p-1"
+            onClick = {() => {
                if (!(isSelected)) {
                   handleOnClick(true);
                }
             }}
          >
-            <div className="cursor-pointer">
+            <div className = "cursor-pointer">
                {tag.title}
             </div>
             {
                <PopUp
-                  className="max-w-2xl"
-                  cover={
+                  className = "max-w-2xl"
+                  cover = {
                      <FontAwesomeIcon
-                        icon={faGear}
-                        onClick={() => {
+                        icon = {faGear}
+                        onClick = {() => {
                            // Update edit tag information state
                            props.dispatch({
                               type: "updateInput",
@@ -327,7 +327,7 @@ export function WorkoutTag(props: InputProps, tag: Tag, isSelected: boolean): JS
                               }
                            });
                         }}
-                        className="cursor-pointer text-xs hover:scale-125 transition duration-300 ease-in-out"
+                        className = "cursor-pointer text-xs hover:scale-125 transition duration-300 ease-in-out"
                      />
                   }
                >
@@ -337,10 +337,10 @@ export function WorkoutTag(props: InputProps, tag: Tag, isSelected: boolean): JS
             {
                isSelected &&
                   <FontAwesomeIcon
-                     onMouseDown={() => handleOnClick(false)}
-                     icon={faXmark}
-                     className="cursor-pointer text-md transition duration-300 ease-in-out hover:scale-125 hover:text-red-500"
-               />
+                     onMouseDown = {() => handleOnClick(false)}
+                     icon = {faXmark}
+                     className = "cursor-pointer text-md transition duration-300 ease-in-out hover:scale-125 hover:text-red-500"
+                  />
             }
          </div>
       </li>
@@ -387,8 +387,8 @@ export function TagSelection(props: InputProps): JSX.Element {
 
    return (
       <div>
-         <div className="flex flex-col flex-wrap justify-center items-center">
-            <ul className="flex flex-col flex-wrap justify-center items-center">
+         <div className = "flex flex-col flex-wrap justify-center items-center">
+            <ul className = "flex flex-col flex-wrap justify-center items-center">
                {
                   results.length > 0 ? results.map((tag: Tag) => {
                      return WorkoutTag(props, tag, false);

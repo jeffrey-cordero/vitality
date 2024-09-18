@@ -1,7 +1,7 @@
 "use server";
 import prisma from "@/lib/database/client";
 import { z } from "zod";
-import { FormResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
+import { VitalityResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
 
 export type Feedback = {
    name: string;
@@ -15,7 +15,7 @@ const feedbackSchema = z.object({
    message: z.string().trim().min(1, { message: "Message is required." })
 });
 
-export async function sendFeedback(feedback: Feedback): Promise<FormResponse>  {
+export async function sendFeedback(feedback: Feedback): Promise<VitalityResponse>  {
    // Validate the feedback form first
    const fields = feedbackSchema.safeParse(feedback);
 
