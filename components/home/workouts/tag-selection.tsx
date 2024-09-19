@@ -1,13 +1,13 @@
 import clsx from "clsx";
 import PopUp from "@/components/global/popup";
-import Input, { InputProps } from "@/components/global/input";
+import Input, { VitalityInputProps } from "@/components/global/input";
 import Button from "@/components/global/button";
 import { faGear, faXmark, faCloudArrowUp, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/workouts/workouts";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useContext, useMemo } from "react";
-import { VitalityResponse } from "@/lib/global/form";
+import { VitalityResponse } from "@/lib/global/state";
 
 const colors = {
    "Light gray": "rgb(55, 55, 55)",
@@ -32,12 +32,17 @@ function searchForTag(tags: Tag[], search: string): Tag[] {
    return tags.filter(tag => tag.title.toLowerCase().startsWith(search));
 }
 
-function NewTagForm(props: InputProps, search: string, userId: string) {
+interface CreateWorkoutTagProps extends VitalityInputProps {
+   search: string;
+   userId: string;
+}
+
+function CreateWorkoutTag(props: CreateWorkoutTagProps) {
    const handleSubmission = async() => {
       const tag: Tag = {
-         user_id: userId,
+         user_id: props.userId,
          id: "",
-         title: search,
+         title: props.search,
          color: "rgb(90, 90, 90)"
       };
 
@@ -56,7 +61,7 @@ function NewTagForm(props: InputProps, search: string, userId: string) {
             value: {
                ...props.input,
                data: {
-                  ...props.input.data,
+                  ...props.data,
                   // Resulting data from backend is the tag with the unique ID in UUID format
                   options: [...props.input.data.options, response.body.data],
                   selected: [...props.input.data.selected, response.body.data]
@@ -80,18 +85,18 @@ function NewTagForm(props: InputProps, search: string, userId: string) {
          }
          }
       >
-         <h1>Create <span className = "inline-block px-3 py-1 rounded-full text-sm font-bold text-white" style = {{ backgroundColor: "rgb(90, 90, 90)" }}>{search}</span></h1>
+         <h1>Create <span className = "inline-block px-3 py-1 rounded-full text-sm font-bold text-white" style = {{ backgroundColor: "rgb(90, 90, 90)" }}>{props.search}</span></h1>
       </div>
    );
 }
 
-function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
+function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
 
    const handleSubmission = async(method: "update" | "delete") => {
       const payload: Tag = {
-         user_id: tag.user_id,
-         id: tag.id,
+         user_id: props.tag.user_id,
+         id: props.tag.id,
          title: props.input.data.inputs.editTitle.value.trim(),
          color: props.input.data.inputs.editColor.value.trim()
       };
@@ -105,7 +110,7 @@ function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
             value: {
                ...props.input,
                data: {
-                  ...props.input.data,
+                  ...props.data,
                   inputs: {
                      editTitle: {
                         ...props.input.data.inputs.editTitle,
@@ -262,7 +267,12 @@ function EditTagForm(props: InputProps, tag: Tag): JSX.Element {
    );
 }
 
-export function WorkoutTag(props: InputProps, tag: Tag, isSelected: boolean): JSX.Element {
+export interface WorkoutTagProps extends VitalityInputProps {
+   tag: Tag;
+   selected: boolean;
+}
+
+export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
    // Handle adding or removing a selected tag
    const handleOnClick = (adding: boolean) => {
       props.dispatch({
@@ -272,7 +282,8 @@ export function WorkoutTag(props: InputProps, tag: Tag, isSelected: boolean): JS
             data: {
                ...props.input.data,
                // Add to selected options, if applicable, or remove
-               selected: adding ? [...props.input.data.selected, tag] : [...props.input.data.selected].filter((other: Tag) => (other) !== tag)
+               selected: adding ? [...props.input.data.selected, props.tag]
+                  : [...props.input.data.selected].filter((other: Tag) => (other) !== props.tag)
             }
          }
       });
@@ -282,20 +293,20 @@ export function WorkoutTag(props: InputProps, tag: Tag, isSelected: boolean): JS
       <li
          className = {clsx("px-3 py-1 m-2 rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
          style = {{
-            backgroundColor: tag.color
+            backgroundColor: props.tag.color
          }}
-         key = {tag.id}
+         key = {props.tag.id}
       >
          <div
             className = "flex justify-center items-center gap-3 p-1"
             onClick = {() => {
-               if (!(isSelected)) {
+               if (!(props.selected)) {
                   handleOnClick(true);
                }
             }}
          >
             <div className = "cursor-pointer">
-               {tag.title}
+               {props.tag.title}
             </div>
             {
                <PopUp
@@ -310,16 +321,16 @@ export function WorkoutTag(props: InputProps, tag: Tag, isSelected: boolean): JS
                               value: {
                                  ...props.input,
                                  data: {
-                                    ...props.input.data,
+                                    ...props.data,
                                     inputs: {
                                        editTitle: {
                                           ...props.input.data.inputs.editTitle,
-                                          value: tag.title,
+                                          value: props.tag.title,
                                           error: null
                                        },
                                        editColor: {
                                           ...props.input.data.inputs.editColor,
-                                          value: tag.color,
+                                          value: props.tag.color,
                                           error: null
                                        }
                                     }
@@ -331,23 +342,23 @@ export function WorkoutTag(props: InputProps, tag: Tag, isSelected: boolean): JS
                      />
                   }
                >
-                  { EditTagForm(props, tag) }
+                  <EditWorkoutTag {...props} />
                </PopUp>
             }
             {
-               isSelected &&
-                  <FontAwesomeIcon
-                     onMouseDown = {() => handleOnClick(false)}
-                     icon = {faXmark}
-                     className = "cursor-pointer text-md transition duration-300 ease-in-out hover:scale-125 hover:text-red-500"
-                  />
+               props.selected &&
+               <FontAwesomeIcon
+                  onMouseDown = {() => handleOnClick(false)}
+                  icon = {faXmark}
+                  className = "cursor-pointer text-md transition duration-300 ease-in-out hover:scale-125 hover:text-red-500"
+               />
             }
          </div>
       </li>
    );
 };
 
-export function TagSelection(props: InputProps): JSX.Element {
+export function TagSelection(props: VitalityInputProps): JSX.Element {
    // Fetch user information from context
    const { user } = useContext(AuthenticationContext);
 
@@ -391,8 +402,10 @@ export function TagSelection(props: InputProps): JSX.Element {
             <ul className = "flex flex-col flex-wrap justify-center items-center">
                {
                   results.length > 0 ? results.map((tag: Tag) => {
-                     return WorkoutTag(props, tag, false);
-                  }) : search.trim().length > 0 && user !== undefined && tagsByTitle[search] === undefined && NewTagForm(props, search, user.id)
+                     return <WorkoutTag {...props} tag = {tag} selected = {false} key = {tag.id} />;
+                  }) : search.trim().length > 0 && user !== undefined && tagsByTitle[search] === undefined && (
+                     <CreateWorkoutTag {...props} search = {search} userId = {user.id} />
+                  )
                }
             </ul>
          </div>

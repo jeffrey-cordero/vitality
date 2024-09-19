@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
 import Heading from "@/components/global/heading";
-import Input from "@/components/global/input";
 import Button from "@/components/global/button";
+import Input from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faUnlockKeyhole } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/form";
+import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/state";
 import { login, Credentials } from "@/lib/authentication/login";
 import { NotificationContext } from "@/app/layout";
 
@@ -17,14 +17,12 @@ const credentials: VitalityState = {
          type: "text",
          id: "username",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       }, password: {
          type: "password",
          id: "password",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       }

@@ -1,9 +1,9 @@
 import Image from "next/image";
-import Input, { InputProps } from "@/components/global/input";
 import PopUp from "@/components/global/popup";
 import ToolTip from "@/components/global/tooltip";
 import clsx from "clsx";
 import Button from "@/components/global/button";
+import Input, { VitalityInputProps } from "@/components/global/input";
 import { Dispatch, useState } from "react";
 import { faPaperclip, faPenToSquare, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,16 +17,21 @@ function verifyURL(url: string): boolean {
    return urlRegex.test(url) || nextMediaRegex.test(url);
 }
 
-function ImageSelectionForm(props: InputProps, isValidImage: boolean, setIsValidImage: Dispatch<boolean>): JSX.Element {
+interface ImageSelectionFormProps extends VitalityInputProps {
+   isValidImage: boolean;
+   setIsValidImage: Dispatch<boolean>;
+}
+
+function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(true);
 
    const handleURLSubmission = () => {
       const isValidURL = verifyURL(props.input.value);
 
       if (!(isValidURL)) {
-         setIsValidImage(false);
-      } else if (!(isValidImage)) {
-         setIsValidImage(true);
+         props.setIsValidImage(false);
+      } else if (!(props.isValidImage)) {
+         props.setIsValidImage(true);
       }
 
       props.dispatch({
@@ -82,8 +87,8 @@ function ImageSelectionForm(props: InputProps, isValidImage: boolean, setIsValid
                               })}
                               onClick = {() => {
                                  // All default images are valid images
-                                 if (!(isValidImage)) {
-                                    setIsValidImage(true);
+                                 if (!(props.isValidImage)) {
+                                    props.setIsValidImage(true);
                                  }
 
                                  props.dispatch({
@@ -112,14 +117,15 @@ function ImageSelectionForm(props: InputProps, isValidImage: boolean, setIsValid
                      }
                   }}>
                   {
-                     isValidImage ? (
+                     props.isValidImage ? (
                         <div className = "flex justify-center m-6">
                            <Image
                               width = {1000}
                               height = {1000}
                               src = {props.input.value}
                               onError = {() => {
-                                 setIsValidImage(false);
+                                 // Resource removed, moved temporarily, etc.
+                                 props.setIsValidImage(false);
                               }}
                               alt = "workout-image"
                               className = {clsx("w-[12rem] h-[12rem] object-cover object-center rounded-xl cursor-pointer transition duration-300 ease-in-out")}
@@ -137,8 +143,8 @@ function ImageSelectionForm(props: InputProps, isValidImage: boolean, setIsValid
                      {...props}
                      onChange = {(event: React.ChangeEvent<HTMLInputElement>) => {
                         // Ensure any changes to URL are verified on a new submission
-                        if (isValidImage) {
-                           setIsValidImage(false);
+                        if (props.isValidImage) {
+                           props.setIsValidImage(false);
                         }
 
                         props.dispatch({
@@ -156,9 +162,7 @@ function ImageSelectionForm(props: InputProps, isValidImage: boolean, setIsValid
                   />
                   <Button
                      type = "button"
-                     onClick = {() => {
-                        handleURLSubmission();
-                     }}
+                     onClick = {() => handleURLSubmission()}
                      className = "w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] min-h-[2.7rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
                      icon = {faPaperclip}
                   >
@@ -170,7 +174,7 @@ function ImageSelectionForm(props: InputProps, isValidImage: boolean, setIsValid
    );
 }
 
-export default function ImageSelection(props: InputProps): JSX.Element {
+export default function ImageSelection(props: VitalityInputProps): JSX.Element {
    const [isValidImage, setIsValidImage] = useState<boolean>(verifyURL(props.input.value));
    const selected = props.input.value !== "";
 
@@ -208,10 +212,9 @@ export default function ImageSelection(props: InputProps): JSX.Element {
                   </div>
                }
                className = "max-w-[80%]">
-               {ImageSelectionForm(props, isValidImage, setIsValidImage)}
+               <ImageSelectionForm {...props} isValidImage = {isValidImage} setIsValidImage = {setIsValidImage} />
             </PopUp>
          </ToolTip>
-
       </div>
    );
 }

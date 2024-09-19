@@ -1,7 +1,7 @@
 "use server";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
-import { VitalityResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
+import { VitalityResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/state";
 
 export type Credentials = {
    username: string;

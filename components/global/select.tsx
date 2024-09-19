@@ -1,4 +1,4 @@
-import { InputProps } from "@/lib/global/form";
+import { VitalityInputProps } from "@/lib/global/state";
 import clsx from "clsx";
 
 function Options(): JSX.Element {
@@ -9,7 +9,7 @@ function Options(): JSX.Element {
    );
 }
 
-export default function Select({ ...props }: InputProps): JSX.Element {
+export default function Select({ ...props }: VitalityInputProps): JSX.Element {
    return (
 
       <div className = "mt-2 p-2 w-full">

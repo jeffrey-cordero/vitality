@@ -3,7 +3,6 @@ import { produce } from "immer";
 export interface VitalityInputState {
   id: string;
   value: any;
-  defaultValue: any;
   error: any | null;
   type: string | null;
   data: { [key: string]: any };
@@ -20,17 +19,25 @@ export interface VitalityResponse {
 }
 
 export interface VitalityResetState {
-  [key: string]: any;
+  [key: string]: {
+    value: any;
+    data: { [key: string]: any };
+  };
 }
 
 export interface VitalityAction {
-  type: "initializeState"| "updateInput" | "updateStatus" | "updateState" | "resetState";
+  type:
+    | "initializeState"
+    | "updateInput"
+    | "updateStatus"
+    | "updateState"
+    | "resetState";
   value:
-    | VitalityInputStates
-    | VitalityInputState
-    | VitalityResponse
-    | VitalityState
-    | VitalityResetState;
+    | VitalityInputStates // User values in table
+    | VitalityInputState // Update form, data, etc.
+    | VitalityResponse // Backend API responses
+    | VitalityState // Complete State Update (complex)
+    | VitalityResetState; // Reset state to default values and provided data objects, if any
 }
 
 export interface VitalityState {
@@ -39,14 +46,17 @@ export interface VitalityState {
   response: VitalityResponse | null;
 }
 
-export function formReducer(state: VitalityState, action: VitalityAction): VitalityState {
+export function formReducer(
+   state: VitalityState,
+   action: VitalityAction
+): VitalityState {
    return produce(state, (draft) => {
       switch (action.type) {
       case "initializeState":
-         const VitalityInputStates = action.value as VitalityInputStates;
+         const inputs = action.value as VitalityInputStates;
 
-         for (const key of Object.keys(VitalityInputStates)) {
-            draft.inputs[key] = VitalityInputStates[key];
+         for (const key of Object.keys(inputs)) {
+            draft.inputs[key] = inputs[key];
          }
 
          break;
@@ -78,9 +88,9 @@ export function formReducer(state: VitalityState, action: VitalityAction): Vital
          for (const key in state.inputs) {
             draft.inputs[key] = {
                ...state.inputs[key],
-               value: state.inputs[key].defaultValue,
+               value: reset[key]?.value ?? "",
                error: null,
-               data: reset[key] ?? state.inputs[key].data
+               data: reset[key]?.data ?? state.inputs[key].data
             };
          }
 
@@ -91,7 +101,10 @@ export function formReducer(state: VitalityState, action: VitalityAction): Vital
    });
 }
 
-export function sendSuccessMessage(message: string, data?: any): VitalityResponse {
+export function sendSuccessMessage(
+   message: string,
+   data?: any
+): VitalityResponse {
    return {
       status: "Success",
       body: { message: message, data: data, errors: {} }

@@ -1,9 +1,9 @@
 "use client";
 import clsx from "clsx";
 import { ChangeEvent, useRef } from "react";
-import { InputProps } from "./input";
+import { VitalityInputProps } from "./input";
 
-export default function TextArea({ ...props }: InputProps): JSX.Element {
+export default function TextArea({ ...props }: VitalityInputProps): JSX.Element {
    const textArea = useRef<HTMLTextAreaElement | null>(null);
 
    const handleTextAreaOverflow = () => {

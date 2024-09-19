@@ -6,7 +6,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faIdCard, faDoorOpen } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/form";
+import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/state";
 import { login } from "@/lib/authentication/login";
 import { signup, Registration } from "@/lib/authentication/signup";
 import { NotificationContext } from "@/app/layout";
@@ -18,7 +18,6 @@ const registration: VitalityState = {
          type: "text",
          id: "username",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       },
@@ -26,7 +25,6 @@ const registration: VitalityState = {
          type: "password",
          id: "password",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       },
@@ -34,7 +32,6 @@ const registration: VitalityState = {
          type: "password",
          id: "confirmPassword",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       },
@@ -42,7 +39,6 @@ const registration: VitalityState = {
          type: "text",
          id: "name",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       },
@@ -50,7 +46,6 @@ const registration: VitalityState = {
          type: "date",
          id: "birthday",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       },
@@ -58,14 +53,12 @@ const registration: VitalityState = {
          type: "email",
          id: "email",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       }, phone: {
          type: "tel",
          id: "phone",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       }

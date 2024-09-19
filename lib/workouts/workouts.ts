@@ -4,7 +4,7 @@ import {
    VitalityResponse,
    sendSuccessMessage,
    sendErrorMessage
-} from "@/lib/global/form";
+} from "@/lib/global/state";
 import prisma from "@/lib/database/client";
 
 export type Workout = {
@@ -101,11 +101,14 @@ export async function addWorkout(workout: Workout): Promise<VitalityResponse> {
 
       return sendSuccessMessage("Successfully added new workout", newWorkout);
    } catch (error: any) {
+      // Possibly an error with database, authentication, or network
       console.error(error);
 
-      return sendErrorMessage("Failure", "Missing implementation", {
-         system: ["Under construction"]
-      });
+      return sendErrorMessage(
+         "Failure",
+         "Internal Server Error. Please try again later.",
+         {}
+      );
    }
 }
 
@@ -113,9 +116,33 @@ export async function editWorkout(
    workout: Workout,
    method: "update" | "delete"
 ): Promise<VitalityResponse> {
-   console.log(workout);
    console.log(method);
-   return sendSuccessMessage("Missing implementation");
+   return sendSuccessMessage("Missing implementation", workout);
+}
+
+export async function removeWorkouts(workouts: Workout[]): Promise<VitalityResponse> {
+   try {
+      const ids: string[] = workouts.map((workout: Workout) => workout.id);
+
+      const response = await prisma.workouts.deleteMany({
+         where: {
+            id: {
+               in: ids
+            }
+         }
+      });
+
+      console.log(`Successfully deleted ${response.count} workout${response.count === 1 ? '' : 's'}`);
+      return sendSuccessMessage(`Successfully deleted ${response.count} workout${response.count === 1 ? '' : 's'}`);
+   } catch (error: any) {
+      console.error(error);
+
+      return sendErrorMessage(
+         "Failure",
+         "Internal Server Error. Please try again later.",
+         {}
+      );
+   }
 }
 
 export type Tag = {

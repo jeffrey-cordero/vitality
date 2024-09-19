@@ -2,10 +2,10 @@ import clsx from "clsx";
 import { ChangeEvent, Dispatch, useRef } from "react";
 import { faEye, faEyeSlash, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { VitalityAction, VitalityState, VitalityInputState } from "@/lib/global/form";
+import { VitalityAction, VitalityState, VitalityInputState } from "@/lib/global/state";
 import Button from "./button";
 
-export interface InputProps extends React.InputHTMLAttributes<any> {
+export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
    label: string;
    input: VitalityInputState;
    dispatch: Dispatch<VitalityAction>;
@@ -13,7 +13,7 @@ export interface InputProps extends React.InputHTMLAttributes<any> {
    data?: { [key: string]: any };
 }
 
-export default function Input({ ...props }: InputProps): JSX.Element {
+export default function Input({ ...props }: VitalityInputProps): JSX.Element {
    const input = useRef<HTMLInputElement>(null);
    const passwordButton = useRef<SVGSVGElement | null>(null);
 

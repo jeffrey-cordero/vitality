@@ -1,12 +1,12 @@
 "use client";
 import PopUp from "@/components/global/popup";
-import WorkoutCard from "@/components/home/workouts/workout-card";
-import WorkoutTable from "@/components/home/workouts/workout-table";
+import WorkoutCard from "@/components/home/workouts/card";
+import WorkoutTable from "@/components/home/workouts/table";
 import { AuthenticationContext } from "@/app/layout";
-import { fetchWorkoutsInformation, fetchWorkoutTags, Tag, Workout } from "@/lib/workouts/workouts";
+import { fetchWorkoutsInformation, fetchWorkoutTags, Workout } from "@/lib/workouts/workouts";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { useCallback, useContext, useEffect, useReducer } from "react";
-import { formReducer, VitalityState } from "@/lib/global/form";
+import { useCallback, useContext, useEffect, useMemo, useReducer } from "react";
+import { formReducer, VitalityState } from "@/lib/global/state";
 
 const workouts: VitalityState = {
    status: "Initial",
@@ -15,7 +15,6 @@ const workouts: VitalityState = {
          type: "text",
          id: "title",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       },
@@ -23,7 +22,6 @@ const workouts: VitalityState = {
          type: "date",
          id: "date",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       },
@@ -31,7 +29,6 @@ const workouts: VitalityState = {
          type: "text",
          id: "description",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       },
@@ -39,7 +36,6 @@ const workouts: VitalityState = {
          type: "text",
          id: "image",
          value: "",
-         defaultValue: "",
          error: null,
          data: {
             handlesChanges: true
@@ -49,7 +45,6 @@ const workouts: VitalityState = {
          type: "text",
          id: "search",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       },
@@ -57,7 +52,6 @@ const workouts: VitalityState = {
          type: null,
          id: "tags",
          value: null,
-         defaultValue: null,
          error: null,
          data: {
             options: [],
@@ -67,7 +61,6 @@ const workouts: VitalityState = {
                   type: "text",
                   id: "editTitle",
                   value: "",
-                  defaultValue: "",
                   error: null,
                   data: {
                      handlesChanges: true
@@ -77,7 +70,6 @@ const workouts: VitalityState = {
                   type: "text",
                   id: "colors",
                   value: null,
-                  defaultValue: "",
                   error: null,
                   data: {
                      handlesChanges: true
@@ -91,10 +83,10 @@ const workouts: VitalityState = {
          type: null,
          id: "workouts",
          value: [],
-         defaultValue: [],
          error: null,
          data: {
-            fetched: false
+            fetched: false,
+            selected: new Set<Workout>()
          }
       }
    },
@@ -105,49 +97,72 @@ export default function Page() {
    const { user } = useContext(AuthenticationContext);
    const [state, dispatch] = useReducer(formReducer, workouts);
 
-   const fetchWorkouts = async() => {
-      if (user !== undefined) {
-         // Fetch user tags and workouts in a given Promise.all([])
-         let tags: Tag[] = [];
-         let workouts: Workout[] = [];
+   const fetchWorkouts = useCallback(async() => {
+      if (user !== undefined && state.inputs.workouts.data.fetched === false) {
+         try {
+            const [workoutsData, tagsData] = await Promise.all([
+               fetchWorkoutsInformation(user.id),
+               fetchWorkoutTags(user.id)
+            ]);
 
-         await Promise.all([
-            fetchWorkoutsInformation(user.id).then((data) => {
-               workouts = data;
-            }),
-            fetchWorkoutTags(user.id).then((data) => {
-               tags = data;
-            })
-         ]).catch((error)=> {
-            console.error(error);
-         });
+            dispatch({
+               type: "initializeState",
+               value: {
+                  tags: {
+                     ...state.inputs.tags,
+                     data: {
+                        ...state.inputs.tags.data,
+                        options: tagsData
+                     }
+                  },
+                  workouts: {
+                     ...state.inputs.workouts,
+                     value: workoutsData,
+                     data: {
+                        ...state.inputs.workouts.data,
+                        fetched: true
+                     }
+                  }
+               }
+            });
+         } catch (error) {
+            console.error("Failed to fetch workouts or tags:", error);
+         }
+      }
+   }, [user, state.inputs.tags, state.inputs.workouts, dispatch]);
 
-         // Update state for tags and workouts
+   const handleReset = useMemo(() => {
+      return () => {
          dispatch({
-            type: "initializeState",
+            // Reset state for new workout form
+            type: "resetState",
             value: {
+               // Reset selected tags data
                tags: {
-                  ...state.inputs.tags,
                   data: {
                      ...state.inputs.tags.data,
-                     options: tags
-                  }
+                     selected: []
+                  },
+                  value: state.inputs.tags.value
                },
                workouts: {
-                  ...state.inputs.workouts,
-                  value: workouts,
-                  fetched: true
+                  data: {
+                     ...state.inputs.workouts.data
+                  },
+                  value: state.inputs.workouts.value
                }
             }
          });
-      }
-   };
+      };
+   }, [state.inputs.tags.data, state.inputs.tags.value,
+      state.inputs.workouts.data, state.inputs.workouts.value]);
+
 
    useEffect(() => {
-      if (!(state.inputs.workouts.data.fetched)) {
+      if (!state.inputs.workouts.data.fetched) {
          fetchWorkouts();
       }
-   }, [user, state.inputs.workouts.data.fetched]);
+   }, [fetchWorkouts, state.inputs.workouts.data.fetched, state.inputs.tags, state.inputs.workouts]);
 
    return (
       <main className = "w-full mx-auto flex gap-2 min-h-screen flex-col items-center justify-start text-center">
@@ -158,12 +173,19 @@ export default function Page() {
          <div className = "flex justify-center w-full mx-auto">
             <PopUp text = "New Workout"
                className = "max-w-4xl"
-               buttonClassName = "min-w-[9rem] min-h-[2.8rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out"
-               icon = {faPlus}>
-               { WorkoutCard(undefined, state, dispatch) }
+               buttonClassName = "min-w-[10rem] min-h-[2.9rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out"
+               icon = {faPlus}
+               onClick = {() => handleReset()}
+            >
+               <WorkoutCard
+                  workout = {undefined}
+                  state = {state}
+                  dispatch = {dispatch}
+                  reset={handleReset}
+               />
             </PopUp>
          </div>
-         <WorkoutTable workouts={state.inputs.workouts.value} state={state} dispatch={dispatch} />
+         <WorkoutTable workouts = {state.inputs.workouts.value} state = {state} dispatch = {dispatch} reset={handleReset}/>
       </main >
    );
 }

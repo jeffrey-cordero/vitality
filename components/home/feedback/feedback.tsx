@@ -1,12 +1,12 @@
 "use client";
-import Input from "@/components/global/input";
 import TextArea from "@/components/global/textarea";
 import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
+import Input from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/form";
+import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/state";
 import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
 import { NotificationContext } from "@/app/layout";
 
@@ -17,7 +17,6 @@ const feedback: VitalityState = {
          type: "text",
          id: "name",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       },
@@ -25,7 +24,6 @@ const feedback: VitalityState = {
          type: "email",
          id: "email",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       },
@@ -33,7 +31,6 @@ const feedback: VitalityState = {
          type: "text",
          id: "message",
          value: "",
-         defaultValue: "",
          error: null,
          data: {}
       }

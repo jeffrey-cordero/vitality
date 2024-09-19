@@ -3,7 +3,7 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/database/client";
 import { z } from "zod";
-import { VitalityResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/form";
+import { VitalityResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/state";
 
 export type Registration = {
   name: string;
