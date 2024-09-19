@@ -42,7 +42,7 @@ function Form(): JSX.Element {
             username: state.inputs.username.value.trim(),
             password: state.inputs.password.value.trim()
          };
-         const response: VitalityResponse = await login(payload);
+         const response: VitalityResponse<null> = await login(payload);
 
          dispatch({
             type: "updateStatus",

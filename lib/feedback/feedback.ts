@@ -15,12 +15,12 @@ const feedbackSchema = z.object({
    message: z.string().trim().min(1, { message: "Message is required." })
 });
 
-export async function sendFeedback(feedback: Feedback): Promise<VitalityResponse>  {
+export async function sendFeedback(feedback: Feedback): Promise<VitalityResponse<null>>  {
    // Validate the feedback form first
    const fields = feedbackSchema.safeParse(feedback);
 
    if (!(fields.success)) {
-      return sendErrorMessage("Error", "Message.", fields.error.flatten().fieldErrors);
+      return sendErrorMessage("Error", "Message.", null, fields.error.flatten().fieldErrors);
    }
 
    try {
@@ -31,10 +31,10 @@ export async function sendFeedback(feedback: Feedback): Promise<VitalityResponse
          data: userFeedback
       });
 
-      return sendSuccessMessage("Successfully received your feedback!");
+      return sendSuccessMessage("Successfully received your feedback!", null);
    } catch (err) {
       console.error(err);
    }
 
-   return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", {});
+   return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", null, {});
 }

@@ -83,7 +83,7 @@ function Form(): JSX.Element {
             birthday: new Date(state.inputs.birthday.value),
             phone: state.inputs.phone.value.trim()
          };
-         const response: VitalityResponse = await signup(payload as Registration);
+         const response: VitalityResponse<null> = await signup(payload as Registration);
 
          dispatch({
             type: "updateStatus",

@@ -11,7 +11,7 @@ export type Workout = {
   id: string;
   user_id: string;
   title: string;
-  date: string | Date;
+  date: Date;
   image: string;
   description: string;
   tags: Tag[];
@@ -58,7 +58,24 @@ const workoutsSchema = z.object({
    tags: z.array(TagSchema).optional()
 });
 
-export async function addWorkout(workout: Workout): Promise<VitalityResponse> {
+// Turn combined tag and exercise rows as a uniform Workout type
+function formatWorkout(workout: any): Workout {
+   return {
+      id: workout.id,
+      user_id: workout.user_id,
+      title: workout.title,
+      date: workout.date,
+      description: workout.description ?? "",
+      image: workout.image ?? "",
+      tags: workout.workout_applied_tags.map(
+         (applied_tag: any) => applied_tag.workout_tags
+      )
+   };
+}
+
+export async function addWorkout(
+   workout: Workout
+): Promise<VitalityResponse<Workout>> {
    try {
       // Validate the feedback form first
       const fields = workoutsSchema.safeParse(workout);
@@ -71,12 +88,13 @@ export async function addWorkout(workout: Workout): Promise<VitalityResponse> {
          if (
             !(
                errors.fieldErrors.id !== undefined &&
-          Object.keys(errors.fieldErrors).length == 1
+               Object.keys(errors.fieldErrors).length == 1
             )
          ) {
             return sendErrorMessage(
                "Error",
                "Invalid workout tag fields",
+               workout,
                errors.fieldErrors
             );
          }
@@ -88,6 +106,7 @@ export async function addWorkout(workout: Workout): Promise<VitalityResponse> {
             title: workout.title,
             date: workout.date,
             image: workout.image,
+            description: workout.description,
             // Nested create operation to add entries to the workout_applied_tags table
             workout_applied_tags: {
                create: workout.tags.map((tag: Tag) => {
@@ -96,10 +115,20 @@ export async function addWorkout(workout: Workout): Promise<VitalityResponse> {
                   };
                })
             }
+         },
+         include: {
+            workout_applied_tags: {
+               include: {
+                  workout_tags: true
+               }
+            }
          }
       });
 
-      return sendSuccessMessage("Successfully added new workout", newWorkout);
+      return sendSuccessMessage(
+         "Successfully added new workout",
+         formatWorkout(newWorkout)
+      );
    } catch (error: any) {
       // Possibly an error with database, authentication, or network
       console.error(error);
@@ -107,6 +136,7 @@ export async function addWorkout(workout: Workout): Promise<VitalityResponse> {
       return sendErrorMessage(
          "Failure",
          "Internal Server Error. Please try again later.",
+         workout,
          {}
       );
    }
@@ -115,12 +145,14 @@ export async function addWorkout(workout: Workout): Promise<VitalityResponse> {
 export async function editWorkout(
    workout: Workout,
    method: "update" | "delete"
-): Promise<VitalityResponse> {
+): Promise<VitalityResponse<Workout>> {
    console.log(method);
    return sendSuccessMessage("Missing implementation", workout);
 }
 
-export async function removeWorkouts(workouts: Workout[]): Promise<VitalityResponse> {
+export async function removeWorkouts(
+   workouts: Workout[]
+): Promise<VitalityResponse<number>> {
    try {
       const ids: string[] = workouts.map((workout: Workout) => workout.id);
 
@@ -132,14 +164,19 @@ export async function removeWorkouts(workouts: Workout[]): Promise<VitalityRespo
          }
       });
 
-      console.log(`Successfully deleted ${response.count} workout${response.count === 1 ? '' : 's'}`);
-      return sendSuccessMessage(`Successfully deleted ${response.count} workout${response.count === 1 ? '' : 's'}`);
+      return sendSuccessMessage(
+         `Successfully deleted ${response.count} workout${
+            response.count === 1 ? "" : "s"
+         }`,
+         response.count
+      );
    } catch (error: any) {
       console.error(error);
 
       return sendErrorMessage(
          "Failure",
          "Internal Server Error. Please try again later.",
+         0,
          {}
       );
    }
@@ -197,17 +234,7 @@ export async function fetchWorkoutsInformation(
       });
 
       const formattedWorkouts = workoutsWithTags.map((workout) => {
-         return {
-            id: workout.id,
-            user_id: userId,
-            title: workout.title,
-            date: workout.date,
-            description: workout.description ?? "",
-            image: workout.image ?? "",
-            tags: workout.workout_applied_tags.map(
-               (applied_tag) => applied_tag.workout_tags
-            )
-         };
+         return formatWorkout(workout);
       });
 
       return formattedWorkouts;
@@ -243,7 +270,9 @@ export async function fetchWorkoutTags(userId: string): Promise<Tag[]> {
    }
 }
 
-export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse> {
+export async function addWorkoutTag(
+   tag: Tag
+): Promise<VitalityResponse<Tag>> {
    const fields = workoutTagSchema.safeParse(tag);
 
    if (!fields.success) {
@@ -252,7 +281,7 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse> {
 
       // Only error should be title being too long or short
       if (errors.fieldErrors.title) {
-         return sendErrorMessage("Error", "Invalid workout tag fields", {
+         return sendErrorMessage("Error", "Invalid workout tag fields", tag, {
             search: errors.fieldErrors.title ?? [""]
          });
       }
@@ -276,13 +305,14 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse> {
       error.meta?.target?.includes("title")
       ) {
       // Workout tags must be unique
-         return sendErrorMessage("Error", "Workout tag already exists", {
+         return sendErrorMessage("Error", "Workout tag already exists", tag, {
             search: ["Workout tag already exists"]
          });
       } else {
          return sendErrorMessage(
             "Failure",
             "Internal Server Error. Please try again later.",
+            tag,
             {}
          );
       }
@@ -292,16 +322,17 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse> {
 export async function updateWorkoutTag(
    tag: Tag,
    method: "update" | "delete"
-): Promise<VitalityResponse> {
+): Promise<VitalityResponse<null>> {
    const fields = workoutTagSchema.safeParse(tag);
 
    // Handle invalid tag id's and user fields
    if (tag.id === undefined) {
-      return sendErrorMessage("Failure", "Missing Workout Tag ID", {});
+      return sendErrorMessage("Failure", "Missing Workout Tag ID", null, {});
    } else if (!fields.success) {
       return sendErrorMessage(
          "Error",
          "Invalid workout tag fields",
+         null,
          fields.error.flatten().fieldErrors
       );
    }
@@ -317,7 +348,7 @@ export async function updateWorkoutTag(
             data: tag
          });
 
-         return sendSuccessMessage("Successfully updated workout tag");
+         return sendSuccessMessage("Successfully updated workout tag", null);
       case "delete":
          await prisma.workout_tags.delete({
             where: {
@@ -325,11 +356,12 @@ export async function updateWorkoutTag(
             }
          });
 
-         return sendSuccessMessage("Successfully deleted workout tag");
+         return sendSuccessMessage("Successfully deleted workout tag", null);
       default:
          return sendErrorMessage(
             "Failure",
             "Invalid Workout Tag Update Method",
+            null,
             {}
          );
       }
@@ -341,13 +373,14 @@ export async function updateWorkoutTag(
       error.meta?.target?.includes("title")
       ) {
       // Workout tags must be unique by their title
-         return sendErrorMessage("Error", "Workout tag title already exists", {
+         return sendErrorMessage("Error", "Workout tag title already exists", null, {
             title: ["Workout tag title already exists"]
          });
       } else {
          return sendErrorMessage(
             "Failure",
             "Internal Server Error. Please try again later.",
+            null,
             {}
          );
       }

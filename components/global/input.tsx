@@ -1,14 +1,14 @@
 import clsx from "clsx";
+import Button from "@/components/global/button";
 import { ChangeEvent, Dispatch, useRef } from "react";
 import { faEye, faEyeSlash, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { VitalityAction, VitalityState, VitalityInputState } from "@/lib/global/state";
-import Button from "./button";
 
 export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
    label: string;
    input: VitalityInputState;
-   dispatch: Dispatch<VitalityAction>;
+   dispatch: Dispatch<VitalityAction<any>>;
    state?: VitalityState;
    data?: { [key: string]: any };
 }

@@ -181,11 +181,11 @@ export default function Page() {
                   workout = {undefined}
                   state = {state}
                   dispatch = {dispatch}
-                  reset={handleReset}
+                  reset = {handleReset}
                />
             </PopUp>
          </div>
-         <WorkoutTable workouts = {state.inputs.workouts.value} state = {state} dispatch = {dispatch} reset={handleReset}/>
+         <WorkoutTable state = {state} dispatch = {dispatch} reset = {handleReset}/>
       </main >
    );
 }

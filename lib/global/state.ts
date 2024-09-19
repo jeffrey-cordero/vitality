@@ -3,17 +3,17 @@ import { produce } from "immer";
 export interface VitalityInputState {
   id: string;
   value: any;
-  error: any | null;
+  error: string[] | null;
   type: string | null;
   data: { [key: string]: any };
 }
 
 export type VitalityInputStates = { [key: string]: VitalityInputState };
-export interface VitalityResponse {
+export interface VitalityResponse<T> {
   status: "Success" | "Error" | "Failure";
   body: {
     message: string;
-    data: any | null;
+    data: T;
     errors: { [key: string]: string[] | undefined };
   };
 }
@@ -25,7 +25,7 @@ export interface VitalityResetState {
   };
 }
 
-export interface VitalityAction {
+export interface VitalityAction<T> {
   type:
     | "initializeState"
     | "updateInput"
@@ -35,7 +35,7 @@ export interface VitalityAction {
   value:
     | VitalityInputStates // User values in table
     | VitalityInputState // Update form, data, etc.
-    | VitalityResponse // Backend API responses
+    | VitalityResponse<T> // Backend API responses
     | VitalityState // Complete State Update (complex)
     | VitalityResetState; // Reset state to default values and provided data objects, if any
 }
@@ -43,12 +43,12 @@ export interface VitalityAction {
 export interface VitalityState {
   status: "Initial" | "Success" | "Error" | "Failure";
   inputs: VitalityInputStates;
-  response: VitalityResponse | null;
+  response: VitalityResponse<any> | null;
 }
 
 export function formReducer(
    state: VitalityState,
-   action: VitalityAction
+   action: VitalityAction<any>
 ): VitalityState {
    return produce(state, (draft) => {
       switch (action.type) {
@@ -66,7 +66,7 @@ export function formReducer(
 
          break;
       case "updateStatus":
-         const response = action.value as VitalityResponse;
+         const response = action.value as VitalityResponse<any>;
 
          if (response) {
             draft.status = response.status;
@@ -101,26 +101,27 @@ export function formReducer(
    });
 }
 
-export function sendSuccessMessage(
+export function sendSuccessMessage<T>(
    message: string,
-   data?: any
-): VitalityResponse {
+   data: T
+): VitalityResponse<T> {
    return {
       status: "Success",
       body: { message: message, data: data, errors: {} }
    };
 }
 
-export function sendErrorMessage(
+export function sendErrorMessage<T>(
    status: "Error" | "Failure",
    message: string,
+   data: T,
    errors: { [key: string]: string[] }
-): VitalityResponse {
+): VitalityResponse<T> {
    return {
       status: status,
       body: {
          message: message,
-         data: null,
+         data: data,
          errors: errors ?? {}
       }
    };

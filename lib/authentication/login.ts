@@ -8,7 +8,7 @@ export type Credentials = {
    password: string;
 }
 
-export async function login(credentials: Credentials): Promise<VitalityResponse> {
+export async function login(credentials: Credentials): Promise<VitalityResponse<null>> {
    try {
       const userCredentials = new FormData();
       userCredentials.append("username", credentials.username.trim());
@@ -20,14 +20,14 @@ export async function login(credentials: Credentials): Promise<VitalityResponse>
          switch (error.type) {
          case "CallbackRouteError":
          case "CredentialsSignin":
-            return sendErrorMessage("Error", "Invalid credentials", { username : ["Invalid credentials"], password: ["Invalid credentials"] });
+            return sendErrorMessage("Error", "Invalid credentials", null, { username : ["Invalid credentials"], password: ["Invalid credentials"] });
          default:
-            return sendErrorMessage("Failure", "Internal Server Authentication Error. Please try again later.", {});
+            return sendErrorMessage("Failure", "Internal Server Authentication Error. Please try again later.", null, {});
          }
       }
 
       throw error;
    }
 
-   return sendSuccessMessage("Successfully logged in");
+   return sendSuccessMessage("Successfully logged in", null);
 }

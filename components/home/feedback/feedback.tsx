@@ -51,7 +51,7 @@ function Form(): JSX.Element {
             email: state.inputs.email.value.trim(),
             message: state.inputs.message.value.trim()
          };
-         const response: VitalityResponse = await sendFeedback(payload);
+         const response: VitalityResponse<null> = await sendFeedback(payload);
 
          dispatch({
             type: "updateStatus",

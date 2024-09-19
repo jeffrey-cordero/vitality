@@ -13,7 +13,7 @@ import { Dispatch, useCallback, useContext } from "react";
 interface WorkoutCardProps {
    workout: Workout | undefined;
    state: VitalityState;
-   dispatch: Dispatch<VitalityAction>;
+   dispatch: Dispatch<VitalityAction<Workout>>;
    reset: () => void;
 }
 
@@ -35,11 +35,13 @@ export default function WorkoutCard(props: WorkoutCardProps): JSX.Element {
             tags: props.state.inputs.tags.data.selected
          };
 
-         const response: VitalityResponse = props.workout === undefined ?  await addWorkout(payload) : await editWorkout(payload, method);
+         // We request to either add or update the workout instance
+         const response: VitalityResponse<Workout> = props.workout === undefined
+            ?  await addWorkout(payload) : await editWorkout(payload, method);
 
          // Add new workout in response body to state and display notification message
          if (response.status === "Success") {
-            let newWorkouts: Workout[];
+            let newWorkouts: Workout[] = [];
 
             if (props.workout === undefined) {
                // New workout added
@@ -93,7 +95,7 @@ export default function WorkoutCard(props: WorkoutCardProps): JSX.Element {
                className = "text-6xl text-primary mt-1"
             />
             <h1 className = "text-3xl font-bold text-black mb-2">
-               {props !== undefined ? "Edit" : "New"} Workout
+               {props.workout !== undefined ? "Edit" : "New"} Workout
             </h1>
          </div>
          <div className = "relative mt-2 w-full flex flex-col justify-center align-center text-left gap-3">

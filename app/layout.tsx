@@ -1,11 +1,11 @@
 "use client";
-import "./global.css";
+import "@/app/global.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import cx from "classnames";
 import Head from "next/head";
 import Footer from "@/components/global/footer";
 import Notification from "@/components/global/notification";
-import { sfPro, inter } from "./fonts";
+import { sfPro, inter } from "@/app/fonts";
 import { SideBar } from "@/components/global/sidebar";
 import { createContext, SetStateAction, useEffect, useState } from "react";
 import { users as User } from "@prisma/client";

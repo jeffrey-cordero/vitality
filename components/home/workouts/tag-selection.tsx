@@ -101,7 +101,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
          color: props.input.data.inputs.editColor.value.trim()
       };
 
-      const response: VitalityResponse = await updateWorkoutTag(payload, method);
+      const response: VitalityResponse<null> = await updateWorkoutTag(payload, method);
 
       if (response.status !== "Success") {
          // Add respective errors, if any

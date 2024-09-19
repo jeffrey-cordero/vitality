@@ -1,7 +1,7 @@
 "use client";
 import clsx from "clsx";
 import { ChangeEvent, useRef } from "react";
-import { VitalityInputProps } from "./input";
+import { VitalityInputProps } from "@/components/global/input";
 
 export default function TextArea({ ...props }: VitalityInputProps): JSX.Element {
    const textArea = useRef<HTMLTextAreaElement | null>(null);
