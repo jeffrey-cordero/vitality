@@ -98,6 +98,27 @@ function WorkoutRow(props: WorkoutRowProps) {
       };
    }, [selected, workout, updateNotification, state, dispatch]);
 
+   const workoutTags = useMemo(() => {
+      return workout.tagIds.map((tagId: string) => {
+         // Fetch tag using id
+         const tag: Tag = state.inputs.tags.data.dictionary[tagId];
+
+         return (
+            // Undefined in case of removal
+            tag !== undefined &&
+            <div
+               className = {clsx("px-3 py-1 m-2 rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
+               style = {{
+                  backgroundColor: tag.color
+               }}
+               key = {tag.id}
+            >
+               {tag.title}
+            </div>
+         );
+      });
+   }, [workout, state.inputs.tags.data.dictionary]);
+
    return (
       <tr
          className = "bg-white border-b hover:bg-gray-50 overflow-x-auto"
@@ -120,21 +141,7 @@ function WorkoutRow(props: WorkoutRowProps) {
          </td>
          <td className = "px-6 py-4">
             <div className = "flex flex-wrap justify-start items-center gap-2 max-w-[10rem]">
-               {
-                  workout.tags.map((tag: Tag) => {
-                     return (
-                        <div
-                           className = {clsx("px-3 py-1 m-2 rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
-                           style = {{
-                              backgroundColor: tag.color
-                           }}
-                           key = {tag.id}
-                        >
-                           {tag.title}
-                        </div>
-                     );
-                  })
-               }
+               {workoutTags}
             </div>
          </td>
          <th scope = "row" className = "w-[10rem] h-[10rem] font-normal whitespace-nowrap overflow-hidden text-ellipsis">
@@ -151,7 +158,6 @@ function WorkoutRow(props: WorkoutRowProps) {
                   <div className = "rounded-2xl flex justify-center items-center">
                      <FontAwesomeIcon icon = {faPersonRunning} className = "text-primary cursor-pointer text-3xl" />
                   </div>
-
                )
             }
 
@@ -185,8 +191,8 @@ function WorkoutRow(props: WorkoutRowProps) {
                               ...state.inputs.tags,
                               data: {
                                  ...state.inputs.tags.data,
-                                 // Display all selected tags, if any
-                                 selected: workout.tags
+                                 // Display all selected tags by their id's, if applicable
+                                 selected: workout.tagIds.map((tagId: string) => state.inputs.tags.data.dictionary[tagId])
                               }
                            }
                         }

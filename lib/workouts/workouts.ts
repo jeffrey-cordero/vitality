@@ -14,16 +14,8 @@ export type Workout = {
   date: Date;
   image: string;
   description: string;
-  tags: Tag[];
+  tagIds: string[];
 };
-
-// Define the Zod schema for the Tag type
-const TagSchema = z.object({
-   user_id: z.string(),
-   id: z.string(),
-   title: z.string(),
-   color: z.string()
-});
 
 const urlRegex =
   /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
@@ -46,7 +38,7 @@ const workoutsSchema = z.object({
       .trim()
       .min(1, { message: "A title must be at least 1 character" }),
    date: z.date().max(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), {
-      message: "A birthday must not be after today"
+      message: "A workout date must not be after today"
    }),
    description: z.string().optional().or(z.literal("")),
    image: z
@@ -55,11 +47,11 @@ const workoutsSchema = z.object({
          message: "Invalid URL or media path"
       })
       .or(z.literal("")),
-   tags: z.array(TagSchema).optional()
+   tags: z.array(z.string()).optional()
 });
 
 // Turn combined tag and exercise rows as a uniform Workout type
-function formatWorkout(workout: any): Workout {
+function formatWorkout(workout): Workout {
    return {
       id: workout.id,
       user_id: workout.user_id,
@@ -67,8 +59,8 @@ function formatWorkout(workout: any): Workout {
       date: workout.date,
       description: workout.description ?? "",
       image: workout.image ?? "",
-      tags: workout.workout_applied_tags.map(
-         (applied_tag: any) => applied_tag.workout_tags
+      tagIds: workout.workout_applied_tags.map(
+         (applied_tag: any) => applied_tag.workout_tags.id
       )
    };
 }
@@ -85,11 +77,10 @@ export async function addWorkout(
          const errors = fields.error.flatten();
 
          // Only error caught should be related to invalid UUID format for ID
-         if (
-            !(
-               errors.fieldErrors.id !== undefined &&
+         if (!(
+            errors.fieldErrors.id !== undefined &&
           Object.keys(errors.fieldErrors).length == 1
-            )
+         )
          ) {
             return sendErrorMessage(
                "Error",
@@ -109,9 +100,9 @@ export async function addWorkout(
             description: workout.description,
             // Nested create operation to add entries to the workout_applied_tags table
             workout_applied_tags: {
-               create: workout.tags.map((tag: Tag) => {
+               create: workout.tagIds.map((tagId: string) => {
                   return {
-                     tag_id: tag.id
+                     tag_id: tagId
                   };
                })
             }
@@ -164,7 +155,7 @@ export async function editWorkout(workout: Workout): Promise<VitalityResponse<Wo
          const existingTagIds: string[] = existingWorkout?.workout_applied_tags.map(tag => tag.tag_id) || [];
 
          // Determine tags to connect and disconnect
-         const newTagIds: string[] = workout.tags.map(tag => tag.id);
+         const newTagIds: string[] = workout.tagIds;
          const tagsToRemove: string[] = existingTagIds.filter(id => !(newTagIds).includes(id));
          const tagsToAdd: string[] = newTagIds.filter(id => !(existingTagIds).includes(id));
 
@@ -390,17 +381,17 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
 export async function updateWorkoutTag(
    tag: Tag,
    method: "update" | "delete"
-): Promise<VitalityResponse<null>> {
+): Promise<VitalityResponse<Tag>> {
    const fields = workoutTagSchema.safeParse(tag);
 
    // Handle invalid tag id's and user fields
    if (tag.id === undefined) {
-      return sendErrorMessage("Failure", "Missing Workout Tag ID", null, {});
+      return sendErrorMessage("Failure", "Missing Workout Tag ID", tag, {});
    } else if (!fields.success) {
       return sendErrorMessage(
          "Error",
          "Invalid workout tag fields",
-         null,
+         tag,
          fields.error.flatten().fieldErrors
       );
    }
@@ -409,27 +400,27 @@ export async function updateWorkoutTag(
       // Handle update/delete workout tags
       switch (method) {
       case "update":
-         await prisma.workout_tags.update({
+         const newTag = await prisma.workout_tags.update({
             where: {
                id: tag.id
             },
             data: tag
          });
 
-         return sendSuccessMessage("Successfully updated workout tag", null);
+         return sendSuccessMessage("Successfully updated workout tag", newTag);
       case "delete":
-         await prisma.workout_tags.delete({
+         const deletedTag = await prisma.workout_tags.delete({
             where: {
                id: tag.id
             }
          });
 
-         return sendSuccessMessage("Successfully deleted workout tag", null);
+         return sendSuccessMessage("Successfully deleted workout tag", deletedTag);
       default:
          return sendErrorMessage(
             "Failure",
             "Invalid Workout Tag Update Method",
-            null,
+            tag,
             {}
          );
       }
@@ -444,7 +435,7 @@ export async function updateWorkoutTag(
          return sendErrorMessage(
             "Error",
             "Workout tag title already exists",
-            null,
+            tag,
             {
                title: ["Workout tag title already exists"]
             }
@@ -453,7 +444,7 @@ export async function updateWorkoutTag(
          return sendErrorMessage(
             "Failure",
             "Internal Server Error. Please try again later.",
-            null,
+            tag,
             {}
          );
       }

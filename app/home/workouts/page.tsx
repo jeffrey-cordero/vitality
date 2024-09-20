@@ -54,6 +54,8 @@ const workouts: VitalityState = {
          value: null,
          error: null,
          data: {
+            // [tag.id] -> tag
+            dictionary: {},
             options: [],
             selected: [],
             inputs: {
@@ -113,7 +115,9 @@ export default function Page() {
                      ...state.inputs.tags,
                      data: {
                         ...state.inputs.tags.data,
-                        options: tagsData
+                        options: tagsData,
+                        selected: [],
+                        dictionary: Object.fromEntries(tagsData.map(tag => [tag.id, tag]))
                      }
                   },
                   workouts: {
@@ -186,9 +190,6 @@ export default function Page() {
                />
             </PopUp>
          </div>
-         {
-
-         }
          <WorkoutTable state = {state} dispatch = {dispatch} reset = {handleReset}/>
       </main >
    );

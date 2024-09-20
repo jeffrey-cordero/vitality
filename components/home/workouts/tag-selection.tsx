@@ -104,7 +104,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
          color: input.data.inputs.editColor.value.trim()
       };
 
-      const response: VitalityResponse<null> = await updateWorkoutTag(payload, method);
+      const response: VitalityResponse<Tag> = await updateWorkoutTag(payload, method);
 
       if (response.status !== "Success") {
          // Add respective errors, if any
@@ -130,15 +130,24 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
       } else {
          // Display simple success message and update tag options (update or delete)
          if (state !== undefined) {
-            const { options, selected } = state.inputs.tags.data;
+            const { options, selected, dictionary } = state.inputs.tags.data;
+            const returnedTag = response.body.data;
 
             const mapOrFilter = method === "update" ?
-               (tag: Tag) => (tag.id === payload.id ? payload : tag) :
-               (tag: Tag) => tag.id !== payload.id;
+               (tag: Tag) => (tag && tag.id === returnedTag.id ? returnedTag : tag) :
+               (tag: Tag) => (tag !== undefined && tag.id !== returnedTag.id);
 
             const newOptions: Tag[] = method === "update" ? [...options.map(mapOrFilter)] : [...options.filter(mapOrFilter)];
             const newSelected: Tag[] = method === "update" ? [...selected.map(mapOrFilter)] : [...selected.filter(mapOrFilter)];
+            const newDictionary: { [key: string]: Tag } = { ...dictionary };
 
+            if (method === "update") {
+               newDictionary[returnedTag.id] = returnedTag;
+            } else {
+               delete newDictionary[returnedTag.id];
+            }
+
+            console.log(newDictionary);
             dispatch({
                type: "updateState",
                value: {
@@ -150,7 +159,8 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
                         data: {
                            ...state.inputs.tags.data,
                            options: newOptions,
-                           selected: newSelected
+                           selected: newSelected,
+                           dictionary: newDictionary
                         }
                      }
                   },
@@ -364,7 +374,7 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
 };
 
 export function TagSelection(props: VitalityInputProps): JSX.Element {
-   const { input, state } = props;
+   const { input, state, dispatch } = props;
 
    // Fetch user information from context
    const { user } = useContext(AuthenticationContext);
@@ -381,8 +391,6 @@ export function TagSelection(props: VitalityInputProps): JSX.Element {
    const selectedOptions: Set<Tag> = useMemo(() => {
       return new Set<Tag>(selected);
    }, [selected]);
-
-   console.log(selectedOptions);
 
    const searchOptions = useMemo(() => {
       return options.filter((tag: Tag) => !(selectedOptions.has(tag)));
@@ -410,7 +418,7 @@ export function TagSelection(props: VitalityInputProps): JSX.Element {
             <ul className = "flex flex-col flex-wrap justify-center items-center">
                {
                   results.length > 0 ? results.map((tag: Tag) => {
-                     return <WorkoutTag {...props} tag = {tag} selected = {false} key = {tag.id} />;
+                     return <WorkoutTag {...props} state = {state} dispatch = {dispatch} tag = {tag} selected = {false} key = {tag.id} />;
                   }) : search.trim().length > 0 && user !== undefined && tagsByTitle[search] === undefined && (
                      <CreateWorkoutTag {...props} search = {search} userId = {user.id} />
                   )

@@ -25,10 +25,12 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
    // Upon creating a new workout, ensure we can edit it
    const [edit, setEdit] = useState<boolean>(workout !== undefined);
 
-   const handleSubmission = useCallback(async(event: React.MouseEvent<HTMLButtonElement>, method: "update" | "delete") => {
+   const handleSubmission = async(event: React.MouseEvent<HTMLButtonElement>, method: "update" | "delete") => {
       event.stopPropagation();
 
       if (user !== undefined) {
+         const { selected, dictionary } = state.inputs.tags.data;
+
          const payload: Workout = {
             user_id: user.id,
             id: workout !== undefined ? workout.id : "",
@@ -36,7 +38,8 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             date: new Date(state.inputs.date.value),
             image: state.inputs.image.value,
             description: state.inputs.description.value.trim(),
-            tags: state.inputs.tags.data.selected
+            // Ensure only valid tag id's are sent to the backend, which may be removed from other workout forms
+            tagIds: selected.map((selected: Tag) => selected?.id).filter((id: string) => dictionary[id] !== undefined)
          };
 
          // We request to either add or update the workout instance
@@ -46,19 +49,20 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
          // Add new workout in response body to state and display notification message
          if (response.status === "Success") {
             let newWorkouts: Workout[] = [];
+            const returnedWorkout: Workout = response.body.data;
 
             if (workout === undefined) {
                // New workout added
-               newWorkouts = [...state.inputs.workouts.value, response.body.data];
+               newWorkouts = [...state.inputs.workouts.value, returnedWorkout];
                // Edit the workout after construction
                setEdit(true);
             } else if (method === "delete") {
                // Remove the existing workout
-               newWorkouts = [...state.inputs.workouts.value].filter((workout: Workout) => workout.id !== payload.id);
+               newWorkouts = [...state.inputs.workouts.value].filter((workout: Workout) => workout.id !== returnedWorkout.id);
             } else {
                // Update the existing workout
                newWorkouts = [...state.inputs.workouts.value].map((workout: Workout) => {
-                  return workout.id === payload.id ? response.body.data : workout;
+                  return workout.id === returnedWorkout.id ? returnedWorkout : workout;
                });
             }
 
@@ -91,7 +95,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             });
          }
       }
-   }, [user, updateNotification, props]);
+   };
 
    return (
       <div className = "relative">
@@ -116,7 +120,8 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                {
                   state.inputs.tags.data.selected.map((selected: Tag) => {
                      return (
-                        <WorkoutTag input = {state.inputs.tags} label = "&#x1F50E; Tags" dispatch = {dispatch} tag = {selected} selected = {true} key = {selected.id} />
+                        selected !== undefined &&
+                           <WorkoutTag input = {state.inputs.tags} label = "&#x1F50E; Tags" state = {state} dispatch = {dispatch} tag = {selected} selected = {true} key = {selected.id} />
                      );
                   })
                }
