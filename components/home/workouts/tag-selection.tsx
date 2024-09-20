@@ -38,11 +38,13 @@ interface CreateWorkoutTagProps extends VitalityInputProps {
 }
 
 function CreateWorkoutTag(props: CreateWorkoutTagProps) {
+   const { input, search, userId, dispatch } = props;
+
    const handleSubmission = async() => {
       const tag: Tag = {
-         user_id: props.userId,
+         user_id: userId,
          id: "",
-         title: props.search,
+         title: search,
          color: "rgb(90, 90, 90)"
       };
 
@@ -50,21 +52,21 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
 
       if (!(response.status === "Success")) {
          // Display the respective error message
-         props.dispatch({
+         dispatch({
             type: "updateStatus",
             value: response
          });
       } else {
          // Add the new tag (search pattern) to the overall user options
-         props.dispatch({
+         dispatch({
             type: "updateInput",
             value: {
-               ...props.input,
+               ...input,
                data: {
-                  ...props.data,
+                  ...input.data,
                   // Resulting data from backend is the tag with the unique ID in UUID format
-                  options: [...props.input.data.options, response.body.data],
-                  selected: [...props.input.data.selected, response.body.data]
+                  options: [...input.data.options, response.body.data],
+                  selected: [...input.data.selected, response.body.data]
                }
             }
          });
@@ -85,39 +87,40 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
          }
          }
       >
-         <h1>Create <span className = "inline-block px-3 py-1 rounded-full text-sm font-bold text-white" style = {{ backgroundColor: "rgb(90, 90, 90)" }}>{props.search}</span></h1>
+         <h1>Create <span className = "inline-block px-3 py-1 rounded-full text-sm font-bold text-white" style = {{ backgroundColor: "rgb(90, 90, 90)" }}>{search}</span></h1>
       </div>
    );
 }
 
 function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
+   const { input, tag, state, dispatch } = props;
    const { updateNotification } = useContext(NotificationContext);
 
    const handleSubmission = async(method: "update" | "delete") => {
       const payload: Tag = {
-         user_id: props.tag.user_id,
-         id: props.tag.id,
-         title: props.input.data.inputs.editTitle.value.trim(),
-         color: props.input.data.inputs.editColor.value.trim()
+         user_id: tag.user_id,
+         id: tag.id,
+         title: input.data.inputs.editTitle.value.trim(),
+         color: input.data.inputs.editColor.value.trim()
       };
 
       const response: VitalityResponse<null> = await updateWorkoutTag(payload, method);
 
       if (response.status !== "Success") {
          // Add respective errors, if any
-         props.dispatch({
+         dispatch({
             type: "updateInput",
             value: {
-               ...props.input,
+               ...input,
                data: {
-                  ...props.data,
+                  ...input.data,
                   inputs: {
                      editTitle: {
-                        ...props.input.data.inputs.editTitle,
+                        ...input.data.inputs.editTitle,
                         error: response.body.errors["title"] ?? null
                      },
                      editColor: {
-                        ...props.input.data.inputs.editColor,
+                        ...input.data.inputs.editColor,
                         error: response.body.errors["color"] ?? null
                      }
                   }
@@ -126,8 +129,8 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
          });
       } else {
          // Display simple success message and update tag options (update or delete)
-         if (props.state !== undefined) {
-            const { options, selected } = props.state.inputs.tags.data;
+         if (state !== undefined) {
+            const { options, selected } = state.inputs.tags.data;
 
             const mapOrFilter = method === "update" ?
                (tag: Tag) => (tag.id === payload.id ? payload : tag) :
@@ -136,16 +139,16 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
             const newOptions: Tag[] = method === "update" ? [...options.map(mapOrFilter)] : [...options.filter(mapOrFilter)];
             const newSelected: Tag[] = method === "update" ? [...selected.map(mapOrFilter)] : [...selected.filter(mapOrFilter)];
 
-            props.dispatch({
+            dispatch({
                type: "updateState",
                value: {
                   status: "Success",
                   inputs: {
-                     ...props.state.inputs,
+                     ...state.inputs,
                      tags: {
-                        ...props.state.inputs.tags,
+                        ...state.inputs.tags,
                         data: {
-                           ...props.state.inputs.tags.data,
+                           ...state.inputs.tags.data,
                            options: newOptions,
                            selected: newSelected
                         }
@@ -179,19 +182,19 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
          </div>
          {/* Nested input props */}
          <Input
-            input = {props.input.data.inputs.editTitle} label = "&#x1F58A; Title" dispatch = {props.dispatch}
+            input = {input.data.inputs.editTitle} label = "&#x1F58A; Title" dispatch = {dispatch}
             onChange = {(event: React.ChangeEvent<HTMLInputElement>) => {
                // Update editing title value
-               props.dispatch({
+               dispatch({
                   type: "updateInput",
                   value: {
-                     ...props.input,
+                     ...input,
                      data: {
-                        ...props.input.data,
+                        ...input.data,
                         inputs: {
-                           ...props.input.data.inputs,
+                           ...input.data.inputs,
                            editTitle: {
-                              ...props.input.data.inputs.editTitle,
+                              ...input.data.inputs.editTitle,
                               value: event.target.value,
                               error: null
                            }
@@ -208,16 +211,16 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
 
                   const changeColor = () => {
                      // Update editing color value
-                     props.dispatch({
+                     dispatch({
                         type: "updateInput",
                         value: {
-                           ...props.input,
+                           ...input,
                            data: {
-                              ...props.input.data,
+                              ...input.data,
                               inputs: {
-                                 ...props.input.data.inputs,
+                                 ...input.data.inputs,
                                  editColor: {
-                                    ...props.input.data.inputs.editColor,
+                                    ...input.data.inputs.editColor,
                                     value: color
                                  }
                               }
@@ -230,8 +233,8 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
                      <div
                         style = {{ backgroundColor: color }}
                         className = {clsx("cursor-pointer w-full h-[3rem] border-[3px] rounded-sm p-3 text-white text-center", {
-                           "border-primary scale-[1.02]": props.input.data.inputs.editColor.value === color,
-                           "border-white": props.input.data.inputs.editColor.value !== color
+                           "border-primary scale-[1.02]": input.data.inputs.editColor.value === color,
+                           "border-white": input.data.inputs.editColor.value !== color
                         })}
                         onClick = {changeColor}
                         key = {color}>
@@ -241,9 +244,9 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
                })
             }
             {/* Potential error message for invalid color in payload */}
-            {props.input.data.inputs.editColor.error !== null &&
+            {input.data.inputs.editColor.error !== null &&
                <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                  <p className = "text-red-500 font-bold input-error"> {props.input.data.inputs.editColor.error[0]} </p>
+                  <p className = "text-red-500 font-bold input-error"> {input.data.inputs.editColor.error[0]} </p>
                </div>
             }
          </div>
@@ -273,17 +276,19 @@ export interface WorkoutTagProps extends VitalityInputProps {
 }
 
 export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
+   const { input, tag, selected, dispatch } = props;
+
    // Handle adding or removing a selected tag
    const handleOnClick = (adding: boolean) => {
-      props.dispatch({
+      dispatch({
          type: "updateInput",
          value: {
-            ...props.input,
+            ...input,
             data: {
-               ...props.input.data,
+               ...input.data,
                // Add to selected options, if applicable, or remove
-               selected: adding ? [...props.input.data.selected, props.tag]
-                  : [...props.input.data.selected].filter((other: Tag) => (other) !== props.tag)
+               selected: adding ? [...input.data.selected, tag]
+                  : [...input.data.selected].filter((other: Tag) => (other) !== tag)
             }
          }
       });
@@ -293,20 +298,20 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
       <li
          className = {clsx("px-3 py-1 m-2 rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
          style = {{
-            backgroundColor: props.tag.color
+            backgroundColor: tag.color
          }}
-         key = {props.tag.id}
+         key = {tag.id}
       >
          <div
             className = "flex justify-center items-center gap-3 p-1"
             onClick = {() => {
-               if (!(props.selected)) {
+               if (!(selected)) {
                   handleOnClick(true);
                }
             }}
          >
             <div className = "cursor-pointer">
-               {props.tag.title}
+               {tag.title}
             </div>
             {
                <PopUp
@@ -316,21 +321,21 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
                         icon = {faGear}
                         onClick = {() => {
                            // Update edit tag information state
-                           props.dispatch({
+                           dispatch({
                               type: "updateInput",
                               value: {
-                                 ...props.input,
+                                 ...input,
                                  data: {
-                                    ...props.data,
+                                    ...input.data,
                                     inputs: {
                                        editTitle: {
-                                          ...props.input.data.inputs.editTitle,
-                                          value: props.tag.title,
+                                          ...input.data.inputs.editTitle,
+                                          value: tag.title,
                                           error: null
                                        },
                                        editColor: {
-                                          ...props.input.data.inputs.editColor,
-                                          value: props.tag.color,
+                                          ...input.data.inputs.editColor,
+                                          value: tag.color,
                                           error: null
                                        }
                                     }
@@ -346,7 +351,7 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
                </PopUp>
             }
             {
-               props.selected &&
+               selected &&
                <FontAwesomeIcon
                   onMouseDown = {() => handleOnClick(false)}
                   icon = {faXmark}
@@ -359,31 +364,34 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
 };
 
 export function TagSelection(props: VitalityInputProps): JSX.Element {
+   const { input, state } = props;
+
    // Fetch user information from context
    const { user } = useContext(AuthenticationContext);
 
    // Store overall and selected tags
-   const { options, selected } = props.input.data;
+   const { options, selected } = input.data;
 
    // Convert search string to lower case for case-insensitive comparison
-   const search = useMemo(() => {
-      return props.state?.inputs.search.value.trim().toLowerCase();
-   }, [props.state?.inputs.search]);
+   const search: string = useMemo(() => {
+      return state?.inputs.search.value.trim().toLowerCase();
+   }, [state?.inputs.search]);
 
    // Differentiate between selected and unselected options
-   const selectedOptions = useMemo(() => {
-      return new Set(selected);
+   const selectedOptions: Set<Tag> = useMemo(() => {
+      return new Set<Tag>(selected);
    }, [selected]);
+
+   console.log(selectedOptions);
 
    const searchOptions = useMemo(() => {
       return options.filter((tag: Tag) => !(selectedOptions.has(tag)));
    }, [options, selectedOptions]);
 
    // Search results
-   const results = useMemo(() => {
+   const results: Tag[] = useMemo(() => {
       return searchForTag(searchOptions, search);
    }, [searchOptions, search]);
-
 
    // Tags by title
    const tagsByTitle: { [title: string]: Tag } = useMemo(() => {

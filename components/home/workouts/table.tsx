@@ -1,9 +1,10 @@
 import clsx from "clsx";
+import Image from "next/image";
 import PopUp from "@/components/global/popup";
 import Button from "@/components/global/button";
-import WorkoutCard from "@/components/home/workouts/card";
+import WorkoutForm from "@/components/home/workouts/form";
 import { VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/state";
-import { faPencil, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faPencil, faPersonRunning, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { removeWorkouts, Tag, Workout } from "@/lib/workouts/workouts";
 import { Dispatch, useContext, useMemo } from "react";
@@ -25,72 +26,102 @@ function getWorkoutDate(date: Date) {
 }
 
 function WorkoutRow(props: WorkoutRowProps) {
+   const { workout, state, dispatch, reset } = props;
    const { updateNotification } = useContext(NotificationContext);
-   const selected: Set<Workout> = props.state.inputs.workouts.data.selected;
-   const formattedDate = useMemo(() => getWorkoutDate(new Date(props.workout.date)), [props.workout.date]);
+   const selected: Set<Workout> = state.inputs.workouts.data.selected;
+   const formattedDate = useMemo(() => getWorkoutDate(new Date(workout.date)), [workout.date]);
 
    const handleToggle = useMemo(() => {
       return () => {
          // Either add or remove from selected
          const newSelected: Set<Workout> = new Set(selected);
 
-         if (newSelected.has(props.workout)) {
-            newSelected.delete(props.workout);
+         if (newSelected.has(workout)) {
+            newSelected.delete(workout);
          } else {
-            newSelected.add(props.workout);
+            newSelected.add(workout);
          }
 
-         props.dispatch({
+         dispatch({
             type: "updateInput",
             value: {
-               ...props.state.inputs.workouts,
+               ...state.inputs.workouts,
                data: {
-                  ...props.state.inputs.workouts.data,
+                  ...state.inputs.workouts.data,
                   selected: newSelected
                }
             }
          });
       };
-   }, [props, selected]);
+   }, [state.inputs.workouts, workout, selected, dispatch]);
 
    const handleDelete = useMemo(async() => {
-      return async () => {
+      return async() => {
          // Remove the current or selected set of workout's
-            const response: VitalityResponse<number> = selected.size === 0
-            ? await removeWorkouts([props.workout]) : await removeWorkouts(Array.from(selected));
+         const size = selected.size == 0 ? 1 : selected.size;
+
+         const response: VitalityResponse<number> =
+            size == 1 ? await removeWorkouts([workout]) : await removeWorkouts(Array.from(selected));
+
+         if (response.body.data === size) {
+            // Clear selected and filter workouts list
+            const newWorkouts = [...state.inputs.workouts.value].filter((workout) => {
+               // Remove single or multiple workouts
+               return selected.size == 1 ? workout.id !== workout.id : !(selected.has(workout));
+            });
+
+            dispatch({
+               type: "updateState",
+               value: {
+                  ...state,
+                  inputs: {
+                     ...state.inputs,
+                     workouts: {
+                        ...state.inputs.workouts,
+                        value: newWorkouts,
+                        data: {
+                           ...state.inputs.workouts.data,
+                           // Clear selected workouts
+                           selected: new Set<Workout>()
+                        }
+                     }
+                  }
+               }
+            });
+         }
 
          // Display the success or failure notification to the user
          updateNotification({
             status: response.status,
             message: response.body.message
          });
-      }
-   }, [selected, props.workout, updateNotification]);
+      };
+   }, [selected, workout, updateNotification, state, dispatch]);
 
    return (
       <tr
-         className = "bg-white border-b hover:bg-gray-50 0"
-         key = {props.workout.id}>
+         className = "bg-white border-b hover:bg-gray-50 overflow-x-auto"
+         key = {workout.id}>
          <td className = "w-4 p-4">
             <div className = "flex items-center">
                <input
                   type = "checkbox"
                   className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                  checked = {props.state.inputs.workouts.data.selected.has(props.workout)}
+                  checked = {state.inputs.workouts.data.selected.has(workout)}
                   onChange = {() => handleToggle()}
                />
             </div>
          </td>
-         <th scope = "row" className = "px-6 py-4 font-normal whitespace-nowrap overflow-hidden text-ellipsis max-w-[30rem]">
-            {props.workout.title}
+         <th scope = "row" className = "px-6 py-4 font-normal whitespace-nowrap overflow-hidden text-ellipsis max-w-[10rem]">
+            {workout.title}
          </th>
-         <td className = "px-6 py-4 max-w-[15rem]">
+         <td className = "px-6 py-4">
             {formattedDate}
          </td>
-         <td className = "px-6 py-4 max-w-[50rem]">
-            <div className = "flex flex-wrap justify-start items-center gap-2">
+         <td className = "px-6 py-4">
+            <div className = "flex flex-wrap justify-start items-center gap-2 max-w-[10rem]">
                {
-                  props.workout.tags.map((tag: Tag) => {
+                  workout.tags.map((tag: Tag) => {
                      return (
                         <div
                            className = {clsx("px-3 py-1 m-2 rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
@@ -106,37 +137,56 @@ function WorkoutRow(props: WorkoutRowProps) {
                }
             </div>
          </td>
+         <th scope = "row" className = "w-[10rem] h-[10rem] font-normal whitespace-nowrap overflow-hidden text-ellipsis">
+            {
+               workout.image ? (
+                  <Image
+                     width = {1000}
+                     height = {1000}
+                     src = {workout.image}
+                     alt = "workout-image"
+                     className = {clsx(" object-cover object-center rounded-2xl cursor-pointer transition duration-300 ease-in-out")}
+                  />
+               ) : (
+                  <div className = "rounded-2xl flex justify-center items-center">
+                     <FontAwesomeIcon icon = {faPersonRunning} className = "text-primary cursor-pointer text-3xl" />
+                  </div>
+
+               )
+            }
+
+         </th>
          <td className = "px-6 py-4 min-w-[10rem]">
-            <div className = "flex justify-start items-center gap-4">
+            <div className = "flex justify-end pr-12 items-center gap-4">
                <PopUp
                   onClick = {() => {
                      // Update input states based on current workout
-                     props.dispatch({
+                     dispatch({
                         type: "initializeState",
                         value: {
                            title: {
-                              ...props.state.inputs.title,
-                              value: props.workout.title
+                              ...state.inputs.title,
+                              value: workout.title
                            },
                            date: {
-                              ...props.state.inputs.date,
+                              ...state.inputs.date,
                               // Convert to form MM-DD-YYYY for input value
-                              value: props.workout.date.toISOString().split("T")[0]
+                              value: workout.date.toISOString().split("T")[0]
                            },
                            image: {
-                              ...props.state.inputs.image,
-                              value: props.workout.image
+                              ...state.inputs.image,
+                              value: workout.image
                            },
                            description: {
-                              ...props.state.inputs.description,
-                              value: props.workout.description
+                              ...state.inputs.description,
+                              value: workout.description
                            },
                            tags: {
-                              ...props.state.inputs.tags,
+                              ...state.inputs.tags,
                               data: {
-                                 ...props.state.inputs.tags.data,
+                                 ...state.inputs.tags.data,
                                  // Display all selected tags, if any
-                                 selected: props.workout.tags
+                                 selected: workout.tags
                               }
                            }
                         }
@@ -146,10 +196,9 @@ function WorkoutRow(props: WorkoutRowProps) {
                      <FontAwesomeIcon icon = {faPencil} className = "text-primary cursor-pointer text-lg hover:scale-125 transition duration-300 ease-in-out" />
                   }
                >
-                  <WorkoutCard {...props} reset = {props.reset} />
+                  <WorkoutForm {...props} reset = {reset} />
                </PopUp>
                <PopUp
-                  className = "max-w-[40rem]"
                   cover = {
                      <FontAwesomeIcon
                         icon = {faTrashCan}
@@ -158,20 +207,23 @@ function WorkoutRow(props: WorkoutRowProps) {
                   }
                >
                   <div className = "flex flex-col justify-center items-center gap-4">
-                     <FontAwesomeIcon icon = {faTrashCan} className = "text-red-500 text-4xl"/>
+                     <FontAwesomeIcon icon = {faTrashCan} className = "text-red-500 text-4xl" />
                      <p className = "font-bold">
                         {
 
                            selected.size === 0 ?
                               "Are you sure you want to delete this item?"
-                              : `Are you sure you want to delete ${selected.size} workout${selected.size === 1 ? "" : "s"}?`
+                              :
+                              `Are you sure you want to delete ${selected.size} workout${selected.size === 1 ? "" : "s"}?`
                         }
                      </p>
                      <div className = "flex flex-row justify-center items-center gap-4 flex-1">
                         <Button type = "button" className = "w-[10rem] bg-gray-100 text-black mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out">
                            No, cancel
                         </Button>
-                        <Button type = "button" onClick = {() => handleDelete} className = "w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out">
+                        <Button type = "button" onClick = {async() => {
+                           (await handleDelete)();
+                        }} className = "w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out">
                            Yes, I&apos;m sure
                         </Button>
                      </div>
@@ -190,38 +242,39 @@ interface WorkoutTableProps {
 }
 
 export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
-   const selected: Set<Workout> = props.state.inputs.workouts.data.selected;
-   const workouts: Workout[] = props.state.inputs.workouts.value;
+   const { state, dispatch, reset } = props;
+   const selected: Set<Workout> = state.inputs.workouts.data.selected;
+   const workouts: Workout[] = state.inputs.workouts.value;
 
    const handleToggle = useMemo(() => {
       return () => {
          if (selected.size === workouts.length) {
             // Select no workouts
-            props.dispatch({
+            dispatch({
                type: "updateInput",
                value: {
-                  ...props.state.inputs.workouts,
+                  ...state.inputs.workouts,
                   data: {
-                     ...props.state.inputs.workouts.data,
+                     ...state.inputs.workouts.data,
                      selected: new Set<Workout>()
                   }
                }
             });
          } else {
             // Select all workouts
-            props.dispatch({
+            dispatch({
                type: "updateInput",
                value: {
-                  ...props.state.inputs.workouts,
+                  ...state.inputs.workouts,
                   data: {
-                     ...props.state.inputs.workouts.data,
+                     ...state.inputs.workouts.data,
                      selected: new Set(workouts)
                   }
                }
             });
          }
       };
-   }, [props, workouts, selected.size]);
+   }, [state.inputs.workouts, workouts, selected.size, dispatch]);
 
    return (
       <div className = "relative w-10/12 m-6 overflow-x-auto shadow-md sm:rounded-xl">
@@ -238,23 +291,25 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
                         />
                      </div>
                   </th>
-                  <th scope = "col" className = "text-base px-6 py-8">
+                  <th scope = "col" className = "text-base px-8 py-12">
                      Title
                   </th>
-                  <th scope = "col" className = "text-base px-6 py-8">
+                  <th scope = "col" className = "text-base px-8 py-12">
                      Date
                   </th>
-                  <th scope = "col" className = "text-base px-6 py-8">
+                  <th scope = "col" className = "text-base px-8 py-12">
                      Tags
                   </th>
-                  <th scope = "col" className = "text-base px-6 py-8">
-                     Action
+                  <th scope = "col" className = "text-base px-8 py-12">
+                     Image
+                  </th>
+                  <th scope = "col" className = "text-base px-8 py-12">
                   </th>
                </tr>
             </thead>
             <tbody>
                {workouts.map((workout: Workout) => (
-                  <WorkoutRow workout = {workout} state = {props.state} dispatch = {props.dispatch} key = {workout.id} reset = {props.reset} />
+                  <WorkoutRow workout = {workout} state = {state} dispatch = {dispatch} key = {workout.id} reset = {reset} />
                ))}
             </tbody>
          </table>

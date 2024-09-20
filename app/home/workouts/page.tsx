@@ -1,11 +1,11 @@
 "use client";
 import PopUp from "@/components/global/popup";
-import WorkoutCard from "@/components/home/workouts/card";
+import WorkoutForm from "@/components/home/workouts/form";
 import WorkoutTable from "@/components/home/workouts/table";
 import { AuthenticationContext } from "@/app/layout";
 import { fetchWorkoutsInformation, fetchWorkoutTags, Workout } from "@/lib/workouts/workouts";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { useCallback, useContext, useEffect, useMemo, useReducer } from "react";
+import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
 
 const workouts: VitalityState = {
@@ -96,6 +96,7 @@ const workouts: VitalityState = {
 export default function Page() {
    const { user } = useContext(AuthenticationContext);
    const [state, dispatch] = useReducer(formReducer, workouts);
+   const [view, setView] = useState<"table" | "cards">("table");
 
    const fetchWorkouts = useCallback(async() => {
       if (user !== undefined && state.inputs.workouts.data.fetched === false) {
@@ -159,7 +160,7 @@ export default function Page() {
 
 
    useEffect(() => {
-      if (!state.inputs.workouts.data.fetched) {
+      if (!(state.inputs.workouts.data.fetched)) {
          fetchWorkouts();
       }
    }, [fetchWorkouts, state.inputs.workouts.data.fetched, state.inputs.tags, state.inputs.workouts]);
@@ -173,11 +174,11 @@ export default function Page() {
          <div className = "flex justify-center w-full mx-auto">
             <PopUp text = "New Workout"
                className = "max-w-4xl"
-               buttonClassName = "min-w-[10rem] min-h-[2.9rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out"
+               buttonClassName = "w-[9.5rem] h-[2.9rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out"
                icon = {faPlus}
                onClick = {() => handleReset()}
             >
-               <WorkoutCard
+               <WorkoutForm
                   workout = {undefined}
                   state = {state}
                   dispatch = {dispatch}
@@ -185,6 +186,9 @@ export default function Page() {
                />
             </PopUp>
          </div>
+         {
+
+         }
          <WorkoutTable state = {state} dispatch = {dispatch} reset = {handleReset}/>
       </main >
    );

@@ -14,32 +14,33 @@ export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
 }
 
 export default function Input({ ...props }: VitalityInputProps): JSX.Element {
-   const input = useRef<HTMLInputElement>(null);
+   const { label, placeholder, input, dispatch, onChange } = props;
+   const inputRef = useRef<HTMLInputElement>(null);
    const passwordButton = useRef<SVGSVGElement | null>(null);
 
    return (
       <div className = "relative">
          <input
-            type = {props.input.type ?? ""}
-            id = {props.input.id}
-            value = {props.input.value}
-            ref = {input}
-            placeholder = {props.placeholder ?? ""}
+            type = {input.type ?? ""}
+            id = {input.id}
+            value = {input.value}
+            ref = {inputRef}
+            placeholder = {placeholder ?? ""}
             className = {clsx("peer p-4 block w-full rounded-lg text-sm font-semibold border-1 placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2",
                {
-                  "border-gray-200 border-[1.5px]": props.input.error === null,
-                  "border-red-500 border-[1.5px]": props.input.error !== null
+                  "border-gray-200 border-[1.5px]": input.error === null,
+                  "border-red-500 border-[1.5px]": input.error !== null
                })}
             onChange = {(event: ChangeEvent<HTMLInputElement>) => {
-               if (props.input.data.handlesChanges !== undefined) {
+               if (input.data.handlesChanges !== undefined) {
                   // Call the user-defined event handler (complex state)
-                  props.onChange?.call(null, event);
+                  onChange?.call(null, event);
                } else {
                   // Simple state
-                  props.dispatch({
+                  dispatch({
                      type: "updateInput",
                      value: {
-                        ...props.input,
+                        ...input,
                         value: event.target.value,
                         error: null
                      }
@@ -47,28 +48,28 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
                }
             }}
          />
-         {(props.input.type === "password" || passwordButton.current !== null) &&
+         {(input.type === "password" || passwordButton.current !== null) &&
             <Button type = "button" className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
                <FontAwesomeIcon
-                  icon = {props.input.type == "password" ? faEye : faEyeSlash}
+                  icon = {input.type == "password" ? faEye : faEyeSlash}
                   className = "flex-shrink-0 size-3.5 password-icon"
                   ref = {passwordButton}
                   onClick = {() => {
                      if (passwordButton.current !== null) {
-                        input.current?.focus();
+                        inputRef.current?.focus();
 
-                        if (props.input.type === "password") {
+                        if (input.type === "password") {
                            passwordButton.current.classList.add("text-primary");
                         } else {
                            passwordButton.current.classList.remove("text-primary");
 
                         }
 
-                        props.dispatch({
+                        dispatch({
                            type: "updateInput",
                            value: {
-                              ...props.input,
-                              type: props.input.type === "password" ? "text" : "password"
+                              ...input,
+                              type: input.type === "password" ? "text" : "password"
                            }
                         });
                      }
@@ -76,29 +77,29 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             </Button>
          }
          {
-            props.input.data.validIcon !== undefined &&
-               (props.input.data.validIcon || !(props.input.data.validIcon !== undefined) && props.input.error != null) && (
+            input.data.validIcon !== undefined &&
+               (input.data.validIcon || !(input.data.validIcon !== undefined) && input.error != null) && (
                <Button type = "button" className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
                   <FontAwesomeIcon
-                     icon = {props.input.data.validIcon ? faCircleCheck : faCircleXmark}
+                     icon = {input.data.validIcon ? faCircleCheck : faCircleXmark}
                      className = {clsx("flex-shrink-0 size-3.5 password-icon", {
-                        "text-green-500" : props.input.data.validIcon,
-                        "text-red-500": !(props.input.data.validIcon)
+                        "text-green-500" : input.data.validIcon,
+                        "text-red-500": !(input.data.validIcon)
                      })}
                   />
                </Button>
             )
          }
          <label
-            htmlFor = {props.input.id}
+            htmlFor = {input.id}
             className = {clsx("absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-gray-500 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500", {
-               "font-bold": props.label.includes("*")
+               "font-bold": label.includes("*")
             })}>
-            {props.label}
+            {label}
          </label>
-         {props.input.error !== null &&
+         {input.error !== null &&
             <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-               <p className = "text-red-500 font-bold input-error"> {props.input.error[0]} </p>
+               <p className = "text-red-500 font-bold input-error"> {input.error[0]} </p>
             </div>
          }
       </div>

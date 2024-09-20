@@ -23,21 +23,22 @@ interface ImageSelectionFormProps extends VitalityInputProps {
 }
 
 function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
+   const { input, dispatch, isValidImage, setIsValidImage } = props;
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(true);
 
    const handleURLSubmission = () => {
-      const isValidURL = verifyURL(props.input.value);
+      const isValidURL = verifyURL(input.value);
 
       if (!(isValidURL)) {
-         props.setIsValidImage(false);
-      } else if (!(props.isValidImage)) {
-         props.setIsValidImage(true);
+         setIsValidImage(false);
+      } else if (!(isValidImage)) {
+         setIsValidImage(true);
       }
 
-      props.dispatch({
+      dispatch({
          type: "updateInput",
          value: {
-            ...props.input,
+            ...input,
             error: isValidURL ? null : ["Invalid image URL"],
             data: {
                validIcon: isValidURL
@@ -83,18 +84,18 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                               key = {source}
                               alt = "workout-image"
                               className = {clsx("w-[12rem] h-[12rem] object-cover object-center shadow-inner rounded-xl cursor-pointer", {
-                                 "border-[4px] border-primary shadow-2xl scale-[1.05] transition duration-300 ease-in-out": props.input.value === source
+                                 "border-[4px] border-primary shadow-2xl scale-[1.05] transition duration-300 ease-in-out": input.value === source
                               })}
                               onClick = {() => {
                                  // All default images are valid images
-                                 if (!(props.isValidImage)) {
-                                    props.setIsValidImage(true);
+                                 if (!(isValidImage)) {
+                                    setIsValidImage(true);
                                  }
 
-                                 props.dispatch({
+                                 dispatch({
                                     type: "updateInput",
                                     value: {
-                                       ...props.input,
+                                       ...input,
                                        value: source,
                                        error: null,
                                        data: {
@@ -117,15 +118,15 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                      }
                   }}>
                   {
-                     props.isValidImage ? (
+                     isValidImage ? (
                         <div className = "flex justify-center m-6">
                            <Image
                               width = {1000}
                               height = {1000}
-                              src = {props.input.value}
+                              src = {input.value}
                               onError = {() => {
                                  // Resource removed, moved temporarily, etc.
-                                 props.setIsValidImage(false);
+                                 setIsValidImage(false);
                               }}
                               alt = "workout-image"
                               className = {clsx("w-[12rem] h-[12rem] object-cover object-center rounded-xl cursor-pointer transition duration-300 ease-in-out")}
@@ -133,7 +134,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                         </div>
                      ) :
                         // Show resource error on a valid image URL
-                        verifyURL(props.input.value) &&
+                        verifyURL(input.value) &&
                         <div className = "flex flex-col justify-center items-center text-center gap-4 m-6 font-bold">
                            <FontAwesomeIcon className = "text-red-500 text-4xl" icon = {faTriangleExclamation} />
                            <h2>Failed to fetch the desired image resource. Please try again.</h2>
@@ -143,14 +144,14 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                      {...props}
                      onChange = {(event: React.ChangeEvent<HTMLInputElement>) => {
                         // Ensure any changes to URL are verified on a new submission
-                        if (props.isValidImage) {
-                           props.setIsValidImage(false);
+                        if (isValidImage) {
+                           setIsValidImage(false);
                         }
 
-                        props.dispatch({
+                        dispatch({
                            type: "updateInput",
                            value: {
-                              ...props.input,
+                              ...input,
                               value: event.target.value,
                               error: null,
                               data: {
@@ -175,18 +176,19 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
 }
 
 export default function ImageSelection(props: VitalityInputProps): JSX.Element {
-   const [isValidImage, setIsValidImage] = useState<boolean>(verifyURL(props.input.value));
-   const selected = props.input.value !== "";
+   const { input } = props;
+   const [isValidImage, setIsValidImage] = useState<boolean>(verifyURL(input.value));
+   const selected = input.value !== "";
 
    return (
       <div>
          <ToolTip
             tooltipContent = {
-               verifyURL(props.input.value) && isValidImage ?
+               verifyURL(input.value) && isValidImage ?
                   <Image
                      width = {1000}
                      height = {1000}
-                     src = {props.input.value}
+                     src = {input.value}
                      onError = {() => {
                         setIsValidImage(false);
                      }}
@@ -204,9 +206,9 @@ export default function ImageSelection(props: VitalityInputProps): JSX.Element {
                         {selected ? "Edit Image" : "Add Image"}
                         <FontAwesomeIcon icon = {selected ? faPenToSquare : faPaperclip} />
                      </Button>
-                     {props.input.error !== null &&
+                     {input.error !== null &&
                         <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                           <p className = "text-red-500 font-bold input-error"> {props.input.error[0]} </p>
+                           <p className = "text-red-500 font-bold input-error"> {input.error[0]} </p>
                         </div>
                      }
                   </div>

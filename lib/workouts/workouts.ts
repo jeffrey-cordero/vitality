@@ -88,7 +88,7 @@ export async function addWorkout(
          if (
             !(
                errors.fieldErrors.id !== undefined &&
-               Object.keys(errors.fieldErrors).length == 1
+          Object.keys(errors.fieldErrors).length == 1
             )
          ) {
             return sendErrorMessage(
@@ -142,14 +142,84 @@ export async function addWorkout(
    }
 }
 
-export async function editWorkout(
-   workout: Workout,
-   method: "update" | "delete"
-): Promise<VitalityResponse<Workout>> {
-   console.log(method);
-   return sendSuccessMessage("Missing implementation", workout);
+export async function editWorkout(workout: Workout): Promise<VitalityResponse<Workout>> {
+   try {
+      const fields = workoutsSchema.safeParse(workout);
+
+      if (!(fields.success)) {
+         return sendErrorMessage(
+            "Error",
+            "Invalid workout fields",
+            workout,
+            fields.error.flatten().fieldErrors
+         );
+      } else {
+         // Fetch existing tags first for data integrity
+         const existingWorkout = await prisma.workouts.findUnique({
+            where: { id: workout.id },
+            include: { workout_applied_tags: true }
+         });
+
+         // Extract existing tag IDs
+         const existingTagIds: string[] = existingWorkout?.workout_applied_tags.map(tag => tag.tag_id) || [];
+
+         // Determine tags to connect and disconnect
+         const newTagIds: string[] = workout.tags.map(tag => tag.id);
+         const tagsToRemove: string[] = existingTagIds.filter(id => !(newTagIds).includes(id));
+         const tagsToAdd: string[] = newTagIds.filter(id => !(existingTagIds).includes(id));
+
+         // Update the workout with set operation
+         const updatedWorkout = await prisma.workouts.update({
+            where: { id: workout.id },
+            data: {
+               title: workout.title,
+               description: workout.description,
+               date: workout.date,
+               image: workout.image,
+               // Update tags
+               workout_applied_tags: {
+                  // Disconnect existing tags
+                  deleteMany: {
+                     tag_id: { in: tagsToRemove }
+                  },
+                  // Add new tag entries using tagsToAdd id's
+                  createMany: {
+                     data: tagsToAdd.map((tagId: string) => ({
+                        tag_id: tagId
+                     }))
+                  }
+               }
+            },
+            include: {
+               workout_applied_tags: {
+                  include: {
+                     workout_tags: true
+                  }
+               }
+            }
+         });
+
+
+         console.log(updatedWorkout);
+
+         return sendSuccessMessage(
+            "Successfully updated workout",
+            formatWorkout(updatedWorkout)
+         );
+      }
+   } catch (error) {
+      console.error(error);
+
+      return sendErrorMessage(
+         "Failure",
+         "Internal Server Error. Please try again later.",
+         workout,
+         {}
+      );
+   }
 }
 
+// Handle removing single or multiple workouts in a given list
 export async function removeWorkouts(
    workouts: Workout[]
 ): Promise<VitalityResponse<number>> {
@@ -270,9 +340,7 @@ export async function fetchWorkoutTags(userId: string): Promise<Tag[]> {
    }
 }
 
-export async function addWorkoutTag(
-   tag: Tag
-): Promise<VitalityResponse<Tag>> {
+export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
    const fields = workoutTagSchema.safeParse(tag);
 
    if (!fields.success) {
@@ -373,9 +441,14 @@ export async function updateWorkoutTag(
       error.meta?.target?.includes("title")
       ) {
       // Workout tags must be unique by their title
-         return sendErrorMessage("Error", "Workout tag title already exists", null, {
-            title: ["Workout tag title already exists"]
-         });
+         return sendErrorMessage(
+            "Error",
+            "Workout tag title already exists",
+            null,
+            {
+               title: ["Workout tag title already exists"]
+            }
+         );
       } else {
          return sendErrorMessage(
             "Failure",
