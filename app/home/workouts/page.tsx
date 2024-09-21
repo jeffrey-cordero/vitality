@@ -1,12 +1,13 @@
 "use client";
-import PopUp from "@/components/global/popup";
 import WorkoutForm from "@/components/home/workouts/form";
 import WorkoutTable from "@/components/home/workouts/table";
 import { AuthenticationContext } from "@/app/layout";
 import { fetchWorkoutsInformation, fetchWorkoutTags, Workout } from "@/lib/workouts/workouts";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
+import WorkoutCards from "@/components/home/workouts/cards";
+import Button from "@/components/global/button";
+import clsx from "clsx";
 
 const workouts: VitalityState = {
    status: "Initial",
@@ -176,21 +177,36 @@ export default function Page() {
             <p className = "text-lg text-gray-700 mt-4">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
          </div>
          <div className = "flex justify-center w-full mx-auto">
-            <PopUp text = "New Workout"
-               className = "max-w-4xl"
-               buttonClassName = "w-[9.5rem] h-[2.9rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out"
-               icon = {faPlus}
-               onClick = {() => handleReset()}
-            >
-               <WorkoutForm
-                  workout = {undefined}
-                  state = {state}
-                  dispatch = {dispatch}
-                  reset = {handleReset}
-               />
-            </PopUp>
+            <WorkoutForm
+               workout = {undefined}
+               state = {state}
+               dispatch = {dispatch}
+               reset = {handleReset}
+            />
          </div>
-         <WorkoutTable state = {state} dispatch = {dispatch} reset = {handleReset}/>
+         <div className = "relative w-10/12 overflow-x-auto flex justify-start items-center text-left gap-2">
+            <Button 
+               onClick={()=> setView("table")}
+               className={clsx("transition duration-300 ease-in-out", {
+                  "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
+               })}>
+               Table
+            </Button>
+            <Button 
+               onClick={()=> setView("cards")}
+               className={clsx("transition duration-300 ease-in-out", {
+                  "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
+               })}>
+               Cards
+            </Button>
+         </div>
+         {
+            view === "table" ? (
+               <WorkoutTable state = {state} dispatch = {dispatch} reset = {handleReset}/>
+            ) : (
+               <WorkoutCards state = {state} dispatch = {dispatch} reset = {handleReset} />
+            )
+         }
       </main >
    );
 }

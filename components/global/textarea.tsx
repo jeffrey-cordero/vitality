@@ -1,11 +1,12 @@
 "use client";
 import clsx from "clsx";
-import { ChangeEvent, useRef } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { VitalityInputProps } from "@/components/global/input";
 
 export default function TextArea(props: VitalityInputProps): JSX.Element {
    const { label, input, placeholder, dispatch } = props;
    const textArea = useRef<HTMLTextAreaElement | null>(null);
+   const [visible, setVisible] = useState<boolean>(false);
 
    const handleTextAreaOverflow = () => {
       const textarea = textArea.current;
@@ -15,6 +16,14 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
          textarea.style.height = `${textarea.scrollHeight}px`;
       }
    };
+
+   useEffect(() => {
+      // On mounting, handle overflow for large input values
+      if (!(visible)) {
+         handleTextAreaOverflow();
+         setVisible(true);
+      }
+   }, [visible]);
 
    return (
       <div className = "relative">

@@ -130,7 +130,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
       } else {
          // Display simple success message and update tag options (update or delete)
          if (state !== undefined) {
-            const { options, selected, dictionary } = state.inputs.tags.data;
+            const { options, selected } = state.inputs.tags.data;
             const returnedTag = response.body.data;
 
             const mapOrFilter = method === "update" ?
@@ -139,7 +139,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
 
             const newOptions: Tag[] = method === "update" ? [...options.map(mapOrFilter)] : [...options.filter(mapOrFilter)];
             const newSelected: Tag[] = method === "update" ? [...selected.map(mapOrFilter)] : [...selected.filter(mapOrFilter)];
-            const newDictionary: { [key: string]: Tag } = { ...dictionary };
+            const newDictionary: { [key: string]: Tag } = Object.fromEntries(newOptions.map(tag => [tag.id, tag]));
 
             if (method === "update") {
                newDictionary[returnedTag.id] = returnedTag;
@@ -147,7 +147,6 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
                delete newDictionary[returnedTag.id];
             }
 
-            console.log(newDictionary);
             dispatch({
                type: "updateState",
                value: {

@@ -4,7 +4,7 @@ import PopUp from "@/components/global/popup";
 import Button from "@/components/global/button";
 import WorkoutForm from "@/components/home/workouts/form";
 import { VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/state";
-import { faPencil, faPersonRunning, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faPencil, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { removeWorkouts, Tag, Workout } from "@/lib/workouts/workouts";
 import { Dispatch, useContext, useMemo } from "react";
@@ -18,11 +18,11 @@ interface WorkoutRowProps {
 }
 
 function getWorkoutDate(date: Date) {
-   const day = String(date.getDate()).padStart(2, "0");
    const month = String(date.getMonth() + 1).padStart(2, "0");
+   const day = String(date.getDate() + 1).padStart(2, "0");
    const year = date.getFullYear();
 
-   return `${day}/${month}/${year}`;
+   return `${month}/${day}/${year}`;
 }
 
 function WorkoutRow(props: WorkoutRowProps) {
@@ -31,72 +31,69 @@ function WorkoutRow(props: WorkoutRowProps) {
    const selected: Set<Workout> = state.inputs.workouts.data.selected;
    const formattedDate = useMemo(() => getWorkoutDate(new Date(workout.date)), [workout.date]);
 
-   const handleToggle = useMemo(() => {
-      return () => {
-         // Either add or remove from selected
-         const newSelected: Set<Workout> = new Set(selected);
+   const handleToggle = () => {
+      // Either add or remove from selected
+      const newSelected: Set<Workout> = new Set(selected);
 
-         if (newSelected.has(workout)) {
-            newSelected.delete(workout);
-         } else {
-            newSelected.add(workout);
+      if (newSelected.has(workout)) {
+         newSelected.delete(workout);
+      } else {
+         newSelected.add(workout);
+      }
+
+      dispatch({
+         type: "updateInput",
+         value: {
+            ...state.inputs.workouts,
+            data: {
+               ...state.inputs.workouts.data,
+               selected: newSelected
+            }
          }
+      });
+   };
+
+   const handleDelete = async() => {
+      // Remove the current or selected set of workout's
+      const size = selected.size == 0 ? 1 : selected.size;
+
+      const response: VitalityResponse<number> =
+         size == 1 ? await removeWorkouts([workout]) : await removeWorkouts(Array.from(selected));
+
+      if (response.body.data === size) {
+         // Clear selected and filter workouts list
+         const newWorkouts = [...state.inputs.workouts.value].filter((w: Workout) => {
+            // Remove single or multiple workouts
+            return size == 1 ? workout.id !== w.id : !(selected.has(w));
+         });
 
          dispatch({
-            type: "updateInput",
+            type: "updateState",
             value: {
-               ...state.inputs.workouts,
-               data: {
-                  ...state.inputs.workouts.data,
-                  selected: newSelected
-               }
-            }
-         });
-      };
-   }, [state.inputs.workouts, workout, selected, dispatch]);
-
-   const handleDelete = useMemo(async() => {
-      return async() => {
-         // Remove the current or selected set of workout's
-         const size = selected.size == 0 ? 1 : selected.size;
-
-         const response: VitalityResponse<number> =
-            size == 1 ? await removeWorkouts([workout]) : await removeWorkouts(Array.from(selected));
-
-         if (response.body.data === size) {
-            // Clear selected and filter workouts list
-            const newWorkouts = [...state.inputs.workouts.value].filter((workout) => {
-               // Remove single or multiple workouts
-               return selected.size == 1 ? workout.id !== workout.id : !(selected.has(workout));
-            });
-
-            dispatch({
-               type: "updateState",
-               value: {
-                  ...state,
-                  inputs: {
-                     ...state.inputs,
-                     workouts: {
-                        ...state.inputs.workouts,
-                        value: newWorkouts,
-                        data: {
-                           ...state.inputs.workouts.data,
-                           // Clear selected workouts
-                           selected: new Set<Workout>()
-                        }
+               ...state,
+               inputs: {
+                  ...state.inputs,
+                  workouts: {
+                     ...state.inputs.workouts,
+                     value: newWorkouts,
+                     data: {
+                        ...state.inputs.workouts.data,
+                        // Clear selected workouts
+                        selected: new Set<Workout>()
                      }
                   }
                }
-            });
-         }
-
-         // Display the success or failure notification to the user
-         updateNotification({
-            status: response.status,
-            message: response.body.message
+            }
          });
-      };
-   }, [selected, workout, updateNotification, state, dispatch]);
+      }
+
+      // Display the success or failure notification to the user
+      updateNotification({
+         status: response.status,
+         message: response.body.message
+      });
+
+   };
 
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
@@ -140,11 +137,11 @@ function WorkoutRow(props: WorkoutRowProps) {
             {formattedDate}
          </td>
          <td className = "px-6 py-4">
-            <div className = "flex flex-wrap justify-start items-center gap-2 max-w-[10rem]">
+            <div className = "flex flex-row flex-wrap justify-start items-center gap-2 max-w-[30rem]">
                {workoutTags}
             </div>
          </td>
-         <th scope = "row" className = "w-[10rem] h-[10rem] font-normal whitespace-nowrap overflow-hidden text-ellipsis">
+         <th scope = "row" className = "w-[5rem] h-[5rem] p-3 font-normal whitespace-nowrap overflow-hidden text-ellipsis">
             {
                workout.image ? (
                   <Image
@@ -152,58 +149,16 @@ function WorkoutRow(props: WorkoutRowProps) {
                      height = {1000}
                      src = {workout.image}
                      alt = "workout-image"
-                     className = {clsx(" object-cover object-center rounded-2xl cursor-pointer transition duration-300 ease-in-out")}
+                     className = {clsx("object-cover object-center rounded-2xl cursor-pointer transition duration-300 ease-in-out")}
                   />
                ) : (
-                  <div className = "rounded-2xl flex justify-center items-center">
-                     <FontAwesomeIcon icon = {faPersonRunning} className = "text-primary cursor-pointer text-3xl" />
-                  </div>
+                  <div className = "rounded-2xl flex justify-center items-center" />
                )
             }
-
          </th>
          <td className = "px-6 py-4 min-w-[10rem]">
             <div className = "flex justify-end pr-12 items-center gap-4">
-               <PopUp
-                  onClick = {() => {
-                     // Update input states based on current workout
-                     dispatch({
-                        type: "initializeState",
-                        value: {
-                           title: {
-                              ...state.inputs.title,
-                              value: workout.title
-                           },
-                           date: {
-                              ...state.inputs.date,
-                              // Convert to form MM-DD-YYYY for input value
-                              value: workout.date.toISOString().split("T")[0]
-                           },
-                           image: {
-                              ...state.inputs.image,
-                              value: workout.image
-                           },
-                           description: {
-                              ...state.inputs.description,
-                              value: workout.description
-                           },
-                           tags: {
-                              ...state.inputs.tags,
-                              data: {
-                                 ...state.inputs.tags.data,
-                                 // Display all selected tags by their id's, if applicable
-                                 selected: workout.tagIds.map((tagId: string) => state.inputs.tags.data.dictionary[tagId])
-                              }
-                           }
-                        }
-                     });
-                  }}
-                  cover = {
-                     <FontAwesomeIcon icon = {faPencil} className = "text-primary cursor-pointer text-lg hover:scale-125 transition duration-300 ease-in-out" />
-                  }
-               >
-                  <WorkoutForm {...props} reset = {reset} />
-               </PopUp>
+               <WorkoutForm {...props} reset = {reset} />
                <PopUp
                   cover = {
                      <FontAwesomeIcon
@@ -218,7 +173,7 @@ function WorkoutRow(props: WorkoutRowProps) {
                         {
 
                            selected.size === 0 ?
-                              "Are you sure you want to delete this item?"
+                              "Are you sure you want to delete this workout?"
                               :
                               `Are you sure you want to delete ${selected.size} workout${selected.size === 1 ? "" : "s"}?`
                         }
@@ -227,9 +182,7 @@ function WorkoutRow(props: WorkoutRowProps) {
                         <Button type = "button" className = "w-[10rem] bg-gray-100 text-black mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out">
                            No, cancel
                         </Button>
-                        <Button type = "button" onClick = {async() => {
-                           (await handleDelete)();
-                        }} className = "w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out">
+                        <Button type = "button" onClick = {async() => handleDelete()} className = "w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out">
                            Yes, I&apos;m sure
                         </Button>
                      </div>
@@ -297,19 +250,19 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
                         />
                      </div>
                   </th>
-                  <th scope = "col" className = "text-base px-8 py-12">
+                  <th scope = "col" className = "text-base p-6">
                      Title
                   </th>
-                  <th scope = "col" className = "text-base px-8 py-12">
+                  <th scope = "col" className = "text-base p-6">
                      Date
                   </th>
-                  <th scope = "col" className = "text-base px-8 py-12">
+                  <th scope = "col" className = "text-base p-6">
                      Tags
                   </th>
-                  <th scope = "col" className = "text-base px-8 py-12">
+                  <th scope = "col" className = "text-base text-center p-6">
                      Image
                   </th>
-                  <th scope = "col" className = "text-base px-8 py-12">
+                  <th scope = "col" className = "text-base p-6">
                   </th>
                </tr>
             </thead>

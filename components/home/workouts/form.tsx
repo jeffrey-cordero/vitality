@@ -5,12 +5,14 @@ import ImageSelection from "@/components/home/workouts/image-selection";
 import { TagSelection, WorkoutTag } from "@/components/home/workouts/tag-selection";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/state";
-import { addWorkout, editWorkout, Tag, Workout } from "@/lib/workouts/workouts";
-import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { addWorkout, updateWorkout, Tag, Workout } from "@/lib/workouts/workouts";
+import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTrash, faPencil, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Dispatch, useCallback, useContext, useState } from "react";
+import { Dispatch, useContext, useState } from "react";
+import PopUp from "@/components/global/popup";
 
 interface WorkoutFormProps {
+   cover?: React.ReactNode;
    workout: Workout | undefined;
    state: VitalityState;
    dispatch: Dispatch<VitalityAction<Workout>>;
@@ -18,14 +20,14 @@ interface WorkoutFormProps {
 }
 
 export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
-   const { workout, state, dispatch, reset } = props;
+   const { workout, cover, state, dispatch, reset } = props;
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
 
    // Upon creating a new workout, ensure we can edit it
    const [edit, setEdit] = useState<boolean>(workout !== undefined);
 
-   const handleSubmission = async(event: React.MouseEvent<HTMLButtonElement>, method: "update" | "delete") => {
+   const handleSubmission = async (event: React.MouseEvent<HTMLButtonElement>, method: "update" | "delete") => {
       event.stopPropagation();
 
       if (user !== undefined) {
@@ -44,14 +46,14 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
 
          // We request to either add or update the workout instance
          const response: VitalityResponse<Workout> = workout === undefined
-            ?  await addWorkout(payload) : await editWorkout(payload);
+            ? await addWorkout(payload) : await updateWorkout(payload);
 
          // Add new workout in response body to state and display notification message
          if (response.status === "Success") {
             let newWorkouts: Workout[] = [];
             const returnedWorkout: Workout = response.body.data;
 
-            if (workout === undefined) {
+            if (workout === undefined && method === "update") {
                // New workout added
                newWorkouts = [...state.inputs.workouts.value, returnedWorkout];
                // Edit the workout after construction
@@ -98,68 +100,129 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
    };
 
    return (
-      <div className = "relative">
-         <div className = "flex flex-col justify-center align-center text-center gap-3">
-            <FontAwesomeIcon
-               icon = {faPersonRunning}
-               className = "text-6xl text-primary mt-1"
-            />
-            <h1 className = "text-3xl font-bold text-black mb-2">
-               {edit ? "Edit" : "New"} Workout
-            </h1>
-         </div>
-         <div className = "relative mt-2 w-full flex flex-col justify-center align-center text-left gap-3">
-            <FontAwesomeIcon
-               icon = {faArrowRotateLeft}
-               onClick = {() => reset()}
-               className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
-            />
-            <Input input = {state.inputs.title} label = "&#x1F58A; Title" dispatch = {dispatch} />
-            <Input input = {state.inputs.date} label = "&#x1F4C5; Date" dispatch = {dispatch} />
-            <ul className = "flex flex-row flex-wrap justify-center items-center">
-               {
-                  state.inputs.tags.data.selected.map((selected: Tag) => {
-                     return (
-                        selected !== undefined &&
-                           <WorkoutTag input = {state.inputs.tags} label = "&#x1F50E; Tags" state = {state} dispatch = {dispatch} tag = {selected} selected = {true} key = {selected.id} />
-                     );
-                  })
+      <PopUp
+         text={workout !== undefined ? "Edit Workout" : "New Workout"}
+         className="max-w-4xl"
+         buttonClassName="w-[9.5rem] h-[2.9rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out"
+         icon={faPlus}
+         onClick={() => {
+            // Update input states based on current workout or to a new workout
+            dispatch({
+               type: "initializeState",
+               value: {
+                  title: {
+                     ...state.inputs.title,
+                     value: workout?.title ?? ""
+                  },
+                  date: {
+                     ...state.inputs.date,
+                     // Convert to form MM-DD-YYYY for input value
+                     value: workout?.date.toISOString().split("T")[0] ?? ""
+                  },
+                  image: {
+                     ...state.inputs.image,
+                     value: workout?.image ?? ""
+                  },
+                  description: {
+                     ...state.inputs.description,
+                     value: workout?.description ?? ""
+                  },
+                  tags: {
+                     ...state.inputs.tags,
+                     data: {
+                        ...state.inputs.tags.data,
+                        // Display all selected tags by their id's, if applicable
+                        selected: workout?.tagIds.map((tagId: string) => state.inputs.tags.data.dictionary[tagId]) ?? []
+                     }
+                  }
                }
-            </ul>
-            <Input input = {state.inputs.search} label = "&#x1F50E; Tags" dispatch = {dispatch} />
-            <TagSelection input = {state.inputs.tags} label = "Tags " dispatch = {dispatch} state = {state} />
-            <TextArea input = {state.inputs.description} label = "&#x1F5DE; Description" dispatch = {dispatch} />
-            <ImageSelection input = {state.inputs.image} label = "&#x1F587; URL" dispatch = {dispatch} />
-            {
-               edit && (
-                  <Button
-                     type = "button"
-                     className = "bg-red-500 text-white h-[2.6rem]"
-                     icon = {faTrash}
-                     onClick = {(event) => handleSubmission(event, "delete")}
-                  >
-                     Delete
-                  </Button>
-               )
-            }
-            <Button
-               type = "button"
-               className = "bg-primary text-white h-[2.6rem]"
-               icon = {props !== undefined ? faCloudArrowUp : faSquarePlus}
-               onClick = {(event) => handleSubmission(event, "update")}
-            >
+            });
+         }}
+         cover={
+            workout !== undefined ? cover ?? <FontAwesomeIcon icon={faPencil} className="text-primary cursor-pointer text-lg hover:scale-125 transition duration-300 ease-in-out" /> : undefined
+         }
+      >
+         <div className="relative">
+            <div className="flex flex-col justify-center align-center text-center gap-3">
+               <FontAwesomeIcon
+                  icon={faPersonRunning}
+                  className="text-6xl text-primary mt-1"
+               />
+               <h1 className="text-3xl font-bold text-black mb-2">
+                  {edit ? "Edit" : "New"} Workout
+               </h1>
+            </div>
+            <div className="relative mt-2 w-full flex flex-col justify-center align-center text-left gap-3">
+               <FontAwesomeIcon
+                  icon={faArrowRotateLeft}
+                  onClick={() => reset()}
+                  className="absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+               />
+               <Input input={state.inputs.title} label="&#x1F58A; Title" dispatch={dispatch} />
+               <Input input={state.inputs.date} label="&#x1F4C5; Date" dispatch={dispatch} />
+               <ul className="flex flex-row flex-wrap justify-center items-center">
+                  {
+                     state.inputs.tags.data.selected.map((selected: Tag) => {
+                        return (
+                           selected !== undefined &&
+                           <WorkoutTag input={state.inputs.tags} label="&#x1F50E; Tags" state={state} dispatch={dispatch} tag={selected} selected={true} key={selected.id} />
+                        );
+                     })
+                  }
+               </ul>
+               <Input input={state.inputs.search} label="&#x1F50E; Tags" dispatch={dispatch} />
+               <TagSelection input={state.inputs.tags} label="Tags " dispatch={dispatch} state={state} />
+               <TextArea input={state.inputs.description} label="&#x1F5DE; Description" dispatch={dispatch} />
+               <ImageSelection input={state.inputs.image} label="&#x1F587; URL" dispatch={dispatch} />
                {
-                  edit ? "Save" : "Create"
+                  workout !== undefined && edit && (
+                     <PopUp
+                        cover={
+                           <Button
+                              type="button"
+                              className="w-full bg-red-500 text-white h-[2.6rem]"
+                              icon={faTrash}
+                           >
+                              Delete
+                           </Button>
+                        }
+                     >
+                        <div className="flex flex-col justify-center items-center gap-4">
+                           <FontAwesomeIcon icon={faTrashCan} className="text-red-500 text-4xl" />
+                           <p className="font-bold">
+                              Are you sure you want to delete this workout?
+                           </p>
+                           <div className="flex flex-row justify-center items-center gap-4 flex-1">
+                              <Button type="button" className="w-[10rem] bg-gray-100 text-black mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out">
+                                 No, cancel
+                              </Button>
+                              <Button type="button" onClick={async (event) => handleSubmission(event, "delete")} className="w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out">
+                                 Yes, I&apos;m sure
+                              </Button>
+                           </div>
+                        </div>
+                     </PopUp>
+                  )
                }
-            </Button>
-            {
-               edit && (
-                  <div>
-                     EDIT HERE!
-                  </div>
-               )
-            }
+               <Button
+                  type="button"
+                  className="bg-primary text-white h-[2.6rem]"
+                  icon={props !== undefined ? faCloudArrowUp : faSquarePlus}
+                  onClick={(event) => handleSubmission(event, "update")}
+               >
+                  {
+                     edit ? "Save" : "Create"
+                  }
+               </Button>
+               {
+                  edit && (
+                     <div>
+                        EDIT HERE!
+                     </div>
+                  )
+               }
+            </div>
          </div>
-      </div>
+      </PopUp>
    );
 }

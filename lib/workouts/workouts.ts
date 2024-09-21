@@ -36,7 +36,8 @@ const workoutsSchema = z.object({
    title: z
       .string()
       .trim()
-      .min(1, { message: "A title must be at least 1 character" }),
+      .min(1, { message: "A title must be at least 1 character" })
+      .max(50, { message : "A title must be at most 50 characters" }),
    date: z.date().max(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), {
       message: "A workout date must not be after today"
    }),
@@ -133,7 +134,7 @@ export async function addWorkout(
    }
 }
 
-export async function editWorkout(workout: Workout): Promise<VitalityResponse<Workout>> {
+export async function updateWorkout(workout: Workout): Promise<VitalityResponse<Workout>> {
    try {
       const fields = workoutsSchema.safeParse(workout);
 
