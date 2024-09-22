@@ -8,8 +8,8 @@ import { VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/st
 import { addWorkout, updateWorkout, Tag, Workout } from "@/lib/workouts/workouts";
 import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTrash, faPencil, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Dispatch, useContext, useState } from "react";
-import PopUp from "@/components/global/popup";
+import { Dispatch, useContext, useRef, useState } from "react";
+import { PopUp } from "@/components/global/popup";
 
 interface WorkoutFormProps {
    cover?: React.ReactNode;
@@ -23,6 +23,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
    const { workout, cover, state, dispatch, reset } = props;
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
+   const deletePopUpRef = useRef<{ close: () => void }>(null);
 
    // Upon creating a new workout, ensure we can edit it
    const [edit, setEdit] = useState<boolean>(workout !== undefined);
@@ -102,7 +103,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
    return (
       <PopUp
          text={workout !== undefined ? "Edit Workout" : "New Workout"}
-         className="max-w-4xl"
+         className="max-w-3xl"
          buttonClassName="w-[9.5rem] h-[2.9rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out"
          icon={faPlus}
          onClick={() => {
@@ -132,7 +133,14 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                      data: {
                         ...state.inputs.tags.data,
                         // Display all selected tags by their id's, if applicable
-                        selected: workout?.tagIds.map((tagId: string) => state.inputs.tags.data.dictionary[tagId]) ?? []
+                        selected: workout?.tagIds.map((tagId: string) => state.inputs.tags.data.dictionary[tagId]) ?? [],
+                        inputs: {
+                           ...state.inputs.tags.data.inputs,
+                           tagSearch: {
+                              ...state.inputs.tags.data.inputs.tagSearch,
+                              value: ""
+                           }
+                        }
                      }
                   }
                }
@@ -170,13 +178,39 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                      })
                   }
                </ul>
-               <Input input={state.inputs.search} label="&#x1F50E; Tags" dispatch={dispatch} />
+               <Input
+                  input={state.inputs.tags.data.inputs.tagSearch}
+                  label="&#x1F50E; Tags"
+                  dispatch={dispatch}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                     // Update editing title value
+                     dispatch({
+                        type: "updateInput",
+                        value: {
+                           ...state.inputs.tags,
+                           data: {
+                              ...state.inputs.tags.data,
+                              inputs: {
+                                 ...state.inputs.tags.data.inputs,
+                                 tagSearch: {
+                                    ...state.inputs.tags.data.inputs.tagSearch,
+                                    value: event.target.value,
+                                    error: null
+                                 }
+                              }
+                           }
+                        }
+                     });
+                  }}
+               />
                <TagSelection input={state.inputs.tags} label="Tags " dispatch={dispatch} state={state} />
                <TextArea input={state.inputs.description} label="&#x1F5DE; Description" dispatch={dispatch} />
                <ImageSelection input={state.inputs.image} label="&#x1F587; URL" dispatch={dispatch} />
                {
                   workout !== undefined && edit && (
                      <PopUp
+                        className="max-w-xl"
+                        ref={deletePopUpRef}
                         cover={
                            <Button
                               type="button"
@@ -193,10 +227,23 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                               Are you sure you want to delete this workout?
                            </p>
                            <div className="flex flex-row justify-center items-center gap-4 flex-1">
-                              <Button type="button" className="w-[10rem] bg-gray-100 text-black mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out">
+                              <Button
+                                 type="button" 
+                                 className="w-[10rem] bg-gray-100 text-black mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
+                                 onClick={() => {
+                                    // Close the popup for deletion confirmation
+                                    if (deletePopUpRef.current) {
+                                       deletePopUpRef.current.close();
+                                    }
+                                 }}
+                              >
                                  No, cancel
                               </Button>
-                              <Button type="button" onClick={async (event) => handleSubmission(event, "delete")} className="w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out">
+                              <Button 
+                                 type="button"
+                                 className="w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
+                                 onClick={async (event) => handleSubmission(event, "delete")}
+                                 >
                                  Yes, I&apos;m sure
                               </Button>
                            </div>

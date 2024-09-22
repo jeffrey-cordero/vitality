@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
-import { useState } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
@@ -14,8 +14,17 @@ interface PopUpProps extends React.HTMLAttributes<HTMLDivElement> {
    text?: string;
 }
 
-export default function PopUp(props: PopUpProps): JSX.Element {
+export const PopUp = forwardRef(function PopUp(props: PopUpProps, ref) {
    const [open, setOpen] = useState<boolean>(false);
+
+   const onClose = () => {
+      // Close the PopUp from current or parent component
+      setOpen(false); 
+   }
+
+   useImperativeHandle(ref, () => ({
+      close: onClose,
+   }));
 
    return (
       <div
@@ -52,7 +61,7 @@ export default function PopUp(props: PopUpProps): JSX.Element {
                         onClick = {(event) => {
                            // Ensure the onClick does that propagate to parent cover component
                            event.stopPropagation();
-                           setOpen(false);
+                           onClose();
                         }}
                      >
                         <FontAwesomeIcon
@@ -73,7 +82,7 @@ export default function PopUp(props: PopUpProps): JSX.Element {
                                  && !(target.isContentEditable)
                                  && target.classList.contains("popup")) {
                               event.stopPropagation();
-                              setOpen(false);
+                              onClose();
                            }
                         }}
                      >
@@ -86,5 +95,4 @@ export default function PopUp(props: PopUpProps): JSX.Element {
          }
       </div>
    );
-}
-
+});

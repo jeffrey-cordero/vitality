@@ -1,14 +1,14 @@
 import clsx from "clsx";
 import Image from "next/image";
-import PopUp from "@/components/global/popup";
 import Button from "@/components/global/button";
 import WorkoutForm from "@/components/home/workouts/form";
 import { VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/state";
-import { faPencil, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { removeWorkouts, Tag, Workout } from "@/lib/workouts/workouts";
 import { Dispatch, useContext, useMemo } from "react";
 import { NotificationContext } from "@/app/layout";
+import { PopUp } from "@/components/global/popup";
 
 interface WorkoutRowProps {
    workout: Workout;

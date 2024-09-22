@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import PopUp from "@/components/global/popup";
 import Input, { VitalityInputProps } from "@/components/global/input";
 import Button from "@/components/global/button";
 import { faGear, faXmark, faCloudArrowUp, faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -8,6 +7,7 @@ import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/workouts/workouts";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useContext, useMemo } from "react";
 import { VitalityResponse } from "@/lib/global/state";
+import { PopUp } from "@/components/global/popup";
 
 const colors = {
    "Light gray": "rgb(55, 55, 55)",
@@ -383,8 +383,8 @@ export function TagSelection(props: VitalityInputProps): JSX.Element {
 
    // Convert search string to lower case for case-insensitive comparison
    const search: string = useMemo(() => {
-      return state?.inputs.search.value.trim().toLowerCase();
-   }, [state?.inputs.search]);
+      return state?.inputs.tags.data.inputs.tagSearch.value.trim().toLowerCase();
+   }, [state?.inputs.tags.data.inputs.tagSearch]);
 
    // Differentiate between selected and unselected options
    const selectedOptions: Set<Tag> = useMemo(() => {

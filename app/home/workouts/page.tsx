@@ -1,17 +1,25 @@
 "use client";
 import WorkoutForm from "@/components/home/workouts/form";
 import WorkoutTable from "@/components/home/workouts/table";
+import WorkoutCards from "@/components/home/workouts/cards";
+import Button from "@/components/global/button";
+import clsx from "clsx";
+import Input from "@/components/global/input";
 import { AuthenticationContext } from "@/app/layout";
 import { fetchWorkoutsInformation, fetchWorkoutTags, Workout } from "@/lib/workouts/workouts";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
-import WorkoutCards from "@/components/home/workouts/cards";
-import Button from "@/components/global/button";
-import clsx from "clsx";
 
 const workouts: VitalityState = {
    status: "Initial",
    inputs: {
+      search: {
+         type: "text",
+         id: "search",
+         value: "",
+         error: null,
+         data: {}
+      },
       title: {
          type: "text",
          id: "title",
@@ -42,13 +50,6 @@ const workouts: VitalityState = {
             handlesChanges: true
          }
       },
-      search: {
-         type: "text",
-         id: "search",
-         value: "",
-         error: null,
-         data: {}
-      },
       tags: {
          type: null,
          id: "tags",
@@ -73,6 +74,15 @@ const workouts: VitalityState = {
                   type: "text",
                   id: "colors",
                   value: null,
+                  error: null,
+                  data: {
+                     handlesChanges: true
+                  }
+               },
+               tagSearch: {
+                  type: "text",
+                  id: "tagSearch",
+                  value: "",
                   error: null,
                   data: {
                      handlesChanges: true
@@ -171,10 +181,10 @@ export default function Page() {
    }, [fetchWorkouts, state.inputs.workouts.data.fetched, state.inputs.tags, state.inputs.workouts]);
 
    return (
-      <main className = "w-full mx-auto flex gap-2 min-h-screen flex-col items-center justify-start text-center">
+      <main className = "w-full mx-auto my-6 flex min-h-screen flex-col items-center justify-start gap-4 text-center">
          <div>
             <h1 className = "text-4xl font-bold mt-8">Welcome Back, Champion!</h1>
-            <p className = "text-lg text-gray-700 mt-4">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
+            <p className = "text-lg text-gray-700 mt-4 max-w-[25rem] mx-auto">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
          </div>
          <div className = "flex justify-center w-full mx-auto">
             <WorkoutForm
@@ -184,17 +194,22 @@ export default function Page() {
                reset = {handleReset}
             />
          </div>
+         <div className = "relative w-10/12 overflow-x-auto flex justify-start items-center text-left gap-2 my-2">
+            <div className = "w-full">
+               <Input input = {state.inputs.search} label = "&#x1F50E; Search" dispatch = {dispatch} />
+            </div>
+         </div>
          <div className = "relative w-10/12 overflow-x-auto flex justify-start items-center text-left gap-2">
-            <Button 
-               onClick={()=> setView("table")}
-               className={clsx("transition duration-300 ease-in-out", {
+            <Button
+               onClick = {() => setView("table")}
+               className = {clsx("transition duration-300 ease-in-out", {
                   "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
                })}>
                Table
             </Button>
-            <Button 
-               onClick={()=> setView("cards")}
-               className={clsx("transition duration-300 ease-in-out", {
+            <Button
+               onClick = {() => setView("cards")}
+               className = {clsx("transition duration-300 ease-in-out", {
                   "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
                })}>
                Cards
@@ -202,7 +217,7 @@ export default function Page() {
          </div>
          {
             view === "table" ? (
-               <WorkoutTable state = {state} dispatch = {dispatch} reset = {handleReset}/>
+               <WorkoutTable state = {state} dispatch = {dispatch} reset = {handleReset} />
             ) : (
                <WorkoutCards state = {state} dispatch = {dispatch} reset = {handleReset} />
             )

@@ -1,10 +1,10 @@
 import Image from "next/image";
-import PopUp from "@/components/global/popup";
 import ToolTip from "@/components/global/tooltip";
 import clsx from "clsx";
 import Button from "@/components/global/button";
 import Input, { VitalityInputProps } from "@/components/global/input";
 import { Dispatch, useState } from "react";
+import { PopUp } from "@/components/global/popup";
 import { faPaperclip, faPenToSquare, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
