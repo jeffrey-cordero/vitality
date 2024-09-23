@@ -19,11 +19,11 @@ export const PopUp = forwardRef(function PopUp(props: PopUpProps, ref) {
 
    const onClose = () => {
       // Close the PopUp from current or parent component
-      setOpen(false); 
-   }
+      setOpen(false);
+   };
 
    useImperativeHandle(ref, () => ({
-      close: onClose,
+      close: onClose
    }));
 
    return (
@@ -34,9 +34,9 @@ export const PopUp = forwardRef(function PopUp(props: PopUpProps, ref) {
             event.stopPropagation();
 
             if (open === false) {
-               setOpen(true);
                // Trigger defined onClick on display, if any
                props.onClick?.call(null, event);
+               setOpen(true);
             }
          }}
       >

@@ -17,7 +17,7 @@ function WorkoutCard(props: WorkoutCardProps): JSX.Element {
          {...props}
          cover = {
             <div className = "cursor-pointer flex flex-col justify-center items-center gap-2 w-[18rem] rounded-2xl overflow-hidden shadow-lg bg-white hover:scale-105 transition duration-300 ease-in-out">
-               <div className = "w-full h-[10rem] rounded-2xl">
+               <div className = "w-full h-[10rem] rounded-2xl rounded-b-none bg-primary">
                   {
                      workout.image ? (
                         <Image
@@ -25,7 +25,7 @@ function WorkoutCard(props: WorkoutCardProps): JSX.Element {
                            height = {1000}
                            src = {workout.image}
                            alt = "workout-image"
-                           className = {clsx("w-full h-full object-cover object-center rounded-2xl rounded-b-none cursor-pointer transition duration-300 ease-in-out")}
+                           className = {clsx("w-full h-full object-cover object-center transition duration-300 ease-in-out")}
                         />
                      ) : (
                         null
@@ -43,20 +43,30 @@ function WorkoutCard(props: WorkoutCardProps): JSX.Element {
 };
 
 interface WorkoutCardsProps {
+   workouts: Workout[];
    state: VitalityState;
    dispatch: Dispatch<VitalityAction<Workout>>;
    reset: () => void;
 }
 
 export default function WorkoutCards(props: WorkoutCardsProps): JSX.Element {
-   const { state } = props;
-   const workouts: Workout[] = state.inputs.workouts.value;
+   const { workouts } = props;
 
    return (
-      <div className = "flex flex-wrap justify-center space-x-6">
-         {workouts.map((workout: Workout) => (
-            <WorkoutCard {...props} workout = {workout} key = {workout.id} />
-         ))}
+      <div className = "relative w-full min-h-screen">
+         {
+            workouts.length > 0 ? (
+               <div className = "flex flex-wrap justify-center space-x-6">
+                  {workouts.map((workout: Workout) => (
+                     <WorkoutCard {...props} workout = {workout} key = {workout.id} />
+                  ))}
+               </div>
+            ) : (
+               <div className = "w-screen h-[15rem] mx-auto text-center flex justify-center items-center">
+                  <h1 className = "font-bold text-xl">No available workouts...</h1>
+               </div>
+            )
+         }
       </div>
    );
 }

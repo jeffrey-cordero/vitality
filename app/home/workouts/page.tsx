@@ -6,20 +6,17 @@ import Button from "@/components/global/button";
 import clsx from "clsx";
 import Input from "@/components/global/input";
 import { AuthenticationContext } from "@/app/layout";
-import { fetchWorkoutsInformation, fetchWorkoutTags, Workout } from "@/lib/workouts/workouts";
+import { fetchWorkouts, Workout } from "@/lib/workouts/workouts";
+import { fetchWorkoutTags } from "@/lib/workouts/tags";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
+import { searchForTitle } from "@/lib/workouts/shared";
+import { faCalendar, faTag, faPersonRunning } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const workouts: VitalityState = {
    status: "Initial",
    inputs: {
-      search: {
-         type: "text",
-         id: "search",
-         value: "",
-         error: null,
-         data: {}
-      },
       title: {
          type: "text",
          id: "title",
@@ -60,37 +57,31 @@ const workouts: VitalityState = {
             dictionary: {},
             options: [],
             selected: [],
-            inputs: {
-               editTitle: {
-                  type: "text",
-                  id: "editTitle",
-                  value: "",
-                  error: null,
-                  data: {
-                     handlesChanges: true
-                  }
-               },
-               editColor: {
-                  type: "text",
-                  id: "colors",
-                  value: null,
-                  error: null,
-                  data: {
-                     handlesChanges: true
-                  }
-               },
-               tagSearch: {
-                  type: "text",
-                  id: "tagSearch",
-                  value: "",
-                  error: null,
-                  data: {
-                     handlesChanges: true
-                  }
-               }
-            },
             handlesChanges: true
          }
+      },
+      tagsTitle: {
+         type: "text",
+         id: "tagsTitle",
+         value: "",
+         error: null,
+         data: {}
+      },
+      tagsColor: {
+         type: "text",
+         id: "tagsColor",
+         value: null,
+         error: null,
+         data: {
+            handlesChanges: true
+         }
+      },
+      tagsSearch: {
+         type: "text",
+         id: "tagsSearch",
+         value: "",
+         error: null,
+         data: {}
       },
       workouts: {
          type: null,
@@ -99,8 +90,17 @@ const workouts: VitalityState = {
          error: null,
          data: {
             fetched: false,
-            selected: new Set<Workout>()
+            selected: new Set<Workout>(),
+            // Based on search title pattern, data interval, tags, etc.
+            visible: []
          }
+      },
+      workoutsSearch: {
+         type: "text",
+         id: "workoutsSearch",
+         value: "",
+         error: null,
+         data: {}
       }
    },
    response: null
@@ -111,11 +111,33 @@ export default function Page() {
    const [state, dispatch] = useReducer(formReducer, workouts);
    const [view, setView] = useState<"table" | "cards">("table");
 
-   const fetchWorkouts = useCallback(async() => {
+   // Convert search string to lower case for case-insensitive comparison
+   const search: string = useMemo(() => {
+      return state.inputs.workoutsSearch.value.trim().toLowerCase();
+   }, [state.inputs.workoutsSearch]);
+
+   // Differentiate between visible and overall workouts
+   const visible: Workout[] = state.inputs.workouts.data.visible;
+   const workoutsResults: Workout[] = state.inputs.workouts.value;
+
+   const visibleOptions: Set<Workout> = useMemo(() => {
+      return new Set<Workout>(visible);
+   }, [visible]);
+
+   const searchOptions = useMemo(() => {
+      return workoutsResults.filter((workout: Workout) => !(visibleOptions.has(workout)));
+   }, [workoutsResults, visibleOptions]);
+
+   // Search results for workouts
+   const workoutSearchResults: Workout[] = useMemo(() => {
+      return searchForTitle(searchOptions, search);
+   }, [searchOptions, search]);
+
+   const fetchWorkoutsData = useCallback(async() => {
       if (user !== undefined && state.inputs.workouts.data.fetched === false) {
          try {
             const [workoutsData, tagsData] = await Promise.all([
-               fetchWorkoutsInformation(user.id),
+               fetchWorkouts(user.id),
                fetchWorkoutTags(user.id)
             ]);
 
@@ -176,9 +198,9 @@ export default function Page() {
 
    useEffect(() => {
       if (!(state.inputs.workouts.data.fetched)) {
-         fetchWorkouts();
+         fetchWorkoutsData();
       }
-   }, [fetchWorkouts, state.inputs.workouts.data.fetched, state.inputs.tags, state.inputs.workouts]);
+   }, [fetchWorkoutsData, state.inputs.workouts.data.fetched, state.inputs.tags, state.inputs.workouts]);
 
    return (
       <main className = "w-full mx-auto my-6 flex min-h-screen flex-col items-center justify-start gap-4 text-center">
@@ -194,32 +216,57 @@ export default function Page() {
                reset = {handleReset}
             />
          </div>
-         <div className = "relative w-10/12 overflow-x-auto flex justify-start items-center text-left gap-2 my-2">
-            <div className = "w-full">
-               <Input input = {state.inputs.search} label = "&#x1F50E; Search" dispatch = {dispatch} />
-            </div>
-         </div>
-         <div className = "relative w-10/12 overflow-x-auto flex justify-start items-center text-left gap-2">
-            <Button
-               onClick = {() => setView("table")}
-               className = {clsx("transition duration-300 ease-in-out", {
-                  "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
-               })}>
-               Table
-            </Button>
-            <Button
-               onClick = {() => setView("cards")}
-               className = {clsx("transition duration-300 ease-in-out", {
-                  "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
-               })}>
-               Cards
-            </Button>
-         </div>
          {
-            view === "table" ? (
-               <WorkoutTable state = {state} dispatch = {dispatch} reset = {handleReset} />
+            workoutsResults.length > 0 ? (
+               <div className = "w-full mx-auto flex flex-col justify-center items-center">
+                  <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 my-2">
+                     <div className = "w-full flex flex-col justify-start  gap-2">
+                        <Input input = {state.inputs.workoutsSearch} label = "Search" icon = {faPersonRunning} dispatch = {dispatch} />
+                        <div className = "w-full flex flex-row justify-start items-center gap-2">
+                           <Button
+                              type = "button"
+                              className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.6rem] text-sm"
+                           >
+                              <FontAwesomeIcon icon = {faCalendar} className = "text-xs" />
+                              Filter by Date
+                           </Button>
+                           <Button
+                              type = "button"
+                              className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.6rem] text-sm"
+
+                           >
+                              <FontAwesomeIcon icon = {faTag} className = "text-xs" />
+                              Filter by Tags
+                           </Button>
+                        </div>
+                     </div>
+                  </div>
+                  <div className = "relative w-10/12 overflow-x-auto flex justify-start items-center text-left gap-2 mt-2">
+                     <Button
+                        onClick = {() => setView("table")}
+                        className = {clsx("transition duration-300 ease-in-out", {
+                           "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
+                        })}>
+                        Table
+                     </Button>
+                     <Button
+                        onClick = {() => setView("cards")}
+                        className = {clsx("transition duration-300 ease-in-out", {
+                           "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
+                        })}>
+                        Cards
+                     </Button>
+                  </div>
+                  {
+                     view === "table" ? (
+                        <WorkoutTable workouts = {workoutSearchResults} state = {state} dispatch = {dispatch} reset = {handleReset} />
+                     ) : (
+                        <WorkoutCards workouts = {workoutSearchResults} state = {state} dispatch = {dispatch} reset = {handleReset} />
+                     )
+                  }
+               </div>
             ) : (
-               <WorkoutCards state = {state} dispatch = {dispatch} reset = {handleReset} />
+               null
             )
          }
       </main >

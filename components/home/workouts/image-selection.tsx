@@ -26,7 +26,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
    const { input, dispatch, isValidImage, setIsValidImage } = props;
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(true);
 
-   const handleURLSubmission = () => {
+   const handleImageURLSubmission = () => {
       const isValidURL = verifyURL(input.value);
 
       if (!(isValidURL)) {
@@ -114,7 +114,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                   className = "p-6"
                   onKeyDown = {(event: React.KeyboardEvent) => {
                      if (event.key === "Enter") {
-                        handleURLSubmission();
+                        handleImageURLSubmission();
                      }
                   }}>
                   {
@@ -163,7 +163,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                   />
                   <Button
                      type = "button"
-                     onClick = {() => handleURLSubmission()}
+                     onClick = {() => handleImageURLSubmission()}
                      className = "w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] min-h-[2.7rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
                      icon = {faPaperclip}
                   >

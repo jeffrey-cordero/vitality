@@ -2,9 +2,10 @@
 import clsx from "clsx";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { VitalityInputProps } from "@/components/global/input";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function TextArea(props: VitalityInputProps): JSX.Element {
-   const { label, input, placeholder, dispatch } = props;
+   const { label, icon, input, placeholder, dispatch } = props;
    const textArea = useRef<HTMLTextAreaElement | null>(null);
    const [visible, setVisible] = useState<boolean>(false);
 
@@ -54,7 +55,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
             className = {clsx("absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-gray-500 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500", {
                "font-bold": label.includes("*")
             })}>
-            {label}
+            { icon && <FontAwesomeIcon icon = {icon} /> } { label }
          </label>
          {input.error !== null &&
             <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
