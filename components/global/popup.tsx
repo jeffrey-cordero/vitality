@@ -88,7 +88,6 @@ export const PopUp = forwardRef(function PopUp(props: PopUpProps, ref) {
                      >
                         {props.children}
                      </div>
-
                   </div>
                </div>
             )

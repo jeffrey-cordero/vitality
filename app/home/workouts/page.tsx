@@ -11,8 +11,9 @@ import { fetchWorkoutTags } from "@/lib/workouts/tags";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { searchForTitle } from "@/lib/workouts/shared";
-import { faCalendar, faTag, faPersonRunning } from "@fortawesome/free-solid-svg-icons";
+import { faTag, faPersonRunning } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FilterByDate } from "@/components/home/workouts/filter";
 
 const workouts: VitalityState = {
    status: "Initial",
@@ -98,6 +99,30 @@ const workouts: VitalityState = {
       workoutsSearch: {
          type: "text",
          id: "workoutsSearch",
+         value: "",
+         error: null,
+         data: {}
+      },
+      workoutsDateFilter: {
+         type: "select",
+         value: "Is on or after",
+         id: "workoutsDateFilter",
+         error: null,
+         data: {
+            options: ["Is on or after", "Is on or before", "Is between (inclusive)"],
+            default: "Is on or after",
+         }
+      },
+      workoutsMinDate: {
+         type: "date",
+         id: "workoutsMinDate",
+         value: "",
+         error: null,
+         data: {}
+      },
+      workoutsMaxDate: {
+         type: "date",
+         id: "workoutsMaxDate",
          value: "",
          error: null,
          data: {}
@@ -223,13 +248,7 @@ export default function Page() {
                      <div className = "w-full flex flex-col justify-start  gap-2">
                         <Input input = {state.inputs.workoutsSearch} label = "Search" icon = {faPersonRunning} dispatch = {dispatch} />
                         <div className = "w-full flex flex-row justify-start items-center gap-2">
-                           <Button
-                              type = "button"
-                              className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.6rem] text-sm"
-                           >
-                              <FontAwesomeIcon icon = {faCalendar} className = "text-xs" />
-                              Filter by Date
-                           </Button>
+                           <FilterByDate state = {state} dispatch = {dispatch} />
                            <Button
                               type = "button"
                               className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.6rem] text-sm"
@@ -241,7 +260,7 @@ export default function Page() {
                         </div>
                      </div>
                   </div>
-                  <div className = "relative w-10/12 overflow-x-auto flex justify-start items-center text-left gap-2 mt-2">
+                  <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 mt-2">
                      <Button
                         onClick = {() => setView("table")}
                         className = {clsx("transition duration-300 ease-in-out", {
