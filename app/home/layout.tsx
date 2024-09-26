@@ -1,5 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
+import { useContext, useEffect } from "react";
+import { AuthenticationContext } from "../layout";
 
 function useValidateHomeURL(): void {
    const pathname = usePathname();
@@ -14,8 +16,22 @@ export default function Layout({
 }: {
    children: React.ReactNode;
 }) {
+   const { user } = useContext(AuthenticationContext);
+
    useValidateHomeURL();
 
+   useEffect(() => {
+      // TODO - Fix undefined user on server start
+      const timeout = setTimeout(() => {
+         if (user === undefined) {
+            window.location.reload();
+         }
+      }, 5000);
+
+      // Clear timeout
+      return () => clearTimeout(timeout);
+   }, [user]);
+   
    return (
       <>
          <div className = "flex flex-col">

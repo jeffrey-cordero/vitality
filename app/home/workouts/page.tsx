@@ -91,6 +91,8 @@ const workouts: VitalityState = {
          error: null,
          data: {
             fetched: false,
+            dateFilter: false,
+            tagsFilter: false,
             selected: new Set<Workout>(),
             // Based on search title pattern, data interval, tags, etc.
             filtered: []
@@ -202,7 +204,9 @@ export default function Page() {
             workouts: {
                data: {
                   ...state.inputs.workouts.data,
-                  filtered: state.inputs.workouts.value
+                  filtered: state.inputs.workouts.value,
+                  dateFilter: false,
+                  tagsFilter: false,
                },
                value: state.inputs.workouts.value
             },

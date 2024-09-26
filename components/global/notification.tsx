@@ -13,12 +13,11 @@ export interface NotificationProps extends React.HTMLAttributes<any> {
 
 export default function Notification(props: NotificationProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
-   const [visible, setVisible] = useState<boolean>(true);
    const icon = props.status === "Success" ? faCircleCheck : faTriangleExclamation;
 
    return (
       <>
-         {visible &&
+         {1 &&
             <div
                className = "fixed w-[30rem] max-w-[90%] min-h-[4.5rem] top-0 left-1/2 transform -translate-x-1/2 max-w-4/5 mx-auto mt-4 opacity-0 notification animate-fadeIn z-50"
                {...props}
@@ -49,7 +48,6 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      className = "hover:text-danger hover:cursor-pointer text-red-600"
                      onClick = {() => {
                         // Remove from the DOM and reset notification context
-                        setVisible(false);
                         updateNotification({
                            status: "Initial",
                            message: ""

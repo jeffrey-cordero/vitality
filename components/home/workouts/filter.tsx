@@ -8,6 +8,38 @@ import { faCalendar, faMagnifyingGlass, faArrowsUpDown, faArrowRight, faArrowLef
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dispatch, useMemo } from "react";
 
+export function filterByTags(state: VitalityState, workout: Workout): boolean {
+   // No filtering required
+   if (!(state.inputs.workouts.data.tagsFilter)) {
+      return true;
+   }
+
+   // TODO
+
+   return true;
+}
+
+export function filterByDate(state: VitalityState, workout: Workout): boolean {
+   // No filtering required
+   if (!(state.inputs.workouts.data.dateFilter)) {
+      return true;
+   }
+
+   // Apply date filter
+   const dateFilter: string = state.inputs.workoutsDateFilter.value;
+   const minDate: Date = new Date(state.inputs.workoutsMinDate.value);
+   const maxDate: Date = new Date(state.inputs.workoutsMaxDate.value);
+
+   switch (dateFilter) {
+      case "Is on or after":
+         return isNaN(minDate.getTime()) || workout.date >= minDate;
+      case "Is on or before":
+         return workout.date <= maxDate;
+      default:
+         return workout.date >= minDate && workout.date <= maxDate;
+   }
+}
+
 interface FilterByDateProps {
    state: VitalityState;
    dispatch: Dispatch<VitalityAction<Workout | null>>;
@@ -20,7 +52,8 @@ export function applyDateFilters(props: FilterByDateProps): Workout[] | null {
    const filter: string = state.inputs.workoutsDateFilter.value;
    const minDate: Date = new Date(state.inputs.workoutsMinDate.value);
    const maxDate: Date = new Date(state.inputs.workoutsMaxDate.value);
-
+   const isRange: boolean = filter === "Is between";
+   
    // Handle invalid inputs
    const errors = {};
 
@@ -30,12 +63,17 @@ export function applyDateFilters(props: FilterByDateProps): Workout[] | null {
       }
    };
 
-   // Invalid date errors
-   validateDate(minDate, "workoutsMinDate");
-   validateDate(maxDate, "workoutsMaxDate");
+   // Invalid date errors, for the current applied filter
+   if (isRange || filter === "Is on or after") {
+      validateDate(minDate, "workoutsMinDate");
+   }
+
+   if (isRange || filter === "Is on or before") {
+      validateDate(maxDate, "workoutsMaxDate");
+   }
 
    // Invalid range errors
-   if (!(Object.keys(errors).length) && filter === "Is between" && minDate > maxDate) {
+   if (isRange && !(Object.keys(errors).length) && minDate > maxDate) {
       errors["workoutsMinDate"] = errors["workoutsMaxDate"] = ["Date range must be valid"];
    }
 
@@ -53,14 +91,7 @@ export function applyDateFilters(props: FilterByDateProps): Workout[] | null {
       });
 
       const filteredWorkouts: Workout[] = [...state.inputs.workouts.value].filter((workout: Workout) => {
-         switch (filter) {
-         case "Is on or after":
-            return isNaN(minDate.getTime()) || workout.date >= minDate;
-         case "Is on or before":
-            return workout.date <= maxDate;
-         default:
-            return workout.date >= minDate && workout.date <= maxDate;
-         }
+         return filterByDate(state, workout);
       });
 
       return filteredWorkouts;
@@ -79,15 +110,15 @@ function DateInput(props: DateInputProps) {
    const icon = isMinDate ? faArrowRight : faArrowLeft;
 
    return (
-      <div className = "flex flex-col justify-center items-center my-6">
-         <div className = "text-primary">
+      <div className="flex flex-col justify-center items-center my-6">
+         <div className="text-primary">
             <FontAwesomeIcon
-               icon = {icon}
-               className = "text-lg text-primary my-2"
+               icon={icon}
+               className="text-lg text-primary my-2"
             />
          </div>
-         <div className = "w-full mx-auto">
-            <Input input = {input} label = "Date" icon = {faCalendar} dispatch = {dispatch} />
+         <div className="w-full mx-auto">
+            <Input input={input} label="Date" icon={faCalendar} dispatch={dispatch} />
          </div>
       </div>
    );
@@ -112,58 +143,58 @@ export function FilterByDate(props: FilterByDateProps): JSX.Element {
 
    return (
       <PopUp
-         className = "max-w-xl"
-         cover = {
+         className="max-w-xl"
+         cover={
             <Button
-               type = "button"
-               className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.6rem] text-sm"
+               type="button"
+               className="bg-gray-300 text-black font-medium w-[10rem] h-[2.6rem] text-sm"
             >
-               <FontAwesomeIcon icon = {faCalendar} className = "text-xs" />
+               <FontAwesomeIcon icon={faCalendar} className="text-xs" />
                Filter by Date
             </Button>
          }
       >
-         <div className = "flex flex-col justify-center align-center text-center gap-2 py-2">
+         <div className="flex flex-col justify-center align-center text-center gap-2 py-2">
             <FontAwesomeIcon
-               icon = {faCalendar}
-               className = "text-3xl text-primary mt-1"
+               icon={faCalendar}
+               className="text-3xl text-primary mt-1"
             />
-            <h1 className = "text-2xl font-bold text-black mb-2">
+            <h1 className="text-2xl font-bold text-black mb-2">
                Filter by Date
             </h1>
-            <div className = "relative">
+            <div className="relative">
                <FontAwesomeIcon
-                  icon = {faArrowRotateLeft}
-                  onClick = {() => reset()}
-                  className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                  icon={faArrowRotateLeft}
+                  onClick={() => reset()}
+                  className="absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
-               <Select input = {dateTypeInput} label = "Type" icon = {faCalendar} dispatch = {dispatch} />
+               <Select input={dateTypeInput} label="Type" icon={faCalendar} dispatch={dispatch} />
                {
                   input !== undefined ? (
                      // Min or max
-                     <div className = "mt-6">
-                        <DateInput {...props} input = {input} />
+                     <div className="mt-6">
+                        <DateInput {...props} input={input} />
                      </div>
                   ) : (
                      // Range (Min and Max inputs)
-                     <div className = "my-6">
-                        <Input input = {state.inputs.workoutsMinDate} label = "Min" icon = {faCalendar} dispatch = {dispatch} />
+                     <div className="my-6">
+                        <Input input={state.inputs.workoutsMinDate} label="Min" icon={faCalendar} dispatch={dispatch} />
                         <FontAwesomeIcon
-                           icon = {faArrowsUpDown}
-                           className = "text-lg text-primary my-2"
+                           icon={faArrowsUpDown}
+                           className="text-lg text-primary my-2"
                         />
-                        <Input input = {state.inputs.workoutsMaxDate} label = "Max" icon = {faCalendar} dispatch = {dispatch} />
+                        <Input input={state.inputs.workoutsMaxDate} label="Max" icon={faCalendar} dispatch={dispatch} />
                      </div>
                   )
                }
                <Button
-                  type = "button"
-                  className = "bg-primary text-white font-bold w-full h-[2.6rem] text-sm"
-                  icon = {faMagnifyingGlass}
-                  onClick = {() => {
+                  type="button"
+                  className="bg-primary text-white font-bold w-full h-[2.6rem] text-sm"
+                  icon={faMagnifyingGlass}
+                  onClick={() => {
                      // Apply date filter
                      const filteredWorkouts = applyDateFilters(props);
-                     
+
                      if (filteredWorkouts !== null) {
                         // Update filtered state
                         dispatch({
@@ -172,7 +203,8 @@ export function FilterByDate(props: FilterByDateProps): JSX.Element {
                               ...state.inputs.workouts,
                               data: {
                                  ...state.inputs.workouts.data,
-                                 filtered: filteredWorkouts
+                                 filtered: filteredWorkouts,
+                                 dateFilter: true
                               }
                            }
                         });

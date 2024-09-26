@@ -2,6 +2,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import Button from "@/components/global/button";
 import WorkoutForm from "@/components/home/workouts/form";
+import Loading from "@/components/global/loading";
 import { VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/state";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -218,6 +219,8 @@ interface WorkoutTableProps {
 export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
    const { workouts, state, dispatch, reset } = props;
    const selected: Set<Workout> = state.inputs.workouts.data.selected;
+   const fetched: boolean = state.inputs.workouts.data.fetched;
+   
    const handleWorkoutToggle = useMemo(() => {
       return () => {
          if (selected.size === workouts.length) {
@@ -291,7 +294,7 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
                </div>
             ) : (
                <div className = "w-screen h-[15rem] mx-auto text-center flex justify-center items-center">
-                  <h1 className = "font-bold text-xl">No available workouts...</h1>
+                  { fetched ? <h1 className = "font-bold text-xl">No available workouts</h1> : <Loading /> }
                </div>
             )
          }

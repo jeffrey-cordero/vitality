@@ -11,7 +11,7 @@ import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTra
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dispatch, useContext, useRef, useState } from "react";
 import { PopUp } from "@/components/global/popup";
-import { applyDateFilters } from "./filter";
+import { applyDateFilters, filterByDate, filterByTags } from "./filter";
 
 interface WorkoutFormProps {
    cover?: React.ReactNode;
@@ -54,22 +54,49 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
          // Add new workout in response body to state and display notification message
          if (response.status === "Success") {
             let newWorkouts: Workout[] = [];
+            let newFiltered: Workout[] = [];
+            
             const returnedWorkout: Workout = response.body.data;
 
             if (workout === undefined && method === "update") {
                // New workout added
                newWorkouts = [...state.inputs.workouts.value, returnedWorkout];
+               
                // Edit the workout after construction
                setEdit(true);
+
+               if (filterByDate(state, returnedWorkout) && filterByTags(state, returnedWorkout))  {
+                  // New workout passes current filter(s)
+                  newFiltered = [...state.inputs.workouts.data.filtered, returnedWorkout];
+               } else {
+                  newFiltered = [...state.inputs.workouts.data.filtered];
+               }
             } else if (method === "delete") {
                // Remove the existing workout
                newWorkouts = [...state.inputs.workouts.value].filter((workout: Workout) => workout.id !== returnedWorkout.id);
+
+               // Remove from visible filtered list, if applicable
+               newFiltered = [...state.inputs.workouts.data.filtered].filter((workout: Workout) => workout.id !== returnedWorkout.id);
             } else {
                // Update the existing workout
                newWorkouts = [...state.inputs.workouts.value].map((workout: Workout) => {
                   return workout.id === returnedWorkout.id ? returnedWorkout : workout;
                });
+
+               for (const filtered of state.inputs.workouts.data.filtered) {
+                  if (filtered.id !== returnedWorkout.id) {
+                     // Other filtered workout
+                     newFiltered.push(filtered);
+                  } else if (filterByDate(state, returnedWorkout) && filterByTags(state, returnedWorkout)) {
+                     // Updated workout passes filter, thus pass store the new reference
+                     newFiltered.push(returnedWorkout);
+                  }
+               }
             }
+
+            // Sort the workout lists from latest to farthest dates
+            newWorkouts = newWorkouts.sort((a, b) => b.date.getTime() - a.date.getTime());
+            newFiltered = newFiltered.sort((a, b) => b.date.getTime() - a.date.getTime());
 
             dispatch({
                type: "updateState",
@@ -79,17 +106,14 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                      ...state.inputs,
                      workouts: {
                         ...state.inputs.workouts,
+                        data: {
+                           ...state.inputs.workouts.data,
+                           filtered: newFiltered
+                        },
                         value: newWorkouts,
                      }
                   }
                }
-            });
-
-            // Apply date filter
-            applyDateFilters({
-               state: state,
-               dispatch: dispatch,
-               reset: reset
             });
          }
 

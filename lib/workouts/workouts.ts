@@ -177,6 +177,8 @@ export async function updateWorkout(workout: Workout): Promise<VitalityResponse<
          const tagsToRemove: string[] = existingTagIds.filter(id => !(newTagIds).includes(id));
          const tagsToAdd: string[] = newTagIds.filter(id => !(existingTagIds).includes(id));
 
+         console.log(workout.date);
+
          // Update the workout with set operation
          const updatedWorkout = await prisma.workouts.update({
             where: { id: workout.id },
