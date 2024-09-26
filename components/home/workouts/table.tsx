@@ -15,7 +15,7 @@ import { PopUp } from "@/components/global/popup";
 interface WorkoutRowProps {
    workout: Workout;
    state: VitalityState;
-   dispatch: Dispatch<VitalityAction<Workout>>;
+   dispatch: Dispatch<VitalityAction<Workout | null>>;
    reset: () => void;
 }
 
@@ -211,7 +211,7 @@ function WorkoutRow(props: WorkoutRowProps) {
 interface WorkoutTableProps {
    workouts: Workout[];
    state: VitalityState;
-   dispatch: Dispatch<VitalityAction<Workout>>;
+   dispatch: Dispatch<VitalityAction<Workout | null>>;
    reset: () => void;
 }
 

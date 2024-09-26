@@ -11,12 +11,13 @@ import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTra
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dispatch, useContext, useRef, useState } from "react";
 import { PopUp } from "@/components/global/popup";
+import { applyDateFilters } from "./filter";
 
 interface WorkoutFormProps {
    cover?: React.ReactNode;
    workout: Workout | undefined;
    state: VitalityState;
-   dispatch: Dispatch<VitalityAction<Workout>>;
+   dispatch: Dispatch<VitalityAction<Workout | null>>;
    reset: () => void;
 }
 
@@ -78,10 +79,17 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                      ...state.inputs,
                      workouts: {
                         ...state.inputs.workouts,
-                        value: newWorkouts
+                        value: newWorkouts,
                      }
                   }
                }
+            });
+
+            // Apply date filter
+            applyDateFilters({
+               state: state,
+               dispatch: dispatch,
+               reset: reset
             });
          }
 

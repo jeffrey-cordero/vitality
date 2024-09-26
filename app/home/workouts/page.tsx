@@ -10,7 +10,7 @@ import { fetchWorkouts, Workout } from "@/lib/workouts/workouts";
 import { fetchWorkoutTags } from "@/lib/workouts/tags";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
-import { searchForTitle } from "@/lib/workouts/shared";
+import { getWorkoutDate, searchForTitle } from "@/lib/workouts/shared";
 import { faTag, faPersonRunning } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FilterByDate } from "@/components/home/workouts/filter";
@@ -93,7 +93,7 @@ const workouts: VitalityState = {
             fetched: false,
             selected: new Set<Workout>(),
             // Based on search title pattern, data interval, tags, etc.
-            visible: []
+            filtered: []
          }
       },
       workoutsSearch: {
@@ -109,21 +109,21 @@ const workouts: VitalityState = {
          id: "workoutsDateFilter",
          error: null,
          data: {
-            options: ["Is on or after", "Is on or before", "Is between (inclusive)"],
-            default: "Is on or after",
+            options: ["Is on or after", "Is on or before", "Is between"],
+            default: "Is on or after"
          }
       },
       workoutsMinDate: {
          type: "date",
          id: "workoutsMinDate",
-         value: "",
+         value: getWorkoutDate(new Date()),
          error: null,
          data: {}
       },
       workoutsMaxDate: {
          type: "date",
          id: "workoutsMaxDate",
-         value: "",
+         value: getWorkoutDate(new Date()),
          error: null,
          data: {}
       }
@@ -141,22 +141,13 @@ export default function Page() {
       return state.inputs.workoutsSearch.value.trim().toLowerCase();
    }, [state.inputs.workoutsSearch]);
 
-   // Differentiate between visible and overall workouts
-   const visible: Workout[] = state.inputs.workouts.data.visible;
-   const workoutsResults: Workout[] = state.inputs.workouts.value;
-
-   const visibleOptions: Set<Workout> = useMemo(() => {
-      return new Set<Workout>(visible);
-   }, [visible]);
-
-   const searchOptions = useMemo(() => {
-      return workoutsResults.filter((workout: Workout) => !(visibleOptions.has(workout)));
-   }, [workoutsResults, visibleOptions]);
+   // Filtered based on selected tags or date intervals
+   const filtered: Workout[] = state.inputs.workouts.data.filtered;
 
    // Search results for workouts
-   const workoutSearchResults: Workout[] = useMemo(() => {
-      return searchForTitle(searchOptions, search);
-   }, [searchOptions, search]);
+   const results: Workout[] = useMemo(() => {
+      return searchForTitle(filtered, search);
+   }, [filtered, search]);
 
    const fetchWorkoutsData = useCallback(async() => {
       if (user !== undefined && state.inputs.workouts.data.fetched === false) {
@@ -183,6 +174,7 @@ export default function Page() {
                      value: workoutsData,
                      data: {
                         ...state.inputs.workouts.data,
+                        filtered: workoutsData,
                         fetched: true
                      }
                   }
@@ -194,32 +186,35 @@ export default function Page() {
       }
    }, [user, state.inputs.tags, state.inputs.workouts, dispatch]);
 
-   const handleReset = useMemo(() => {
-      return () => {
-         dispatch({
-            // Reset state for new workout form
-            type: "resetState",
-            value: {
-               // Reset selected tags data
-               tags: {
-                  data: {
-                     ...state.inputs.tags.data,
-                     selected: []
-                  },
-                  value: state.inputs.tags.value
+   const handleReset = () => {
+      dispatch({
+         // Reset state for new workout form
+         type: "resetState",
+         value: {
+            // Reset selected tags data
+            tags: {
+               data: {
+                  ...state.inputs.tags.data,
+                  selected: []
                },
-               workouts: {
-                  data: {
-                     ...state.inputs.workouts.data
-                  },
-                  value: state.inputs.workouts.value
-               }
+               value: state.inputs.tags.value
+            },
+            workouts: {
+               data: {
+                  ...state.inputs.workouts.data,
+                  filtered: state.inputs.workouts.value
+               },
+               value: state.inputs.workouts.value
+            },
+            workoutsDateFilter: {
+               data: {
+                  ...state.inputs.workoutsDateFilter.data
+               },
+               value: state.inputs.workoutsDateFilter.value
             }
-         });
-      };
-   }, [state.inputs.tags.data, state.inputs.tags.value,
-      state.inputs.workouts.data, state.inputs.workouts.value]);
-
+         }
+      });
+   }
 
    useEffect(() => {
       if (!(state.inputs.workouts.data.fetched)) {
@@ -242,51 +237,47 @@ export default function Page() {
             />
          </div>
          {
-            workoutsResults.length > 0 ? (
-               <div className = "w-full mx-auto flex flex-col justify-center items-center">
-                  <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 my-2">
-                     <div className = "w-full flex flex-col justify-start  gap-2">
-                        <Input input = {state.inputs.workoutsSearch} label = "Search" icon = {faPersonRunning} dispatch = {dispatch} />
-                        <div className = "w-full flex flex-row justify-start items-center gap-2">
-                           <FilterByDate state = {state} dispatch = {dispatch} />
-                           <Button
-                              type = "button"
-                              className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.6rem] text-sm"
+            <div className = "w-full mx-auto flex flex-col justify-center items-center">
+               <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 my-2">
+                  <div className = "w-full flex flex-col justify-start  gap-2">
+                     <Input input = {state.inputs.workoutsSearch} label = "Search" icon = {faPersonRunning} dispatch = {dispatch} />
+                     <div className = "w-full flex flex-row justify-start items-center gap-2">
+                        <FilterByDate state = {state} dispatch = {dispatch} reset = {handleReset} />
+                        <Button
+                           type = "button"
+                           className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.6rem] text-sm"
 
-                           >
-                              <FontAwesomeIcon icon = {faTag} className = "text-xs" />
-                              Filter by Tags
-                           </Button>
-                        </div>
+                        >
+                           <FontAwesomeIcon icon = {faTag} className = "text-xs" />
+                           Filter by Tags
+                        </Button>
                      </div>
                   </div>
-                  <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 mt-2">
-                     <Button
-                        onClick = {() => setView("table")}
-                        className = {clsx("transition duration-300 ease-in-out", {
-                           "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
-                        })}>
-                        Table
-                     </Button>
-                     <Button
-                        onClick = {() => setView("cards")}
-                        className = {clsx("transition duration-300 ease-in-out", {
-                           "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
-                        })}>
-                        Cards
-                     </Button>
-                  </div>
-                  {
-                     view === "table" ? (
-                        <WorkoutTable workouts = {workoutSearchResults} state = {state} dispatch = {dispatch} reset = {handleReset} />
-                     ) : (
-                        <WorkoutCards workouts = {workoutSearchResults} state = {state} dispatch = {dispatch} reset = {handleReset} />
-                     )
-                  }
                </div>
-            ) : (
-               null
-            )
+               <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 mt-2">
+                  <Button
+                     onClick = {() => setView("table")}
+                     className = {clsx("transition duration-300 ease-in-out", {
+                        "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
+                     })}>
+                     Table
+                  </Button>
+                  <Button
+                     onClick = {() => setView("cards")}
+                     className = {clsx("transition duration-300 ease-in-out", {
+                        "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
+                     })}>
+                     Cards
+                  </Button>
+               </div>
+               {
+                  view === "table" ? (
+                     <WorkoutTable workouts = {results} state = {state} dispatch = {dispatch} reset = {handleReset} />
+                  ) : (
+                     <WorkoutCards workouts = {results} state = {state} dispatch = {dispatch} reset = {handleReset} />
+                  )
+               }
+            </div>
          }
       </main >
    );

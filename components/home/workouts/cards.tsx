@@ -45,7 +45,7 @@ function WorkoutCard(props: WorkoutCardProps): JSX.Element {
 interface WorkoutCardsProps {
    workouts: Workout[];
    state: VitalityState;
-   dispatch: Dispatch<VitalityAction<Workout>>;
+   dispatch: Dispatch<VitalityAction<Workout | null>>;
    reset: () => void;
 }
 

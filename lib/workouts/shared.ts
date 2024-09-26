@@ -11,16 +11,16 @@ export function searchForTitle(array: any[], search: string): any[] {
 }
 
 export function getWorkoutDate(date: Date): string {
+   // Format: YYYY-MM-DD
    const month = String(date.getMonth() + 1).padStart(2, "0");
    const day = String(date.getDate() + 1).padStart(2, "0");
    const year = date.getFullYear();
 
-   return `${month}/${day}/${year}`;
+   return `${year}-${month}-${day}`;
 }
 
-
-// Turn combined tag and exercise data into a uniform Workout type
 export function formatWorkout(workout): Workout {
+   // Turn combined tag and exercise data into a uniform Workout type
    return {
       id: workout.id,
       user_id: workout.user_id,
