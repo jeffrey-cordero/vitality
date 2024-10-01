@@ -63,6 +63,11 @@ function WorkoutRow(props: WorkoutRowProps) {
             return size == 1 ? workout.id !== w.id : !(selected.has(w));
          });
 
+         const newFiltered = [...state.inputs.workouts.data.filtered].filter((w: Workout) => {
+            // Remove single or multiple workouts
+            return size == 1 ? workout.id !== w.id : !(selected.has(w));
+         });
+
          dispatch({
             type: "updateState",
             value: {
@@ -75,6 +80,7 @@ function WorkoutRow(props: WorkoutRowProps) {
                      data: {
                         ...state.inputs.workouts.data,
                         // Clear selected workouts
+                        filtered: newFiltered,
                         selected: new Set<Workout>()
                      }
                   }
@@ -143,6 +149,7 @@ function WorkoutRow(props: WorkoutRowProps) {
                   <Image
                      width = {1000}
                      height = {1000}
+                     quality = {100}
                      src = {workout.image}
                      alt = "workout-image"
                      className = {clsx("w-full h-full object-cover object-center rounded-2xl cursor-pointer transition duration-300 ease-in-out")}
@@ -220,7 +227,7 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
    const { workouts, state, dispatch, reset } = props;
    const selected: Set<Workout> = state.inputs.workouts.data.selected;
    const fetched: boolean = state.inputs.workouts.data.fetched;
-   
+
    const handleWorkoutToggle = useMemo(() => {
       return () => {
          if (selected.size === workouts.length) {

@@ -96,7 +96,7 @@ function Form(): JSX.Element {
 
 export default function FeedbackForm(): JSX.Element {
    return (
-      <>
+      <div>
          <div className = "w-full mx-auto flex flex-col items-center justify-center">
             <Heading
                title = "We're here for your health"
@@ -104,6 +104,6 @@ export default function FeedbackForm(): JSX.Element {
             />
             <Form />
          </div>
-      </>
+      </div>
    );
 }

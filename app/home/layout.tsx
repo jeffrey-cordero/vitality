@@ -1,14 +1,16 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { useContext, useEffect } from "react";
-import { AuthenticationContext } from "../layout";
+import { useEffect } from "react";
 
-function useValidateHomeURL(): void {
+function useValidateAuthenticatedURL() {
+   // Ensure logged in user URL's start are in form "/home/..."
    const pathname = usePathname();
 
-   if (!(pathname.startsWith("/home"))) {
-      window.location.reload();
-   }
+   useEffect(() => {
+      if (!(pathname.startsWith("/home"))) {
+         window.location.reload();
+      }
+   });
 }
 
 export default function Layout({
@@ -16,29 +18,15 @@ export default function Layout({
 }: {
    children: React.ReactNode;
 }) {
-   const { user } = useContext(AuthenticationContext);
+   useValidateAuthenticatedURL();
 
-   useValidateHomeURL();
-
-   useEffect(() => {
-      // TODO - Fix undefined user on server start
-      const timeout = setTimeout(() => {
-         if (user === undefined) {
-            window.location.reload();
-         }
-      }, 5000);
-
-      // Clear timeout
-      return () => clearTimeout(timeout);
-   }, [user]);
-   
    return (
-      <>
+      <div>
          <div className = "flex flex-col">
             <div className = "flex-grow p-2">
                {children}
             </div>
          </div>
-      </>
+      </div>
    );
 }

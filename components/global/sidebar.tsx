@@ -44,7 +44,7 @@ function SideBarLinks(): JSX.Element {
    }, [user]);
 
    return (
-      <>
+      <div>
          {links.map((link) => {
             return (
                <Link
@@ -72,7 +72,7 @@ function SideBarLinks(): JSX.Element {
                </Link>
             );
          })}
-      </>
+      </div>
    );
 }
 
@@ -80,7 +80,7 @@ export function SideBar(): JSX.Element {
    const [visibleSideBar, setVisibleSideBar] = useState<boolean>(false);
 
    return (
-      <>
+      <div>
          <div
             className = "fixed top-0 left-0 w-full z-30">
             <div className = "relative top-0 left-0 transform translate-x-[15px] translate-y-[25px] z-30">
@@ -120,6 +120,6 @@ export function SideBar(): JSX.Element {
                </div>
             </div>
          </div>
-      </>
+      </div>
    );
 }

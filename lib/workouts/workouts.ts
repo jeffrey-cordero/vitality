@@ -20,8 +20,7 @@ export type Workout = {
 
 const urlRegex =
   /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
-const nextMediaRegex =
-  /^\/_next\/static\/media\/[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+\.jpg$/;
+const nextMediaRegex = /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
 
 const workoutsSchema = z.object({
    user_id: z
@@ -176,8 +175,6 @@ export async function updateWorkout(workout: Workout): Promise<VitalityResponse<
          const newTagIds: string[] = workout.tagIds;
          const tagsToRemove: string[] = existingTagIds.filter(id => !(newTagIds).includes(id));
          const tagsToAdd: string[] = newTagIds.filter(id => !(existingTagIds).includes(id));
-
-         console.log(workout.date);
 
          // Update the workout with set operation
          const updatedWorkout = await prisma.workouts.update({

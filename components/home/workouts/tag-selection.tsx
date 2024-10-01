@@ -49,6 +49,13 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
          });
       } else {
          // Add the new tag (search pattern) to the overall user options
+         const newOption: Tag = response.body.data;
+
+         const newOptions: Tag[] = [...input.data.options, newOption];
+         const newSelected: Tag[] =  [...input.data.selected, newOption];
+         const newDictionary: { [key: string]: Tag } = Object.fromEntries(newOptions.map(tag => [tag.id, tag]));
+         newDictionary[newOption.id] = newOption;
+
          dispatch({
             type: "updateInput",
             value: {
@@ -56,8 +63,9 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
                data: {
                   ...input.data,
                   // Resulting data from backend is the tag with the unique ID in UUID format
-                  options: [...input.data.options, response.body.data],
-                  selected: [...input.data.selected, response.body.data]
+                  options: newOptions,
+                  selected: newSelected,
+                  dictionary: newDictionary
                }
             }
          });
@@ -155,7 +163,6 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
                response: response
             }
          });
-
       }
 
       if (response.status !== "Error") {

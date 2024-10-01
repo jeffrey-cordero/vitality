@@ -11,9 +11,9 @@ import { fetchWorkoutTags } from "@/lib/workouts/tags";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { getWorkoutDate, searchForTitle } from "@/lib/workouts/shared";
-import { faTag, faPersonRunning } from "@fortawesome/free-solid-svg-icons";
+import { faTag, faPersonRunning, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FilterByDate } from "@/components/home/workouts/filter";
+import { FilterByDate, FilterByTags } from "@/components/home/workouts/filter";
 
 const workouts: VitalityState = {
    status: "Initial",
@@ -206,7 +206,7 @@ export default function Page() {
                   ...state.inputs.workouts.data,
                   filtered: state.inputs.workouts.value,
                   dateFilter: false,
-                  tagsFilter: false,
+                  tagsFilter: false
                },
                value: state.inputs.workouts.value
             },
@@ -218,7 +218,7 @@ export default function Page() {
             }
          }
       });
-   }
+   };
 
    useEffect(() => {
       if (!(state.inputs.workouts.data.fetched)) {
@@ -238,6 +238,11 @@ export default function Page() {
                state = {state}
                dispatch = {dispatch}
                reset = {handleReset}
+               cover = {
+                  <Button type = "button" className = "bg-primary text-white w-full h-[2.6rem] p-4" icon = {faPlus}>
+                     New Workout
+                  </Button>
+               }
             />
          </div>
          {
@@ -247,14 +252,7 @@ export default function Page() {
                      <Input input = {state.inputs.workoutsSearch} label = "Search" icon = {faPersonRunning} dispatch = {dispatch} />
                      <div className = "w-full flex flex-row justify-start items-center gap-2">
                         <FilterByDate state = {state} dispatch = {dispatch} reset = {handleReset} />
-                        <Button
-                           type = "button"
-                           className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.6rem] text-sm"
-
-                        >
-                           <FontAwesomeIcon icon = {faTag} className = "text-xs" />
-                           Filter by Tags
-                        </Button>
+                        <FilterByTags state = {state} dispatch = {dispatch} reset = {handleReset} />
                      </div>
                   </div>
                </div>

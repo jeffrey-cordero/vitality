@@ -5,7 +5,7 @@ import Loading from "@/components/global/loading";
 
 export default function Home(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   
+
    return (
       <main className = "w-full mx-auto flex min-h-screen flex-col items-center justify-start text-center mt-6">
          {

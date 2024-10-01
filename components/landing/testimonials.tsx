@@ -25,6 +25,7 @@ function Testimonial(props: TestimonialProps): JSX.Element {
                <Image
                   width = {200}
                   height = {200}
+                  quality = {100}
                   className = "rounded-full w-[4.5rem] h-[4.5rem] object-cover object-center shadow-inner"
                   src = {props.image}
                   alt = "Rounded avatar"

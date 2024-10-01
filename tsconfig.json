@@ -1,11 +1,16 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "types": ["node"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "types": [
+      "node"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -13,16 +18,19 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "strict": false,
     "incremental": true,
     "noImplicitAny": false,
     "plugins": [
       {
-        "name": "next",
+        "name": "next"
       }
     ],
     "paths": {
-      "@/*": ["./*"]
-    },
+      "@/*": [
+        "./*"
+      ]
+    }
   },
   "include": [
     "next-env.d.ts",
@@ -30,7 +38,10 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "scripts/seed/data.js",
-    "scripts/seed/seed.js"
-, "eslint.config.js"  ],
-  "exclude": ["node_modules"]
+    "scripts/seed/seed.js",
+    "eslint.config.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

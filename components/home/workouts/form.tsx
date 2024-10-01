@@ -11,7 +11,7 @@ import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTra
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dispatch, useContext, useRef, useState } from "react";
 import { PopUp } from "@/components/global/popup";
-import { applyDateFilters, filterByDate, filterByTags } from "./filter";
+import { filterByDate, filterByTags } from "./filter";
 
 interface WorkoutFormProps {
    cover?: React.ReactNode;
@@ -25,10 +25,8 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
    const { workout, cover, state, dispatch, reset } = props;
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
+   const [workoutId, setWorkoutId] = useState<string | undefined>(workout?.id);
    const deletePopUpRef = useRef<{ close: () => void }>(null);
-
-   // Upon creating a new workout, ensure we can edit it
-   const [edit, setEdit] = useState<boolean>(workout !== undefined);
 
    const handleWorkoutSubmission = async(event: React.MouseEvent<HTMLButtonElement>, method: "update" | "delete") => {
       event.stopPropagation();
@@ -38,7 +36,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
 
          const payload: Workout = {
             user_id: user.id,
-            id: workout !== undefined ? workout.id : "",
+            id: workoutId !== undefined ? workoutId : "",
             title: state.inputs.title.value.trim(),
             date: new Date(state.inputs.date.value),
             image: state.inputs.image.value,
@@ -48,23 +46,22 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
          };
 
          // We request to either add or update the workout instance
-         const response: VitalityResponse<Workout> = workout === undefined
+         const response: VitalityResponse<Workout> = workoutId === undefined
             ? await addWorkout(payload) : await updateWorkout(payload);
 
          // Add new workout in response body to state and display notification message
          if (response.status === "Success") {
             let newWorkouts: Workout[] = [];
             let newFiltered: Workout[] = [];
-            
+
             const returnedWorkout: Workout = response.body.data;
 
-            if (workout === undefined && method === "update") {
+            if (workoutId === undefined && method === "update") {
                // New workout added
                newWorkouts = [...state.inputs.workouts.value, returnedWorkout];
-               
-               // Edit the workout after construction
-               setEdit(true);
 
+               // Edit the workout after construction
+               setWorkoutId(returnedWorkout.id);
                if (filterByDate(state, returnedWorkout) && filterByTags(state, returnedWorkout))  {
                   // New workout passes current filter(s)
                   newFiltered = [...state.inputs.workouts.data.filtered, returnedWorkout];
@@ -110,7 +107,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                            ...state.inputs.workouts.data,
                            filtered: newFiltered
                         },
-                        value: newWorkouts,
+                        value: newWorkouts
                      }
                   }
                }
@@ -135,7 +132,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
 
    return (
       <PopUp
-         text = {workout !== undefined ? "Edit Workout" : "New Workout"}
+         text = {workoutId !== undefined ? "Edit Workout" : "New Workout"}
          className = "max-w-3xl"
          buttonClassName = "w-[9.5rem] h-[2.9rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out"
          icon = {faPlus}
@@ -177,7 +174,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             });
          }}
          cover = {
-            workout !== undefined ? cover ?? <FontAwesomeIcon icon = {faPencil} className = "text-primary cursor-pointer text-lg hover:scale-125 transition duration-300 ease-in-out" /> : undefined
+            cover ?? <FontAwesomeIcon icon = {faPencil} className = "text-primary cursor-pointer text-lg hover:scale-125 transition duration-300 ease-in-out" />
          }
       >
          <div className = "relative">
@@ -187,7 +184,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   className = "text-6xl text-primary mt-1"
                />
                <h1 className = "text-3xl font-bold text-black mb-2">
-                  {edit ? "Edit" : "New"} Workout
+                  {workoutId !== undefined ? "Edit" : "New"} Workout
                </h1>
             </div>
             <div className = "relative mt-2 w-full flex flex-col justify-center align-center text-left gap-3">
@@ -202,7 +199,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                <TextArea input = {state.inputs.description} label = "Description" icon = {faBook} dispatch = {dispatch} />
                <ImageSelection input = {state.inputs.image} label = "URL" icon = {faLink} dispatch = {dispatch} />
                {
-                  workout !== undefined && edit && (
+                  workout !== undefined && workoutId !== undefined && (
                      <PopUp
                         className = "max-w-xl"
                         ref = {deletePopUpRef}
@@ -253,11 +250,11 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   onClick = {(event) => handleWorkoutSubmission(event, "update")}
                >
                   {
-                     edit ? "Save" : "Create"
+                     workoutId !== undefined ? "Save" : "Create"
                   }
                </Button>
                {
-                  edit && (
+                  workoutId !== undefined && (
                      <div>
                         EDIT HERE!
                      </div>

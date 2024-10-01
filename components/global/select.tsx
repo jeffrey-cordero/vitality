@@ -13,7 +13,7 @@ export default function Select(props: VitalityInputProps): JSX.Element {
          <select
             id = {input.id}
             placeholder = {placeholder ?? ""}
-            value={input.value}
+            value = {input.value}
             className = {clsx("peer p-4 block w-full rounded-lg text-sm font-semibold border-1 placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2",
                {
                   "border-gray-200": input.error === null,

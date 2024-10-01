@@ -12,7 +12,7 @@ interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 function PricingCard(props: PricingCardProps): JSX.Element {
    return (
-      <>
+      <div>
          <div className = "flex justify-center w-[23rem] h-[34rem] max-w-[90%] text-center rounded-2xl border border-gray-200 bg-white shadow-md px-4">
             <div className = "relative flex flex-col justify-center align-center">
                <span className = "mb-3 block text-3xl font-extrabold text-primary">
@@ -35,7 +35,7 @@ function PricingCard(props: PricingCardProps): JSX.Element {
 
             </div>
          </div>
-      </>
+      </div>
    );
 };
 

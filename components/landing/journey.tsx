@@ -22,6 +22,7 @@ export default function Journey(): JSX.Element {
                                  <Image
                                     width = {2010}
                                     height = {1441}
+                                    quality = {100}
                                     src = "/landing/journey.jpg"
                                     alt = ""
                                     className = "w-full h-full shadow-sm rounded-2xl"
@@ -31,6 +32,7 @@ export default function Journey(): JSX.Element {
                                  <Image
                                     width = {640}
                                     height = {960}
+                                    quality = {100}
                                     src = "/landing/food.jpg"
                                     alt = ""
                                     className = "w-full h-full shadow-sm rounded-2xl"
@@ -45,6 +47,7 @@ export default function Journey(): JSX.Element {
                                  priority = {true}
                                  width = {1920}
                                  height = {2880}
+                                 quality = {100}
                                  src = "/landing/mountains.jpg"
                                  alt = ""
                                  className = "w-full h-full shadow-sm rounded-2xl"

@@ -8,9 +8,9 @@ import { PopUp } from "@/components/global/popup";
 import { faPaperclip, faPenToSquare, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const defaultImages = ["bike.jpg", "cardio.jpg", "default.jpg", "hike.jpg", "legs.jpg", "lift.jpg", "machine.jpg", "run.jpg", "swim.jpg", "weights.jpg"];
+const defaultImages = ["bike.png", "cardio.png", "default.png", "hike.png", "legs.png", "lift.png", "machine.png", "run.png", "swim.png", "weights.png"];
 const urlRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
-const nextMediaRegex = /^\/_next\/static\/media\/[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+\.jpg$/;
+const nextMediaRegex = /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
 
 function verifyURL(url: string): boolean {
    // URL may be relative to WWW or NextJS Static Media
@@ -49,13 +49,13 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
 
    return (
       <div className = "flex flex-col gap-3">
-         <div className = "flex gap-8 font-bold">
+         <div className = "flex gap-8 font-bold text-lg">
             <h3
                onClick = {() => {
                   setIsDefaultImage(true);
                }}
                className = {clsx("cursor-pointer", {
-                  "border-b-[2.5px] border-primary text-red": isDefaultImage
+                  "border-b-[3px] border-primary text-red": isDefaultImage
                })}>
                Defaults
             </h3>
@@ -64,7 +64,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                   setIsDefaultImage(false);
                }}
                className = {clsx("cursor-pointer", {
-                  "border-b-[2.5px] border-primary text-red": !(isDefaultImage)
+                  "border-b-[3px] border-primary text-red": !(isDefaultImage)
                })}>
                URL
             </h3>
@@ -74,16 +74,17 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                <div className = "flex flex-wrap gap-6 justify-center items-center p-6">
                   {
                      defaultImages.map((image) => {
-                        const source = require(`@/public/workouts/${image}`).default.src;
+                        const source = `/workouts/${image}`;
 
                         return (
                            <Image
                               width = {1000}
                               height = {1000}
+                              quality = {100}
                               src = {source}
                               key = {source}
                               alt = "workout-image"
-                              className = {clsx("w-[12rem] h-[12rem] object-cover object-center shadow-inner rounded-xl cursor-pointer", {
+                              className = {clsx("w-[20rem] h-[20rem] object-cover object-center shadow-inner rounded-xl cursor-pointer", {
                                  "border-[4px] border-primary shadow-2xl scale-[1.05] transition duration-300 ease-in-out": input.value === source
                               })}
                               onClick = {() => {
@@ -111,7 +112,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                </div>
                :
                <div
-                  className = "p-6"
+                  className = "p-2"
                   onKeyDown = {(event: React.KeyboardEvent) => {
                      if (event.key === "Enter") {
                         handleImageURLSubmission();
@@ -123,13 +124,14 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                            <Image
                               width = {1000}
                               height = {1000}
+                              quality = {100}
                               src = {input.value}
                               onError = {() => {
                                  // Resource removed, moved temporarily, etc.
                                  setIsValidImage(false);
                               }}
                               alt = "workout-image"
-                              className = {clsx("w-[12rem] h-[12rem] object-cover object-center rounded-xl cursor-pointer transition duration-300 ease-in-out")}
+                              className = {clsx("w-[20rem] h-[20rem] object-cover object-center rounded-xl cursor-pointer transition duration-300 ease-in-out")}
                            />
                         </div>
                      ) :
@@ -164,7 +166,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                   <Button
                      type = "button"
                      onClick = {() => handleImageURLSubmission()}
-                     className = "w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] min-h-[2.7rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
+                     className = "w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] min-h-[2.8rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
                      icon = {faPaperclip}
                   >
                      Link
@@ -188,6 +190,7 @@ export default function ImageSelection(props: VitalityInputProps): JSX.Element {
                   <Image
                      width = {1000}
                      height = {1000}
+                     quality = {100}
                      src = {input.value}
                      onError = {() => {
                         setIsValidImage(false);

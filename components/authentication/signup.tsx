@@ -149,11 +149,11 @@ function Form(): JSX.Element {
 
 export default function SignUpForm(): JSX.Element {
    return (
-      <>
+      <div>
          <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
             <Heading title = "Sign Up" description = "Create an account to get started" />
             <Form />
          </div>
-      </>
+      </div>
    );
 }

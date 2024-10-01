@@ -18,13 +18,14 @@ function WorkoutCard(props: WorkoutCardProps): JSX.Element {
       <WorkoutForm
          {...props}
          cover = {
-            <div className = "cursor-pointer flex flex-col justify-center items-center gap-2 w-[18rem] rounded-2xl overflow-hidden shadow-lg bg-white hover:scale-105 transition duration-300 ease-in-out">
-               <div className = "w-full h-[10rem] rounded-2xl rounded-b-none bg-primary">
+            <div className = "cursor-pointer flex flex-col justify-center items-center gap-2 w-[17rem] rounded-2xl overflow-hidden shadow-lg bg-white hover:scale-105 transition duration-300 ease-in-out">
+               <div className = "w-full h-[12rem] rounded-2xl rounded-b-none bg-primary">
                   {
                      workout.image ? (
                         <Image
                            width = {1000}
                            height = {1000}
+                           quality = {100}
                            src = {workout.image}
                            alt = "workout-image"
                            className = {clsx("w-full h-full object-cover object-center transition duration-300 ease-in-out")}
@@ -59,7 +60,7 @@ export default function WorkoutCards(props: WorkoutCardsProps): JSX.Element {
       <div className = "relative w-full min-h-screen">
          {
             workouts.length > 0 ? (
-               <div className = "w-10/12 mx-auto flex flex-wrap justify-center space-x-6 space-y-6 mt-6">
+               <div className = "w-10/12 mx-auto flex flex-wrap justify-center gap-6 mt-6">
                   {workouts.map((workout: Workout) => (
                      <WorkoutCard {...props} workout = {workout} key = {workout.id} />
                   ))}
