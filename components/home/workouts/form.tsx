@@ -11,7 +11,7 @@ import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTra
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dispatch, useContext, useRef, useState } from "react";
 import { PopUp } from "@/components/global/popup";
-import { filterByDate, filterByTags } from "./filter";
+import { filterWorkout } from "@/components/home/workouts/filter";
 
 interface WorkoutFormProps {
    cover?: React.ReactNode;
@@ -62,7 +62,8 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
 
                // Edit the workout after construction
                setWorkoutId(returnedWorkout.id);
-               if (filterByDate(state, returnedWorkout) && filterByTags(state, returnedWorkout))  {
+
+               if (filterWorkout(state, returnedWorkout))  {
                   // New workout passes current filter(s)
                   newFiltered = [...state.inputs.workouts.data.filtered, returnedWorkout];
                } else {
@@ -84,16 +85,18 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   if (filtered.id !== returnedWorkout.id) {
                      // Other filtered workout
                      newFiltered.push(filtered);
-                  } else if (filterByDate(state, returnedWorkout) && filterByTags(state, returnedWorkout)) {
+                  } else if (filterWorkout(state, returnedWorkout)) {
                      // Updated workout passes filter, thus pass store the new reference
                      newFiltered.push(returnedWorkout);
                   }
                }
             }
 
-            // Sort the workout lists from latest to farthest dates
-            newWorkouts = newWorkouts.sort((a, b) => b.date.getTime() - a.date.getTime());
-            newFiltered = newFiltered.sort((a, b) => b.date.getTime() - a.date.getTime());
+            // Sort the workout lists from latest to farthest dates (if date changed)
+            if (workout.date.getTime() !== returnedWorkout.date.getTime()) {
+               newWorkouts = newWorkouts.sort((a, b) => b.date.getTime() - a.date.getTime());
+               newFiltered = newFiltered.sort((a, b) => b.date.getTime() - a.date.getTime());
+            }
 
             dispatch({
                type: "updateState",
@@ -118,7 +121,8 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             // Display the success or failure notification to the user
             updateNotification({
                status: response.status,
-               message: response.body.message
+               message: response.body.message,
+               timer: 1250
             });
          } else {
             // Display errors

@@ -24,11 +24,9 @@ export async function sendFeedback(feedback: Feedback): Promise<VitalityResponse
    }
 
    try {
-      const userFeedback = fields.data;
-
       // Add new feedback into the database for further improvement of the application
       await prisma.feedback.create({
-         data: userFeedback
+         data: null
       });
 
       return sendSuccessMessage("Successfully received your feedback!", null);

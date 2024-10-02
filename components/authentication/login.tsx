@@ -84,11 +84,9 @@ function Form(): JSX.Element {
 
 export default function LoginForm(): JSX.Element {
    return (
-      <div>
-         <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
-            <Heading title = "Log In" description = "Enter valid credentials to enter" />
-            <Form />
-         </div>
+      <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
+         <Heading title = "Log In" description = "Enter valid credentials to enter" />
+         <Form />
       </div>
    );
 }

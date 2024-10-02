@@ -8,24 +8,24 @@ import { faCalendar, faMagnifyingGlass, faArrowsUpDown, faArrowRight, faArrowLef
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dispatch, useMemo } from "react";
 import { TagSelection } from "@/components/home/workouts/tag-selection";
+import { Tag } from "@/lib/workouts/tags";
 
-export function filterByTags(state: VitalityState, workout: Workout): boolean {
-   // No filtering required
-   if (!(state.inputs.workouts.data.tagsFilter)) {
-      return true;
+export function filterByTags(tagIds: Set<string>, workout: Workout): boolean {
+   // Ensure all tags within the given workout contain the desired set
+   let size: number = 0;
+
+   for (const tagId of workout.tagIds) {
+      console.log(tagId);
+
+      if (tagIds.has(tagId)) {
+         size++;
+      }
    }
 
-   // TODO
-
-   return true;
+   return size >= tagIds.size;
 }
 
 export function filterByDate(state: VitalityState, workout: Workout): boolean {
-   // No filtering required
-   if (!(state.inputs.workouts.data.dateFilter)) {
-      return true;
-   }
-
    // Apply date filter
    const dateFilter: string = state.inputs.workoutsDateFilter.value;
    const minDate: Date = new Date(state.inputs.workoutsMinDate.value);
@@ -47,7 +47,29 @@ interface FilterProps {
    reset: () => void;
 }
 
-export function applyDateFilters(props: FilterProps): Workout[] | null {
+export function filterWorkout(state: VitalityState, workout: Workout): boolean {
+   const tagIds: Set<string> = new Set(
+      state.inputs.tags.data.selected.map((tag: Tag) => tag.id)
+   );
+
+   return filterByDate(state, workout) && filterByTags(tagIds, workout);
+}
+
+export function getFilteredTagsWorkouts(props: FilterProps): Workout[] | null {
+   const { state } = props;
+
+   const tagIds: Set<string> = new Set(
+      state.inputs.tags.data.selected.map((tag: Tag) => tag.id)
+   );
+
+   const filteredWorkouts: Workout[] = [...state.inputs.workouts.value].filter((workout: Workout) => {
+      return filterByTags(tagIds, workout);
+   });
+
+   return filteredWorkouts;
+}
+
+export function getFilteredDateWorkouts(props: FilterProps): Workout[] | null {
    const { state, dispatch } = props;
 
    const filter: string = state.inputs.workoutsDateFilter.value;
@@ -111,7 +133,7 @@ function DateInput(props: DateInputProps) {
    const icon = isMinDate ? faArrowRight : faArrowLeft;
 
    return (
-      <div className = "flex flex-col justify-center items-center my-6">
+      <div className = "flex flex-col justify-center items-center mt-2">
          <div className = "text-primary">
             <FontAwesomeIcon
                icon = {icon}
@@ -155,7 +177,7 @@ export function FilterByDate(props: FilterProps): JSX.Element {
             </Button>
          }
       >
-         <div className = "flex flex-col justify-center align-center text-center gap-2 py-2">
+         <div className = "flex flex-col justify-center align-center text-center gap-2">
             <FontAwesomeIcon
                icon = {faCalendar}
                className = "text-3xl text-primary mt-1"
@@ -173,12 +195,12 @@ export function FilterByDate(props: FilterProps): JSX.Element {
                {
                   input !== undefined ? (
                      // Min or max
-                     <div className = "mt-6">
+                     <div>
                         <DateInput {...props} input = {input} />
                      </div>
                   ) : (
                      // Range (Min and Max inputs)
-                     <div className = "my-6">
+                     <div className = "my-2">
                         <Input input = {state.inputs.workoutsMinDate} label = "Min" icon = {faCalendar} dispatch = {dispatch} />
                         <FontAwesomeIcon
                            icon = {faArrowsUpDown}
@@ -190,11 +212,11 @@ export function FilterByDate(props: FilterProps): JSX.Element {
                }
                <Button
                   type = "button"
-                  className = "bg-primary text-white font-bold w-full h-[2.6rem] text-sm"
+                  className = "bg-primary text-white font-bold w-full h-[2.6rem] text-sm mt-3"
                   icon = {faMagnifyingGlass}
                   onClick = {() => {
                      // Apply date filter
-                     const filteredWorkouts = applyDateFilters(props);
+                     const filteredWorkouts = getFilteredDateWorkouts(props);
 
                      if (filteredWorkouts !== null) {
                         // Update filtered state
@@ -204,8 +226,7 @@ export function FilterByDate(props: FilterProps): JSX.Element {
                               ...state.inputs.workouts,
                               data: {
                                  ...state.inputs.workouts.data,
-                                 filtered: filteredWorkouts,
-                                 dateFilter: true
+                                 filtered: filteredWorkouts
                               }
                            }
                         });
@@ -223,7 +244,7 @@ export function FilterByDate(props: FilterProps): JSX.Element {
 
 export function FilterByTags(props: FilterProps): JSX.Element {
    const { state, dispatch, reset } = props;
-   
+
    return (
       <PopUp
          className = "max-w-xl"
@@ -231,13 +252,27 @@ export function FilterByTags(props: FilterProps): JSX.Element {
             <Button
                type = "button"
                className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.6rem] text-sm"
+               onClick = {() => {
+                  dispatch({
+                     type: "updateInput",
+                     value: {
+                        ...state.inputs.tags,
+                        data: {
+                           ...state.inputs.tags.data,
+                           // Selected tags are fetched from prior filter choices
+                           selected: state.inputs.tags.data.filteredSelected
+                        }
+                     }
+                  });
+               }}
             >
                <FontAwesomeIcon icon = {faTag} className = "text-xs" />
                Filter by Tags
             </Button>
          }
+
       >
-         <div className = "flex flex-col justify-center align-center text-center gap-2 py-2">
+         <div className = "flex flex-col justify-center align-center text-center gap-2">
             <FontAwesomeIcon
                icon = {faTag}
                className = "text-3xl text-primary mt-1"
@@ -251,8 +286,45 @@ export function FilterByTags(props: FilterProps): JSX.Element {
                   onClick = {() => reset()}
                   className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
-               <div className="w-full mx-auto my-2">
-               <TagSelection input = {state.inputs.tags} label = "Tags " dispatch = {dispatch} state = {state} />
+               <div className = "w-full mx-auto my-2">
+                  <TagSelection input = {state.inputs.tags} label = "Tags " dispatch = {dispatch} state = {state} />
+                  <Button
+                     type = "button"
+                     className = "bg-primary text-white font-bold w-full h-[2.6rem] text-sm mt-3"
+                     icon = {faMagnifyingGlass}
+                     onClick = {() => {
+                        // Apply tag filter
+                        const filteredWorkouts = getFilteredTagsWorkouts(props);
+
+                        if (filteredWorkouts !== null) {
+                           // Update filtered state
+                           dispatch({
+                              type: "updateInput",
+                              value: {
+                                 ...state.inputs.workouts,
+                                 data: {
+                                    ...state.inputs.workouts.data,
+                                    filtered: filteredWorkouts
+                                 }
+                              }
+                           });
+
+                           dispatch({
+                              type: "updateInput",
+                              value: {
+                                 ...state.inputs.tags,
+                                 data: {
+                                    ...state.inputs.tags.data,
+                                    // Cache filtered tags selection
+                                    filteredSelected: state.inputs.tags.data.selected
+                                 }
+                              }
+                           });
+                        }
+                     }}
+                  >
+                     Apply
+                  </Button>
                </div>
             </div>
          </div>

@@ -11,9 +11,9 @@ import { fetchWorkoutTags } from "@/lib/workouts/tags";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { getWorkoutDate, searchForTitle } from "@/lib/workouts/shared";
-import { faTag, faPersonRunning, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {  faChevronCircleLeft, faCircleChevronLeft, faCircleChevronRight, faPersonRunning, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FilterByDate, FilterByTags } from "@/components/home/workouts/filter";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const workouts: VitalityState = {
    status: "Initial",
@@ -91,8 +91,6 @@ const workouts: VitalityState = {
          error: null,
          data: {
             fetched: false,
-            dateFilter: false,
-            tagsFilter: false,
             selected: new Set<Workout>(),
             // Based on search title pattern, data interval, tags, etc.
             filtered: []
@@ -151,6 +149,10 @@ export default function Page() {
       return searchForTitle(filtered, search);
    }, [filtered, search]);
 
+   // Hold total table/cards pages and current page index
+   const pages: number = results.length / state.inputs.workouts.data.size;
+   const page: number = state.inputs.workouts.data.page;
+
    const fetchWorkoutsData = useCallback(async() => {
       if (user !== undefined && state.inputs.workouts.data.fetched === false) {
          try {
@@ -168,6 +170,7 @@ export default function Page() {
                         ...state.inputs.tags.data,
                         options: tagsData,
                         selected: [],
+                        filteredSelected: [],
                         dictionary: Object.fromEntries(tagsData.map(tag => [tag.id, tag]))
                      }
                   },
@@ -177,6 +180,8 @@ export default function Page() {
                      data: {
                         ...state.inputs.workouts.data,
                         filtered: workoutsData,
+                        page: 0,
+                        size: 10,
                         fetched: true
                      }
                   }
@@ -197,7 +202,8 @@ export default function Page() {
             tags: {
                data: {
                   ...state.inputs.tags.data,
-                  selected: []
+                  selected: [],
+                  filteredSelected: []
                },
                value: state.inputs.tags.value
             },
@@ -205,8 +211,7 @@ export default function Page() {
                data: {
                   ...state.inputs.workouts.data,
                   filtered: state.inputs.workouts.value,
-                  dateFilter: false,
-                  tagsFilter: false
+                  page: 0
                },
                value: state.inputs.workouts.value
             },
@@ -250,9 +255,18 @@ export default function Page() {
                <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 my-2">
                   <div className = "w-full flex flex-col justify-start  gap-2">
                      <Input input = {state.inputs.workoutsSearch} label = "Search" icon = {faPersonRunning} dispatch = {dispatch} />
-                     <div className = "w-full flex flex-row justify-start items-center gap-2">
-                        <FilterByDate state = {state} dispatch = {dispatch} reset = {handleReset} />
-                        <FilterByTags state = {state} dispatch = {dispatch} reset = {handleReset} />
+                     <div className = "w-full flex flex-row justify-between items-center gap-2">
+                        <div className="flex flex-row gap-2">
+                           <FilterByDate state = {state} dispatch = {dispatch} reset = {handleReset} />
+                           <FilterByTags state = {state} dispatch = {dispatch} reset = {handleReset} />
+                        </div>
+                        <div>
+                           <FontAwesomeIcon icon={faCircleChevronLeft} className="cursor-pointer text-primary text-xl" />
+                           <FontAwesomeIcon icon={faCircleChevronRight} className="cursor-pointer text-primary text-xl" />
+                           {
+                               
+                           }
+                        </div>
                      </div>
                   </div>
                </div>

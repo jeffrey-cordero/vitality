@@ -65,6 +65,7 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
                   // Resulting data from backend is the tag with the unique ID in UUID format
                   options: newOptions,
                   selected: newSelected,
+
                   dictionary: newDictionary
                }
             }
@@ -169,7 +170,8 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
          // Display the success or failure notification to the user
          updateNotification({
             status: response.status,
-            message: response.body.message
+            message: response.body.message,
+            timer: 1250
          });
       }
    };
@@ -214,7 +216,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
                      <div
                         style = {{ backgroundColor: color }}
                         className = {clsx("cursor-pointer w-full h-[3rem] border-[3px] rounded-sm p-3 text-white text-center", {
-                           "border-primary scale-[1.02]": state.inputs.tagsColor.value === color,
+                           "border-primary scale-[1.02] shadow-2xl": state.inputs.tagsColor.value === color,
                            "border-white": state.inputs.tagsColor.value !== color
                         })}
                         onClick = {changeColor}
@@ -233,7 +235,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
          </div>
          <div>
             <Button
-               type = "submit" className = "bg-red-500 text-white w-full" icon = {faTrash}
+               type = "submit" className = "bg-red-500 text-white w-full h-[2.9rem]" icon = {faTrash}
                onClick = {() => handleEditWorkoutTagSubmission("delete")}
             >
                Delete
@@ -241,7 +243,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
          </div>
          <div>
             <Button
-               type = "submit" className = "bg-primary text-white w-full" icon = {faCloudArrowUp}
+               type = "submit" className = "bg-primary text-white w-full  h-[2.9rem]" icon = {faCloudArrowUp}
                onClick = {() => handleEditWorkoutTagSubmission("update")}
             >
                Save
@@ -333,11 +335,11 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
             }
             {
                selected &&
-               <FontAwesomeIcon
-                  onMouseDown = {() => handleSelectWorkoutTag(false)}
-                  icon = {faXmark}
-                  className = "cursor-pointer text-md transition duration-300 ease-in-out hover:scale-125 hover:text-red-500"
-               />
+                  <FontAwesomeIcon
+                     onMouseDown = {() => handleSelectWorkoutTag(false)}
+                     icon = {faXmark}
+                     className = "cursor-pointer text-md transition duration-300 ease-in-out hover:scale-125 hover:text-red-500"
+                  />
             }
          </div>
       </li>
@@ -391,12 +393,14 @@ export function TagSelection(props: TagSelectionProps): JSX.Element {
    return (
       <div>
          <div className = "flex flex-col flex-wrap justify-center items-center">
-            <ul className = "flex flex-row flex-wrap justify-center items-center">
+            <ul className = {clsx("flex flex-row flex-wrap justify-center items-center", {
+               "pb-3" : state.inputs.tags.data.selected.length > 0
+            })}>
                {
                   state.inputs.tags.data.selected.map((selected: Tag) => {
                      return (
                         selected !== undefined &&
-                        <WorkoutTag input = {state.inputs.tags} label = "Tags" state = {state} dispatch = {dispatch} tag = {selected} selected = {true} key = {selected.id} />
+                           <WorkoutTag input = {state.inputs.tags} label = "Tags" state = {state} dispatch = {dispatch} tag = {selected} selected = {true} key = {selected.id} />
                      );
                   })
                }
@@ -409,7 +413,9 @@ export function TagSelection(props: TagSelectionProps): JSX.Element {
                   dispatch = {dispatch}
                />
             </div>
-            <ul className = "flex flex-col flex-wrap justify-center items-center">
+            <ul className = {clsx("flex flex-row flex-wrap justify-center items-center", {
+               "pt-3" : results.length > 0 || search.trim().length > 0
+            })}>
                {
                   results.length > 0 ? results.map((tag: Tag) => {
                      return <WorkoutTag {...props} state = {state} dispatch = {dispatch} tag = {tag} selected = {false} key = {tag.id} />;

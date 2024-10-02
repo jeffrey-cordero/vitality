@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import { useContext, useEffect, useState } from "react";
@@ -44,7 +45,7 @@ function SideBarLinks(): JSX.Element {
    }, [user]);
 
    return (
-      <div>
+      <>
          {links.map((link) => {
             return (
                <Link
@@ -72,7 +73,7 @@ function SideBarLinks(): JSX.Element {
                </Link>
             );
          })}
-      </div>
+      </>
    );
 }
 

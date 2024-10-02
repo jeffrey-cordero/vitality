@@ -30,6 +30,5 @@ export default function Modal(props: ModalProps): JSX.Element {
                </div>
             )}
       </div>
-
    );
 }

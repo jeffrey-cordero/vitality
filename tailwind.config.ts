@@ -25,7 +25,6 @@ const config: Config = {
                   transform: "translateY(0)"
                }
             },
-
             fadeIn: {
                from: {
                   opacity: "0"
@@ -33,11 +32,20 @@ const config: Config = {
                to: {
                   opacity: "1"
                }
+            },
+            fadeOut: {
+               from: {
+                  opacity: "1"
+               },
+               to: {
+                  opacity: "0"
+               }
             }
          },
          animation: {
             slideIn: "slideIn 1s ease-in-out",
-            fadeIn: "fadeIn 700ms ease-in-out forwards"
+            fadeIn: "fadeIn 700ms ease-in-out forwards",
+            fadeOut: "fadeOut 700ms ease-in-out forwards"
          }
       }
    },
