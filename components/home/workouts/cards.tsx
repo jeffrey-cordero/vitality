@@ -57,7 +57,7 @@ export default function WorkoutCards(props: WorkoutCardsProps): JSX.Element {
    const fetched: boolean = state.inputs.workouts.data.fetched;
 
    return (
-      <div className = "relative w-full min-h-screen">
+      <div className = "relative w-full">
          {
             workouts.length > 0 ? (
                <div className = "w-10/12 mx-auto flex flex-wrap justify-center gap-6 mt-6">

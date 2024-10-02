@@ -93,7 +93,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             }
 
             // Sort the workout lists from latest to farthest dates (if date changed)
-            if (workout.date.getTime() !== returnedWorkout.date.getTime()) {
+            if (workout === undefined || workout.date.getTime() !== returnedWorkout.date.getTime()) {
                newWorkouts = newWorkouts.sort((a, b) => b.date.getTime() - a.date.getTime());
                newFiltered = newFiltered.sort((a, b) => b.date.getTime() - a.date.getTime());
             }

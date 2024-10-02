@@ -1,0 +1,81 @@
+import clsx from "clsx";
+import Button from "@/components/global/button";
+import Select from "@/components/global/select";
+import { VitalityAction, VitalityState } from "@/lib/global/state";
+import { Workout } from "@/lib/workouts/workouts";
+import { faCircleChevronLeft, faCircleChevronRight, faTabletScreenButton } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Dispatch } from "react";
+
+interface PaginationProps {
+   workouts: Workout[];
+   state: VitalityState;
+   dispatch: Dispatch<VitalityAction<Workout>>;
+}
+
+export default function Pagination(props: PaginationProps): JSX.Element {
+   const { state, dispatch, workouts } = props;
+
+   // Hold total table/cards pages and current page index
+   const pages: number = Math.ceil(workouts.length / state.inputs.workoutsPaging.value);
+   const page: number = state.inputs.workoutsPaging.data.page;
+
+   const handlePageClick = (page: number) => {
+      dispatch({
+         type: "updateInput",
+         value: {
+            ...state.inputs.workoutsPaging,
+            data: {
+               ...state.inputs.workoutsPaging.data,
+               page: page
+            }
+         }
+      });
+   }
+
+   const handleLeftClick = () => {
+      handlePageClick(Math.max(0, page - 1));
+   }
+
+   const handleRightClick = () => {
+      handlePageClick(Math.min(pages - 1, page + 1));
+   }
+
+   return (
+      <div className="mt-6 text-lg">
+         <div className="flex flex-row justify-center items-center mb-2">
+            <FontAwesomeIcon icon={faCircleChevronLeft} className="cursor-pointer text-primary text-xl mr-2" onClick={handleLeftClick} />
+            {Array.from({ length: pages }, (_, index) => (
+               <Button
+                  key={index}
+                  onClick={() => handlePageClick(index)}
+                  className={clsx("rounded-lg px-2 py-1", {
+                     "font-bold text-primary border-2 border-primary bg-blue-100": index === page,
+                  })}
+               >
+                  {index + 1}
+               </Button>
+            ))}
+            <FontAwesomeIcon icon={faCircleChevronRight} className="cursor-pointer text-primary text-xl ml-2" onClick={handleRightClick} />
+         </div>
+         <div>
+            <Select label="Entries" icon={faTabletScreenButton} input={state.inputs.workoutsPaging} state={state} dispatch={dispatch} className="min-w-[10rem] max-h-[5rem] mt-4" 
+            onChange={(event)=> {
+               dispatch({
+                  type: "updateInput",
+                  value: {
+                     ...state.inputs.workoutsPaging,
+                     value: event.target.value,
+                     error: null,
+                     data: {
+                        ...state.inputs.workoutsPaging.data,
+                        page: 0
+                     }
+                  }
+               });
+            }}
+            />
+         </div>
+      </div>
+   )
+}

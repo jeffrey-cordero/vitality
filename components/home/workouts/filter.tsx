@@ -15,8 +15,6 @@ export function filterByTags(tagIds: Set<string>, workout: Workout): boolean {
    let size: number = 0;
 
    for (const tagId of workout.tagIds) {
-      console.log(tagId);
-
       if (tagIds.has(tagId)) {
          size++;
       }
@@ -48,11 +46,14 @@ interface FilterProps {
 }
 
 export function filterWorkout(state: VitalityState, workout: Workout): boolean {
+   const { dateFiltered, tagsFiltered } = state.inputs.workouts.data;
+
    const tagIds: Set<string> = new Set(
       state.inputs.tags.data.selected.map((tag: Tag) => tag.id)
    );
 
-   return filterByDate(state, workout) && filterByTags(tagIds, workout);
+   // Only check if a filter passes if it has been applied already
+   return (!(dateFiltered) || filterByDate(state, workout)) && (!(tagsFiltered) || filterByTags(tagIds, workout));
 }
 
 export function getFilteredTagsWorkouts(props: FilterProps): Workout[] | null {
@@ -170,7 +171,7 @@ export function FilterByDate(props: FilterProps): JSX.Element {
          cover = {
             <Button
                type = "button"
-               className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.6rem] text-sm"
+               className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.9rem] text-sm"
             >
                <FontAwesomeIcon icon = {faCalendar} className = "text-xs" />
                Filter by Date
@@ -226,7 +227,8 @@ export function FilterByDate(props: FilterProps): JSX.Element {
                               ...state.inputs.workouts,
                               data: {
                                  ...state.inputs.workouts.data,
-                                 filtered: filteredWorkouts
+                                 filtered: filteredWorkouts,
+                                 dateFiltered: true
                               }
                            }
                         });
@@ -251,7 +253,7 @@ export function FilterByTags(props: FilterProps): JSX.Element {
          cover = {
             <Button
                type = "button"
-               className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.6rem] text-sm"
+               className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.9rem] text-sm"
                onClick = {() => {
                   dispatch({
                      type: "updateInput",
@@ -304,7 +306,8 @@ export function FilterByTags(props: FilterProps): JSX.Element {
                                  ...state.inputs.workouts,
                                  data: {
                                     ...state.inputs.workouts.data,
-                                    filtered: filteredWorkouts
+                                    filtered: filteredWorkouts,
+                                    tagsFiltered: true
                                  }
                               }
                            });

@@ -3,6 +3,7 @@ import WorkoutForm from "@/components/home/workouts/form";
 import WorkoutTable from "@/components/home/workouts/table";
 import WorkoutCards from "@/components/home/workouts/cards";
 import Button from "@/components/global/button";
+import Pagination from "@/components/home/workouts/pagination";
 import clsx from "clsx";
 import Input from "@/components/global/input";
 import { AuthenticationContext } from "@/app/layout";
@@ -11,7 +12,7 @@ import { fetchWorkoutTags } from "@/lib/workouts/tags";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { getWorkoutDate, searchForTitle } from "@/lib/workouts/shared";
-import {  faChevronCircleLeft, faCircleChevronLeft, faCircleChevronRight, faPersonRunning, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCircleChevronLeft, faCircleChevronRight, faPersonRunning, faPlus, faTabletScreenButton } from "@fortawesome/free-solid-svg-icons";
 import { FilterByDate, FilterByTags } from "@/components/home/workouts/filter";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -92,6 +93,8 @@ const workouts: VitalityState = {
          data: {
             fetched: false,
             selected: new Set<Workout>(),
+            dateFiltered: false,
+            tagsFiltered: false,
             // Based on search title pattern, data interval, tags, etc.
             filtered: []
          }
@@ -109,8 +112,7 @@ const workouts: VitalityState = {
          id: "workoutsDateFilter",
          error: null,
          data: {
-            options: ["Is on or after", "Is on or before", "Is between"],
-            default: "Is on or after"
+            options: ["Is on or after", "Is on or before", "Is between"]
          }
       },
       workoutsMinDate: {
@@ -126,6 +128,17 @@ const workouts: VitalityState = {
          value: getWorkoutDate(new Date()),
          error: null,
          data: {}
+      },
+      workoutsPaging: {
+         type: "select",
+         id: "workoutsPaging",
+         value: 10,
+         error: null,
+         data: {
+            page: 0,
+            options: [5, 10, 25, 50, 100, 500, 1000],
+            handlesChanges: true
+         }
       }
    },
    response: null
@@ -144,16 +157,22 @@ export default function Page() {
    // Filtered based on selected tags or date intervals
    const filtered: Workout[] = state.inputs.workouts.data.filtered;
 
-   // Search results for workouts
+   // Search results for workouts, accounting for pagination
    const results: Workout[] = useMemo(() => {
       return searchForTitle(filtered, search);
    }, [filtered, search]);
 
-   // Hold total table/cards pages and current page index
-   const pages: number = results.length / state.inputs.workouts.data.size;
-   const page: number = state.inputs.workouts.data.page;
+   const pages: number = state.inputs.workoutsPaging.value;
+   const page: number = state.inputs.workoutsPaging.data.page;
 
-   const fetchWorkoutsData = useCallback(async() => {
+   const low: number = page * pages;
+   const high = low + pages - 1;
+
+   const workoutsSection: Workout[] = useMemo(()=> {
+      return results.slice(low, high + 1);
+   }, [results, low, high]);
+
+   const fetchWorkoutsData = useCallback(async () => {
       if (user !== undefined && state.inputs.workouts.data.fetched === false) {
          try {
             const [workoutsData, tagsData] = await Promise.all([
@@ -180,8 +199,8 @@ export default function Page() {
                      data: {
                         ...state.inputs.workouts.data,
                         filtered: workoutsData,
-                        page: 0,
-                        size: 10,
+                        dateFiltered: false,
+                        tagsFiltered: false,
                         fetched: true
                      }
                   }
@@ -210,8 +229,7 @@ export default function Page() {
             workouts: {
                data: {
                   ...state.inputs.workouts.data,
-                  filtered: state.inputs.workouts.value,
-                  page: 0
+                  filtered: state.inputs.workouts.value
                },
                value: state.inputs.workouts.value
             },
@@ -220,6 +238,13 @@ export default function Page() {
                   ...state.inputs.workoutsDateFilter.data
                },
                value: state.inputs.workoutsDateFilter.value
+            },
+            workoutsPaging: {
+               data: {
+                  ...state.inputs.workoutsPaging.data,
+                  page: 0
+               },
+               value: 10
             }
          }
       });
@@ -232,55 +257,48 @@ export default function Page() {
    }, [fetchWorkoutsData, state.inputs.workouts.data.fetched, state.inputs.tags, state.inputs.workouts]);
 
    return (
-      <main className = "w-full mx-auto my-6 flex min-h-screen flex-col items-center justify-start gap-4 text-center">
+      <main className="w-full mx-auto my-6 flex min-h-screen flex-col items-center justify-start gap-4 text-center">
          <div>
-            <h1 className = "text-4xl font-bold mt-8">Welcome Back, Champion!</h1>
-            <p className = "text-lg text-gray-700 mt-4 max-w-[25rem] mx-auto">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
+            <h1 className="text-4xl font-bold mt-8">Welcome Back, Champion!</h1>
+            <p className="text-lg text-gray-700 mt-4 max-w-[25rem] mx-auto">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
          </div>
-         <div className = "flex justify-center w-full mx-auto">
+         <div className="flex justify-center w-full mx-auto">
             <WorkoutForm
-               workout = {undefined}
-               state = {state}
-               dispatch = {dispatch}
-               reset = {handleReset}
-               cover = {
-                  <Button type = "button" className = "bg-primary text-white w-full h-[2.6rem] p-4" icon = {faPlus}>
+               workout={undefined}
+               state={state}
+               dispatch={dispatch}
+               reset={handleReset}
+               cover={
+                  <Button type="button" className="bg-primary text-white w-full h-[2.6rem] p-4" icon={faPlus}>
                      New Workout
                   </Button>
                }
             />
          </div>
          {
-            <div className = "w-full mx-auto flex flex-col justify-center items-center">
-               <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 my-2">
-                  <div className = "w-full flex flex-col justify-start  gap-2">
-                     <Input input = {state.inputs.workoutsSearch} label = "Search" icon = {faPersonRunning} dispatch = {dispatch} />
-                     <div className = "w-full flex flex-row justify-between items-center gap-2">
+            <div className="w-full mx-auto flex flex-col justify-center items-center">
+               <div className="relative w-10/12 flex justify-start items-center text-left gap-2 my-2">
+                  <div className="w-full flex flex-col justify-start  gap-2">
+                     <Input input={state.inputs.workoutsSearch} label="Search" icon={faPersonRunning} dispatch={dispatch} />
+                     <div className="w-full flex flex-row justify-between items-center gap-2">
                         <div className="flex flex-row gap-2">
-                           <FilterByDate state = {state} dispatch = {dispatch} reset = {handleReset} />
-                           <FilterByTags state = {state} dispatch = {dispatch} reset = {handleReset} />
-                        </div>
-                        <div>
-                           <FontAwesomeIcon icon={faCircleChevronLeft} className="cursor-pointer text-primary text-xl" />
-                           <FontAwesomeIcon icon={faCircleChevronRight} className="cursor-pointer text-primary text-xl" />
-                           {
-                               
-                           }
+                           <FilterByDate state={state} dispatch={dispatch} reset={handleReset} />
+                           <FilterByTags state={state} dispatch={dispatch} reset={handleReset} />
                         </div>
                      </div>
                   </div>
                </div>
-               <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 mt-2">
+               <div className="relative w-10/12 flex justify-start items-center text-left gap-2 mt-2">
                   <Button
-                     onClick = {() => setView("table")}
-                     className = {clsx("transition duration-300 ease-in-out", {
+                     onClick={() => setView("table")}
+                     className={clsx("transition duration-300 ease-in-out", {
                         "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
                      })}>
                      Table
                   </Button>
                   <Button
-                     onClick = {() => setView("cards")}
-                     className = {clsx("transition duration-300 ease-in-out", {
+                     onClick={() => setView("cards")}
+                     className={clsx("transition duration-300 ease-in-out", {
                         "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
                      })}>
                      Cards
@@ -288,9 +306,14 @@ export default function Page() {
                </div>
                {
                   view === "table" ? (
-                     <WorkoutTable workouts = {results} state = {state} dispatch = {dispatch} reset = {handleReset} />
+                     <WorkoutTable workouts={workoutsSection} state={state} dispatch={dispatch} reset={handleReset} />
                   ) : (
-                     <WorkoutCards workouts = {results} state = {state} dispatch = {dispatch} reset = {handleReset} />
+                     <WorkoutCards workouts={workoutsSection} state={state} dispatch={dispatch} reset={handleReset} />
+                  )
+               }
+               {
+                  results.length > 0 && (
+                     <Pagination workouts={results} state={state} dispatch={dispatch} />
                   )
                }
             </div>

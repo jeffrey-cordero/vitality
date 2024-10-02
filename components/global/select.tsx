@@ -5,7 +5,7 @@ import { VitalityInputProps } from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Select(props: VitalityInputProps): JSX.Element {
-   const { label, icon, input, placeholder, dispatch } = props;
+   const { label, icon, input, placeholder, dispatch, onChange } = props;
    const options: string[] = input.data.options;
 
    return (
@@ -18,16 +18,22 @@ export default function Select(props: VitalityInputProps): JSX.Element {
                {
                   "border-gray-200": input.error === null,
                   "border-red-500 ": input.error !== null
-               })}
+               }, props.className)}
             onChange = {(event: ChangeEvent<HTMLSelectElement>) => {
-               dispatch({
-                  type: "updateInput",
-                  value: {
-                     ...input,
-                     value: event.target.value,
-                     error: null
-                  }
-               });
+               if (input.data.handlesChanges !== undefined) {
+                  // Call the user-defined event handler (complex state)
+                  onChange?.call(null, event);
+               } else {
+                  // Simple state
+                  dispatch({
+                     type: "updateInput",
+                     value: {
+                        ...input,
+                        value: event.target.value,
+                        error: null
+                     }
+                  });
+               }
             }}
          >
             { options.map((option: string) => {

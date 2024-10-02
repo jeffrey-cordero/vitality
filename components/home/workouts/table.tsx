@@ -259,7 +259,7 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
    }, [state.inputs.workouts, workouts, selected.size, dispatch]);
 
    return (
-      <div className = "relative w-full min-h-screen">
+      <div className = "relative w-full">
          {
             workouts.length > 0 ? (
                <div className = "w-10/12 mx-auto overflow-x-auto mt-6 rounded-xl shadow-xl">
