@@ -9,7 +9,6 @@ export default function Page() {
 
    return (
       <main className = "w-full mx-auto flex min-h-screen flex-col items-center justify-start text-center">
-
          <Link href = "/home/feedback">
             <Button
                className = "flex h-[48px] grow items-center justify-center gap-2 my-4 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-primary md:flex-none md:justify-start md:p-2 md:px-3"
@@ -21,7 +20,9 @@ export default function Page() {
          <form
             action = {async() => {
                "use server";
-               await signOut();
+               await signOut({
+                  redirect: true
+               });
             }}
          >
             <Button

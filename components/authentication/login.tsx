@@ -8,7 +8,7 @@ import { faArrowRotateLeft, faUnlockKeyhole } from "@fortawesome/free-solid-svg-
 import { FormEvent, useContext, useReducer } from "react";
 import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/state";
 import { login, Credentials } from "@/lib/authentication/login";
-import { NotificationContext } from "@/app/layout";
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
 
 const credentials: VitalityState = {
    status: "Initial",
@@ -31,8 +31,14 @@ const credentials: VitalityState = {
 };
 
 function Form(): JSX.Element {
+   const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, credentials);
+
+   if (user !== undefined) {
+      // Ensure after a successful logout, the URL is updated accordingly
+      window.location.reload();
+   }
 
    const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();
@@ -49,7 +55,7 @@ function Form(): JSX.Element {
             value: response
          });
 
-         if (response.status === "Failure") {
+         if (response?.status === "Failure") {
             // Display the failure notification to the user
             updateNotification({
                status: response.status,
@@ -57,7 +63,7 @@ function Form(): JSX.Element {
             });
          }
       } catch (error) {
-         console.error("Error updating status:", error);
+         console.error(error);
       }
    };
 

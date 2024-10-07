@@ -3,7 +3,11 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/database/client";
 import { z } from "zod";
-import { VitalityResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/state";
+import {
+   VitalityResponse,
+   sendSuccessMessage,
+   sendErrorMessage
+} from "@/lib/global/state";
 
 export type Registration = {
   name: string;
@@ -21,7 +25,10 @@ const registrationSchema = z.object({
       .trim()
       .min(2, { message: "A name must be at least 2 characters" }),
    birthday: z
-      .date()
+      .date({
+         required_error: "Birthday for account is required",
+         invalid_type_error: "A valid birthday is required"
+      })
       .min(new Date(new Date().getFullYear() - 200, 0, 1), {
          message: "A birthday must not be before 200 years ago"
       })
@@ -49,19 +56,21 @@ const registrationSchema = z.object({
       .optional()
 });
 
-export async function signup(registration: Registration): Promise<VitalityResponse<null>> {
+export async function signup(
+   registration: Registration
+): Promise<VitalityResponse<null>> {
    if (registration?.phone?.trim().length === 0) {
       delete registration.phone;
    }
 
    const fields = registrationSchema.safeParse(registration);
 
-   if (!(fields.success)) {
+   if (!fields.success) {
       return sendErrorMessage(
          "Error",
          "Invalid user registration fields",
          null,
-         fields.error.flatten().fieldErrors,
+         fields.error.flatten().fieldErrors
       );
    } else if (!(registration.password === registration.confirmPassword)) {
       return sendErrorMessage("Error", "Invalid user registration fields", null, {
@@ -81,11 +90,19 @@ export async function signup(registration: Registration): Promise<VitalityRespon
       }
 
       await prisma.users.create({
-         data: userRegistration
+         data: {
+            username: userRegistration.username,
+            name: userRegistration.name,
+            email: userRegistration.email,
+            password: userRegistration.password,
+            birthday: userRegistration.birthday,
+            phone: userRegistration.phone
+         }
       });
 
       return sendSuccessMessage("Successfully registered", null);
    } catch (error: any) {
+      console.error(error);
       if (error.code === "P2002" && error.meta?.target?.includes("username")) {
          return sendErrorMessage("Error", "Internal database conflicts", null, {
             username: ["Username already taken"]
@@ -105,7 +122,12 @@ export async function signup(registration: Registration): Promise<VitalityRespon
             phone: ["Phone number already taken"]
          });
       } else {
-         return sendErrorMessage("Failure", "Internal Server Error. Please try again later.", null, {});
+         return sendErrorMessage(
+            "Failure",
+            "Internal Server Error. Please try again later.",
+            null,
+            {}
+         );
       }
    }
 }

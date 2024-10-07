@@ -43,7 +43,8 @@ CREATE TABLE "sets" (
       set_order INTEGER,
       weight INTEGER,
       duration INTERVAL,
-      repetitions INTEGER
+      repetitions INTEGER,
+      other TEXT
 );
 
 CREATE INDEX "sets_exercise_index" ON "sets" (exercise_id);

@@ -1,13 +1,32 @@
 "use client";
 import clsx from "clsx";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState, useCallback } from "react";
 import { VitalityInputProps } from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function TextArea(props: VitalityInputProps): JSX.Element {
-   const { label, icon, input, placeholder, dispatch } = props;
+   const { label, icon, input, onChange, placeholder, dispatch } = props;
    const textArea = useRef<HTMLTextAreaElement | null>(null);
    const [visible, setVisible] = useState<boolean>(false);
+
+   const handleTextAreaChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
+      if (input.data.handlesChanges !== undefined) {
+         // Call the user-defined event handler (complex state)
+         onChange?.call(null, event);
+      } else {
+         // Simple state
+         dispatch({
+            type: "updateInput",
+            value: {
+               ...input,
+               value: event.target.value,
+               error: null
+            }
+         });
+      }
+
+      handleTextAreaOverflow();
+   }, [dispatch, input,  onChange]);
 
    const handleTextAreaOverflow = () => {
       const textarea = textArea.current;
@@ -37,17 +56,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
                   "border-gray-200": input.error === null,
                   "border-red-500 ": input.error !== null
                })}
-            onChange = {(event: ChangeEvent<HTMLTextAreaElement>) => {
-               dispatch({
-                  type: "updateInput",
-                  value: {
-                     ...input,
-                     value: event.target.value,
-                     error: null
-                  }
-               });
-               handleTextAreaOverflow();
-            }}
+            onChange = {(event: ChangeEvent<HTMLTextAreaElement>) => {handleTextAreaChange(event);}}
             ref = {textArea}
          />
          <label

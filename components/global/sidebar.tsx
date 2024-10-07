@@ -13,7 +13,6 @@ interface SideBarProps {
    name: string;
    href: string;
    icon: IconDefinition;
-   logout?: boolean;
 }
 
 const landingLinks: SideBarProps[] = [
@@ -55,9 +54,6 @@ function SideBarLinks(): JSX.Element {
                      "flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-black bg-gray-50 text-sm font-medium hover:text-primary z-40",
                      {
                         "bg-sky-100 text-primary": pathname === link.href
-                     },
-                     {
-                        "text-red-600 hover:text-primary": link.logout
                      }
                   )}>
                   <div

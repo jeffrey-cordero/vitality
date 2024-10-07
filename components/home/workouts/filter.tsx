@@ -6,12 +6,12 @@ import { sendErrorMessage, sendSuccessMessage, VitalityAction, VitalityInputStat
 import { Workout } from "@/lib/workouts/workouts";
 import { faCalendar, faMagnifyingGlass, faArrowsUpDown, faArrowRight, faArrowLeft, faArrowRotateLeft, faTag } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Dispatch, useMemo } from "react";
+import { Dispatch, useCallback, useMemo } from "react";
 import { TagSelection } from "@/components/home/workouts/tag-selection";
 import { Tag } from "@/lib/workouts/tags";
 
 export function filterByTags(tagIds: Set<string>, workout: Workout): boolean {
-   // Ensure all tags within the given workout contain the desired set
+   // Ensure tags within the given workout cover entire provided set of tag id's
    let size: number = 0;
 
    for (const tagId of workout.tagIds) {
@@ -24,7 +24,7 @@ export function filterByTags(tagIds: Set<string>, workout: Workout): boolean {
 }
 
 export function filterByDate(state: VitalityState, workout: Workout): boolean {
-   // Apply date filter
+   // Apply date filter using min and/or max date and specific method (before, after, between)
    const dateFilter: string = state.inputs.workoutsDateFilter.value;
    const minDate: Date = new Date(state.inputs.workoutsMinDate.value);
    const maxDate: Date = new Date(state.inputs.workoutsMaxDate.value);
@@ -42,7 +42,7 @@ export function filterByDate(state: VitalityState, workout: Workout): boolean {
 interface FilterProps {
    state: VitalityState;
    dispatch: Dispatch<VitalityAction<Workout | null>>;
-   reset: () => void;
+   reset: (_filterReset: boolean) => void;
 }
 
 export function filterWorkout(state: VitalityState, workout: Workout): boolean {
@@ -52,7 +52,7 @@ export function filterWorkout(state: VitalityState, workout: Workout): boolean {
       state.inputs.tags.data.selected.map((tag: Tag) => tag.id)
    );
 
-   // Only check if a filter passes if it has been applied already
+   // Filter by date and/or applied tags, if applicable for either method
    return (!(dateFiltered) || filterByDate(state, workout)) && (!(tagsFiltered) || filterByTags(tagIds, workout));
 }
 
@@ -73,13 +73,13 @@ export function getFilteredTagsWorkouts(props: FilterProps): Workout[] | null {
 export function getFilteredDateWorkouts(props: FilterProps): Workout[] | null {
    const { state, dispatch } = props;
 
+   // Handle invalid inputs
+   const errors = {};
+
    const filter: string = state.inputs.workoutsDateFilter.value;
    const minDate: Date = new Date(state.inputs.workoutsMinDate.value);
    const maxDate: Date = new Date(state.inputs.workoutsMaxDate.value);
    const isRange: boolean = filter === "Is between";
-
-   // Handle invalid inputs
-   const errors = {};
 
    const validateDate = (date: Date, key: string) => {
       if (isNaN(date.getTime())) {
@@ -87,7 +87,7 @@ export function getFilteredDateWorkouts(props: FilterProps): Workout[] | null {
       }
    };
 
-   // Invalid date errors, for the current applied filter
+   // For range method, both date inputs are validated
    if (isRange || filter === "Is on or after") {
       validateDate(minDate, "workoutsMinDate");
    }
@@ -108,14 +108,14 @@ export function getFilteredDateWorkouts(props: FilterProps): Workout[] | null {
          value: sendErrorMessage<null>("Error", "Invalid Date filter(s)", null, errors)
       });
    } else {
-      // Remove all errors, if any, and apply filter
+      // Remove all errors, if any, and apply filter all available workouts
       dispatch({
          type: "updateStatus",
          value: sendSuccessMessage<null>("Success", null)
       });
 
       const filteredWorkouts: Workout[] = [...state.inputs.workouts.value].filter((workout: Workout) => {
-         return filterByDate(state, workout);
+         return filterWorkout(state, workout);
       });
 
       return filteredWorkouts;
@@ -150,8 +150,8 @@ function DateInput(props: DateInputProps) {
 
 export function FilterByDate(props: FilterProps): JSX.Element {
    const { state, dispatch, reset } = props;
-   const dateTypeInput = state.inputs.workoutsDateFilter;
-   const type = dateTypeInput.value;
+   const dateFilterInput = state.inputs.workoutsDateFilter;
+   const type = dateFilterInput.value;
 
    const inputs: { [key: string]: VitalityInputState | undefined } = useMemo(() => {
       return {
@@ -164,6 +164,26 @@ export function FilterByDate(props: FilterProps): JSX.Element {
    const input: VitalityInputState | undefined = useMemo(() => {
       return inputs[type];
    }, [inputs, type]);
+
+   const handleApplyFilterClick = useCallback(() => {
+      // Apply date filter
+      const filteredWorkouts = getFilteredDateWorkouts(props);
+
+      if (filteredWorkouts !== null) {
+         // Update filtered state
+         dispatch({
+            type: "updateInput",
+            value: {
+               ...state.inputs.workouts,
+               data: {
+                  ...state.inputs.workouts.data,
+                  filtered: filteredWorkouts,
+                  dateFiltered: true
+               }
+            }
+         });
+      }
+   }, [props, state.inputs.workouts, dispatch]);
 
    return (
       <PopUp
@@ -189,10 +209,10 @@ export function FilterByDate(props: FilterProps): JSX.Element {
             <div className = "relative">
                <FontAwesomeIcon
                   icon = {faArrowRotateLeft}
-                  onClick = {() => reset()}
+                  onClick = {() => reset(true)}
                   className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
-               <Select input = {dateTypeInput} label = "Type" icon = {faCalendar} dispatch = {dispatch} />
+               <Select input = {dateFilterInput} label = "Type" icon = {faCalendar} dispatch = {dispatch} />
                {
                   input !== undefined ? (
                      // Min or max
@@ -200,7 +220,7 @@ export function FilterByDate(props: FilterProps): JSX.Element {
                         <DateInput {...props} input = {input} />
                      </div>
                   ) : (
-                     // Range (Min and Max inputs)
+                     // Range (Min and Max Date Input's)
                      <div className = "my-2">
                         <Input input = {state.inputs.workoutsMinDate} label = "Min" icon = {faCalendar} dispatch = {dispatch} />
                         <FontAwesomeIcon
@@ -215,25 +235,7 @@ export function FilterByDate(props: FilterProps): JSX.Element {
                   type = "button"
                   className = "bg-primary text-white font-bold w-full h-[2.6rem] text-sm mt-3"
                   icon = {faMagnifyingGlass}
-                  onClick = {() => {
-                     // Apply date filter
-                     const filteredWorkouts = getFilteredDateWorkouts(props);
-
-                     if (filteredWorkouts !== null) {
-                        // Update filtered state
-                        dispatch({
-                           type: "updateInput",
-                           value: {
-                              ...state.inputs.workouts,
-                              data: {
-                                 ...state.inputs.workouts.data,
-                                 filtered: filteredWorkouts,
-                                 dateFiltered: true
-                              }
-                           }
-                        });
-                     }
-                  }}
+                  onClick = {handleApplyFilterClick}
                >
                   Apply
                </Button>
@@ -243,9 +245,54 @@ export function FilterByDate(props: FilterProps): JSX.Element {
    );
 }
 
-
 export function FilterByTags(props: FilterProps): JSX.Element {
    const { state, dispatch, reset } = props;
+
+   const handleInitializeFilteredTags = useCallback(() => {
+      // Selected tags are applied from prior filter form selection
+      dispatch({
+         type: "updateInput",
+         value: {
+            ...state.inputs.tags,
+            data: {
+               ...state.inputs.tags.data,
+               selected: state.inputs.tags.data.filteredSelected
+            }
+         }
+      });
+   }, [state.inputs.tags, dispatch]);
+
+   const handleApplyFilterClick = useCallback(() => {
+      // Apply tag filter
+      const filteredWorkouts = getFilteredTagsWorkouts(props);
+
+      if (filteredWorkouts !== null) {
+         // Update filtered state
+         dispatch({
+            type: "updateInput",
+            value: {
+               ...state.inputs.workouts,
+               data: {
+                  ...state.inputs.workouts.data,
+                  filtered: filteredWorkouts,
+                  tagsFiltered: true
+               }
+            }
+         });
+
+         // Cache filtered tags selection
+         dispatch({
+            type: "updateInput",
+            value: {
+               ...state.inputs.tags,
+               data: {
+                  ...state.inputs.tags.data,
+                  filteredSelected: state.inputs.tags.data.selected
+               }
+            }
+         });
+      }
+   }, [dispatch, props, state.inputs.tags, state.inputs.workouts]);
 
    return (
       <PopUp
@@ -254,25 +301,12 @@ export function FilterByTags(props: FilterProps): JSX.Element {
             <Button
                type = "button"
                className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.9rem] text-sm"
-               onClick = {() => {
-                  dispatch({
-                     type: "updateInput",
-                     value: {
-                        ...state.inputs.tags,
-                        data: {
-                           ...state.inputs.tags.data,
-                           // Selected tags are fetched from prior filter choices
-                           selected: state.inputs.tags.data.filteredSelected
-                        }
-                     }
-                  });
-               }}
+               onClick = {handleInitializeFilteredTags}
             >
                <FontAwesomeIcon icon = {faTag} className = "text-xs" />
                Filter by Tags
             </Button>
          }
-
       >
          <div className = "flex flex-col justify-center align-center text-center gap-2">
             <FontAwesomeIcon
@@ -285,7 +319,7 @@ export function FilterByTags(props: FilterProps): JSX.Element {
             <div className = "relative">
                <FontAwesomeIcon
                   icon = {faArrowRotateLeft}
-                  onClick = {() => reset()}
+                  onClick = {() => reset(true)}
                   className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
                <div className = "w-full mx-auto my-2">
@@ -294,37 +328,7 @@ export function FilterByTags(props: FilterProps): JSX.Element {
                      type = "button"
                      className = "bg-primary text-white font-bold w-full h-[2.6rem] text-sm mt-3"
                      icon = {faMagnifyingGlass}
-                     onClick = {() => {
-                        // Apply tag filter
-                        const filteredWorkouts = getFilteredTagsWorkouts(props);
-
-                        if (filteredWorkouts !== null) {
-                           // Update filtered state
-                           dispatch({
-                              type: "updateInput",
-                              value: {
-                                 ...state.inputs.workouts,
-                                 data: {
-                                    ...state.inputs.workouts.data,
-                                    filtered: filteredWorkouts,
-                                    tagsFiltered: true
-                                 }
-                              }
-                           });
-
-                           dispatch({
-                              type: "updateInput",
-                              value: {
-                                 ...state.inputs.tags,
-                                 data: {
-                                    ...state.inputs.tags.data,
-                                    // Cache filtered tags selection
-                                    filteredSelected: state.inputs.tags.data.selected
-                                 }
-                              }
-                           });
-                        }
-                     }}
+                     onClick = {handleApplyFilterClick}
                   >
                      Apply
                   </Button>

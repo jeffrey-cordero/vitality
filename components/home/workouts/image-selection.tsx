@@ -3,7 +3,7 @@ import ToolTip from "@/components/global/tooltip";
 import clsx from "clsx";
 import Button from "@/components/global/button";
 import Input, { VitalityInputProps } from "@/components/global/input";
-import { Dispatch, useState } from "react";
+import { Dispatch, useCallback, useState } from "react";
 import { PopUp } from "@/components/global/popup";
 import { faPaperclip, faPenToSquare, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,7 +26,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
    const { input, dispatch, isValidImage, setIsValidImage } = props;
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(true);
 
-   const handleImageURLSubmission = () => {
+   const handleImageURLSubmission = useCallback(() => {
       const isValidURL = verifyURL(input.value);
 
       if (!(isValidURL)) {
@@ -45,7 +45,26 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
             }
          }
       });
-   };
+   }, [dispatch, input, isValidImage, setIsValidImage]);
+
+   const handleDefaultImageSelection = useCallback((source: string) => {
+      // All default images are valid images
+      if (!(isValidImage)) {
+         setIsValidImage(true);
+      }
+
+      dispatch({
+         type: "updateInput",
+         value: {
+            ...input,
+            value: source,
+            error: null,
+            data: {
+               validIcon: true
+            }
+         }
+      });
+   }, [dispatch, input, isValidImage, setIsValidImage]);
 
    return (
       <div className = "flex flex-col gap-3">
@@ -87,24 +106,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                               className = {clsx("w-[20rem] h-[20rem] object-cover object-center shadow-inner rounded-xl cursor-pointer", {
                                  "border-[4px] border-primary shadow-2xl scale-[1.05] transition duration-300 ease-in-out": input.value === source
                               })}
-                              onClick = {() => {
-                                 // All default images are valid images
-                                 if (!(isValidImage)) {
-                                    setIsValidImage(true);
-                                 }
-
-                                 dispatch({
-                                    type: "updateInput",
-                                    value: {
-                                       ...input,
-                                       value: source,
-                                       error: null,
-                                       data: {
-                                          validIcon: true
-                                       }
-                                    }
-                                 });
-                              }}
+                              onClick = {() => handleDefaultImageSelection(source)}
                            />
                         );
                      })

@@ -38,7 +38,10 @@ const workoutsSchema = z.object({
       .trim()
       .min(1, { message: "A title must be at least 1 character" })
       .max(50, { message : "A title must be at most 50 characters" }),
-   date: z.date().max(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), {
+   date: z.date({
+      required_error: "Date for workout is required",
+      invalid_type_error: "A valid date is required"
+   }).max(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), {
       message: "A workout date must not be after today"
    }),
    description: z.string().optional().or(z.literal("")),
@@ -115,7 +118,7 @@ export async function addWorkout(
             date: workout.date,
             image: workout.image,
             description: workout.description,
-            // Nested create operation to add entries to the workout_applied_tags table
+            // Nested create operation to add entries to the workout_applied_tags table, if any
             workout_applied_tags: {
                create: workout.tagIds.map((tagId: string) => {
                   return {

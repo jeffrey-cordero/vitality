@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { removeWorkouts, Workout } from "@/lib/workouts/workouts";
 import { getWorkoutDate } from "@/lib/workouts/shared";
 import { Tag } from "@/lib/workouts/tags";
-import { Dispatch, useContext, useMemo, useRef } from "react";
+import { Dispatch, useCallback, useContext, useMemo, useRef } from "react";
 import { NotificationContext } from "@/app/layout";
 import { PopUp } from "@/components/global/popup";
 
@@ -17,7 +17,7 @@ interface WorkoutRowProps {
    workout: Workout;
    state: VitalityState;
    dispatch: Dispatch<VitalityAction<Workout | null>>;
-   reset: () => void;
+   reset: (_filterReset: boolean) => void;
 }
 
 function WorkoutRow(props: WorkoutRowProps) {
@@ -27,7 +27,7 @@ function WorkoutRow(props: WorkoutRowProps) {
    const selected: Set<Workout> = state.inputs.workouts.data.selected;
    const formattedDate = useMemo(() => getWorkoutDate(new Date(workout.date)), [workout.date]);
 
-   const handleWorkoutToggle = () => {
+   const handleWorkoutToggle = useCallback(() => {
       // Either add or remove from selected
       const newSelected: Set<Workout> = new Set(selected);
 
@@ -47,9 +47,9 @@ function WorkoutRow(props: WorkoutRowProps) {
             }
          }
       });
-   };
+   }, [dispatch, selected, state.inputs.workouts, workout]);
 
-   const handleDelete = async() => {
+   const handleWorkoutDelete = useCallback(async() => {
       // Remove the current or selected set of workout's
       const size = selected.size == 0 ? 1 : selected.size;
 
@@ -95,7 +95,7 @@ function WorkoutRow(props: WorkoutRowProps) {
          message: response.body.message
       });
 
-   };
+   }, [dispatch, selected, state, updateNotification,  workout]);
 
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
@@ -105,15 +105,15 @@ function WorkoutRow(props: WorkoutRowProps) {
          return (
             // Undefined in case of removal
             tag !== undefined &&
-            <div
-               className = {clsx("px-3 py-1 m-2 rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
-               style = {{
-                  backgroundColor: tag.color
-               }}
-               key = {tag.id}
-            >
-               {tag.title}
-            </div>
+               <div
+                  className = {clsx("px-3 py-1 m-2 rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
+                  style = {{
+                     backgroundColor: tag.color
+                  }}
+                  key = {tag.id}
+               >
+                  {tag.title}
+               </div>
          );
       });
    }, [workout, state.inputs.tags.data.dictionary]);
@@ -125,6 +125,7 @@ function WorkoutRow(props: WorkoutRowProps) {
          <td className = "w-4 p-4">
             <div className = "flex items-center">
                <input
+                  id={`workout-select-${workout.id}`}
                   type = "checkbox"
                   className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                   checked = {state.inputs.workouts.data.selected.has(workout)}
@@ -201,7 +202,7 @@ function WorkoutRow(props: WorkoutRowProps) {
                               <Button
                                  type = "button"
                                  className = "w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
-                                 onClick = {async() => handleDelete()}
+                                 onClick = {async() => handleWorkoutDelete()}
                               >
                                  Yes, I&apos;m sure
                               </Button>
@@ -220,7 +221,7 @@ interface WorkoutTableProps {
    workouts: Workout[];
    state: VitalityState;
    dispatch: Dispatch<VitalityAction<Workout | null>>;
-   reset: () => void;
+   reset: (_filterReset: boolean) => void;
 }
 
 export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
@@ -228,35 +229,39 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
    const selected: Set<Workout> = state.inputs.workouts.data.selected;
    const fetched: boolean = state.inputs.workouts.data.fetched;
 
+   // Visible workouts that have been selected
+   const visible = useMemo(() => {
+      return new Set<Workout>(workouts.filter(workout => selected.has(workout)));
+   }, [workouts, selected]);
+
+   // Check if all visible workouts are selected
+   const allVisibleSelected: boolean = workouts.length > 0 && workouts.every(workout => selected.has(workout));
+
+   // Function to update selected workouts in the state
+   const handleUpdateSelectedWorkouts = useCallback((newSelected: Set<Workout>) => {
+      dispatch({
+         type: "updateInput",
+         value: {
+            ...state.inputs.workouts,
+            data: {
+               ...state.inputs.workouts.data,
+               selected: newSelected
+            }
+         }
+      });
+   }, [dispatch, state.inputs.workouts]);
+
    const handleWorkoutToggle = useMemo(() => {
       return () => {
-         if (selected.size === workouts.length) {
-            // Select no workouts
-            dispatch({
-               type: "updateInput",
-               value: {
-                  ...state.inputs.workouts,
-                  data: {
-                     ...state.inputs.workouts.data,
-                     selected: new Set<Workout>()
-                  }
-               }
-            });
+         if (allVisibleSelected) {
+            // Remove all visibly selected workouts
+            handleUpdateSelectedWorkouts(new Set([...Array.from(selected)].filter(workout => !visible.has(workout))));
          } else {
-            // Select all workouts
-            dispatch({
-               type: "updateInput",
-               value: {
-                  ...state.inputs.workouts,
-                  data: {
-                     ...state.inputs.workouts.data,
-                     selected: new Set(workouts)
-                  }
-               }
-            });
+            // Select all visible workouts
+            handleUpdateSelectedWorkouts(new Set([...Array.from(selected), ...workouts]));
          }
       };
-   }, [state.inputs.workouts, workouts, selected.size, dispatch]);
+   }, [allVisibleSelected, handleUpdateSelectedWorkouts, workouts, selected, visible]);
 
    return (
       <div className = "relative w-full">
@@ -269,8 +274,9 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
                            <th scope = "col" className = "p-4">
                               <div className = "flex items-center">
                                  <input
+                                    id="workout-select-all"
                                     type = "checkbox"
-                                    checked = {selected.size === workouts.length && selected.size !== 0}
+                                    checked = {allVisibleSelected}
                                     className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                                     onChange = {() => handleWorkoutToggle()}
                                  />
@@ -301,7 +307,7 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
                </div>
             ) : (
                <div className = "w-screen h-[15rem] mx-auto text-center flex justify-center items-center">
-                  { fetched ? <h1 className = "font-bold text-xl">No available workouts</h1> : <Loading /> }
+                  {fetched ? <h1 className = "font-bold text-xl">No available workouts</h1> : <Loading />}
                </div>
             )
          }

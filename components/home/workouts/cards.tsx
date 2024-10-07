@@ -37,7 +37,7 @@ function WorkoutCard(props: WorkoutCardProps): JSX.Element {
                </div>
                <div className = "flex flex-col justify-start items-center gap-2 w-full h-[10rem] overflow-hidden text-center">
                   <h2 className = "font-bold text-xl mb-2 px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis max-w-[90%]">{workout.title}</h2>
-                  <p className = "text-gray-600 text-sm">{ getWorkoutDate(workout.date) }</p>
+                  <p className = "text-gray-600 text-sm">{getWorkoutDate(workout.date)}</p>
                </div>
             </div>
          }
@@ -49,7 +49,7 @@ interface WorkoutCardsProps {
    workouts: Workout[];
    state: VitalityState;
    dispatch: Dispatch<VitalityAction<Workout | null>>;
-   reset: () => void;
+   reset: (_filterReset: boolean) => void;
 }
 
 export default function WorkoutCards(props: WorkoutCardsProps): JSX.Element {
@@ -66,7 +66,6 @@ export default function WorkoutCards(props: WorkoutCardsProps): JSX.Element {
                   ))}
                </div>
             ) : (
-
                <div className = "w-screen h-[15rem] mx-auto text-center flex justify-center items-center">
                   { fetched ? <h1 className = "font-bold text-xl">No available workouts</h1> : <Loading /> }
                </div>

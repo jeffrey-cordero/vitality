@@ -20,14 +20,14 @@ export default function Notification(props: NotificationProps): JSX.Element {
 
    const removeNotification = () => {
       // Add a fading out animation and eventually remove from the DOM
-      notificationRef.current.classList.add("animate-fadeOut");
+      notificationRef.current?.classList.add("animate-fadeOut");
 
       setTimeout(() => {
          updateNotification({
             status: "Initial",
             message: ""
          });
-      }, 1000);
+      }, 1250);
    };
 
    // If timer is provided, remove after the desired time limit

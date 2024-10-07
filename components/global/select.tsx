@@ -1,12 +1,29 @@
 "use client";
 import clsx from "clsx";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useCallback } from "react";
 import { VitalityInputProps } from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Select(props: VitalityInputProps): JSX.Element {
    const { label, icon, input, placeholder, dispatch, onChange } = props;
    const options: string[] = input.data.options;
+
+   const handleSelectChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
+      if (input.data.handlesChanges !== undefined) {
+         // Call the user-defined event handler (complex state)
+         onChange?.call(null, event);
+      } else {
+         // Simple state
+         dispatch({
+            type: "updateInput",
+            value: {
+               ...input,
+               value: event.target.value,
+               error: null
+            }
+         });
+      }
+   }, [dispatch, input,  onChange]);
 
    return (
       <div className = "relative">
@@ -19,22 +36,7 @@ export default function Select(props: VitalityInputProps): JSX.Element {
                   "border-gray-200": input.error === null,
                   "border-red-500 ": input.error !== null
                }, props.className)}
-            onChange = {(event: ChangeEvent<HTMLSelectElement>) => {
-               if (input.data.handlesChanges !== undefined) {
-                  // Call the user-defined event handler (complex state)
-                  onChange?.call(null, event);
-               } else {
-                  // Simple state
-                  dispatch({
-                     type: "updateInput",
-                     value: {
-                        ...input,
-                        value: event.target.value,
-                        error: null
-                     }
-                  });
-               }
-            }}
+            onChange = {(event: ChangeEvent<HTMLSelectElement>) => {handleSelectChange(event)}}
          >
             { options.map((option: string) => {
                return (

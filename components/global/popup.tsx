@@ -12,12 +12,15 @@ interface PopUpProps extends React.HTMLAttributes<HTMLDivElement> {
    buttonClassName?: string;
    icon?: IconProp;
    text?: string;
+   onClose?: () => void;
 }
 
 export const PopUp = forwardRef(function PopUp(props: PopUpProps, ref) {
    const [open, setOpen] = useState<boolean>(false);
 
    const onClose = () => {
+      // Call user-defined pop-up close methods for cleanup
+      props.onClose?.call(null);
       // Close the PopUp from current or parent component
       setOpen(false);
    };

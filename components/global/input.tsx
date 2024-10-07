@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
-import { ChangeEvent, Dispatch, useRef } from "react";
+import { ChangeEvent, Dispatch, useCallback, useRef } from "react";
 import { faEye, faEyeSlash, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { VitalityAction, VitalityState, VitalityInputState } from "@/lib/global/state";
@@ -20,6 +20,44 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
    const inputRef = useRef<HTMLInputElement>(null);
    const passwordButton = useRef<SVGSVGElement | null>(null);
 
+   const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+      if (input.data.handlesChanges !== undefined) {
+         // Call the user-defined event handler (complex state)
+         onChange?.call(null, event);
+      } else {
+         // Simple state
+         dispatch({
+            type: "updateInput",
+            value: {
+               ...input,
+               value: event.target.value,
+               error: null
+            }
+         });
+      }
+   }, [dispatch, input,  onChange]);
+
+   const handlePasswordIconClick = useCallback(() => {
+      if (passwordButton.current !== null) {
+         inputRef.current?.focus();
+
+         if (input.type === "password") {
+            passwordButton.current.classList.add("text-primary");
+         } else {
+            passwordButton.current.classList.remove("text-primary");
+
+         }
+
+         dispatch({
+            type: "updateInput",
+            value: {
+               ...input,
+               type: input.type === "password" ? "text" : "password"
+            }
+         });
+      }
+   }, [dispatch, input]);
+
    return (
       <div className = "relative">
          <input
@@ -33,22 +71,7 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
                   "border-gray-200 border-[1.5px]": input.error === null,
                   "border-red-500 border-[1.5px]": input.error !== null
                })}
-            onChange = {(event: ChangeEvent<HTMLInputElement>) => {
-               if (input.data.handlesChanges !== undefined) {
-                  // Call the user-defined event handler (complex state)
-                  onChange?.call(null, event);
-               } else {
-                  // Simple state
-                  dispatch({
-                     type: "updateInput",
-                     value: {
-                        ...input,
-                        value: event.target.value,
-                        error: null
-                     }
-                  });
-               }
-            }}
+            onChange = {(event: ChangeEvent<HTMLInputElement>) => handleInputChange(event)}
          />
          {(input.type === "password" || passwordButton.current !== null) &&
             <Button type = "button" className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
@@ -56,26 +79,7 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
                   icon = {input.type == "password" ? faEye : faEyeSlash}
                   className = "flex-shrink-0 size-3.5 password-icon"
                   ref = {passwordButton}
-                  onClick = {() => {
-                     if (passwordButton.current !== null) {
-                        inputRef.current?.focus();
-
-                        if (input.type === "password") {
-                           passwordButton.current.classList.add("text-primary");
-                        } else {
-                           passwordButton.current.classList.remove("text-primary");
-
-                        }
-
-                        dispatch({
-                           type: "updateInput",
-                           value: {
-                              ...input,
-                              type: input.type === "password" ? "text" : "password"
-                           }
-                        });
-                     }
-                  }} />
+                  onClick = {handlePasswordIconClick} />
             </Button>
          }
          {

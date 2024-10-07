@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
-import { getUser } from "@/lib/authentication/user";
+import { getUserByUsername } from "@/lib/authentication/user";
 import { expect } from "@jest/globals";
 import { signup } from "@/lib/authentication/signup";
 
@@ -42,10 +42,10 @@ describe("User can be created and conflicts arise when attempting login with inv
       await expect(signup(payload)).resolves.toEqual(expected);
 
       // Mock login with user credentials using same logic used in @/lib/credentials/login.ts and @/auth.ts to avoid module conflicts
-      const user = await getUser(payload.username.trim());
+      const user = await getUserByUsername(payload.username.trim(), false);
       expect(user).not.toBe(null);
 
-      const missingUser = await getUser(payload.username.trim() + "a");
+      const missingUser = await getUserByUsername(payload.username.trim() + "a", false);
       expect(missingUser).toBe(null);
 
       const validCredentials = await bcrypt.compare(payload.password, user?.password);

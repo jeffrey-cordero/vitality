@@ -6,8 +6,8 @@ export function searchForTitle(array: any[], search: string): any[] {
       return array;
    }
 
-   // Simple search for items based on starting with specific pattern
-   return array.filter(t => t.title.toLowerCase().startsWith(search));
+   // Partial match search (case-insensitive - assumes search is lowercase)
+   return array.filter(t => t.title.toLowerCase().includes(search));
 }
 
 export function getWorkoutDate(date: Date): string {

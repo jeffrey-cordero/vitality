@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
 }
 
@@ -25,6 +25,7 @@ model sets {
   weight      Int?
   duration    Unsupported("interval")?
   repetitions Int?
+  other       String?
   exercises   exercises                @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
 
   @@index([exercise_id], map: "sets_exercise_index")
@@ -88,7 +89,7 @@ model workout_tags {
   id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id              String                 @db.Uuid
   title                String                 @db.VarChar(30)
-  color                String                 @default("#e5e7eb") @db.VarChar(7)
+  color                String                 @default("rgb(90, 90, 90)") @db.VarChar(20)
   workout_applied_tags workout_applied_tags[]
   users                users                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 

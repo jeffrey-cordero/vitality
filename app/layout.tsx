@@ -14,14 +14,12 @@ import { NotificationProps } from "@/components/global/notification";
 
 interface AuthenticationContextType {
    user: User | undefined;
-   // eslint-disable-next-line no-unused-vars
-   updateUser: (user: SetStateAction<User | undefined>) => void;
+   updateUser: (_user: SetStateAction<User | undefined>) => void;
 }
 
 interface NotificationContextType {
    notification: NotificationProps | undefined;
-   // eslint-disable-next-line no-unused-vars
-   updateNotification: (notification: NotificationProps) => void;
+   updateNotification: (_notification: NotificationProps) => void;
 }
 
 export const AuthenticationContext = createContext<AuthenticationContextType>({
