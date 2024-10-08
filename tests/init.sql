@@ -32,6 +32,7 @@ CREATE index "workouts_user_index" ON "workouts" (user_id);
 CREATE TABLE "exercises" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       workout_id UUID NOT NULL REFERENCES "workouts"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+      exercise_order INTEGER NOT NULL,
       name VARCHAR(50) NOT NULL
 );
 
@@ -40,11 +41,13 @@ CREATE INDEX "exercises_workout_index" ON "exercises" (workout_id);
 CREATE TABLE "sets" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       exercise_id UUID NOT NULL REFERENCES "exercises"(id) ON DELETE CASCADE ON UPDATE CASCADE,
-      set_order INTEGER,
+      set_order INTEGER NOT NULL,
       weight INTEGER,
-      duration INTERVAL,
+      hours INTEGER,
+      minutes INTEGER,
+      seconds INTEGER,
       repetitions INTEGER,
-      other TEXT
+      text TEXT
 );
 
 CREATE INDEX "sets_exercise_index" ON "sets" (exercise_id);

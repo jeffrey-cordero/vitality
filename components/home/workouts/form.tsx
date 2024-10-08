@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dispatch, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { PopUp } from "@/components/global/popup";
 import { filterWorkout } from "@/components/home/workouts/filter";
+import Exercises from "./exercises";
 
 interface WorkoutFormProps {
    cover?: React.ReactNode;
@@ -226,7 +227,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                            <div className = "flex flex-row justify-center items-center gap-4 flex-1">
                               <Button
                                  type = "button"
-                                 className = "w-[10rem] bg-gray-100 text-black mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
+                                 className = "w-[10rem] bg-gray-100 text-black mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
                                  onClick = {() => {
                                     // Close the popup for deletion confirmation
                                     if (deletePopUpRef.current) {
@@ -238,7 +239,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                               </Button>
                               <Button
                                  type = "button"
-                                 className = "w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
+                                 className = "w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
                                  onClick = {async() => handleWorkoutSubmission("delete")}
                               >
                                  Yes, I&apos;m sure
@@ -260,9 +261,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                </Button>
                {
                   workoutId !== undefined && (
-                     <div className = "w-full mx-auto text-center my-4 font-bold">
-                        Exercise Inputs Coming Soon...
-                     </div>
+                     <Exercises state = {state} dispatch = {dispatch}/>
                   )
                }
             </div>

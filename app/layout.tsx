@@ -2,7 +2,6 @@
 import "@/app/global.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import cx from "classnames";
-import Head from "next/head";
 import Footer from "@/components/global/footer";
 import Notification from "@/components/global/notification";
 import { sfPro, inter } from "@/app/fonts";
@@ -68,7 +67,7 @@ export default function Layout({
 
    return (
       <html lang = "en" className = "m-0 p-0 overflow-x-hidden w-full">
-         <Head>
+         <head>
             <title>Vitality</title>
             <meta name = "description" content = "A modern fitness tracker to fuel your fitness goals" />
             <meta name = "author" content = "Jeffrey Cordero" />
@@ -76,7 +75,7 @@ export default function Layout({
             <meta name = "robots" content = "index, follow" />
             <link rel = "icon" href = "favcon.ico" />
             <meta name = "viewport" content = "width=device-width, initial-scale=1.0" />
-         </Head>
+         </head>
          <body
             className = {cx(sfPro.variable, inter.variable, "box-border m-0 p-0  overflow-x-hidden w-full max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black")}
             suppressHydrationWarning = {true}>

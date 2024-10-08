@@ -205,11 +205,11 @@ export default function ImageSelection(props: VitalityInputProps): JSX.Element {
             <PopUp
                cover = {
                   <div>
-                     <Button className = {clsx("w-full text-black font-semibold border-[1.5px] min-h-[3.2rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500", {
+                     <Button className = {clsx("w-full text-black font-semibold border-[1.5px] h-[2.9rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500", {
                         "border-[1.5px] border-red-500": !(isValidImage) && selected
                      })}>
-                        {selected ? "Edit Image" : "Add Image"}
                         <FontAwesomeIcon icon = {selected ? faPenToSquare : faPaperclip} />
+                        {selected ? "Edit Image" : "Add Image"}
                      </Button>
                      {input.error !== null &&
                         <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">

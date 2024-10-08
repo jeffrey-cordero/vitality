@@ -125,7 +125,7 @@ function WorkoutRow(props: WorkoutRowProps) {
          <td className = "w-4 p-4">
             <div className = "flex items-center">
                <input
-                  id={`workout-select-${workout.id}`}
+                  id = {`workout-select-${workout.id}`}
                   type = "checkbox"
                   className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                   checked = {state.inputs.workouts.data.selected.has(workout)}
@@ -274,7 +274,7 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
                            <th scope = "col" className = "p-4">
                               <div className = "flex items-center">
                                  <input
-                                    id="workout-select-all"
+                                    id = "workout-select-all"
                                     type = "checkbox"
                                     checked = {allVisibleSelected}
                                     className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"

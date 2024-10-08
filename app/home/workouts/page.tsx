@@ -138,6 +138,69 @@ const workouts: VitalityState = {
             options: [5, 10, 25, 50, 100, 500, 1000],
             handlesChanges: true
          }
+      },
+      exerciseTitle: {
+         type: "text",
+         id: "exerciseTitle",
+         value: "test",
+         error: null,
+         data: {}
+      },
+      weight: {
+         type: "number",
+         id: "weight",
+         value: "",
+         error: null,
+         data: {}
+      },
+      repetitions: {
+         type: "number",
+         id: "repetitions",
+         value: "",
+         error: null,
+         data: {}
+      },
+      hours: {
+         type: "number",
+         id: "hours",
+         value: "",
+         error: null,
+         data: {}
+      },
+      minutes: {
+         type: "number",
+         id: "minutes",
+         value: "",
+         error: null,
+         data: {}
+      },
+      seconds: {
+         type: "number",
+         id: "seconds",
+         value: "",
+         error: null,
+         data: {}
+      },
+      text: {
+         type: "text",
+         id: "text",
+         value: "",
+         error: null,
+         data: {}
+      },
+      exercise: {
+         type: null,
+         id: "workoutExercise",
+         value : {},
+         error: null,
+         data: {}
+      },
+      exercises: {
+         type: null,
+         id: "workoutsExercises",
+         value : [],
+         error: null,
+         data: {}
       }
    },
    response: null

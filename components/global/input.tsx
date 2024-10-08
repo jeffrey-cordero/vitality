@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
-import { ChangeEvent, Dispatch, useCallback, useRef } from "react";
+import { ChangeEvent, Dispatch, useCallback, useRef, useState } from "react";
 import { faEye, faEyeSlash, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { VitalityAction, VitalityState, VitalityInputState } from "@/lib/global/state";
@@ -11,6 +11,7 @@ export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
    icon?: IconProp;
    input: VitalityInputState;
    dispatch: Dispatch<VitalityAction<any>>;
+   onBlur?: () => void;
    state?: VitalityState;
    data?: { [key: string]: any };
 }
@@ -72,6 +73,7 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
                   "border-red-500 border-[1.5px]": input.error !== null
                })}
             onChange = {(event: ChangeEvent<HTMLInputElement>) => handleInputChange(event)}
+            onBlur = {props.onBlur}
          />
          {(input.type === "password" || passwordButton.current !== null) &&
             <Button type = "button" className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">

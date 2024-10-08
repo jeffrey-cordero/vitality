@@ -9,24 +9,27 @@ datasource db {
 }
 
 model exercises {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  workout_id String   @db.Uuid
-  name       String   @db.VarChar(50)
-  workouts   workouts @relation(fields: [workout_id], references: [id], onDelete: Cascade)
-  sets       sets[]
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workout_id     String   @db.Uuid
+  exercise_order Int
+  name           String   @db.VarChar(50)
+  workouts       workouts @relation(fields: [workout_id], references: [id], onDelete: Cascade)
+  sets           sets[]
 
   @@index([workout_id], map: "exercises_workout_index")
 }
 
 model sets {
-  id          String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  exercise_id String                   @db.Uuid
-  set_order   Int?
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  exercise_id String    @db.Uuid
+  set_order   Int
   weight      Int?
-  duration    Unsupported("interval")?
+  hours       Int?
+  minutes     Int?
+  seconds     Int?
   repetitions Int?
-  other       String?
-  exercises   exercises                @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
+  custom      String?
+  exercises   exercises @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
 
   @@index([exercise_id], map: "sets_exercise_index")
 }

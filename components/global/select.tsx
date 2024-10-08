@@ -36,7 +36,7 @@ export default function Select(props: VitalityInputProps): JSX.Element {
                   "border-gray-200": input.error === null,
                   "border-red-500 ": input.error !== null
                }, props.className)}
-            onChange = {(event: ChangeEvent<HTMLSelectElement>) => {handleSelectChange(event)}}
+            onChange = {(event: ChangeEvent<HTMLSelectElement>) => {handleSelectChange(event);}}
          >
             { options.map((option: string) => {
                return (
