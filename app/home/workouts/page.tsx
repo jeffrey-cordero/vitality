@@ -18,6 +18,7 @@ import { FilterByDate, FilterByTags } from "@/components/home/workouts/filter";
 const workouts: VitalityState = {
    status: "Initial",
    inputs: {
+      // Workout form
       title: {
          type: "text",
          id: "title",
@@ -48,6 +49,7 @@ const workouts: VitalityState = {
             handlesChanges: true
          }
       },
+      // Tag form
       tags: {
          type: null,
          id: "tags",
@@ -84,6 +86,7 @@ const workouts: VitalityState = {
          error: null,
          data: {}
       },
+      // Main overall workout objects
       workouts: {
          type: null,
          id: "workouts",
@@ -98,6 +101,7 @@ const workouts: VitalityState = {
             filtered: []
          }
       },
+      // Filter form
       workoutsSearch: {
          type: "text",
          id: "workoutsSearch",
@@ -139,10 +143,11 @@ const workouts: VitalityState = {
             handlesChanges: true
          }
       },
+      // Exercise form
       exerciseTitle: {
          type: "text",
          id: "exerciseTitle",
-         value: "test",
+         value: "",
          error: null,
          data: {}
       },

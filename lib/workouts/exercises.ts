@@ -1,34 +1,74 @@
-// Exercises - <TODO>
-
 import { z } from "zod";
+import {
+   VitalityResponse,
+   sendSuccessMessage,
+   sendErrorMessage
+} from "@/lib/global/state";
 
-/*
--- Bicep Curl (Exercise)
-      -- #1 (order) 30 lbs (weight) x 10 (repetitions) [set 1]
-      -- ... [set x]
+export type Set = {
+  id: string;
+  exerciseId: string;
+  hours?: number;
+  minutes?: number;
+  seconds: number;
+  weight?: number;
+  repetitions?: number;
+  text?: string;
+};
 
--- Zone 2 Cardio
-      -- #1 (order) 10lbs (weight ~ optional) x 10 (repetitions ~ optional) - 01:00:00 (interval ~ optional)
-*/
+const setSchema = z.object({
+   id: z.string(),
+   exercise_id: z.string(),
+   hours: z.number().min(1).optional(),
+   minutes: z.number().min(1).optional(),
+   seconds: z.number().min(1),
+   weight: z.number().min(1).optional(),
+   repetitions: z.number().min(1).optional(),
+   text: z.string().optional()
+});
+
 export type Exercise = {
-  id?: string;
-  workoutId: string;
+  id: string;
+  user_id: string;
+  workout_id: string;
   title: string;
   sets: Set[];
 };
 
-export type Set = {
-      id: string;
-      exercise_id: string;
-      hours?: number;
-      minutes?: number;
-      seconds: number;
-      weight?: number;
-      repetitions? : number;
-      text?: string;
-}
-
-const setSchema = z.object({
-   // HH:MM:SS
-   interval: z.string().regex(/^\d{1,}:\d{2}:\d{2}(\.\d+)?\s*$/)
+const exerciseSchema = z.object({
+   id: z.string().optional(),
+   workout_id: z.string(),
+   title: z
+      .string()
+      .trim()
+      .min(1, { message: "A title must be at least 1 character" })
+      .max(50, { message: "A title must be at most 50 characters" }),
+   sets: z.array(setSchema)
 });
+
+export async function addExercise(
+   exercise: Exercise
+): Promise<VitalityResponse<Exercise>> {
+   try {
+      const fields = exerciseSchema.safeParse(exercise);
+
+      if (!fields.success) {
+         return sendErrorMessage(
+            "Error",
+            "Invalid exercise fields",
+            exercise,
+            fields.error.flatten().fieldErrors
+         );
+      }
+
+      return sendSuccessMessage("Missing implementation", exercise);
+   } catch (error) {
+      console.error(error);
+      return sendErrorMessage(
+         "Failure",
+         "Internal Server Error. Please try again later.",
+         exercise,
+         {}
+      );
+   }
+}

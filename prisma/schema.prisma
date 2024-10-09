@@ -12,7 +12,7 @@ model exercises {
   id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   workout_id     String   @db.Uuid
   exercise_order Int
-  name           String   @db.VarChar(50)
+  title          String   @db.VarChar(50)
   workouts       workouts @relation(fields: [workout_id], references: [id], onDelete: Cascade)
   sets           sets[]
 
@@ -28,7 +28,7 @@ model sets {
   minutes     Int?
   seconds     Int?
   repetitions Int?
-  custom      String?
+  text        String?
   exercises   exercises @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
 
   @@index([exercise_id], map: "sets_exercise_index")

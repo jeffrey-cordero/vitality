@@ -7,6 +7,8 @@ import {
    sendErrorMessage
 } from "@/lib/global/state";
 import { formatWorkout } from "@/lib/workouts/shared";
+import { Exercise } from "@/lib/workouts/exercises";
+import { uuidSchema } from "../global/zod";
 
 export type Workout = {
   id: string;
@@ -16,34 +18,30 @@ export type Workout = {
   image: string;
   description: string;
   tagIds: string[];
+  exercises: Exercise[];
 };
 
 const urlRegex =
   /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
-const nextMediaRegex = /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
+const nextMediaRegex =
+  /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
 
 const workoutsSchema = z.object({
-   user_id: z
-      .string()
-      .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/, {
-         message: "Invalid UUID format"
-      }),
-   id: z
-      .string()
-      .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/, {
-         message: "Invalid UUID format"
-      }),
+   user_id: uuidSchema,
+   id: uuidSchema,
    title: z
       .string()
       .trim()
       .min(1, { message: "A title must be at least 1 character" })
-      .max(50, { message : "A title must be at most 50 characters" }),
-   date: z.date({
-      required_error: "Date for workout is required",
-      invalid_type_error: "A valid date is required"
-   }).max(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), {
-      message: "A workout date must not be after today"
-   }),
+      .max(50, { message: "A title must be at most 50 characters" }),
+   date: z
+      .date({
+         required_error: "Date for workout is required",
+         invalid_type_error: "A valid date is required"
+      })
+      .max(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), {
+         message: "A workout date must not be after today"
+      }),
    description: z.string().optional().or(z.literal("")),
    image: z
       .string()
@@ -54,15 +52,18 @@ const workoutsSchema = z.object({
    tags: z.array(z.string()).optional()
 });
 
-export async function fetchWorkouts(
-   userId: string
-): Promise<Workout[]> {
+export async function fetchWorkouts(userId: string): Promise<Workout[]> {
    try {
       const workoutsWithTags = await prisma.workouts.findMany({
          include: {
             workout_applied_tags: {
                include: {
                   workout_tags: true
+               }
+            },
+            exercises: {
+               include: {
+                  sets: true
                }
             }
          },
@@ -92,23 +93,14 @@ export async function addWorkout(
       // Validate the feedback form first
       const fields = workoutsSchema.safeParse(workout);
 
-      if (!fields.success) {
+      if (!(fields.success)) {
       // Return the field errors
-         const errors = fields.error.flatten();
-
-         // Only error caught should be related to invalid UUID format for ID
-         if (!(
-            errors.fieldErrors.id !== undefined &&
-          Object.keys(errors.fieldErrors).length == 1
-         )
-         ) {
-            return sendErrorMessage(
-               "Error",
-               "Invalid workout tag fields",
-               workout,
-               errors.fieldErrors
-            );
-         }
+         return sendErrorMessage(
+            "Error",
+            "Invalid workout tag fields",
+            workout,
+            fields.error.flatten().fieldErrors
+         );
       }
 
       const newWorkout = await prisma.workouts.create({
@@ -127,6 +119,7 @@ export async function addWorkout(
                })
             }
          },
+         // Include tags for the given workout (no exercises)
          include: {
             workout_applied_tags: {
                include: {
@@ -153,11 +146,13 @@ export async function addWorkout(
    }
 }
 
-export async function updateWorkout(workout: Workout): Promise<VitalityResponse<Workout>> {
+export async function updateWorkout(
+   workout: Workout
+): Promise<VitalityResponse<Workout>> {
    try {
       const fields = workoutsSchema.safeParse(workout);
 
-      if (!(fields.success)) {
+      if (!fields.success) {
          return sendErrorMessage(
             "Error",
             "Invalid workout fields",
@@ -165,19 +160,33 @@ export async function updateWorkout(workout: Workout): Promise<VitalityResponse<
             fields.error.flatten().fieldErrors
          );
       } else {
-         // Fetch existing tags first for data integrity
+      // Fetch existing tags first for data integrity
          const existingWorkout = await prisma.workouts.findUnique({
-            where: { id: workout.id },
-            include: { workout_applied_tags: true }
+            where: {
+               id: workout.id
+            },
+            include: {
+               workout_applied_tags: true,
+               exercises: {
+                  include: {
+                     sets: true
+                  }
+               }
+            }
          });
 
          // Extract existing tag IDs
-         const existingTagIds: string[] = existingWorkout?.workout_applied_tags.map(tag => tag.tag_id) || [];
+         const existingTagIds: string[] =
+        existingWorkout?.workout_applied_tags.map((tag) => tag.tag_id) || [];
 
          // Determine tags to connect and disconnect
          const newTagIds: string[] = workout.tagIds;
-         const tagsToRemove: string[] = existingTagIds.filter(id => !(newTagIds).includes(id));
-         const tagsToAdd: string[] = newTagIds.filter(id => !(existingTagIds).includes(id));
+         const tagsToRemove: string[] = existingTagIds.filter(
+            (id) => !newTagIds.includes(id)
+         );
+         const tagsToAdd: string[] = newTagIds.filter(
+            (id) => !existingTagIds.includes(id)
+         );
 
          // Update the workout with set operation
          const updatedWorkout = await prisma.workouts.update({
@@ -201,10 +210,16 @@ export async function updateWorkout(workout: Workout): Promise<VitalityResponse<
                   }
                }
             },
+
             include: {
                workout_applied_tags: {
                   include: {
                      workout_tags: true
+                  }
+               },
+               exercises: {
+                  include: {
+                     sets: true
                   }
                }
             }

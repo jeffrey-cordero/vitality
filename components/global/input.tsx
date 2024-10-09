@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
-import { ChangeEvent, Dispatch, useCallback, useRef, useState } from "react";
+import { ChangeEvent, Dispatch, useCallback, useRef } from "react";
 import { faEye, faEyeSlash, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { VitalityAction, VitalityState, VitalityInputState } from "@/lib/global/state";

@@ -10,9 +10,9 @@ import { Tag } from "@/lib/workouts/tags";
 import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTrash, faPencil, faPlus, faTrashCan, faSignature, faCalendar, faBook, faLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dispatch, useCallback, useContext, useMemo, useRef, useState } from "react";
-import { PopUp } from "@/components/global/popup";
 import { filterWorkout } from "@/components/home/workouts/filter";
 import Exercises from "./exercises";
+import { PopUp } from "@/components/global/popup";
 
 interface WorkoutFormProps {
    cover?: React.ReactNode;
@@ -22,7 +22,7 @@ interface WorkoutFormProps {
    reset: (_filterReset: boolean) => void;
 }
 
-function updateWorkouts(currentWorkouts: Workout[], returnedWorkout: Workout, method: "add" | "update" | "delete" ) {
+function updateWorkouts(currentWorkouts: Workout[], returnedWorkout: Workout, method: "add" | "update" | "delete") {
    let newWorkouts: Workout[] = [];
 
    switch (method) {
@@ -62,29 +62,30 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
    const { workout, cover, state, dispatch, reset } = props;
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
-   const [workoutId, setWorkoutId] = useState<string | undefined>(workout?.id);
+   const [workoutObject, setWorkoutObject] = useState<Workout | undefined>(workout);
    const deletePopUpRef = useRef<{ close: () => void }>(null);
 
    const defaultDate: string = useMemo(() => {
       return new Date().toISOString().split("T")[0];
    }, []);
 
-   const handleWorkoutSubmission = useCallback(async(method: "add" | "update" | "delete") => {
+   const handleWorkoutSubmission = useCallback(async(method: "add" | "update" | "delete", displayNotification: boolean) => {
       const { selected, dictionary } = state.inputs.tags.data;
 
       const payload: Workout = {
          user_id: user.id,
-         id: workoutId ?? "",
+         id: workoutObject?.id ?? "",
          title: state.inputs.title.value.trim(),
          date: new Date(state.inputs.date.value),
          image: state.inputs.image.value,
          description: state.inputs.description.value.trim(),
          // Ensure only existing tag id's are sent to the backend (in case of removal)
-         tagIds: selected.map((tag: Tag) => tag?.id).filter((id: string) => dictionary[id] !== undefined)
+         tagIds: selected.map((tag: Tag) => tag?.id).filter((id: string) => dictionary[id] !== undefined),
+         exercises: state.inputs.exercises.value
       };
 
       // Request to either add or update the workout instance
-      const response: VitalityResponse<Workout> = workoutId === undefined
+      const response: VitalityResponse<Workout> = workoutObject === undefined
          ? await addWorkout(payload)
          : await updateWorkout(payload);
 
@@ -109,15 +110,18 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
          });
 
          // Display success or failure notification to the user
-         updateNotification({
-            status: response.status,
-            message: response.body.message,
-            timer: 1250
-         });
+         if (displayNotification) {
+            // Updating exercises should not always display a notification
+            updateNotification({
+               status: response.status,
+               message: response.body.message,
+               timer: 1250
+            });
+         }
 
          if (method === "add") {
             // Allow workout to be edited
-            setWorkoutId(returnedWorkout.id);
+            setWorkoutObject(returnedWorkout);
          }
       } else {
          // Display errors
@@ -126,7 +130,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             value: response
          });
       }
-   }, [dispatch, state, updateNotification, user?.id, workoutId]);
+   }, [dispatch, state, updateNotification, user?.id, workoutObject]);
 
    const handleInitializeWorkoutState = useCallback(() => {
       // Update input states based on current workout or to a new workout
@@ -161,21 +165,25 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             tagsSearch: {
                ...state.inputs.tagsSearch,
                value: ""
+            },
+            exercises: {
+               ...state.inputs.exercises,
+               value: workout.exercises
             }
          }
       });
-   }, [defaultDate, dispatch, state.inputs.date, state.inputs.description, state.inputs.image, state.inputs.tags, state.inputs.tagsSearch, state.inputs.title, workout?.date, workout?.description, workout?.image, workout?.tagIds, workout?.title]);
+   }, [defaultDate, dispatch, state.inputs.date, state.inputs.description, state.inputs.image, state.inputs.tags, state.inputs.tagsSearch, state.inputs.title, workout?.date, workout?.description, workout?.image, workout?.tagIds, workout?.title, state.inputs.exercises, workout?.exercises]);
 
    return (
       <PopUp
-         text = {workoutId !== undefined ? "Edit Workout" : "New Workout"}
+         text = {workoutObject !== undefined ? "Edit Workout" : "New Workout"}
          className = "max-w-3xl"
          buttonClassName = "w-[9.5rem] h-[2.9rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out"
          icon = {faPlus}
          onClose = {() => {
             if (workout === undefined) {
                // Cleanup new workout form component for future "New Workout" usage
-               setWorkoutId(undefined);
+               setWorkoutObject(undefined);
             }
          }}
          onClick = {handleInitializeWorkoutState}
@@ -190,7 +198,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   className = "text-6xl text-primary mt-1"
                />
                <h1 className = "text-3xl font-bold text-black mb-2">
-                  {workoutId !== undefined ? "Edit" : "New"} Workout
+                  {workoutObject !== undefined ? "Edit" : "New"} Workout
                </h1>
             </div>
             <div className = "relative mt-2 w-full flex flex-col justify-center align-center text-left gap-3">
@@ -205,7 +213,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                <TextArea input = {state.inputs.description} label = "Description" icon = {faBook} dispatch = {dispatch} />
                <ImageSelection input = {state.inputs.image} label = "URL" icon = {faLink} dispatch = {dispatch} />
                {
-                  workout !== undefined && workoutId !== undefined && (
+                  workout !== undefined && workoutObject !== undefined && (
                      <PopUp
                         className = "max-w-xl"
                         ref = {deletePopUpRef}
@@ -240,7 +248,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                               <Button
                                  type = "button"
                                  className = "w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
-                                 onClick = {async() => handleWorkoutSubmission("delete")}
+                                 onClick = {async() => handleWorkoutSubmission("delete", true)}
                               >
                                  Yes, I&apos;m sure
                               </Button>
@@ -253,19 +261,19 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   type = "button"
                   className = "bg-primary text-white h-[2.6rem]"
                   icon = {props !== undefined ? faCloudArrowUp : faSquarePlus}
-                  onClick = {() => handleWorkoutSubmission(workoutId === undefined ? "add" : "update")}
+                  onClick = {() => handleWorkoutSubmission(workoutObject === undefined ? "add" : "update", true)}
                >
                   {
-                     workoutId !== undefined ? "Save" : "Create"
+                     workoutObject !== undefined ? "Save" : "Create"
                   }
                </Button>
                {
-                  workoutId !== undefined && (
-                     <Exercises state = {state} dispatch = {dispatch}/>
+                  workoutObject !== undefined && (
+                     <Exercises workout = {workoutObject} state = {state} dispatch = {dispatch} onSave = {() => handleWorkoutSubmission("update", false)} />
                   )
                }
             </div>
          </div>
       </PopUp>
    );
-}
+};

@@ -6,6 +6,7 @@ import {
    sendSuccessMessage,
    sendErrorMessage
 } from "@/lib/global/state";
+import { uuidSchema } from "../global/zod";
 
 export type Tag = {
   user_id: string;
@@ -15,16 +16,8 @@ export type Tag = {
 };
 
 const workoutTagSchema = z.object({
-   user_id: z
-      .string()
-      .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/, {
-         message: "Invalid UUID format"
-      }),
-   id: z
-      .string()
-      .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/, {
-         message: "Invalid UUID format"
-      }),
+   user_id: uuidSchema,
+   id: uuidSchema,
    title: z
       .string()
       .min(1, {
@@ -71,7 +64,7 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
       // Return the field errors
       const errors = fields.error.flatten();
 
-      // Only error should be title being too long or short
+      // Only error should be tag title being too long or short
       if (errors.fieldErrors.title) {
          return sendErrorMessage("Error", "Invalid workout tag fields", tag, {
             search: errors.fieldErrors.title ?? [""]
