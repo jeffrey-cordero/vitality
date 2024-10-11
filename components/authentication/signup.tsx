@@ -117,7 +117,7 @@ function Form(): JSX.Element {
             });
          }
       } catch (error) {
-         console.error("Error updating status:", error);
+         console.error(error);
       }
    };
 

@@ -6,7 +6,7 @@ import {
    sendSuccessMessage,
    sendErrorMessage
 } from "@/lib/global/state";
-import { uuidSchema } from "../global/zod";
+import { uuidSchema } from "@/lib/global/zod";
 
 export type Tag = {
   user_id: string;
@@ -53,6 +53,7 @@ export async function fetchWorkoutTags(userId: string): Promise<Tag[]> {
       return result;
    } catch (error) {
       console.error(error);
+
       return [];
    }
 }
@@ -82,7 +83,9 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
       });
 
       return sendSuccessMessage("Successfully added new workout tag", newTag);
-   } catch (error: any) {
+   } catch (error) {
+      console.error(error);
+
       if (
          error.code === "P2002" &&
       error.meta?.modelName === "workout_tags" &&
@@ -96,9 +99,9 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
       } else {
          return sendErrorMessage(
             "Failure",
-            "Internal Server Error. Please try again later.",
+            error.meta?.message,
             tag,
-            {}
+            { system: error.meta?.message }
          );
       }
    }
@@ -153,7 +156,9 @@ export async function updateWorkoutTag(
             {}
          );
       }
-   } catch (error: any) {
+   } catch (error) {
+      console.error(error);
+
       if (
          error.code === "P2002" &&
       error.meta?.modelName === "workout_tags" &&
@@ -172,9 +177,9 @@ export async function updateWorkoutTag(
       } else {
          return sendErrorMessage(
             "Failure",
-            "Internal Server Error. Please try again later.",
+            error.meta?.message,
             tag,
-            {}
+            { system: error.meta?.message }
          );
       }
    }

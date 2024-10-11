@@ -8,7 +8,7 @@ import {
 } from "@/lib/global/state";
 import { formatWorkout } from "@/lib/workouts/shared";
 import { Exercise } from "@/lib/workouts/exercises";
-import { uuidSchema } from "../global/zod";
+import { uuidSchema } from "@/lib/global/zod";
 
 export type Workout = {
   id: string;
@@ -64,6 +64,9 @@ export async function fetchWorkouts(userId: string): Promise<Workout[]> {
             exercises: {
                include: {
                   sets: true
+               },
+               orderBy: {
+                  exercise_order: "asc"
                }
             }
          },
@@ -82,6 +85,7 @@ export async function fetchWorkouts(userId: string): Promise<Workout[]> {
       return formattedWorkouts;
    } catch (error) {
       console.error(error);
+
       return [];
    }
 }
@@ -119,11 +123,18 @@ export async function addWorkout(
                })
             }
          },
-         // Include tags for the given workout (no exercises)
          include: {
             workout_applied_tags: {
                include: {
                   workout_tags: true
+               }
+            },
+            exercises: {
+               include: {
+                  sets: true
+               },
+               orderBy: {
+                  exercise_order: "asc"
                }
             }
          }
@@ -133,15 +144,14 @@ export async function addWorkout(
          "Successfully added new workout",
          formatWorkout(newWorkout)
       );
-   } catch (error: any) {
-      // Possibly an error with database, authentication, or network
+   } catch (error) {
       console.error(error);
 
       return sendErrorMessage(
          "Failure",
-         "Internal Server Error. Please try again later.",
+         error.meta?.message,
          workout,
-         {}
+         { system: error.meta?.message }
       );
    }
 }
@@ -160,24 +170,30 @@ export async function updateWorkout(
             fields.error.flatten().fieldErrors
          );
       } else {
-      // Fetch existing tags first for data integrity
+         // Fetch existing tags first for data integrity
          const existingWorkout = await prisma.workouts.findUnique({
             where: {
                id: workout.id
             },
             include: {
-               workout_applied_tags: true,
+               workout_applied_tags: {
+                  include: {
+                     workout_tags: true
+                  }
+               },
                exercises: {
                   include: {
                      sets: true
+                  },
+                  orderBy: {
+                     exercise_order: "asc"
                   }
                }
             }
          });
 
          // Extract existing tag IDs
-         const existingTagIds: string[] =
-        existingWorkout?.workout_applied_tags.map((tag) => tag.tag_id) || [];
+         const existingTagIds: string[] = existingWorkout?.workout_applied_tags.map((tag) => tag.tag_id) || [];
 
          // Determine tags to connect and disconnect
          const newTagIds: string[] = workout.tagIds;
@@ -220,6 +236,9 @@ export async function updateWorkout(
                exercises: {
                   include: {
                      sets: true
+                  },
+                  orderBy: {
+                     exercise_order: "asc"
                   }
                }
             }
@@ -235,9 +254,9 @@ export async function updateWorkout(
 
       return sendErrorMessage(
          "Failure",
-         "Internal Server Error. Please try again later.",
+         error.meta?.message,
          workout,
-         {}
+         { system: error.meta?.message }
       );
    }
 }
@@ -263,14 +282,14 @@ export async function removeWorkouts(
          }`,
          response.count
       );
-   } catch (error: any) {
+   } catch (error) {
       console.error(error);
 
       return sendErrorMessage(
          "Failure",
-         "Internal Server Error. Please try again later.",
+         error.meta?.message,
          0,
-         {}
+         { system: error.meta?.message }
       );
    }
 }

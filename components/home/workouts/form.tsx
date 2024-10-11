@@ -27,10 +27,10 @@ function updateWorkouts(currentWorkouts: Workout[], returnedWorkout: Workout, me
 
    switch (method) {
    case "delete":
-      newWorkouts = currentWorkouts.filter(workout => workout.id !== returnedWorkout.id);
+      newWorkouts = [...currentWorkouts].filter(workout => workout.id !== returnedWorkout.id);
       break;
    case "update":
-      newWorkouts = currentWorkouts.map(workout => (workout.id === returnedWorkout.id ? returnedWorkout : workout));
+      newWorkouts = [...currentWorkouts].map(workout => (workout.id === returnedWorkout.id ? returnedWorkout : workout));
       break;
    default:
       newWorkouts = [...currentWorkouts, returnedWorkout];
@@ -62,7 +62,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
    const { workout, cover, state, dispatch, reset } = props;
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
-   const [workoutObject, setWorkoutObject] = useState<Workout | undefined>(workout);
+   const [editingWorkout, setEditingWorkout] = useState<Workout | undefined>(workout);
    const deletePopUpRef = useRef<{ close: () => void }>(null);
 
    const defaultDate: string = useMemo(() => {
@@ -74,18 +74,18 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
 
       const payload: Workout = {
          user_id: user.id,
-         id: workoutObject?.id ?? "",
+         id: editingWorkout?.id ?? "",
          title: state.inputs.title.value.trim(),
          date: new Date(state.inputs.date.value),
          image: state.inputs.image.value,
          description: state.inputs.description.value.trim(),
          // Ensure only existing tag id's are sent to the backend (in case of removal)
          tagIds: selected.map((tag: Tag) => tag?.id).filter((id: string) => dictionary[id] !== undefined),
-         exercises: state.inputs.exercises.value
+         exercises: editingWorkout?.exercises ?? []
       };
 
       // Request to either add or update the workout instance
-      const response: VitalityResponse<Workout> = workoutObject === undefined
+      const response: VitalityResponse<Workout> = editingWorkout === undefined
          ? await addWorkout(payload)
          : await updateWorkout(payload);
 
@@ -121,7 +121,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
 
          if (method === "add") {
             // Allow workout to be edited
-            setWorkoutObject(returnedWorkout);
+            setEditingWorkout(returnedWorkout);
          }
       } else {
          // Display errors
@@ -130,10 +130,10 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             value: response
          });
       }
-   }, [dispatch, state, updateNotification, user?.id, workoutObject]);
+   }, [dispatch, state, updateNotification, user?.id, editingWorkout]);
 
    const handleInitializeWorkoutState = useCallback(() => {
-      // Update input states based on current workout or to a new workout
+      // Update input states based on current workout or new workout
       dispatch({
          type: "initializeState",
          value: {
@@ -165,25 +165,22 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             tagsSearch: {
                ...state.inputs.tagsSearch,
                value: ""
-            },
-            exercises: {
-               ...state.inputs.exercises,
-               value: workout.exercises
             }
          }
       });
-   }, [defaultDate, dispatch, state.inputs.date, state.inputs.description, state.inputs.image, state.inputs.tags, state.inputs.tagsSearch, state.inputs.title, workout?.date, workout?.description, workout?.image, workout?.tagIds, workout?.title, state.inputs.exercises, workout?.exercises]);
+   }, [defaultDate, dispatch, state.inputs.date, state.inputs.description, state.inputs.image, state.inputs.tags,
+      state.inputs.tagsSearch, state.inputs.title, workout]);
 
    return (
       <PopUp
-         text = {workoutObject !== undefined ? "Edit Workout" : "New Workout"}
+         text = {editingWorkout !== undefined ? "Edit Workout" : "New Workout"}
          className = "max-w-3xl"
          buttonClassName = "w-[9.5rem] h-[2.9rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out"
          icon = {faPlus}
          onClose = {() => {
             if (workout === undefined) {
                // Cleanup new workout form component for future "New Workout" usage
-               setWorkoutObject(undefined);
+               setEditingWorkout(undefined);
             }
          }}
          onClick = {handleInitializeWorkoutState}
@@ -198,7 +195,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   className = "text-6xl text-primary mt-1"
                />
                <h1 className = "text-3xl font-bold text-black mb-2">
-                  {workoutObject !== undefined ? "Edit" : "New"} Workout
+                  {editingWorkout !== undefined ? "Edit" : "New"} Workout
                </h1>
             </div>
             <div className = "relative mt-2 w-full flex flex-col justify-center align-center text-left gap-3">
@@ -213,7 +210,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                <TextArea input = {state.inputs.description} label = "Description" icon = {faBook} dispatch = {dispatch} />
                <ImageSelection input = {state.inputs.image} label = "URL" icon = {faLink} dispatch = {dispatch} />
                {
-                  workout !== undefined && workoutObject !== undefined && (
+                  workout !== undefined && editingWorkout !== undefined && (
                      <PopUp
                         className = "max-w-xl"
                         ref = {deletePopUpRef}
@@ -261,15 +258,15 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   type = "button"
                   className = "bg-primary text-white h-[2.6rem]"
                   icon = {props !== undefined ? faCloudArrowUp : faSquarePlus}
-                  onClick = {() => handleWorkoutSubmission(workoutObject === undefined ? "add" : "update", true)}
+                  onClick = {() => handleWorkoutSubmission(editingWorkout === undefined ? "add" : "update", true)}
                >
                   {
-                     workoutObject !== undefined ? "Save" : "Create"
+                     editingWorkout !== undefined ? "Save" : "Create"
                   }
                </Button>
                {
-                  workoutObject !== undefined && (
-                     <Exercises workout = {workoutObject} state = {state} dispatch = {dispatch} onSave = {() => handleWorkoutSubmission("update", false)} />
+                  editingWorkout !== undefined && (
+                     <Exercises workout = {editingWorkout} state = {state} dispatch = {dispatch} setEditingWorkout = {setEditingWorkout} />
                   )
                }
             </div>

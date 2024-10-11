@@ -18,7 +18,7 @@ export async function getUserByUsername(username: string, authentication: boolea
 
       return user;
    } catch (error) {
-      console.error("Failed to fetch user:", error);
+      console.error(error);
       throw new Error("Failed to fetch user.");
    }
 }
@@ -38,7 +38,7 @@ export async function getUserByEmail(email: string): Promise<User | undefined> {
 
       return user ?? undefined;
    } catch (error) {
-      console.error("Failed to fetch user:", error);
+      console.error(error);
       throw new Error("Failed to fetch user.");
    }
 }

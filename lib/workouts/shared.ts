@@ -27,6 +27,6 @@ export function formatWorkout(workout): Workout {
       tagIds: workout.workout_applied_tags.map(
          (applied_tag: any) => applied_tag.workout_tags.id
       ),
-      exercises: []
+      exercises: workout.exercises
    };
 }

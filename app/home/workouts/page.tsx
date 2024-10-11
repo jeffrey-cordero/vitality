@@ -149,7 +149,10 @@ const workouts: VitalityState = {
          id: "exerciseTitle",
          value: "",
          error: null,
-         data: {}
+         data: {
+            id: "",
+            edit: false
+         }
       },
       weight: {
          type: "number",
@@ -193,17 +196,11 @@ const workouts: VitalityState = {
          error: null,
          data: {}
       },
-      exercise: {
+      // Editing set ID to intern visible input container
+      setId: {
          type: null,
-         id: "workoutExercise",
-         value : {},
-         error: null,
-         data: {}
-      },
-      exercises: {
-         type: null,
-         id: "workoutsExercises",
-         value : [],
+         id: "setId",
+         value : "",
          error: null,
          data: {}
       }
@@ -274,7 +271,7 @@ export default function Page(): JSX.Element {
                }
             });
          } catch (error) {
-            console.error("Failed to fetch workouts or tags:", error);
+            console.error(error);
          }
       }
    }, [user, state.inputs.tags, state.inputs.workouts, dispatch]);

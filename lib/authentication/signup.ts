@@ -101,8 +101,9 @@ export async function signup(
       });
 
       return sendSuccessMessage("Successfully registered", null);
-   } catch (error: any) {
+   } catch (error) {
       console.error(error);
+
       if (error.code === "P2002" && error.meta?.target?.includes("username")) {
          return sendErrorMessage("Error", "Internal database conflicts", null, {
             username: ["Username already taken"]
@@ -124,9 +125,9 @@ export async function signup(
       } else {
          return sendErrorMessage(
             "Failure",
-            "Internal Server Error. Please try again later.",
+            error.meta?.message,
             null,
-            {}
+            { system: error.meta?.message }
          );
       }
    }

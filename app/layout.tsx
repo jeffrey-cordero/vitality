@@ -53,6 +53,7 @@ export default function Layout({
          const user = await getAuthentication();
          setUser(user);
       } catch (error) {
+         console.error(error);
          setUser(undefined);
       }
    };
