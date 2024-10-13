@@ -7,7 +7,7 @@ import {
    sendErrorMessage
 } from "@/lib/global/state";
 
-export type Set = {
+export type ExerciseSet = {
   id: string;
   exercise_id: string;
   set_order: number;
@@ -46,7 +46,7 @@ export type Exercise = {
   workout_id: string;
   title: string;
   exercise_order: number;
-  sets: Set[];
+  sets: ExerciseSet[];
 };
 
 const exerciseSchema = z.object({
@@ -124,7 +124,7 @@ export async function editExerciseTitle(
                title: title
             }
          });
-   
+
          return sendSuccessMessage("Successfully updated exercise name", true);
       }
    } catch (error) {
@@ -134,6 +134,98 @@ export async function editExerciseTitle(
          "Failure",
          error.meta?.message,
          false,
+         { system: error.meta?.message }
+      );
+   }
+}
+
+export async function updateExercises(workoutId: string, exercises: Exercise[]): Promise<VitalityResponse<Exercise[]>> {
+   for (const exercise of exercises) {
+      const fields = exerciseSchema.safeParse(exercise);
+      if (!(fields.success)) {
+         return sendErrorMessage(
+            "Error",
+            `Invalid exercise fields(ID = ${exercise.id})`,
+            exercises,
+            fields.error.flatten().fieldErrors
+         );
+      }
+   }
+   try {
+      // Fetch existing tags first for data integrity
+      const existingWorkout = await prisma.workouts.findUnique({
+         where: {
+            id: workoutId
+         },
+         include: {
+            exercises: {
+               include: {
+                  sets: true
+               }
+            }
+         }
+      });
+
+      // Extract exercise IDs
+      const existingExerciseIds: string[] = existingWorkout?.exercises.map((exercise)=> exercise.id);
+      const newExerciseIds: string[] = exercises.map((exercise)=> exercise.id) || [];
+
+      // Determine exercise's to connect and disconnect
+      const exerciseIdsToRemove: string[] = newExerciseIds.filter(
+         (id: string) => !(existingExerciseIds.includes(id))
+      );
+
+      const newExercises = Object.fromEntries(exercises.map(exercise => [exercise.id, exercise]));
+      const updatingExercises = Object.fromEntries(exercises.map(exercise => [exercise.id, exercise]));
+      const exerciseIdsToUpdate: string[] = newExerciseIds.filter(
+         (id: string) => existingExerciseIds.includes(id)
+      );
+
+      await prisma.workouts.update({
+         where: { id: workoutId },
+         data: {
+            exercises: {
+               // Remove exercises
+               deleteMany: {
+                  id: { in: exerciseIdsToRemove }
+               },
+               // Update existing exercises
+               updateMany: exerciseIdsToUpdate.map((id: string) => ({
+                  where: {
+                     id: id
+                  },
+                  data: {
+                     title: updatingExercises[id].title,
+                     exercise_order: updatingExercises[id].exercise_order
+                  }
+               }))
+            }
+         },
+         include: {
+            workout_applied_tags: {
+               include: {
+                  workout_tags: true
+               }
+            },
+            exercises: {
+               include: {
+                  sets: true
+               },
+               orderBy: {
+                  exercise_order: "asc"
+               }
+            }
+         }
+      });
+
+      return sendSuccessMessage("Missing implementation", exercises);
+   } catch (error) {
+      console.error(error);
+
+      return sendErrorMessage(
+         "Failure",
+         error.meta?.message,
+         exercises,
          { system: error.meta?.message }
       );
    }

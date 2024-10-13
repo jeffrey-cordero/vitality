@@ -3,29 +3,34 @@ import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import TextArea from "@/components/global/textarea";
 import { VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/state";
-import { Workout } from "@/lib/workouts/workouts";
-import { faClock, faCloudArrowUp, faFeather, faGrip, faHashtag, faPencil, faPlus, faRotateLeft, faWeight } from "@fortawesome/free-solid-svg-icons";
+import { updateWorkout, Workout } from "@/lib/workouts/workouts";
+import { faClock, faCloudArrowUp, faFeather, faHashtag, faPencil, faPlus, faRotateLeft, faWeight } from "@fortawesome/free-solid-svg-icons";
 import { Dispatch, useCallback, useContext, useState } from "react";
-import { addExercise, editExerciseTitle, Exercise, Set } from "@/lib/workouts/exercises";
+import { addExercise, editExerciseTitle, Exercise, ExerciseSet, updateExercises } from "@/lib/workouts/exercises";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import {
    DndContext,
-   useDraggable,
-   useDroppable
-} from '@dnd-kit/core';
-
+   closestCenter,
+   KeyboardSensor,
+   PointerSensor,
+   useSensor,
+   useSensors
+} from "@dnd-kit/core";
 import {
+   arrayMove,
    SortableContext,
-   verticalListSortingStrategy,
-   arrayMove
-} from "@dnd-kit/sortable"
+   sortableKeyboardCoordinates,
+   useSortable,
+   verticalListSortingStrategy
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface ExerciseInputProps {
    workout: Workout;
    state: VitalityState;
-   dispatch: Dispatch<VitalityAction<Workout | Exercise>>;
+   dispatch: Dispatch<VitalityAction<Workout | Exercise | Exercise[]>>;
    onBlur?: () => void;
-   onSave?: (_workout: Workout) => void;
+   onSave?: (_exercises: Exercise[]) => void;
    setEditingWorkout: (_workout: Workout) => void;
 }
 
@@ -49,19 +54,7 @@ function NewExerciseInput(props: ExerciseInputProps): JSX.Element {
 
       if (response.status === "Success") {
          const newExercises: Exercise[] = [...workout.exercises, returnedExercise];
-         const newWorkout: Workout = { ...workout, exercises: newExercises };
-         const newWorkouts: Workout[] = [...state.inputs.workouts.value].map((w) => w.id !== workout.id ? w : newWorkout);
-
-         // Update overall workouts by including new exercise
-         dispatch({
-            type: "updateInput",
-            value: {
-               ...state.inputs.workouts,
-               value: newWorkouts
-            }
-         });
-
-         onSave(newWorkout);
+         await onSave(newExercises);
       } else {
          // Display all errors, where title entry is replaced by exerciseTitle
          if (response.body.errors.title) {
@@ -102,7 +95,7 @@ function NewExerciseInput(props: ExerciseInputProps): JSX.Element {
 }
 
 interface SetProps extends ExerciseInputProps {
-   set: Set;
+   set: ExerciseSet;
 }
 
 function SetContainer(props: SetProps): JSX.Element {
@@ -218,6 +211,20 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    const [editTitle, setEditTitle] = useState(false);
    const displayEditTitle = editTitle && edit && id === exercise.id;
 
+   // Prevent drag and drop mechanisms when user is editing exercise information
+   const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition
+   } = useSortable({ id: exercise.id, disabled: displayEditTitle });
+
+   const style = {
+      transform: CSS.Transform.toString(transform),
+      transition
+   };
+
    const handleSaveExerciseName = useCallback(async () => {
       const newTitle: string = state.inputs.exerciseTitle.value.trim();
       const response: VitalityResponse<boolean> = await editExerciseTitle(exercise.id, newTitle);
@@ -226,23 +233,9 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          // Update the exercise
          const newExercise: Exercise = { ...exercise, title: newTitle };
          const newExercises: Exercise[] = [...workout.exercises].map((e) => e.id !== exercise.id ? e : newExercise);
-         const newWorkout: Workout = {
-            ...workout,
-            exercises: newExercises
-         };
-         const newWorkouts: Workout[] = [...state.inputs.workouts.value].map((w) => w.id !== workout.id ? w : newWorkout);
-
-         // Update overall workouts and hide the editTitle
-         dispatch({
-            type: "updateInput",
-            value: {
-               ...state.inputs.workouts,
-               value: newWorkouts
-            }
-         });
 
          setEditTitle(false);
-         onSave(newWorkout);
+         await onSave(newExercises);
       } else if (response.status === "Failure") {
          // Display failure notification to the user, if any
          updateNotification({
@@ -258,10 +251,10 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                ...state.inputs.exerciseTitle,
                error: [response.body.message]
             }
-         })
+         });
       }
    }, [dispatch, exercise, onSave, state.inputs.workouts, workout,
-      state.inputs.exerciseTitle.value, updateNotification]);
+      state.inputs.exerciseTitle, updateNotification]);
 
    const handleInitializeEditExerciseName = useCallback(() => {
       dispatch({
@@ -282,7 +275,12 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
    return (
       <div
-         className="w-full mx-auto text-left mt-4 cursor-pointer" >
+         className="w-full mx-auto p-4 text-left focus:cursor-move"
+         ref={setNodeRef}
+         style={style}
+         {...attributes}
+         {...listeners}
+      >
          {
             displayEditTitle ? (
                <div>
@@ -301,7 +299,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
             )
          }
          {
-            exercise.sets.map((set: Set) => {
+            exercise.sets.map((set: ExerciseSet) => {
                return (<SetContainer {...props} set={set} key={exercise.id} />);
             })
          }
@@ -319,8 +317,15 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
 export default function Exercises(props: ExerciseInputProps): JSX.Element {
    const { workout, state, dispatch, setEditingWorkout } = props;
-   const { edit } = state.inputs.exerciseTitle.data;
+   const { id, edit } = state.inputs.exerciseTitle.data;
+   const { updateNotification } = useContext(NotificationContext);
    const [addExercise, setAddExercise] = useState(false);
+   const sensors = useSensors(
+      useSensor(PointerSensor),
+      useSensor(KeyboardSensor, {
+         coordinateGetter: sortableKeyboardCoordinates
+      })
+   );
    const displayNewTitle: boolean = addExercise && !(edit);
    const exercises: Exercise[] = workout.exercises;
 
@@ -341,32 +346,81 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
       setAddExercise(true);
    }, [dispatch, state.inputs.exerciseTitle]);
 
-   const handleOnSave = useCallback((workout: Workout) => {
-      // Updating editing workout in main workout component
-      setEditingWorkout(workout);
+   const handleOnSave = useCallback(async (exercises: Exercise[]) => {
+      // Update workout entry in database
+      const response: VitalityResponse<Exercise[]> = await updateExercises(workout.id, exercises);
 
-      // Remove add exercise input
-      setAddExercise(false);
+      if (response.status === "Success") {
+         // Update front-end state on success
+         const newWorkouts: Workout[] = [...state.inputs.workouts.value].map((w) => w.id !== workout.id ? w : workout);
+
+         dispatch({
+            type: "updateInput",
+            value: {
+               ...state.inputs.workouts,
+               value: newWorkouts
+            }
+         });
+
+         // Updating editing workout in main workout component
+         setEditingWorkout({ ...workout, exercises: exercises });
+
+         // Remove add exercise input, if applicable
+         if (addExercise) {
+            setAddExercise(false);
+         }
+      } else if (response.status === "Error") {
+         // Display errors
+         dispatch({
+            type: "updateStatus",
+            value: response
+         });
+      } else {
+         // Display failure message
+         updateNotification({
+            status: response.status,
+            message: response.body.message
+         });
+      }
    }, [setEditingWorkout]);
 
    const handleDragEnd = (event) => {
       const { active, over } = event;
-  
-      // If there is no item to drop on, return early
-      if (!(over)) {
+
+      if (edit === true && id === active.id) {
+         // Don't allow drag and drop for editing exercises
          return;
       }
-  
-      // Reorder exercises based on the drag-and-drop action
-      const oldIndex = exercises.findIndex((exercise) => exercise.id === active.id);
-      const newIndex = exercises.findIndex((exercise) => exercise.id === over.id);
 
-      console.log(arrayMove(exercises, oldIndex, newIndex));
+      if (active.id !== over.id) {
+         let oldIndex: number, newIndex: number;
 
-      // TODO: Update workout exercises
+         for (const exercise of exercises) {
+            if (exercise.id === active.id) {
+               // Original exercise
+               oldIndex = exercise.exercise_order;
+            }
 
-      
-    };
+            if (exercise.id === over.id) {
+               // Swapping exercise
+               newIndex = exercise.exercise_order;
+            }
+         }
+
+         if (oldIndex !== undefined && newIndex !== undefined) {
+            // Use arrayMove to reorder exercises
+            let newExercises: Exercise[] = arrayMove(exercises, oldIndex, newIndex);
+
+            // Update exercise_order
+            newExercises = newExercises.map((exercise, index) => ({
+               ...exercise,
+               exercise_order: index
+            }));
+
+            handleOnSave(newExercises);
+         }
+      }
+   };
 
    return (
       <div className="w-full mx-auto text-center font-bold flex flex-col justify-center items-center">
@@ -388,15 +442,19 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
             New Exercise
          </Button>
          <hr className="text-black w-full mt-4" />
-         <DndContext onDragEnd={handleDragEnd}>
+         <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+         >
             <SortableContext items={exercises.map((exercise) => exercise.id)} strategy={verticalListSortingStrategy}>
-            {
-               workout.exercises.map((exercise: Exercise) => {
-                  return (
-                     <ExerciseContainer {...props} exercise={exercise} key={exercise.workout_id + exercise.id} onSave={handleOnSave} />
-                  );
-               })
-            }
+               {
+                  workout.exercises.map((exercise: Exercise) => {
+                     return (
+                        <ExerciseContainer {...props} exercise={exercise} key={exercise.id} onSave={handleOnSave} />
+                     );
+                  })
+               }
             </SortableContext>
          </DndContext>
       </div>

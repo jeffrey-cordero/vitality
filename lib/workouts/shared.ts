@@ -1,4 +1,5 @@
 import { Workout } from "@/lib/workouts/workouts";
+import { Exercise } from "@/lib/workouts/exercises";
 
 export function searchForTitle(array: any[], search: string): any[] {
    // Handle no input for array search
@@ -16,7 +17,7 @@ export function getWorkoutDate(date: Date): string {
 }
 
 export function formatWorkout(workout): Workout {
-   // Turn combined tag and exercise data into a uniform Workout type
+   // Turn combined tag and exercise data into a uniform Workout typed
    return {
       id: workout.id,
       user_id: workout.user_id,
