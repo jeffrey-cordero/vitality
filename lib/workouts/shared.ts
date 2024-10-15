@@ -1,5 +1,4 @@
 import { Workout } from "@/lib/workouts/workouts";
-import { Exercise } from "@/lib/workouts/exercises";
 
 export function searchForTitle(array: any[], search: string): any[] {
    // Handle no input for array search
@@ -25,9 +24,9 @@ export function formatWorkout(workout): Workout {
       date: workout.date,
       description: workout.description ?? "",
       image: workout.image ?? "",
-      tagIds: workout.workout_applied_tags.map(
+      tagIds: workout.workout_applied_tags?.map(
          (applied_tag: any) => applied_tag.workout_tags.id
-      ),
-      exercises: workout.exercises
+      ) ?? [],
+      exercises: workout.exercises ?? []
    };
 }

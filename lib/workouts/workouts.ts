@@ -97,7 +97,7 @@ export async function addWorkout(
       // Validate the feedback form first
       const fields = workoutsSchema.safeParse(workout);
 
-      if (!(fields.success)) {
+      if (!fields.success) {
       // Return the field errors
          return sendErrorMessage(
             "Error",
@@ -147,12 +147,9 @@ export async function addWorkout(
    } catch (error) {
       console.error(error);
 
-      return sendErrorMessage(
-         "Failure",
-         error.meta?.message,
-         workout,
-         { system: error.meta?.message }
-      );
+      return sendErrorMessage("Failure", error.meta?.message, workout, {
+         system: error.meta?.message
+      });
    }
 }
 
@@ -170,7 +167,7 @@ export async function updateWorkout(
             fields.error.flatten().fieldErrors
          );
       } else {
-         // Fetch existing tags first for data integrity
+      // Fetch existing tags first for data integrity
          const existingWorkout = await prisma.workouts.findUnique({
             where: {
                id: workout.id
@@ -193,15 +190,19 @@ export async function updateWorkout(
          });
 
          // Extract existing tag IDs
-         const existingTagIds: string[] = existingWorkout?.workout_applied_tags.map((tag) => tag.tag_id) || [];
+         const existingTagIdsArray: string[] =
+        existingWorkout?.workout_applied_tags.map((tag) => tag.tag_id) || [];
+         const existingTagIdsSet: Set<string> = new Set(existingTagIdsArray);
 
          // Determine tags to connect and disconnect
-         const newTagIds: string[] = workout.tagIds;
-         const tagsToRemove: string[] = existingTagIds.filter(
-            (id) => !newTagIds.includes(id)
+         const newTagIdsArray: string[] = workout.tagIds;
+         const newTagIdsSet: Set<string> = new Set(workout.tagIds);
+
+         const tagsToRemove: string[] = existingTagIdsArray.filter(
+            (id) => !newTagIdsSet.has(id)
          );
-         const tagsToAdd: string[] = newTagIds.filter(
-            (id) => !existingTagIds.includes(id)
+         const tagsToAdd: string[] = newTagIdsArray.filter(
+            (id) => !existingTagIdsSet.has(id)
          );
 
          // Update the workout with set operation
@@ -252,12 +253,9 @@ export async function updateWorkout(
    } catch (error) {
       console.error(error);
 
-      return sendErrorMessage(
-         "Failure",
-         error.meta?.message,
-         workout,
-         { system: error.meta?.message }
-      );
+      return sendErrorMessage("Failure", error.meta?.message, workout, {
+         system: error.meta?.message
+      });
    }
 }
 
@@ -285,11 +283,8 @@ export async function removeWorkouts(
    } catch (error) {
       console.error(error);
 
-      return sendErrorMessage(
-         "Failure",
-         error.meta?.message,
-         0,
-         { system: error.meta?.message }
-      );
+      return sendErrorMessage("Failure", error.meta?.message, 0, {
+         system: error.meta?.message
+      });
    }
 }

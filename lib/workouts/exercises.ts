@@ -6,6 +6,7 @@ import {
    sendSuccessMessage,
    sendErrorMessage
 } from "@/lib/global/state";
+import { formatWorkout } from "./shared";
 
 export type ExerciseSet = {
   id: string;
@@ -99,33 +100,38 @@ export async function addExercise(
    }
 }
 
-export async function editExerciseTitle(
-   id: string, title: string
-): Promise<VitalityResponse<boolean>> {
+export async function updateExercise(
+   exercise: Exercise, method: "title" | "sets"
+): Promise<VitalityResponse<null>> {
    try {
-      // Ensure new title is valid
-      const newTitle = title.trim();
+      if (method === "title") {
+         // Update exercise title
+         const title = exercise.title.trim();
 
-      if (newTitle.length === 0) {
-         const error: string = "A title must be at least 1 character";
+         if (title.length === 0) {
+            const error: string = "A title must be at least 1 character";
 
-         return sendErrorMessage("Error", error, false, null);
-      } else if (newTitle.length > 50) {
-         const error: string = "A title must be at most 50 characters";
+            return sendErrorMessage("Error", error, null, null);
+         } else if (title.length > 50) {
+            const error: string = "A title must be at most 50 characters";
 
-         return sendErrorMessage("Error", error, false, null);
+            return sendErrorMessage("Error", error, null, null);
+         } else {
+            // Update exercise with new title
+            await prisma.exercises.update({
+               where: {
+                  id: exercise.id
+               },
+               data: {
+                  title: exercise.title
+               }
+            });
+
+            return sendSuccessMessage("Successfully updated exercise name", null);
+         }
       } else {
-         // Update exercise with new title
-         await prisma.exercises.update({
-            where: {
-               id: id
-            },
-            data: {
-               title: title
-            }
-         });
-
-         return sendSuccessMessage("Successfully updated exercise name", true);
+         // Update exercise sets
+         return sendSuccessMessage("Missing implementation for update exercise sets", null);
       }
    } catch (error) {
       console.error(error);
@@ -133,20 +139,21 @@ export async function editExerciseTitle(
       return sendErrorMessage(
          "Failure",
          error.meta?.message,
-         false,
+         null,
          { system: error.meta?.message }
       );
    }
 }
 
-export async function updateExercises(workoutId: string, exercises: Exercise[]): Promise<VitalityResponse<Exercise[]>> {
+export async function updateExercises(workoutId: string,
+   exercises: Exercise[]): Promise<VitalityResponse<Exercise[]>> {
    for (const exercise of exercises) {
       const fields = exerciseSchema.safeParse(exercise);
       if (!(fields.success)) {
          return sendErrorMessage(
             "Error",
             `Invalid exercise fields(ID = ${exercise.id})`,
-            exercises,
+            null,
             fields.error.flatten().fieldErrors
          );
       }
@@ -167,46 +174,39 @@ export async function updateExercises(workoutId: string, exercises: Exercise[]):
       });
 
       // Extract exercise IDs
-      const existingExerciseIds: string[] = existingWorkout?.exercises.map((exercise)=> exercise.id);
-      const newExerciseIds: string[] = exercises.map((exercise)=> exercise.id) || [];
+      const existingExerciseIdsArray: string[] = existingWorkout?.exercises.map((exercise) => exercise.id) ?? [];
+      const currentExerciseIdsSet: Set<string> = new Set(exercises.map((exercise) => exercise.id));
 
-      // Determine exercise's to connect and disconnect
-      const exerciseIdsToRemove: string[] = newExerciseIds.filter(
-         (id: string) => !(existingExerciseIds.includes(id))
-      );
-
-      const newExercises = Object.fromEntries(exercises.map(exercise => [exercise.id, exercise]));
+      // Determine exercise's to update and/or remove
       const updatingExercises = Object.fromEntries(exercises.map(exercise => [exercise.id, exercise]));
-      const exerciseIdsToUpdate: string[] = newExerciseIds.filter(
-         (id: string) => existingExerciseIds.includes(id)
+
+      const exerciseIdsToUpdate: string[] = existingExerciseIdsArray.filter(
+         (id: string) => currentExerciseIdsSet.has(id)
       );
 
-      await prisma.workouts.update({
+      const exerciseIdsToRemove: string[] = existingExerciseIdsArray.filter(
+         (id: string) => !(currentExerciseIdsSet.has(id))
+      );
+
+      const workout = await prisma.workouts.update({
          where: { id: workoutId },
          data: {
             exercises: {
-               // Remove exercises
+               // Update existing ordering for reorder or deletion methods
                deleteMany: {
                   id: { in: exerciseIdsToRemove }
                },
-               // Update existing exercises
-               updateMany: exerciseIdsToUpdate.map((id: string) => ({
+               updateMany: exerciseIdsToUpdate.map((id: string, index: number) => ({
                   where: {
                      id: id
                   },
                   data: {
-                     title: updatingExercises[id].title,
-                     exercise_order: updatingExercises[id].exercise_order
+                     exercise_order: index
                   }
                }))
             }
          },
          include: {
-            workout_applied_tags: {
-               include: {
-                  workout_tags: true
-               }
-            },
             exercises: {
                include: {
                   sets: true
@@ -218,14 +218,14 @@ export async function updateExercises(workoutId: string, exercises: Exercise[]):
          }
       });
 
-      return sendSuccessMessage("Missing implementation", exercises);
+      return sendSuccessMessage("Successfully updated workout exercises", formatWorkout(workout).exercises);
    } catch (error) {
       console.error(error);
 
       return sendErrorMessage(
          "Failure",
          error.meta?.message,
-         exercises,
+         null,
          { system: error.meta?.message }
       );
    }
