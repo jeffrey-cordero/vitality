@@ -6,7 +6,7 @@ import {
    sendSuccessMessage,
    sendErrorMessage
 } from "@/lib/global/state";
-import { formatWorkout } from "./shared";
+import { formatExercise, formatWorkout } from "./shared";
 
 export type ExerciseSet = {
   id: string;
@@ -43,7 +43,6 @@ const setSchema = z.object({
 
 export type Exercise = {
   id: string;
-  user_id: string;
   workout_id: string;
   title: string;
   exercise_order: number;
@@ -51,7 +50,7 @@ export type Exercise = {
 };
 
 const exerciseSchema = z.object({
-   id: z.string().optional(),
+   id: z.string(),
    workout_id: z.string(),
    title: z
       .string()
@@ -100,6 +99,68 @@ export async function addExercise(
    }
 }
 
+export async function addExerciseSet(set: ExerciseSet): Promise<VitalityResponse<Exercise | null>> {
+   try {
+      const fields = setSchema.safeParse(set);
+
+      if (!(fields.success)) {
+         return sendErrorMessage(
+            "Error",
+            "Invalid exercise set fields",
+            null,
+            fields.error.flatten().fieldErrors
+         );
+      } else if (Object.keys(set).length <= 3 || set.text?.trim().length === 0) {
+         // Ensure at least one of the exercise fields are being used
+         return sendErrorMessage(
+            "Error",
+            "Exercise set must use at least of one the provided inputs.",
+            null,
+            null
+         );
+      }
+
+      const newExercise = await prisma.exercises.update({
+         where: {
+            id: set.exercise_id
+         },
+         data: {
+            sets: {
+               create: {
+                  set_order: set.set_order,
+                  weight: set.weight,
+                  hours: set.hours,
+                  minutes: set.minutes,
+                  seconds: set.seconds,
+                  repetitions: set.repetitions,
+                  text: set.text
+               }
+            }
+         },
+         include: {
+            sets: {
+               orderBy: {
+                  set_order: "asc"
+               }
+            }
+         }
+      });
+
+      console.log(newExercise);
+
+      return sendSuccessMessage("Successfully added new exercise set", formatExercise(newExercise));
+   } catch (error) {
+      console.error(error);
+
+      return sendErrorMessage(
+         "Failure",
+         error.meta?.message,
+         null,
+         { system: error.meta?.message }
+      );
+   }
+}
+
 export async function updateExercise(
    exercise: Exercise, method: "title" | "sets"
 ): Promise<VitalityResponse<Exercise>> {
@@ -136,7 +197,11 @@ export async function updateExercise(
                id: exercise.id
             },
             include: {
-               sets: true
+               sets: {
+                  orderBy: {
+                     set_order: "asc"
+                  }
+               }
             }
          });
 
@@ -148,14 +213,14 @@ export async function updateExercise(
          const exerciseIdsToRemove: string[] = existingExerciseSetIdsArray.filter(id => !newExerciseSetIdsSet.has(id));
 
          // Determine sets to create or update
-         const exerciseSetsToCreate = []
-         const exerciseSetsToUpdate = []
+         const exerciseSetsToCreate = [];
+         const exerciseSetsToUpdate = [];
 
          for (let i = 0; i < exercise.sets.length; i++) {
             const exerciseSet: ExerciseSet = {
                ...exercise.sets[i],
                set_order: i
-            }
+            };
 
             if (exerciseSet.id === undefined || exerciseSet.id.trim() === "") {
                exerciseSetsToCreate.push(exerciseSet);
@@ -184,7 +249,7 @@ export async function updateExercise(
             }
          });
 
-         return sendSuccessMessage("Missing implementation for update exercise sets", null);
+         return sendSuccessMessage("Missing implementation for update exercise sets", newExercise);
       }
    } catch (error) {
       console.error(error);
@@ -220,7 +285,11 @@ export async function updateExercises(workoutId: string,
          include: {
             exercises: {
                include: {
-                  sets: true
+                  sets: {
+                     orderBy: {
+                        set_order: "asc"
+                     }
+                  }
                }
             }
          }
@@ -257,7 +326,11 @@ export async function updateExercises(workoutId: string,
          include: {
             exercises: {
                include: {
-                  sets: true
+                  sets: {
+                     orderBy: {
+                        set_order: "asc"
+                     }
+                  }
                },
                orderBy: {
                   exercise_order: "asc"

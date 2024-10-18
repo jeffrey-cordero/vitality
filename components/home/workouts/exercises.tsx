@@ -6,8 +6,8 @@ import { VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/st
 import { Workout } from "@/lib/workouts/workouts";
 import { faClock, faCloudArrowUp, faFeather, faHashtag, faPencil, faPlus, faRotateLeft, faTrash, faWeight } from "@fortawesome/free-solid-svg-icons";
 import { Dispatch, useCallback, useContext, useState } from "react";
-import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises } from "@/lib/workouts/exercises";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises, addExerciseSet } from "@/lib/workouts/exercises";
+import { NotificationContext } from "@/app/layout";
 import {
    DndContext,
    closestCenter,
@@ -25,26 +25,79 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+const exercise: VitalityState = {
+   exerciseTitle: {
+      type: "text",
+      id: "exerciseTitle",
+      value: "",
+      error: null,
+      data: {
+         id: "",
+         edit: false
+      }
+   },
+   weight: {
+      type: "number",
+      id: "weight",
+      value: "",
+      error: null,
+      data: {}
+   },
+   repetitions: {
+      type: "number",
+      id: "repetitions",
+      value: "",
+      error: null,
+      data: {}
+   },
+   hours: {
+      type: "number",
+      id: "hours",
+      value: "",
+      error: null,
+      data: {}
+   },
+   minutes: {
+      type: "number",
+      id: "minutes",
+      value: "",
+      error: null,
+      data: {}
+   },
+   seconds: {
+      type: "number",
+      id: "seconds",
+      value: "",
+      error: null,
+      data: {}
+   },
+   text: {
+      type: "text",
+      id: "text",
+      value: "",
+      error: null,
+      data: {}
+   }
+}
+
 interface ExerciseInputProps {
    workout: Workout;
    state: VitalityState;
-   dispatch: Dispatch<VitalityAction<Workout | Exercise | Exercise[]>>;
+   dispatch: Dispatch<VitalityAction<any>>;
    onBlur?: () => void;
    onWorkoutSave?: (_exercises: Exercise[]) => void;
    setEditingWorkout: (_workout: Workout) => void;
 }
 
 function NewExerciseInput(props: ExerciseInputProps): JSX.Element {
-   const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const { workout, state, dispatch, onWorkoutSave } = props;
 
    const handleCreateNewExercise = useCallback(async() => {
       const payload: Exercise = {
-         user_id: user.id,
-         workout_id: workout.id,
          id: "",
-         title: state.inputs.exerciseTitle.value.trim(),
+         workout_id: workout.id,
+         title: state.exerciseTitle.value.trim(),
          exercise_order: workout.exercises.length,
          sets: []
       };
@@ -63,7 +116,7 @@ function NewExerciseInput(props: ExerciseInputProps): JSX.Element {
          }
 
          dispatch({
-            type: "updateStatus",
+            type: "displayErrors",
             value: response
          });
       }
@@ -76,12 +129,12 @@ function NewExerciseInput(props: ExerciseInputProps): JSX.Element {
             timer: 1250
          });
       }
-   }, [onWorkoutSave, dispatch, workout, state.inputs.exerciseTitle.value,
-      updateNotification, user.id]);
+   }, [onWorkoutSave, dispatch, workout, state.exerciseTitle.value,
+      updateNotification]);
 
    return (
       <div className = "w-full mb-2 mx-auto text-left" >
-         <Input input = {state.inputs.exerciseTitle} label = "Title" icon = {faFeather} dispatch = {dispatch} onBlur = {props.onBlur} />
+         <Input input = {state.exerciseTitle} label = "Title" icon = {faFeather} dispatch = {dispatch} onBlur = {props.onBlur} />
          <Button
             type = "button"
             className = "w-full bg-green-600 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
@@ -101,111 +154,124 @@ interface SetProps extends ExerciseInputProps {
 
 function SetContainer(props: SetProps): JSX.Element {
    const { workout, exercise, set, state, dispatch, onBlur, onWorkoutSave } = props;
-   const [exerciseSetObject, setExerciseSetObject] = useState<ExerciseSet | undefined>(set);
-   const [editSet, setEditSet] = useState(exerciseSetObject === undefined);
-   const setId = state.inputs.setId.value;
-   const displayEditInputs = editSet && exerciseSetObject === undefined || exerciseSetObject.id === setId;
+   const { updateNotification } = useContext(NotificationContext);
+   const [editSet, setEditSet] = useState(set === undefined);
+   const editingExerciseId: string = state.exerciseId.value;
+   const editingExerciseSetId: string = state.exerciseId.data.setId;
+   const displayEditInputs = editSet
+      && editingExerciseId === exercise.id
+      && (set === undefined &&  editingExerciseSetId === "" || set.id === editingExerciseSetId);
 
-   const handleSaveExercise = useCallback(async(event) => {
-      event.stopPropagation();
+   console.log(editingExerciseId);
+   console.log(editingExerciseSetId);
 
+   // Construct payload exercise set with valid numeric inputs
+   const constructNewExerciseSet = useCallback(() => {
       const parseNumber = (value) => {
          const num = +value;
-         // Return null if NaN, otherwise return the number
-         return isNaN(num) ? null : num;
+         return isNaN(num) || num === 0 ? undefined : num;
       };
 
-      // Handle new set array construction
-      const newSet: ExerciseSet = {
-         ...exerciseSetObject,
-         id: exerciseSetObject !== undefined ? exerciseSetObject.id : undefined,
-         weight: parseNumber(state.inputs.weight.value),
-         repetitions: parseNumber(state.inputs.repetitions.value),
-         hours: parseNumber(state.inputs.hours.value),
-         minutes: parseNumber(state.inputs.minutes.value),
-         seconds: parseNumber(state.inputs.seconds.value),
-         text: state.inputs.text.value
+      return {
+         ...set,
+         id: set !== undefined ? set.id : "",
+         exercise_id: exercise.id,
+         set_order: set !== undefined ? set.set_order : exercise.sets.length,
+         weight: parseNumber(state.weight.value),
+         repetitions: parseNumber(state.repetitions.value),
+         hours: parseNumber(state.hours.value),
+         minutes: parseNumber(state.minutes.value),
+         seconds: parseNumber(state.seconds.value),
+         text: state.text.value
       };
+   }, [exercise.sets.length, exercise.id, set, state.hours.value, state.minutes.value, state.repetitions.value, state.seconds.value, state.text.value, state.weight.value]);
 
-      const newSets: ExerciseSet[] = exerciseSetObject === undefined ?
-         [...exercise.sets, newSet] : [...exercise.sets].map((s) => s.id === setId ? newSet : s);
-
-      // Update exercise entry in database
-      const newExercise: Exercise = {
-         ...exercise,
-         sets: newSets
-      };
-
-      const response: VitalityResponse<Exercise> = await updateExercise(newExercise, "sets");
+   const handleExerciseSetSubmission = useCallback(async(method: "add" | "update" | "delete") => {
+      const newSet: ExerciseSet = constructNewExerciseSet();
+      const response: VitalityResponse<Exercise> = await addExerciseSet(newSet);
 
       if (response.status === "Success") {
-         // Update workout with new exercises, including the updating exercise sets from backend response
          const newExercises: Exercise[] = [...workout.exercises].map((e) => e.id === exercise.id ? response.body.data : e);
 
-         if (exerciseSetObject === undefined) {
-            setExerciseSetObject(newSet);
-         }
-
          onWorkoutSave(newExercises);
-         setEditSet(false);
+         onBlur();
+      } else if (response.status === "Error" && !(Object.keys(response.body.errors).length === 0)) {
+         // Display errors
+         dispatch({
+            type: "displayErrors",
+            value: response
+         });
       } else {
-         alert("ERROR");
+         // Display failure message
+         updateNotification({
+            status: response.status,
+            message: response.body.message
+         });
       }
-   }, [exercise, exerciseSetObject, onWorkoutSave, setId, state.inputs.hours.value, state.inputs.minutes.value, state.inputs.repetitions.value, state.inputs.seconds.value, state.inputs.text.value, state.inputs.weight.value, workout.exercises]);
 
-   const handleInitializeEditSet = useCallback(() => {
+   }, [constructNewExerciseSet, dispatch, exercise, onWorkoutSave, onBlur, updateNotification, workout.exercises]);
+
+   const handleInitializeEditSet = useCallback((event) => {
+      event.stopPropagation();
+
       // Update exercise inputs
       dispatch({
          type: "initializeState",
          value: {
+            exerciseId: {
+               ...state.exerciseId,
+               value: exercise.id,
+               data: {
+                  setId: set?.id ?? ""
+               }
+            },
             weight: {
-               ...state.inputs.weight,
-               value: exerciseSetObject?.weight ?? ""
+               ...state.weight,
+               value: set?.weight ?? ""
             },
             repetitions: {
-               ...state.inputs.repetitions,
-               value: exerciseSetObject?.repetitions ?? ""
+               ...state.repetitions,
+               value: set?.repetitions ?? ""
             },
             hours: {
-               ...state.inputs.hours,
-               value: exerciseSetObject?.hours ?? ""
+               ...state.hours,
+               value: set?.hours ?? ""
             },
             minutes: {
-               ...state.inputs.minutes,
-               value: exerciseSetObject?.minutes ?? ""
+               ...state.minutes,
+               value: set?.minutes ?? ""
             },
             seconds: {
-               ...state.inputs.seconds,
-               value: exerciseSetObject?.seconds ?? ""
+               ...state.seconds,
+               value: set?.seconds ?? ""
             },
             text: {
-               ...state.inputs.text,
-               value: exerciseSetObject?.text ?? ""
+               ...state.text,
+               value: set?.text ?? ""
             },
             setId: {
-               ...state.inputs.setId,
-               value: exerciseSetObject?.id ?? ""
+               ...state.setId,
+               value: set?.id ?? ""
             }
          }
       });
 
       // Display inputs
       setEditSet(true);
-   }, [dispatch, exerciseSetObject?.hours, exerciseSetObject?.minutes, exerciseSetObject?.repetitions, exerciseSetObject?.seconds, exerciseSetObject?.text, exerciseSetObject?.weight, state.inputs.hours,
-      state.inputs.minutes, state.inputs.repetitions, state.inputs.seconds, state.inputs.text, state.inputs.weight,
-      exerciseSetObject?.id, state.inputs.setId]);
+   }, [dispatch, set?.hours, set?.minutes, set?.repetitions, set?.seconds, set?.text, set?.weight, state.hours,
+      state.minutes, state.repetitions, state.seconds, state.text, state.weight, set?.id, state.setId, state.exerciseId, exercise.id]);
 
    return (
       displayEditInputs ? (
-         <div className = "flex flex-col justify-start gap-2 w-full mx-auto pt-2 text-left">
-            <Input input = {state.inputs.weight} label = "Weight" icon = {faWeight} dispatch = {dispatch} />
-            <Input input = {state.inputs.repetitions} label = "Repetitions" icon = {faHashtag} dispatch = {dispatch} />
+         <li className = "flex flex-col justify-start gap-2 w-full mx-auto pt-2 text-left">
+            <Input input = {state.weight} label = "Weight" icon = {faWeight} dispatch = {dispatch} />
+            <Input input = {state.repetitions} label = "Repetitions" icon = {faHashtag} dispatch = {dispatch} />
             <div className = "flex justify-start items-center gap-2">
-               <Input input = {state.inputs.hours} label = "Hours" icon = {faClock} dispatch = {dispatch} />
-               <Input input = {state.inputs.minutes} label = "Minutes" icon = {faClock} dispatch = {dispatch} />
-               <Input input = {state.inputs.seconds} label = "Seconds" icon = {faClock} dispatch = {dispatch} />
+               <Input input = {state.hours} label = "Hours" icon = {faClock} dispatch = {dispatch} />
+               <Input input = {state.minutes} label = "Minutes" icon = {faClock} dispatch = {dispatch} />
+               <Input input = {state.seconds} label = "Seconds" icon = {faClock} dispatch = {dispatch} />
             </div>
-            <TextArea input = {state.inputs.text} label = "Text" icon = {faPencil} dispatch = {dispatch} />
+            <TextArea input = {state.text} label = "Text" icon = {faPencil} dispatch = {dispatch} />
             <Button
                type = "button"
                className = "w-full bg-grey-200 mb-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
@@ -213,8 +279,8 @@ function SetContainer(props: SetProps): JSX.Element {
                onClick = {(event) => {
                   event.stopPropagation();
 
-                  if (exerciseSetObject === undefined) {
-                     // Remove from DOM for new set inputs
+                  if (set === undefined) {
+                     // Remove from DOM for new exercise set inputs
                      onBlur();
                   }
 
@@ -227,27 +293,34 @@ function SetContainer(props: SetProps): JSX.Element {
                type = "button"
                className = "w-full bg-green-600 text-white mb-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
                icon = {faCloudArrowUp}
-               onClick = {handleSaveExercise}
+               onClick = {(event) => {
+                  event.stopPropagation();
+                  if (set !== undefined) {
+                     handleExerciseSetSubmission("add");
+                  } else {
+                     handleExerciseSetSubmission("update");
+                  }
+               }}
             >
-               Save
+               {set !== undefined ? "Save" : "Create"}
             </Button>
-         </div >)
-         : (
-            <div
-               className = "flex flex-col justify-start font-medium gap-2 w-full mx-auto pt-2 pl-2 text-left"
+         </li >)
+         : set !== undefined && (
+            <li
+               className = "flex flex-col justify-start font-medium gap-2 w-full mx-auto pt-2 pl-2 text-left border-2 border-black p-6"
                onDoubleClick = {handleInitializeEditSet}
             >
-               {exerciseSetObject?.weight && <p>Weight - {set.weight}</p>}
-               {exerciseSetObject?.repetitions && <p>Repetitions - {set.repetitions}</p>}
-               {(exerciseSetObject?.hours || exerciseSetObject?.minutes || exerciseSetObject?.seconds) && (
+               {set.weight && <p>Weight - {set.weight}</p>}
+               {set.repetitions && <p>Repetitions - {set.repetitions}</p>}
+               {(set.hours || set.minutes || set.seconds) && (
                   <p>
-                     Interval - {String(exerciseSetObject?.hours ?? 0).padStart(2, "0")}:
-                     {String(exerciseSetObject?.minutes ?? 0).padStart(2, "0")}:
-                     {String(exerciseSetObject?.seconds ?? 0).padStart(2, "0")}
+                     Interval - {String(set.hours ?? 0).padStart(2, "0")}:
+                     {String(set.minutes ?? 0).padStart(2, "0")}:
+                     {String(set.seconds ?? 0).padStart(2, "0")}
                   </p>
                )}
-               {exerciseSetObject?.text && <p>{set.text}</p>}
-            </div>
+               {set?.text && <p>{set.text}</p>}
+            </li>
          )
    );
 }
@@ -259,7 +332,7 @@ interface ExerciseProps extends ExerciseInputProps {
 function ExerciseContainer(props: ExerciseProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
    const { workout, exercise, state, dispatch, onWorkoutSave } = props;
-   const { edit, id } = state.inputs.exerciseTitle.data;
+   const { edit, id } = state.exerciseTitle.data;
    const [editTitle, setEditTitle] = useState<boolean>(false);
    const [addSet, setAddSet] = useState<boolean>(false);
    const displayEditTitle = editTitle && edit && id === exercise.id;
@@ -271,7 +344,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       setNodeRef,
       transform,
       transition
-   } = useSortable({ id: exercise.id, disabled: displayEditTitle });
+   } = useSortable({ id: exercise.id, disabled: displayEditTitle || addSet });
 
    const style = {
       transform: CSS.Transform.toString(transform),
@@ -280,7 +353,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
    const handleSaveExerciseName = useCallback(async() => {
       // Construct new exercise for update method
-      const newTitle: string = state.inputs.exerciseTitle.value.trim();
+      const newTitle: string = state.exerciseTitle.value.trim();
       const newExercise: Exercise = { ...exercise, title: newTitle };
       const response: VitalityResponse<Exercise> = await updateExercise(newExercise, "title");
 
@@ -302,13 +375,13 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          dispatch({
             type: "updateInput",
             value: {
-               ...state.inputs.exerciseTitle,
+               ...state.exerciseTitle,
                error: [response.body.message]
             }
          });
       }
    }, [dispatch, exercise, onWorkoutSave, workout,
-      state.inputs.exerciseTitle, updateNotification]);
+      state.exerciseTitle, updateNotification]);
 
    const handleDeleteExercise = useCallback(async() => {
       const newExercises: Exercise[] = [...workout.exercises].filter((e) => e.id !== exercise.id);
@@ -331,7 +404,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       dispatch({
          type: "updateInput",
          value: {
-            ...state.inputs.exerciseTitle,
+            ...state.exerciseTitle,
             value: exercise.title,
             error: null,
             data: {
@@ -342,7 +415,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       });
 
       setEditTitle(true);
-   }, [dispatch, exercise.title, state.inputs.exerciseTitle, exercise.id]);
+   }, [dispatch, exercise.title, state.exerciseTitle, exercise.id]);
 
    return (
       <li
@@ -355,7 +428,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          {
             displayEditTitle ? (
                <div>
-                  <Input className = "mb-2" input = {state.inputs.exerciseTitle} label = "Title" icon = {faFeather} dispatch = {dispatch} onBlur = {() => setEditTitle(false)} />
+                  <Input className = "mb-2" input = {state.exerciseTitle} label = "Title" icon = {faFeather} dispatch = {dispatch} onBlur = {() => setEditTitle(false)} />
                   <Button
                      type = "button"
                      className = "w-full bg-green-600 text-white text-md  mt-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
@@ -377,38 +450,46 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                <h1 onDoubleClick = {handleInitializeEditExerciseName} className = "text-xl mb-2">{exercise.title}</h1>
             )
          }
-         {
-            exercise.sets.map((set: ExerciseSet) => {
-               return (<SetContainer {...props} set = {set} key = {exercise.id} onBlur = {undefined} />);
-            })
-         }
-         {
-            addSet && (
-               <SetContainer {...props} set = {undefined} onBlur = {() => setAddSet(false)} />
-            )
-         }
-         {
-            !(addSet) && (
-               <Button
-                  type = "button"
-                  className = "z-50 w-full bg-white text-black text-md mt-6 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
-                  icon = {faPlus}
-                  onClick = {(event) => {
-                     event.stopPropagation();
-                     setAddSet(true);
-                  }}
-               >
-                  New Set
-               </Button>
-            )
-         }
+         <ul className = "list-disc text-black flex flex-col gap-2">
+            {
+               exercise.sets.map((set: ExerciseSet) => {
+                  return (<SetContainer {...props} set = {set} key = {set.id} />);
+               })
+            }
+            {
+               addSet && (
+                  <SetContainer {...props} set = {undefined} onBlur = {() => setAddSet(false)} />
+               )
+            }
+         </ul>
+         <Button
+            type = "button"
+            className = "z-50 w-full bg-white text-black text-md mt-6 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
+            icon = {faPlus}
+            onClick = {(event) => {
+               event.stopPropagation();
+               dispatch({
+                  type: "updateInput",
+                  value: {
+                     ...state.exerciseId,
+                     value: exercise.id,
+                     data: {
+                        setId: ""
+                     }
+                  }
+               });
+               setAddSet(true);
+            }}
+         >
+            New Set
+         </Button>
       </li>
    );
 }
 
 export default function Exercises(props: ExerciseInputProps): JSX.Element {
    const { workout, state, dispatch, setEditingWorkout } = props;
-   const { id, edit } = state.inputs.exerciseTitle.data;
+   const { id, edit } = state.exerciseTitle.data;
    const { updateNotification } = useContext(NotificationContext);
    const [addExercise, setAddExercise] = useState(false);
    const sensors = useSensors(
@@ -424,7 +505,7 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
       dispatch({
          type: "updateInput",
          value: {
-            ...state.inputs.exerciseTitle,
+            ...state.exerciseTitle,
             value: "",
             error: null,
             data: {
@@ -435,7 +516,7 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
       });
 
       setAddExercise(true);
-   }, [dispatch, state.inputs.exerciseTitle]);
+   }, [dispatch, state.exerciseTitle]);
 
    const handleSaveWorkout = useCallback(async(updatingExercises: Exercise[]) => {
       // Update workout entry in database
@@ -443,12 +524,12 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
 
       if (response.status === "Success") {
          // Update front-end state on success
-         const newWorkouts: Workout[] = [...state.inputs.workouts.value].map((w) => w.id !== workout.id ? w : workout);
+         const newWorkouts: Workout[] = [...state.workouts.value].map((w) => w.id !== workout.id ? w : workout);
 
          dispatch({
             type: "updateInput",
             value: {
-               ...state.inputs.workouts,
+               ...state.workouts,
                value: newWorkouts
             }
          });
@@ -463,7 +544,7 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
       } else if (response.status === "Error") {
          // Display errors
          dispatch({
-            type: "updateStatus",
+            type: "displayErrors",
             value: response
          });
       } else {
@@ -473,7 +554,7 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
             message: response.body.message
          });
       }
-   }, [setEditingWorkout, addExercise, dispatch, state.inputs.workouts, updateNotification, workout]);
+   }, [setEditingWorkout, addExercise, dispatch, state.workouts, updateNotification, workout]);
 
    const handleDragEnd = (event) => {
       const { active, over } = event;
@@ -483,7 +564,7 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
          return;
       }
 
-      if (active.id !== over.id) {
+      if (active.id !== over?.id) {
          let oldIndex: number, newIndex: number;
 
          for (const exercise of exercises) {

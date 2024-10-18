@@ -70,15 +70,15 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
    }, []);
 
    const handleWorkoutSubmission = useCallback(async(method: "add" | "update" | "delete", displayNotification: boolean) => {
-      const { selected, dictionary } = state.inputs.tags.data;
+      const { selected, dictionary } = state.tags.data;
 
       const payload: Workout = {
          user_id: user.id,
          id: editingWorkout?.id ?? "",
-         title: state.inputs.title.value.trim(),
-         date: new Date(state.inputs.date.value),
-         image: state.inputs.image.value,
-         description: state.inputs.description.value.trim(),
+         title: state.title.value.trim(),
+         date: new Date(state.date.value),
+         image: state.image.value,
+         description: state.description.value.trim(),
          // Ensure only existing tag id's are sent to the backend (in case of removal)
          tagIds: selected.map((tag: Tag) => tag?.id).filter((id: string) => dictionary[id] !== undefined),
          exercises: editingWorkout?.exercises ?? []
@@ -93,16 +93,16 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
       if (response.status === "Success") {
          const returnedWorkout: Workout = response.body.data;
 
-         const newWorkouts: Workout[] = updateWorkouts(state.inputs.workouts.value, returnedWorkout, method);
-         const newFiltered: Workout[] = updateFilteredWorkouts(state, state.inputs.workouts.data.filtered, returnedWorkout, method);
+         const newWorkouts: Workout[] = updateWorkouts(state.workouts.value, returnedWorkout, method);
+         const newFiltered: Workout[] = updateFilteredWorkouts(state, state.workouts.data.filtered, returnedWorkout, method);
 
          // Dispatch the new state with updated workouts
          dispatch({
             type: "updateInput",
             value: {
-               ...state.inputs.workouts,
+               ...state.workouts,
                data: {
-                  ...state.inputs.workouts.data,
+                  ...state.workouts.data,
                   filtered: newFiltered
                },
                value: newWorkouts
@@ -126,7 +126,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
       } else {
          // Display errors
          dispatch({
-            type: "updateStatus",
+            type: "displayErrors",
             value: response
          });
       }
@@ -138,38 +138,38 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
          type: "initializeState",
          value: {
             title: {
-               ...state.inputs.title,
+               ...state.title,
                value: workout?.title ?? ""
             },
             date: {
-               ...state.inputs.date,
+               ...state.date,
                // Convert to form MM-DD-YYYY for input value
                value: workout?.date.toISOString().split("T")[0] ?? defaultDate
             },
             image: {
-               ...state.inputs.image,
+               ...state.image,
                value: workout?.image ?? ""
             },
             description: {
-               ...state.inputs.description,
+               ...state.description,
                value: workout?.description ?? ""
             },
             tags: {
-               ...state.inputs.tags,
+               ...state.tags,
                data: {
-                  ...state.inputs.tags.data,
+                  ...state.tags.data,
                   // Display all existing tags by their id
-                  selected: workout?.tagIds.map((tagId: string) => state.inputs.tags.data.dictionary[tagId]) ?? []
+                  selected: workout?.tagIds.map((tagId: string) => state.tags.data.dictionary[tagId]) ?? []
                }
             },
             tagsSearch: {
-               ...state.inputs.tagsSearch,
+               ...state.tagsSearch,
                value: ""
             }
          }
       });
-   }, [defaultDate, dispatch, state.inputs.date, state.inputs.description, state.inputs.image, state.inputs.tags,
-      state.inputs.tagsSearch, state.inputs.title, workout]);
+   }, [defaultDate, dispatch, state.date, state.description, state.image, state.tags,
+      state.tagsSearch, state.title, workout]);
 
    return (
       <PopUp
@@ -204,11 +204,11 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   onClick = {() => reset(false)}
                   className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
-               <Input input = {state.inputs.title} label = "Title" icon = {faSignature} dispatch = {dispatch} />
-               <Input input = {state.inputs.date} label = "Date" icon = {faCalendar} dispatch = {dispatch} />
-               <TagSelection input = {state.inputs.tags} label = "Tags " dispatch = {dispatch} state = {state} />
-               <TextArea input = {state.inputs.description} label = "Description" icon = {faBook} dispatch = {dispatch} />
-               <ImageSelection input = {state.inputs.image} label = "URL" icon = {faLink} dispatch = {dispatch} />
+               <Input input = {state.title} label = "Title" icon = {faSignature} dispatch = {dispatch} />
+               <Input input = {state.date} label = "Date" icon = {faCalendar} dispatch = {dispatch} />
+               <TagSelection input = {state.tags} label = "Tags " dispatch = {dispatch} state = {state} />
+               <TextArea input = {state.description} label = "Description" icon = {faBook} dispatch = {dispatch} />
+               <ImageSelection input = {state.image} label = "URL" icon = {faLink} dispatch = {dispatch} />
                {
                   workout !== undefined && editingWorkout !== undefined && (
                      <PopUp

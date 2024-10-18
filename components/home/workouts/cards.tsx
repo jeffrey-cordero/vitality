@@ -54,7 +54,7 @@ interface WorkoutCardsProps {
 
 export default function WorkoutCards(props: WorkoutCardsProps): JSX.Element {
    const { workouts, state } = props;
-   const fetched: boolean = state.inputs.workouts.data.fetched;
+   const fetched: boolean = state.workouts.data.fetched;
 
    return (
       <div className = "relative w-full">

@@ -11,23 +11,19 @@ import { login, Credentials } from "@/lib/authentication/login";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 
 const credentials: VitalityState = {
-   status: "Initial",
-   inputs: {
-      username: {
-         type: "text",
-         id: "username",
-         value: "",
-         error: null,
-         data: {}
-      }, password: {
-         type: "password",
-         id: "password",
-         value: "",
-         error: null,
-         data: {}
-      }
-   },
-   response: null
+   username: {
+      type: "text",
+      id: "username",
+      value: "",
+      error: null,
+      data: {}
+   }, password: {
+      type: "password",
+      id: "password",
+      value: "",
+      error: null,
+      data: {}
+   }
 };
 
 function Form(): JSX.Element {
@@ -45,17 +41,18 @@ function Form(): JSX.Element {
 
       try {
          const payload: Credentials = {
-            username: state.inputs.username.value.trim(),
-            password: state.inputs.password.value.trim()
+            username: state.username.value.trim(),
+            password: state.password.value.trim()
          };
          const response: VitalityResponse<null> = await login(payload);
+         console.log(response);
 
-         dispatch({
-            type: "updateStatus",
-            value: response
-         });
-
-         if (response?.status === "Failure") {
+         if (response.status === "Error") {
+            dispatch({
+               type: "displayErrors",
+               value: response
+            });
+         } else if (response.status === "Failure") {
             // Display the failure notification to the user
             updateNotification({
                status: response.status,
@@ -77,8 +74,8 @@ function Form(): JSX.Element {
                })}
                className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
-            <Input input = {state.inputs.username} label = "Username *" dispatch = {dispatch} />
-            <Input input = {state.inputs.password} label = "Password *" dispatch = {dispatch} />
+            <Input input = {state.username} label = "Username *" dispatch = {dispatch} />
+            <Input input = {state.password} label = "Password *" dispatch = {dispatch} />
             <Button type = "submit" className = "bg-primary text-white h-[2.6rem]" icon = {faUnlockKeyhole}>
                Submit
             </Button>

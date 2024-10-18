@@ -24,7 +24,7 @@ function WorkoutRow(props: WorkoutRowProps) {
    const { workout, state, dispatch, reset } = props;
    const { updateNotification } = useContext(NotificationContext);
    const deletePopUpRef = useRef<{ close: () => void }>(null);
-   const selected: Set<Workout> = state.inputs.workouts.data.selected;
+   const selected: Set<Workout> = state.workouts.data.selected;
    const formattedDate = useMemo(() => getWorkoutDate(new Date(workout.date)), [workout.date]);
 
    const handleWorkoutToggle = useCallback(() => {
@@ -40,14 +40,14 @@ function WorkoutRow(props: WorkoutRowProps) {
       dispatch({
          type: "updateInput",
          value: {
-            ...state.inputs.workouts,
+            ...state.workouts,
             data: {
-               ...state.inputs.workouts.data,
+               ...state.workouts.data,
                selected: newSelected
             }
          }
       });
-   }, [dispatch, selected, state.inputs.workouts, workout]);
+   }, [dispatch, selected, state.workouts, workout]);
 
    const handleWorkoutDelete = useCallback(async() => {
       // Remove the current or selected set of workout's
@@ -58,31 +58,28 @@ function WorkoutRow(props: WorkoutRowProps) {
 
       if (response.body.data === size) {
          // Clear selected and filter workouts list
-         const newWorkouts = [...state.inputs.workouts.value].filter((w: Workout) => {
+         const newWorkouts = [...state.workouts.value].filter((w: Workout) => {
             // Remove single or multiple workouts
             return size == 1 ? workout.id !== w.id : !(selected.has(w));
          });
 
-         const newFiltered = [...state.inputs.workouts.data.filtered].filter((w: Workout) => {
+         const newFiltered = [...state.workouts.data.filtered].filter((w: Workout) => {
             // Remove single or multiple workouts
             return size == 1 ? workout.id !== w.id : !(selected.has(w));
          });
 
          dispatch({
-            type: "updateState",
+            type: "updateInputs",
             value: {
                ...state,
-               inputs: {
-                  ...state.inputs,
-                  workouts: {
-                     ...state.inputs.workouts,
-                     value: newWorkouts,
-                     data: {
-                        ...state.inputs.workouts.data,
-                        // Clear selected workouts
-                        filtered: newFiltered,
-                        selected: new Set<Workout>()
-                     }
+               workouts: {
+                  ...state.workouts,
+                  value: newWorkouts,
+                  data: {
+                     ...state.workouts.data,
+                     // Clear selected workouts
+                     filtered: newFiltered,
+                     selected: new Set<Workout>()
                   }
                }
             }
@@ -100,7 +97,7 @@ function WorkoutRow(props: WorkoutRowProps) {
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
          // Fetch tag using id
-         const tag: Tag = state.inputs.tags.data.dictionary[tagId];
+         const tag: Tag = state.tags.data.dictionary[tagId];
 
          return (
             // Undefined in case of removal
@@ -116,7 +113,7 @@ function WorkoutRow(props: WorkoutRowProps) {
                </div>
          );
       });
-   }, [workout, state.inputs.tags.data.dictionary]);
+   }, [workout, state.tags.data.dictionary]);
 
    return (
       <tr
@@ -128,7 +125,7 @@ function WorkoutRow(props: WorkoutRowProps) {
                   id = {`workout-select-${workout.id}`}
                   type = "checkbox"
                   className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                  checked = {state.inputs.workouts.data.selected.has(workout)}
+                  checked = {state.workouts.data.selected.has(workout)}
                   onChange = {() => handleWorkoutToggle()}
                />
             </div>
@@ -226,8 +223,8 @@ interface WorkoutTableProps {
 
 export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
    const { workouts, state, dispatch, reset } = props;
-   const selected: Set<Workout> = state.inputs.workouts.data.selected;
-   const fetched: boolean = state.inputs.workouts.data.fetched;
+   const selected: Set<Workout> = state.workouts.data.selected;
+   const fetched: boolean = state.workouts.data.fetched;
 
    // Visible workouts that have been selected
    const visible = useMemo(() => {
@@ -242,14 +239,14 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
       dispatch({
          type: "updateInput",
          value: {
-            ...state.inputs.workouts,
+            ...state.workouts,
             data: {
-               ...state.inputs.workouts.data,
+               ...state.workouts.data,
                selected: newSelected
             }
          }
       });
-   }, [dispatch, state.inputs.workouts]);
+   }, [dispatch, state.workouts]);
 
    const handleWorkoutToggle = useMemo(() => {
       return () => {

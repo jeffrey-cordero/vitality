@@ -25,9 +25,9 @@ export function filterByTags(tagIds: Set<string>, workout: Workout): boolean {
 
 export function filterByDate(state: VitalityState, workout: Workout): boolean {
    // Apply date filter using min and/or max date and specific method (before, after, between)
-   const dateFilter: string = state.inputs.workoutsDateFilter.value;
-   const minDate: Date = new Date(state.inputs.workoutsMinDate.value);
-   const maxDate: Date = new Date(state.inputs.workoutsMaxDate.value);
+   const dateFilter: string = state.workoutsDateFilter.value;
+   const minDate: Date = new Date(state.workoutsMinDate.value);
+   const maxDate: Date = new Date(state.workoutsMaxDate.value);
 
    switch (dateFilter) {
    case "Is on or after":
@@ -46,10 +46,10 @@ interface FilterProps {
 }
 
 export function filterWorkout(state: VitalityState, workout: Workout): boolean {
-   const { dateFiltered, tagsFiltered } = state.inputs.workouts.data;
+   const { dateFiltered, tagsFiltered } = state.workouts.data;
 
    const tagIds: Set<string> = new Set(
-      state.inputs.tags.data.selected.map((tag: Tag) => tag.id)
+      state.tags.data.selected.map((tag: Tag) => tag.id)
    );
 
    // Filter by date and/or applied tags, if applicable for either method
@@ -60,10 +60,10 @@ export function getFilteredTagsWorkouts(props: FilterProps): Workout[] | null {
    const { state } = props;
 
    const tagIds: Set<string> = new Set(
-      state.inputs.tags.data.selected.map((tag: Tag) => tag.id)
+      state.tags.data.selected.map((tag: Tag) => tag.id)
    );
 
-   const filteredWorkouts: Workout[] = [...state.inputs.workouts.value].filter((workout: Workout) => {
+   const filteredWorkouts: Workout[] = [...state.workouts.value].filter((workout: Workout) => {
       return filterByTags(tagIds, workout);
    });
 
@@ -76,9 +76,9 @@ export function getFilteredDateWorkouts(props: FilterProps): Workout[] | null {
    // Handle invalid inputs
    const errors = {};
 
-   const filter: string = state.inputs.workoutsDateFilter.value;
-   const minDate: Date = new Date(state.inputs.workoutsMinDate.value);
-   const maxDate: Date = new Date(state.inputs.workoutsMaxDate.value);
+   const filter: string = state.workoutsDateFilter.value;
+   const minDate: Date = new Date(state.workoutsMinDate.value);
+   const maxDate: Date = new Date(state.workoutsMaxDate.value);
    const isRange: boolean = filter === "Is between";
 
    const validateDate = (date: Date, key: string) => {
@@ -104,17 +104,17 @@ export function getFilteredDateWorkouts(props: FilterProps): Workout[] | null {
    if (Object.keys(errors).length > 0) {
       // Display all errors
       dispatch({
-         type: "updateStatus",
+         type: "displayErrors",
          value: sendErrorMessage<null>("Error", "Invalid Date filter(s)", null, errors)
       });
    } else {
       // Remove all errors, if any, and apply filter all available workouts
       dispatch({
-         type: "updateStatus",
+         type: "displayErrors",
          value: sendSuccessMessage<null>("Success", null)
       });
 
-      const filteredWorkouts: Workout[] = [...state.inputs.workouts.value].filter((workout: Workout) => {
+      const filteredWorkouts: Workout[] = [...state.workouts.value].filter((workout: Workout) => {
          return filterWorkout(state, workout);
       });
 
@@ -130,7 +130,7 @@ interface DateInputProps extends FilterProps {
 
 function DateInput(props: DateInputProps) {
    const { input, state, dispatch } = props;
-   const isMinDate = input === state.inputs.workoutsMinDate;
+   const isMinDate = input === state.workoutsMinDate;
    const icon = isMinDate ? faArrowRight : faArrowLeft;
 
    return (
@@ -150,16 +150,16 @@ function DateInput(props: DateInputProps) {
 
 export function FilterByDate(props: FilterProps): JSX.Element {
    const { state, dispatch, reset } = props;
-   const dateFilterInput = state.inputs.workoutsDateFilter;
+   const dateFilterInput = state.workoutsDateFilter;
    const type = dateFilterInput.value;
 
    const inputs: { [key: string]: VitalityInputState | undefined } = useMemo(() => {
       return {
          "Is between": undefined,
-         "Is on or after": state.inputs.workoutsMinDate,
-         "Is on or before": state.inputs.workoutsMaxDate
+         "Is on or after": state.workoutsMinDate,
+         "Is on or before": state.workoutsMaxDate
       };
-   }, [state.inputs.workoutsMinDate, state.inputs.workoutsMaxDate]);
+   }, [state.workoutsMinDate, state.workoutsMaxDate]);
 
    const input: VitalityInputState | undefined = useMemo(() => {
       return inputs[type];
@@ -174,16 +174,16 @@ export function FilterByDate(props: FilterProps): JSX.Element {
          dispatch({
             type: "updateInput",
             value: {
-               ...state.inputs.workouts,
+               ...state.workouts,
                data: {
-                  ...state.inputs.workouts.data,
+                  ...state.workouts.data,
                   filtered: filteredWorkouts,
                   dateFiltered: true
                }
             }
          });
       }
-   }, [props, state.inputs.workouts, dispatch]);
+   }, [props, state.workouts, dispatch]);
 
    return (
       <PopUp
@@ -222,12 +222,12 @@ export function FilterByDate(props: FilterProps): JSX.Element {
                   ) : (
                      // Range (Min and Max Date Input's)
                      <div className = "my-2">
-                        <Input input = {state.inputs.workoutsMinDate} label = "Min" icon = {faCalendar} dispatch = {dispatch} />
+                        <Input input = {state.workoutsMinDate} label = "Min" icon = {faCalendar} dispatch = {dispatch} />
                         <FontAwesomeIcon
                            icon = {faArrowsUpDown}
                            className = "text-lg text-primary my-2"
                         />
-                        <Input input = {state.inputs.workoutsMaxDate} label = "Max" icon = {faCalendar} dispatch = {dispatch} />
+                        <Input input = {state.workoutsMaxDate} label = "Max" icon = {faCalendar} dispatch = {dispatch} />
                      </div>
                   )
                }
@@ -253,14 +253,14 @@ export function FilterByTags(props: FilterProps): JSX.Element {
       dispatch({
          type: "updateInput",
          value: {
-            ...state.inputs.tags,
+            ...state.tags,
             data: {
-               ...state.inputs.tags.data,
-               selected: state.inputs.tags.data.filteredSelected
+               ...state.tags.data,
+               selected: state.tags.data.filteredSelected
             }
          }
       });
-   }, [state.inputs.tags, dispatch]);
+   }, [state.tags, dispatch]);
 
    const handleApplyFilterClick = useCallback(() => {
       // Apply tag filter
@@ -271,9 +271,9 @@ export function FilterByTags(props: FilterProps): JSX.Element {
          dispatch({
             type: "updateInput",
             value: {
-               ...state.inputs.workouts,
+               ...state.workouts,
                data: {
-                  ...state.inputs.workouts.data,
+                  ...state.workouts.data,
                   filtered: filteredWorkouts,
                   tagsFiltered: true
                }
@@ -284,15 +284,15 @@ export function FilterByTags(props: FilterProps): JSX.Element {
          dispatch({
             type: "updateInput",
             value: {
-               ...state.inputs.tags,
+               ...state.tags,
                data: {
-                  ...state.inputs.tags.data,
-                  filteredSelected: state.inputs.tags.data.selected
+                  ...state.tags.data,
+                  filteredSelected: state.tags.data.selected
                }
             }
          });
       }
-   }, [dispatch, props, state.inputs.tags, state.inputs.workouts]);
+   }, [dispatch, props, state.tags, state.workouts]);
 
    return (
       <PopUp
@@ -323,7 +323,7 @@ export function FilterByTags(props: FilterProps): JSX.Element {
                   className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
                <div className = "w-full mx-auto my-2">
-                  <TagSelection input = {state.inputs.tags} label = "Tags " dispatch = {dispatch} state = {state} />
+                  <TagSelection input = {state.tags} label = "Tags " dispatch = {dispatch} state = {state} />
                   <Button
                      type = "button"
                      className = "bg-primary text-white font-bold w-full h-[2.6rem] text-sm mt-3"

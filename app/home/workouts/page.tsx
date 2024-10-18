@@ -16,196 +16,195 @@ import { faPersonRunning, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FilterByDate, FilterByTags } from "@/components/home/workouts/filter";
 
 const workouts: VitalityState = {
-   status: "Initial",
-   inputs: {
-      // Workout form
-      title: {
-         type: "text",
-         id: "title",
-         value: "",
-         error: null,
-         data: {}
-      },
-      date: {
-         type: "date",
-         id: "date",
-         value: "",
-         error: null,
-         data: {}
-      },
-      description: {
-         type: "text",
-         id: "description",
-         value: "",
-         error: null,
-         data: {}
-      },
-      image: {
-         type: "text",
-         id: "image",
-         value: "",
-         error: null,
-         data: {
-            handlesChanges: true
-         }
-      },
-      // Tag form
-      tags: {
-         type: null,
-         id: "tags",
-         value: null,
-         error: null,
-         data: {
-            // [tag.id] -> tag
-            dictionary: {},
-            options: [],
-            selected: [],
-            handlesChanges: true
-         }
-      },
-      tagsTitle: {
-         type: "text",
-         id: "tagsTitle",
-         value: "",
-         error: null,
-         data: {}
-      },
-      tagsColor: {
-         type: "text",
-         id: "tagsColor",
-         value: null,
-         error: null,
-         data: {
-            handlesChanges: true
-         }
-      },
-      tagsSearch: {
-         type: "text",
-         id: "tagsSearch",
-         value: "",
-         error: null,
-         data: {}
-      },
-      // Main overall workout objects
-      workouts: {
-         type: null,
-         id: "workouts",
-         value: [],
-         error: null,
-         data: {
-            fetched: false,
-            selected: new Set<Workout>(),
-            dateFiltered: false,
-            tagsFiltered: false,
-            // Based on search title pattern, data interval, tags, etc.
-            filtered: []
-         }
-      },
-      // Filter form
-      workoutsSearch: {
-         type: "text",
-         id: "workoutsSearch",
-         value: "",
-         error: null,
-         data: {}
-      },
-      workoutsDateFilter: {
-         type: "select",
-         value: "Is on or after",
-         id: "workoutsDateFilter",
-         error: null,
-         data: {
-            options: ["Is on or after", "Is on or before", "Is between"]
-         }
-      },
-      workoutsMinDate: {
-         type: "date",
-         id: "workoutsMinDate",
-         value: getWorkoutDate(new Date()),
-         error: null,
-         data: {}
-      },
-      workoutsMaxDate: {
-         type: "date",
-         id: "workoutsMaxDate",
-         value: getWorkoutDate(new Date()),
-         error: null,
-         data: {}
-      },
-      workoutsPaging: {
-         type: "select",
-         id: "workoutsPaging",
-         value: 10,
-         error: null,
-         data: {
-            page: 0,
-            options: [5, 10, 25, 50, 100, 500, 1000],
-            handlesChanges: true
-         }
-      },
-      // Exercise form
-      exerciseTitle: {
-         type: "text",
-         id: "exerciseTitle",
-         value: "",
-         error: null,
-         data: {
-            id: "",
-            edit: false
-         }
-      },
-      weight: {
-         type: "number",
-         id: "weight",
-         value: "",
-         error: null,
-         data: {}
-      },
-      repetitions: {
-         type: "number",
-         id: "repetitions",
-         value: "",
-         error: null,
-         data: {}
-      },
-      hours: {
-         type: "number",
-         id: "hours",
-         value: "",
-         error: null,
-         data: {}
-      },
-      minutes: {
-         type: "number",
-         id: "minutes",
-         value: "",
-         error: null,
-         data: {}
-      },
-      seconds: {
-         type: "number",
-         id: "seconds",
-         value: "",
-         error: null,
-         data: {}
-      },
-      text: {
-         type: "text",
-         id: "text",
-         value: "",
-         error: null,
-         data: {}
-      },
-      // Editing set ID to intern visible input container
-      setId: {
-         type: null,
-         id: "setId",
-         value : "",
-         error: null,
-         data: {}
+   // Workout form
+   title: {
+      type: "text",
+      id: "title",
+      value: "",
+      error: null,
+      data: {}
+   },
+   date: {
+      type: "date",
+      id: "date",
+      value: "",
+      error: null,
+      data: {}
+   },
+   description: {
+      type: "text",
+      id: "description",
+      value: "",
+      error: null,
+      data: {}
+   },
+   image: {
+      type: "text",
+      id: "image",
+      value: "",
+      error: null,
+      data: {
+         handlesChanges: true
       }
    },
-   response: null
+   // Tag form
+   tags: {
+      type: null,
+      id: "tags",
+      value: null,
+      error: null,
+      data: {
+         // [tag.id] -> tag
+         dictionary: {},
+         options: [],
+         selected: [],
+         handlesChanges: true
+      }
+   },
+   tagsTitle: {
+      type: "text",
+      id: "tagsTitle",
+      value: "",
+      error: null,
+      data: {}
+   },
+   tagsColor: {
+      type: "text",
+      id: "tagsColor",
+      value: null,
+      error: null,
+      data: {
+         handlesChanges: true
+      }
+   },
+   tagsSearch: {
+      type: "text",
+      id: "tagsSearch",
+      value: "",
+      error: null,
+      data: {}
+   },
+   // Main overall workout objects
+   workouts: {
+      type: null,
+      id: "workouts",
+      value: [],
+      error: null,
+      data: {
+         fetched: false,
+         selected: new Set<Workout>(),
+         dateFiltered: false,
+         tagsFiltered: false,
+         // Based on search title pattern, data interval, tags, etc.
+         filtered: []
+      }
+   },
+   // Filter form
+   workoutsSearch: {
+      type: "text",
+      id: "workoutsSearch",
+      value: "",
+      error: null,
+      data: {}
+   },
+   workoutsDateFilter: {
+      type: "select",
+      value: "Is on or after",
+      id: "workoutsDateFilter",
+      error: null,
+      data: {
+         options: ["Is on or after", "Is on or before", "Is between"]
+      }
+   },
+   workoutsMinDate: {
+      type: "date",
+      id: "workoutsMinDate",
+      value: getWorkoutDate(new Date()),
+      error: null,
+      data: {}
+   },
+   workoutsMaxDate: {
+      type: "date",
+      id: "workoutsMaxDate",
+      value: getWorkoutDate(new Date()),
+      error: null,
+      data: {}
+   },
+   workoutsPaging: {
+      type: "select",
+      id: "workoutsPaging",
+      value: 10,
+      error: null,
+      data: {
+         page: 0,
+         options: [5, 10, 25, 50, 100, 500, 1000],
+         handlesChanges: true
+      }
+   },
+   // Exercise form
+   exerciseTitle: {
+      type: "text",
+      id: "exerciseTitle",
+      value: "",
+      error: null,
+      data: {
+         id: "",
+         edit: false
+      }
+   },
+   weight: {
+      type: "number",
+      id: "weight",
+      value: "",
+      error: null,
+      data: {}
+   },
+   repetitions: {
+      type: "number",
+      id: "repetitions",
+      value: "",
+      error: null,
+      data: {}
+   },
+   hours: {
+      type: "number",
+      id: "hours",
+      value: "",
+      error: null,
+      data: {}
+   },
+   minutes: {
+      type: "number",
+      id: "minutes",
+      value: "",
+      error: null,
+      data: {}
+   },
+   seconds: {
+      type: "number",
+      id: "seconds",
+      value: "",
+      error: null,
+      data: {}
+   },
+   text: {
+      type: "text",
+      id: "text",
+      value: "",
+      error: null,
+      data: {}
+   },
+   // Store editing exercise ID to control interning inputs
+   exerciseId: {
+      type: null,
+      id: "exerciseId",
+      value : null,
+      error: null,
+      data: {
+         // Editing set ID to display potential inputs for
+         setId: ""
+      }
+   }
 };
 
 export default function Page(): JSX.Element {
@@ -215,19 +214,19 @@ export default function Page(): JSX.Element {
 
    // Convert search string to lower case for case-insensitive comparison
    const search: string = useMemo(() => {
-      return state.inputs.workoutsSearch.value.trim().toLowerCase();
-   }, [state.inputs.workoutsSearch]);
+      return state.workoutsSearch.value.trim().toLowerCase();
+   }, [state.workoutsSearch]);
 
    // Filtered based on selected tags or date intervals
-   const filtered: Workout[] = state.inputs.workouts.data.filtered;
+   const filtered: Workout[] = state.workouts.data.filtered;
 
    // Search results for workouts, accounting for pagination
    const results: Workout[] = useMemo(() => {
       return searchForTitle(filtered, search);
    }, [filtered, search]);
 
-   const pages: number = state.inputs.workoutsPaging.value;
-   const page: number = state.inputs.workoutsPaging.data.page;
+   const pages: number = state.workoutsPaging.value;
+   const page: number = state.workoutsPaging.data.page;
 
    const low: number = page * pages;
    const high = low + pages - 1;
@@ -237,7 +236,7 @@ export default function Page(): JSX.Element {
    }, [results, low, high]);
 
    const fetchWorkoutsData = useCallback(async() => {
-      if (user !== undefined && state.inputs.workouts.data.fetched === false) {
+      if (user !== undefined && state.workouts.data.fetched === false) {
          try {
             const [workoutsData, tagsData] = await Promise.all([
                fetchWorkouts(user.id),
@@ -248,9 +247,9 @@ export default function Page(): JSX.Element {
                type: "initializeState",
                value: {
                   tags: {
-                     ...state.inputs.tags,
+                     ...state.tags,
                      data: {
-                        ...state.inputs.tags.data,
+                        ...state.tags.data,
                         options: tagsData,
                         selected: [],
                         filteredSelected: [],
@@ -258,10 +257,10 @@ export default function Page(): JSX.Element {
                      }
                   },
                   workouts: {
-                     ...state.inputs.workouts,
+                     ...state.workouts,
                      value: workoutsData,
                      data: {
-                        ...state.inputs.workouts.data,
+                        ...state.workouts.data,
                         filtered: workoutsData,
                         dateFiltered: false,
                         tagsFiltered: false,
@@ -274,7 +273,7 @@ export default function Page(): JSX.Element {
             console.error(error);
          }
       }
-   }, [user, state.inputs.tags, state.inputs.workouts, dispatch]);
+   }, [user, state.tags, state.workouts, dispatch]);
 
 
    const handleReset = (filterReset: boolean) => {
@@ -285,45 +284,45 @@ export default function Page(): JSX.Element {
             // Reset selected tags data
             tags: {
                data: {
-                  ...state.inputs.tags.data,
+                  ...state.tags.data,
                   selected: [],
                   filteredSelected: []
                },
-               value: state.inputs.tags.value
+               value: state.tags.value
             },
             workouts: {
                data: {
-                  ...state.inputs.workouts.data,
+                  ...state.workouts.data,
                   // Hitting reset icon for filter forms should reset filtering options
-                  tagsFiltered: filterReset ? false : state.inputs.workouts.data.tagsFiltered,
-                  dateFiltered: filterReset ? false : state.inputs.workouts.data.dateFiltered,
-                  filtered: filterReset ? state.inputs.workouts.value : state.inputs.workouts.data.filtered,
-                  selected: filterReset ? new Set<Workout>() :  state.inputs.workouts.data.selected
+                  tagsFiltered: filterReset ? false : state.workouts.data.tagsFiltered,
+                  dateFiltered: filterReset ? false : state.workouts.data.dateFiltered,
+                  filtered: filterReset ? state.workouts.value : state.workouts.data.filtered,
+                  selected: filterReset ? new Set<Workout>() :  state.workouts.data.selected
                },
-               value: state.inputs.workouts.value
+               value: state.workouts.value
             },
             workoutsDateFilter: {
                data: {
-                  ...state.inputs.workoutsDateFilter.data
+                  ...state.workoutsDateFilter.data
                },
-               value: state.inputs.workoutsDateFilter.value
+               value: state.workoutsDateFilter.value
             },
             workoutsPaging: {
                data: {
-                  ...state.inputs.workoutsPaging.data,
+                  ...state.workoutsPaging.data,
                   page: 0
                },
-               value: state.inputs.workoutsPaging.value
+               value: state.workoutsPaging.value
             }
          }
       });
    };
 
    useEffect(() => {
-      if (!(state.inputs.workouts.data.fetched)) {
+      if (!(state.workouts.data.fetched)) {
          fetchWorkoutsData();
       }
-   }, [fetchWorkoutsData, state.inputs.workouts.data.fetched, state.inputs.tags, state.inputs.workouts]);
+   }, [fetchWorkoutsData, state.workouts.data.fetched, state.tags, state.workouts]);
 
    return (
       <main className = "w-full mx-auto my-6 flex min-h-screen flex-col items-center justify-start gap-4 text-center">
@@ -348,7 +347,7 @@ export default function Page(): JSX.Element {
             <div className = "w-full mx-auto flex flex-col justify-center items-center">
                <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 my-2">
                   <div className = "w-full flex flex-col justify-start  gap-2">
-                     <Input input = {state.inputs.workoutsSearch} label = "Search" icon = {faPersonRunning} dispatch = {dispatch} />
+                     <Input input = {state.workoutsSearch} label = "Search" icon = {faPersonRunning} dispatch = {dispatch} />
                      <div className = "w-full flex flex-row justify-between items-center gap-2">
                         <div className = "flex flex-row gap-2">
                            <FilterByDate state = {state} dispatch = {dispatch} reset = {handleReset} />

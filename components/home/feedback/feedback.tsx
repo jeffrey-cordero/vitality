@@ -11,31 +11,27 @@ import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
 import { NotificationContext } from "@/app/layout";
 
 const feedback: VitalityState = {
-   status: "Initial",
-   inputs: {
-      name: {
-         type: "text",
-         id: "name",
-         value: "",
-         error: null,
-         data: {}
-      },
-      email: {
-         type: "email",
-         id: "email",
-         value: "",
-         error: null,
-         data: {}
-      },
-      message: {
-         type: "text",
-         id: "message",
-         value: "",
-         error: null,
-         data: {}
-      }
+   name: {
+      type: "text",
+      id: "name",
+      value: "",
+      error: null,
+      data: {}
    },
-   response: null
+   email: {
+      type: "email",
+      id: "email",
+      value: "",
+      error: null,
+      data: {}
+   },
+   message: {
+      type: "text",
+      id: "message",
+      value: "",
+      error: null,
+      data: {}
+   }
 };
 
 function Form(): JSX.Element {
@@ -47,22 +43,22 @@ function Form(): JSX.Element {
 
       try {
          const payload: Feedback = {
-            name: state.inputs.name.value.trim(),
-            email: state.inputs.email.value.trim(),
-            message: state.inputs.message.value.trim()
+            name: state.name.value.trim(),
+            email: state.email.value.trim(),
+            message: state.message.value.trim()
          };
          const response: VitalityResponse<null> = await sendFeedback(payload);
-
-         dispatch({
-            type: "updateStatus",
-            value: response
-         });
 
          if (response.status !== "Error") {
             // Display the success or failure notification to the user
             updateNotification({
                status: response.status,
                message: response.body.message
+            });
+         } else {
+            dispatch({
+               type: "displayErrors",
+               value: response
             });
          }
       } catch (error) {
@@ -83,9 +79,9 @@ function Form(): JSX.Element {
                })}
                className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
-            <Input input = {state.inputs.name} label = "Name *" dispatch = {dispatch} />
-            <Input input = {state.inputs.email} label = "Email *" dispatch = {dispatch} />
-            <TextArea input = {state.inputs.message} label = "Message *" dispatch = {dispatch} />
+            <Input input = {state.name} label = "Name *" dispatch = {dispatch} />
+            <Input input = {state.email} label = "Email *" dispatch = {dispatch} />
+            <TextArea input = {state.message} label = "Message *" dispatch = {dispatch} />
             <Button type = "submit" className = "bg-primary text-white h-[2.6rem]">
                Submit
             </Button>

@@ -12,58 +12,54 @@ import { signup, Registration } from "@/lib/authentication/signup";
 import { NotificationContext } from "@/app/layout";
 
 const registration: VitalityState = {
-   status: "Initial",
-   inputs: {
-      username: {
-         type: "text",
-         id: "username",
-         value: "",
-         error: null,
-         data: {}
-      },
-      password: {
-         type: "password",
-         id: "password",
-         value: "",
-         error: null,
-         data: {}
-      },
-      confirmPassword: {
-         type: "password",
-         id: "confirmPassword",
-         value: "",
-         error: null,
-         data: {}
-      },
-      name: {
-         type: "text",
-         id: "name",
-         value: "",
-         error: null,
-         data: {}
-      },
-      birthday: {
-         type: "date",
-         id: "birthday",
-         value: "",
-         error: null,
-         data: {}
-      },
-      email: {
-         type: "email",
-         id: "email",
-         value: "",
-         error: null,
-         data: {}
-      }, phone: {
-         type: "tel",
-         id: "phone",
-         value: "",
-         error: null,
-         data: {}
-      }
+   username: {
+      type: "text",
+      id: "username",
+      value: "",
+      error: null,
+      data: {}
    },
-   response: null
+   password: {
+      type: "password",
+      id: "password",
+      value: "",
+      error: null,
+      data: {}
+   },
+   confirmPassword: {
+      type: "password",
+      id: "confirmPassword",
+      value: "",
+      error: null,
+      data: {}
+   },
+   name: {
+      type: "text",
+      id: "name",
+      value: "",
+      error: null,
+      data: {}
+   },
+   birthday: {
+      type: "date",
+      id: "birthday",
+      value: "",
+      error: null,
+      data: {}
+   },
+   email: {
+      type: "email",
+      id: "email",
+      value: "",
+      error: null,
+      data: {}
+   }, phone: {
+      type: "tel",
+      id: "phone",
+      value: "",
+      error: null,
+      data: {}
+   }
 };
 
 function Form(): JSX.Element {
@@ -75,20 +71,15 @@ function Form(): JSX.Element {
 
       try {
          const payload: Registration = {
-            name: state.inputs.name.value.trim(),
-            username: state.inputs.username.value.trim(),
-            password: state.inputs.password.value.trim(),
-            confirmPassword: state.inputs.confirmPassword.value.trim(),
-            email: state.inputs.email.value.trim(),
-            birthday: new Date(state.inputs.birthday.value),
-            phone: state.inputs.phone.value.trim()
+            name: state.name.value.trim(),
+            username: state.username.value.trim(),
+            password: state.password.value.trim(),
+            confirmPassword: state.confirmPassword.value.trim(),
+            email: state.email.value.trim(),
+            birthday: new Date(state.birthday.value),
+            phone: state.phone.value.trim()
          };
          const response: VitalityResponse<null> = await signup(payload as Registration);
-
-         dispatch({
-            type: "updateStatus",
-            value: response
-         });
 
          if (response.status !== "Error") {
             // Display the success or failure notification to the user
@@ -103,8 +94,8 @@ function Form(): JSX.Element {
                         icon = {faDoorOpen}
                         onClick = {async() => {
                            await login({
-                              username: state.inputs.username.value,
-                              password: state.inputs.password.value
+                              username: state.username.value,
+                              password: state.password.value
                            });
 
                            window.location.reload();
@@ -114,6 +105,11 @@ function Form(): JSX.Element {
                      </Button>
                   </Link>
                )
+            });
+         } else {
+            dispatch({
+               type: "displayErrors",
+               value: response
             });
          }
       } catch (error) {
@@ -131,13 +127,13 @@ function Form(): JSX.Element {
                })}
                className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
-            <Input input = {state.inputs.username} label = "Username *" dispatch = {dispatch} />
-            <Input input = {state.inputs.password} label = "Password *" dispatch = {dispatch} />
-            <Input input = {state.inputs.confirmPassword} label = "Confirm Password *" dispatch = {dispatch} />
-            <Input input = {state.inputs.name} label = "Name *" dispatch = {dispatch} />
-            <Input input = {state.inputs.birthday} label = "Birthday *" dispatch = {dispatch} />
-            <Input input = {state.inputs.email} label = "Email *" dispatch = {dispatch} />
-            <Input input = {state.inputs.phone} label = "Phone *" dispatch = {dispatch} />
+            <Input input = {state.username} label = "Username *" dispatch = {dispatch} />
+            <Input input = {state.password} label = "Password *" dispatch = {dispatch} />
+            <Input input = {state.confirmPassword} label = "Confirm Password *" dispatch = {dispatch} />
+            <Input input = {state.name} label = "Name *" dispatch = {dispatch} />
+            <Input input = {state.birthday} label = "Birthday *" dispatch = {dispatch} />
+            <Input input = {state.email} label = "Email *" dispatch = {dispatch} />
+            <Input input = {state.phone} label = "Phone *" dispatch = {dispatch} />
             <Button type = "submit" className = "bg-primary text-white h-[2.6rem]" icon = {faIdCard}>
                Submit
             </Button>

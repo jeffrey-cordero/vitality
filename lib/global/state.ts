@@ -29,22 +29,18 @@ export interface VitalityAction<T> {
   type:
     | "initializeState"
     | "updateInput"
-    | "updateStatus"
-    | "updateState"
+    | "displayErrors"
+    | "updateInputs"
     | "resetState";
   value:
-    | VitalityInputStates // User values in table
-    | VitalityInputState // Update form, data, etc.
-    | VitalityResponse<T> // Backend API responses
-    | VitalityState // Complete State Update (complex)
-    | VitalityResetState; // Reset state to default values and provided data objects, if any
+    | VitalityInputStates
+    | VitalityInputState
+    | VitalityResponse<T>
+    | VitalityState
+    | VitalityResetState;
 }
 
-export interface VitalityState {
-  status: "Initial" | "Success" | "Error" | "Failure";
-  inputs: VitalityInputStates;
-  response: VitalityResponse<any> | null;
-}
+export type VitalityState = { [key: string]: VitalityInputState };
 
 export function formReducer(
    state: VitalityState,
@@ -56,41 +52,36 @@ export function formReducer(
          const inputs = action.value as VitalityInputStates;
 
          for (const key of Object.keys(inputs)) {
-            draft.inputs[key] = inputs[key];
+            draft[key] = inputs[key];
          }
 
          break;
       case "updateInput":
          const input = action.value as VitalityInputState;
-         draft.inputs[input.id] = input;
+         draft[input.id] = input;
 
          break;
-      case "updateStatus":
+      case "updateInputs":
+         // Manually update properties of the draft for complex state manipulation
+         Object.assign(draft, action.value as VitalityState);
+         break;
+      case "displayErrors":
          const response = action.value as VitalityResponse<any>;
 
-         if (response) {
-            draft.status = response.status;
-            draft.response = response;
-
-            for (const key in state.inputs) {
-               draft.inputs[key].error = response?.body.errors[key] ?? null;
-            }
+         for (const key in state) {
+            draft[key].error = response.body.errors[key] ?? null;
          }
 
-         break;
-      case "updateState":
-         // Manually update properties of draft (complex state)
-         Object.assign(draft, action.value as VitalityState);
          break;
       case "resetState":
          const reset = action.value as VitalityResetState;
 
-         for (const key in state.inputs) {
-            draft.inputs[key] = {
-               ...state.inputs[key],
+         for (const key in state) {
+            draft[key] = {
+               ...state[key],
                value: reset[key]?.value ?? "",
                error: null,
-               data: reset[key]?.data ?? state.inputs[key].data
+               data: reset[key]?.data ?? state[key].data
             };
          }
 
