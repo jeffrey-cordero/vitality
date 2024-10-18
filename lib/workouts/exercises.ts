@@ -102,7 +102,7 @@ export async function addExercise(
 
 export async function updateExercise(
    exercise: Exercise, method: "title" | "sets"
-): Promise<VitalityResponse<null>> {
+): Promise<VitalityResponse<Exercise>> {
    try {
       if (method === "title") {
          // Update exercise title
@@ -131,6 +131,59 @@ export async function updateExercise(
          }
       } else {
          // Update exercise sets
+         const existingExercise = await prisma.exercises.findUnique({
+            where: {
+               id: exercise.id
+            },
+            include: {
+               sets: true
+            }
+         });
+
+         const existingExerciseSetIdsArray: string[] = existingExercise?.sets.map((set) => set.id) || [];
+         const newExerciseSetIdsArray: string[] = exercise.sets.map((set) => set.id);
+         const newExerciseSetIdsSet: Set<string> = new Set(newExerciseSetIdsArray);
+
+         // Determine IDs to remove
+         const exerciseIdsToRemove: string[] = existingExerciseSetIdsArray.filter(id => !newExerciseSetIdsSet.has(id));
+
+         // Determine sets to create or update
+         const exerciseSetsToCreate = []
+         const exerciseSetsToUpdate = []
+
+         for (let i = 0; i < exercise.sets.length; i++) {
+            const exerciseSet: ExerciseSet = {
+               ...exercise.sets[i],
+               set_order: i
+            }
+
+            if (exerciseSet.id === undefined || exerciseSet.id.trim() === "") {
+               exerciseSetsToCreate.push(exerciseSet);
+            } else {
+               exerciseSetsToUpdate.push(exerciseSet);
+            }
+         }
+
+         const newExercise = await prisma.exercises.update({
+            where: {
+               id: exercise.id
+            },
+            data: {
+               sets: {
+                  deleteMany: {
+                     id: { in: exerciseIdsToRemove }
+                  },
+                  createMany: {
+                     data: exerciseSetsToCreate
+                  },
+                  updateMany: exerciseSetsToUpdate
+               }
+            },
+            include: {
+               sets: true
+            }
+         });
+
          return sendSuccessMessage("Missing implementation for update exercise sets", null);
       }
    } catch (error) {
@@ -175,17 +228,12 @@ export async function updateExercises(workoutId: string,
 
       // Extract exercise IDs
       const existingExerciseIdsArray: string[] = existingWorkout?.exercises.map((exercise) => exercise.id) ?? [];
-      const currentExerciseIdsSet: Set<string> = new Set(exercises.map((exercise) => exercise.id));
+      const newExerciseIdsArray: string[] = exercises.map((exercise) => exercise.id);
+      const newExerciseIdsSet: Set<string> = new Set(newExerciseIdsArray);
 
-      // Determine exercise's to update and/or remove
-      const updatingExercises = Object.fromEntries(exercises.map(exercise => [exercise.id, exercise]));
-
-      const exerciseIdsToUpdate: string[] = existingExerciseIdsArray.filter(
-         (id: string) => currentExerciseIdsSet.has(id)
-      );
-
+      // Determine exercise's to remove and update ordering accordingly
       const exerciseIdsToRemove: string[] = existingExerciseIdsArray.filter(
-         (id: string) => !(currentExerciseIdsSet.has(id))
+         (id: string) => !(newExerciseIdsSet.has(id))
       );
 
       const workout = await prisma.workouts.update({
@@ -196,7 +244,7 @@ export async function updateExercises(workoutId: string,
                deleteMany: {
                   id: { in: exerciseIdsToRemove }
                },
-               updateMany: exerciseIdsToUpdate.map((id: string, index: number) => ({
+               updateMany: newExerciseIdsArray.map((id: string, index: number) => ({
                   where: {
                      id: id
                   },

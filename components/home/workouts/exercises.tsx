@@ -30,14 +30,14 @@ interface ExerciseInputProps {
    state: VitalityState;
    dispatch: Dispatch<VitalityAction<Workout | Exercise | Exercise[]>>;
    onBlur?: () => void;
-   onSave?: (_exercises: Exercise[]) => void;
+   onWorkoutSave?: (_exercises: Exercise[]) => void;
    setEditingWorkout: (_workout: Workout) => void;
 }
 
 function NewExerciseInput(props: ExerciseInputProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
-   const { workout, state, dispatch, onSave } = props;
+   const { workout, state, dispatch, onWorkoutSave } = props;
 
    const handleCreateNewExercise = useCallback(async() => {
       const payload: Exercise = {
@@ -54,7 +54,7 @@ function NewExerciseInput(props: ExerciseInputProps): JSX.Element {
 
       if (response.status === "Success") {
          const newExercises: Exercise[] = [...workout.exercises, returnedExercise];
-         onSave(newExercises);
+         onWorkoutSave(newExercises);
       } else {
          // Display all errors, where title entry is replaced by exerciseTitle
          if (response.body.errors.title) {
@@ -76,7 +76,7 @@ function NewExerciseInput(props: ExerciseInputProps): JSX.Element {
             timer: 1250
          });
       }
-   }, [onSave, dispatch, workout, state.inputs.exerciseTitle.value,
+   }, [onWorkoutSave, dispatch, workout, state.inputs.exerciseTitle.value,
       updateNotification, user.id]);
 
    return (
@@ -95,18 +95,63 @@ function NewExerciseInput(props: ExerciseInputProps): JSX.Element {
 }
 
 interface SetProps extends ExerciseInputProps {
-   set: ExerciseSet;
+   exercise: Exercise;
+   set: ExerciseSet | undefined;
 }
 
 function SetContainer(props: SetProps): JSX.Element {
-   const { set, state, dispatch } = props;
-   const [editSet, setEditSet] = useState(false);
+   const { workout, exercise, set, state, dispatch, onBlur, onWorkoutSave } = props;
+   const [exerciseSetObject, setExerciseSetObject] = useState<ExerciseSet | undefined>(set);
+   const [editSet, setEditSet] = useState(exerciseSetObject === undefined);
    const setId = state.inputs.setId.value;
-   const displayEditInputs = editSet && set.id === setId;
+   const displayEditInputs = editSet && exerciseSetObject === undefined || exerciseSetObject.id === setId;
 
-   const handleSaveExerciseSet = useCallback(() => {
-      setEditSet(false);
-   }, []);
+   const handleSaveExercise = useCallback(async(event) => {
+      event.stopPropagation();
+
+      const parseNumber = (value) => {
+         const num = +value;
+         // Return null if NaN, otherwise return the number
+         return isNaN(num) ? null : num;
+      };
+
+      // Handle new set array construction
+      const newSet: ExerciseSet = {
+         ...exerciseSetObject,
+         id: exerciseSetObject !== undefined ? exerciseSetObject.id : undefined,
+         weight: parseNumber(state.inputs.weight.value),
+         repetitions: parseNumber(state.inputs.repetitions.value),
+         hours: parseNumber(state.inputs.hours.value),
+         minutes: parseNumber(state.inputs.minutes.value),
+         seconds: parseNumber(state.inputs.seconds.value),
+         text: state.inputs.text.value
+      };
+
+      const newSets: ExerciseSet[] = exerciseSetObject === undefined ?
+         [...exercise.sets, newSet] : [...exercise.sets].map((s) => s.id === setId ? newSet : s);
+
+      // Update exercise entry in database
+      const newExercise: Exercise = {
+         ...exercise,
+         sets: newSets
+      };
+
+      const response: VitalityResponse<Exercise> = await updateExercise(newExercise, "sets");
+
+      if (response.status === "Success") {
+         // Update workout with new exercises, including the updating exercise sets from backend response
+         const newExercises: Exercise[] = [...workout.exercises].map((e) => e.id === exercise.id ? response.body.data : e);
+
+         if (exerciseSetObject === undefined) {
+            setExerciseSetObject(newSet);
+         }
+
+         onWorkoutSave(newExercises);
+         setEditSet(false);
+      } else {
+         alert("ERROR");
+      }
+   }, [exercise, exerciseSetObject, onWorkoutSave, setId, state.inputs.hours.value, state.inputs.minutes.value, state.inputs.repetitions.value, state.inputs.seconds.value, state.inputs.text.value, state.inputs.weight.value, workout.exercises]);
 
    const handleInitializeEditSet = useCallback(() => {
       // Update exercise inputs
@@ -115,41 +160,40 @@ function SetContainer(props: SetProps): JSX.Element {
          value: {
             weight: {
                ...state.inputs.weight,
-               value: set.weight ?? ""
+               value: exerciseSetObject?.weight ?? ""
             },
             repetitions: {
                ...state.inputs.repetitions,
-               value: set.repetitions ?? ""
+               value: exerciseSetObject?.repetitions ?? ""
             },
             hours: {
                ...state.inputs.hours,
-               value: set.hours ?? ""
+               value: exerciseSetObject?.hours ?? ""
             },
             minutes: {
                ...state.inputs.minutes,
-               value: set.minutes ?? ""
+               value: exerciseSetObject?.minutes ?? ""
             },
             seconds: {
                ...state.inputs.seconds,
-               value: set.seconds ?? ""
+               value: exerciseSetObject?.seconds ?? ""
             },
             text: {
                ...state.inputs.text,
-               value: set.text ?? ""
+               value: exerciseSetObject?.text ?? ""
             },
             setId: {
                ...state.inputs.setId,
-               value: set.id
+               value: exerciseSetObject?.id ?? ""
             }
          }
       });
 
       // Display inputs
       setEditSet(true);
-   }, [dispatch, set.hours, set.minutes, set.repetitions, set.seconds, set.text, set.weight, state.inputs.hours,
+   }, [dispatch, exerciseSetObject?.hours, exerciseSetObject?.minutes, exerciseSetObject?.repetitions, exerciseSetObject?.seconds, exerciseSetObject?.text, exerciseSetObject?.weight, state.inputs.hours,
       state.inputs.minutes, state.inputs.repetitions, state.inputs.seconds, state.inputs.text, state.inputs.weight,
-      set.id, state.inputs.setId]);
-
+      exerciseSetObject?.id, state.inputs.setId]);
 
    return (
       displayEditInputs ? (
@@ -166,7 +210,16 @@ function SetContainer(props: SetProps): JSX.Element {
                type = "button"
                className = "w-full bg-grey-200 mb-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
                icon = {faRotateLeft}
-               onClick = {() => setEditSet(false)}
+               onClick = {(event) => {
+                  event.stopPropagation();
+
+                  if (exerciseSetObject === undefined) {
+                     // Remove from DOM for new set inputs
+                     onBlur();
+                  }
+
+                  setEditSet(false);
+               }}
             >
                Cancel
             </Button>
@@ -174,7 +227,7 @@ function SetContainer(props: SetProps): JSX.Element {
                type = "button"
                className = "w-full bg-green-600 text-white mb-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
                icon = {faCloudArrowUp}
-               onClick = {handleSaveExerciseSet}
+               onClick = {handleSaveExercise}
             >
                Save
             </Button>
@@ -184,17 +237,16 @@ function SetContainer(props: SetProps): JSX.Element {
                className = "flex flex-col justify-start font-medium gap-2 w-full mx-auto pt-2 pl-2 text-left"
                onDoubleClick = {handleInitializeEditSet}
             >
-               {set.weight && <p>Weight - {set.weight}</p>}
-               {set.repetitions && <p>Repetitions - {set.repetitions}</p>}
-               {(set.hours || set.minutes || set.seconds) && (
+               {exerciseSetObject?.weight && <p>Weight - {set.weight}</p>}
+               {exerciseSetObject?.repetitions && <p>Repetitions - {set.repetitions}</p>}
+               {(exerciseSetObject?.hours || exerciseSetObject?.minutes || exerciseSetObject?.seconds) && (
                   <p>
-                     Interval - {String(set.hours ?? 0).padStart(2, "0")}:
-                     {String(set.minutes ?? 0).padStart(2, "0")}:
-                     {String(set.seconds ?? 0).padStart(2, "0")}
+                     Interval - {String(exerciseSetObject?.hours ?? 0).padStart(2, "0")}:
+                     {String(exerciseSetObject?.minutes ?? 0).padStart(2, "0")}:
+                     {String(exerciseSetObject?.seconds ?? 0).padStart(2, "0")}
                   </p>
                )}
-               {set.text && <p>{set.text}</p>}
-
+               {exerciseSetObject?.text && <p>{set.text}</p>}
             </div>
          )
    );
@@ -206,9 +258,10 @@ interface ExerciseProps extends ExerciseInputProps {
 
 function ExerciseContainer(props: ExerciseProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
-   const { workout, exercise, state, dispatch, onSave } = props;
+   const { workout, exercise, state, dispatch, onWorkoutSave } = props;
    const { edit, id } = state.inputs.exerciseTitle.data;
-   const [editTitle, setEditTitle] = useState(false);
+   const [editTitle, setEditTitle] = useState<boolean>(false);
+   const [addSet, setAddSet] = useState<boolean>(false);
    const displayEditTitle = editTitle && edit && id === exercise.id;
 
    // Prevent drag and drop mechanisms when user is editing exercise information
@@ -229,14 +282,14 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       // Construct new exercise for update method
       const newTitle: string = state.inputs.exerciseTitle.value.trim();
       const newExercise: Exercise = { ...exercise, title: newTitle };
-      const response: VitalityResponse<null> = await updateExercise(newExercise, "title");
+      const response: VitalityResponse<Exercise> = await updateExercise(newExercise, "title");
 
       if (response.status === "Success") {
          // Update the overall workout exercises
          const newExercises: Exercise[] = [...workout.exercises].map((e) => e.id !== exercise.id ? e : newExercise);
 
          setEditTitle(false);
-         onSave(newExercises);
+         onWorkoutSave(newExercises);
       } else if (response.status === "Failure") {
          // Display failure notification to the user, if any
          updateNotification({
@@ -254,7 +307,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
             }
          });
       }
-   }, [dispatch, exercise, onSave, workout,
+   }, [dispatch, exercise, onWorkoutSave, workout,
       state.inputs.exerciseTitle, updateNotification]);
 
    const handleDeleteExercise = useCallback(async() => {
@@ -263,7 +316,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
       if (response.status === "Success") {
          // Update the overall workout exercises with new exercises from backend response
-         onSave(response.body.data as Exercise[]);
+         onWorkoutSave(response.body.data as Exercise[]);
       } else {
          // Display error or failure notification to the user, if any
          updateNotification({
@@ -272,7 +325,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
             timer: 1250
          });
       }
-   }, [exercise.id, onSave, updateNotification, workout.exercises, workout.id]);
+   }, [exercise.id, onWorkoutSave, updateNotification, workout.exercises, workout.id]);
 
    const handleInitializeEditExerciseName = useCallback(() => {
       dispatch({
@@ -292,7 +345,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    }, [dispatch, exercise.title, state.inputs.exerciseTitle, exercise.id]);
 
    return (
-      <div
+      <li
          className = "w-full mx-auto p-4 text-left focus:cursor-move"
          ref = {setNodeRef}
          style = {style}
@@ -305,7 +358,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   <Input className = "mb-2" input = {state.inputs.exerciseTitle} label = "Title" icon = {faFeather} dispatch = {dispatch} onBlur = {() => setEditTitle(false)} />
                   <Button
                      type = "button"
-                     className = "w-full bg-green-600 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
+                     className = "w-full bg-green-600 text-white text-md  mt-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
                      icon = {faFeather}
                      onClick = {handleSaveExerciseName}
                   >
@@ -313,7 +366,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   </Button>
                   <Button
                      type = "button"
-                     className = "w-full bg-red-600 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
+                     className = "w-full bg-red-600 text-white text-md mt-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
                      icon = {faTrash}
                      onClick = {handleDeleteExercise}
                   >
@@ -321,23 +374,35 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   </Button>
                </div>
             ) : (
-               <h1 onDoubleClick = {handleInitializeEditExerciseName} className = "text-xl mb-2">{exercise.title} (Order: {exercise.exercise_order}) </h1>
+               <h1 onDoubleClick = {handleInitializeEditExerciseName} className = "text-xl mb-2">{exercise.title}</h1>
             )
          }
          {
             exercise.sets.map((set: ExerciseSet) => {
-               return (<SetContainer {...props} set = {set} key = {exercise.id} />);
+               return (<SetContainer {...props} set = {set} key = {exercise.id} onBlur = {undefined} />);
             })
          }
-         <Button
-            type = "button"
-            className = "w-full bg-white text-black px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
-            icon = {faPlus}
-            onClick = {() => alert(1)}
-         >
-            New Set
-         </Button>
-      </div>
+         {
+            addSet && (
+               <SetContainer {...props} set = {undefined} onBlur = {() => setAddSet(false)} />
+            )
+         }
+         {
+            !(addSet) && (
+               <Button
+                  type = "button"
+                  className = "z-50 w-full bg-white text-black text-md mt-6 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
+                  icon = {faPlus}
+                  onClick = {(event) => {
+                     event.stopPropagation();
+                     setAddSet(true);
+                  }}
+               >
+                  New Set
+               </Button>
+            )
+         }
+      </li>
    );
 }
 
@@ -372,9 +437,9 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
       setAddExercise(true);
    }, [dispatch, state.inputs.exerciseTitle]);
 
-   const handleOnSave = useCallback(async(exercises: Exercise[]) => {
+   const handleSaveWorkout = useCallback(async(updatingExercises: Exercise[]) => {
       // Update workout entry in database
-      const response: VitalityResponse<Exercise[]> = await updateExercises(workout.id, exercises);
+      const response: VitalityResponse<Exercise[]> = await updateExercises(workout.id, updatingExercises);
 
       if (response.status === "Success") {
          // Update front-end state on success
@@ -443,7 +508,7 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
                exercise_order: index
             }));
 
-            handleOnSave(newExercises);
+            handleSaveWorkout(newExercises);
          }
       }
    };
@@ -453,7 +518,7 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
          {
             displayNewTitle &&
             <NewExerciseInput {...props}
-               onSave = {handleOnSave}
+               onWorkoutSave = {handleSaveWorkout}
                onBlur = {() => {
                   setAddExercise(false);
                }}
@@ -474,13 +539,16 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
             onDragEnd = {handleDragEnd}
          >
             <SortableContext items = {exercises.map((exercise) => exercise.id)} strategy = {verticalListSortingStrategy}>
-               {
-                  workout.exercises.map((exercise: Exercise) => {
-                     return (
-                        <ExerciseContainer {...props} exercise = {exercise} key = {exercise.id} onSave = {handleOnSave} />
-                     );
-                  })
-               }
+               <ol className = "w-full mx-auto list-decimal pl-6 mt-2">
+                  {
+                     workout.exercises.map((exercise: Exercise) => {
+                        return (
+                           <ExerciseContainer {...props} exercise = {exercise} key = {exercise.id} onWorkoutSave = {handleSaveWorkout} />
+                        );
+                     })
+
+                  }
+               </ol>
             </SortableContext>
          </DndContext>
       </div>
