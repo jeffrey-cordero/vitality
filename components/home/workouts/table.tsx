@@ -38,7 +38,7 @@ function WorkoutRow(props: WorkoutRowProps) {
       }
 
       dispatch({
-         type: "updateInput",
+         type: "updateState",
          value: {
             ...state.workouts,
             data: {
@@ -69,7 +69,7 @@ function WorkoutRow(props: WorkoutRowProps) {
          });
 
          dispatch({
-            type: "updateInputs",
+            type: "updateStates",
             value: {
                ...state,
                workouts: {
@@ -237,7 +237,7 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
    // Function to update selected workouts in the state
    const handleUpdateSelectedWorkouts = useCallback((newSelected: Set<Workout>) => {
       dispatch({
-         type: "updateInput",
+         type: "updateState",
          value: {
             ...state.workouts,
             data: {

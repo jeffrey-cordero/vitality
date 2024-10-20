@@ -4,7 +4,7 @@ import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 import Input from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faBook, faEnvelope, faFeather } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
 import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/state";
 import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
@@ -12,22 +12,16 @@ import { NotificationContext } from "@/app/layout";
 
 const feedback: VitalityState = {
    name: {
-      type: "text",
-      id: "name",
       value: "",
       error: null,
       data: {}
    },
    email: {
-      type: "email",
-      id: "email",
       value: "",
       error: null,
       data: {}
    },
    message: {
-      type: "text",
-      id: "message",
       value: "",
       error: null,
       data: {}
@@ -79,9 +73,9 @@ function Form(): JSX.Element {
                })}
                className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
-            <Input input = {state.name} label = "Name *" dispatch = {dispatch} />
-            <Input input = {state.email} label = "Email *" dispatch = {dispatch} />
-            <TextArea input = {state.message} label = "Message *" dispatch = {dispatch} />
+            <Input id = "name" type = "text" label = "Name" icon = {faFeather} input = {state.name} dispatch = {dispatch} autoFocus required />
+            <Input id = "email" type = "text" label = "Email" icon = {faEnvelope} input = {state.email} dispatch = {dispatch} required />
+            <TextArea id = "message" type = "text" label = "Message" icon = {faBook} input = {state.message} dispatch = {dispatch} required />
             <Button type = "submit" className = "bg-primary text-white h-[2.6rem]">
                Submit
             </Button>

@@ -15,7 +15,7 @@ export default function Select(props: VitalityInputProps): JSX.Element {
       } else {
          // Simple state
          dispatch({
-            type: "updateInput",
+            type: "updateState",
             value: {
                ...input,
                value: event.target.value,

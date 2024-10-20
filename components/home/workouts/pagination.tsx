@@ -22,7 +22,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
 
    const handlePageClick = useCallback((page: number) => {
       dispatch({
-         type: "updateInput",
+         type: "updateState",
          value: {
             ...state.workoutsPaging,
             data: {
@@ -49,7 +49,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
    const handleEntriesOnChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
       // When total visible entries are changed, ensure to reset page index to first page
       dispatch({
-         type: "updateInput",
+         type: "updateState",
          value: {
             ...state.workoutsPaging,
             value: event.target.value,

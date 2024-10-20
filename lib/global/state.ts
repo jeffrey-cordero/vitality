@@ -1,14 +1,14 @@
 import { produce } from "immer";
 
 export interface VitalityInputState {
-  id: string;
   value: any;
-  error: string[] | null;
-  type: string | null;
+  error: string | null;
   data: { [key: string]: any };
 }
 
-export type VitalityInputStates = { [key: string]: VitalityInputState };
+export type VitalityState = { [key: string]: VitalityInputState };
+export type VitalityUpdateState = { id: string; input: VitalityInputState };
+
 export interface VitalityResponse<T> {
   status: "Success" | "Error" | "Failure";
   body: {
@@ -28,19 +28,17 @@ export interface VitalityResetState {
 export interface VitalityAction<T> {
   type:
     | "initializeState"
-    | "updateInput"
+    | "updateState"
+    | "updateStates"
     | "displayErrors"
-    | "updateInputs"
     | "resetState";
   value:
-    | VitalityInputStates
-    | VitalityInputState
+    | VitalityState
+    | VitalityUpdateState
     | VitalityResponse<T>
     | VitalityState
     | VitalityResetState;
 }
-
-export type VitalityState = { [key: string]: VitalityInputState };
 
 export function formReducer(
    state: VitalityState,
@@ -49,27 +47,26 @@ export function formReducer(
    return produce(state, (draft) => {
       switch (action.type) {
       case "initializeState":
-         const inputs = action.value as VitalityInputStates;
+         const inputs = action.value as VitalityState;
 
          for (const key of Object.keys(inputs)) {
             draft[key] = inputs[key];
          }
 
          break;
-      case "updateInput":
-         const input = action.value as VitalityInputState;
-         draft[input.id] = input;
+      case "updateState":
+         const { id, input } = action.value as VitalityUpdateState;
+         draft[id] = input;
 
          break;
-      case "updateInputs":
-         // Manually update properties of the draft for complex state manipulation
+      case "updateStates":
          Object.assign(draft, action.value as VitalityState);
          break;
       case "displayErrors":
          const response = action.value as VitalityResponse<any>;
 
          for (const key in state) {
-            draft[key].error = response.body.errors[key] ?? null;
+            draft[key].error = response.body.errors[key]?.[0] ?? null;
          }
 
          break;

@@ -16,31 +16,22 @@ import { faPersonRunning, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FilterByDate, FilterByTags } from "@/components/home/workouts/filter";
 
 const workouts: VitalityState = {
-   // Workout form
    title: {
-      type: "text",
-      id: "title",
       value: "",
       error: null,
       data: {}
    },
    date: {
-      type: "date",
-      id: "date",
       value: "",
       error: null,
       data: {}
    },
    description: {
-      type: "text",
-      id: "description",
       value: "",
       error: null,
       data: {}
    },
    image: {
-      type: "text",
-      id: "image",
       value: "",
       error: null,
       data: {
@@ -84,7 +75,6 @@ const workouts: VitalityState = {
       error: null,
       data: {}
    },
-   // Main overall workout objects
    workouts: {
       type: null,
       id: "workouts",

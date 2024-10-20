@@ -4,7 +4,7 @@ import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateLeft, faIdCard, faDoorOpen } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faIdCard, faDoorOpen, faFeather, faKey, faEnvelope, faPhone, faUserSecret, faCalendar } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
 import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/state";
 import { login } from "@/lib/authentication/login";
@@ -13,49 +13,35 @@ import { NotificationContext } from "@/app/layout";
 
 const registration: VitalityState = {
    username: {
-      type: "text",
-      id: "username",
       value: "",
       error: null,
       data: {}
    },
    password: {
-      type: "password",
-      id: "password",
       value: "",
       error: null,
       data: {}
    },
    confirmPassword: {
-      type: "password",
-      id: "confirmPassword",
       value: "",
       error: null,
       data: {}
    },
    name: {
-      type: "text",
-      id: "name",
       value: "",
       error: null,
       data: {}
    },
    birthday: {
-      type: "date",
-      id: "birthday",
       value: "",
       error: null,
       data: {}
    },
    email: {
-      type: "email",
-      id: "email",
       value: "",
       error: null,
       data: {}
    }, phone: {
-      type: "tel",
-      id: "phone",
       value: "",
       error: null,
       data: {}
@@ -70,7 +56,7 @@ function Form(): JSX.Element {
       event.preventDefault();
 
       try {
-         const payload: Registration = {
+         const registration: Registration = {
             name: state.name.value.trim(),
             username: state.username.value.trim(),
             password: state.password.value.trim(),
@@ -79,7 +65,7 @@ function Form(): JSX.Element {
             birthday: new Date(state.birthday.value),
             phone: state.phone.value.trim()
          };
-         const response: VitalityResponse<null> = await signup(payload as Registration);
+         const response: VitalityResponse<null> = await signup(registration);
 
          if (response.status !== "Error") {
             // Display the success or failure notification to the user
@@ -127,13 +113,13 @@ function Form(): JSX.Element {
                })}
                className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
-            <Input input = {state.username} label = "Username *" dispatch = {dispatch} />
-            <Input input = {state.password} label = "Password *" dispatch = {dispatch} />
-            <Input input = {state.confirmPassword} label = "Confirm Password *" dispatch = {dispatch} />
-            <Input input = {state.name} label = "Name *" dispatch = {dispatch} />
-            <Input input = {state.birthday} label = "Birthday *" dispatch = {dispatch} />
-            <Input input = {state.email} label = "Email *" dispatch = {dispatch} />
-            <Input input = {state.phone} label = "Phone *" dispatch = {dispatch} />
+            <Input id = "username" type = "text" label = "Username" icon = {faUserSecret} input = {state.username} dispatch = {dispatch} autoFocus required />
+            <Input id = "password" type = "password" label = "Password" icon = {faKey} input = {state.password} dispatch = {dispatch} required />
+            <Input id = "confirmPassword" type = "password" label = "Confirm Password" icon = {faKey}input = {state.confirmPassword} dispatch = {dispatch} required />
+            <Input id = "name" type = "text" label = "Name" icon = {faFeather} input = {state.name} dispatch = {dispatch} required />
+            <Input id = "birthday" type = "date" label = "Birthday" icon = {faCalendar} input = {state.birthday} dispatch = {dispatch} required />
+            <Input id = "email" type = "email" label = "Email" icon = {faEnvelope} input = {state.email} dispatch = {dispatch} required />
+            <Input id = "phone" type = "tel" label = "Phone" icon = {faPhone} input = {state.phone} dispatch = {dispatch} />
             <Button type = "submit" className = "bg-primary text-white h-[2.6rem]" icon = {faIdCard}>
                Submit
             </Button>

@@ -61,7 +61,7 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
          newDictionary[newOption.id] = newOption;
 
          dispatch({
-            type: "updateInput",
+            type: "updateState",
             value: {
                ...input,
                data: {
@@ -107,7 +107,7 @@ function TagColorPicker(props: TagColorPickerProps) {
    const handleChangeColor = useCallback((color: string) => {
       // Update editing color value for the current tag
       dispatch({
-         type: "updateInputs",
+         type: "updateStates",
          value: {
             ...state,
             tagsColor: {
@@ -159,7 +159,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
       if (response.status !== "Success") {
          // Add respective errors, if any
          dispatch({
-            type: "updateInputs",
+            type: "updateStates",
             value: {
                ...state,
 
@@ -171,7 +171,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
                   ...state.tagsColor,
                   error: response.body.errors["color"] ?? null
                }
-               
+
 
             }
          });
@@ -197,7 +197,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
          }
 
          dispatch({
-            type: "updateInputs",
+            type: "updateStates",
             value: {
                ...state,
                tags: {
@@ -209,7 +209,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
                      dictionary: newDictionary
                   }
                }
-            },
+            }
          });
       }
 
@@ -241,7 +241,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
             {/* Potential error message for invalid color passed to tag form submission from frontend */}
             {state.tagsColor.error !== null &&
                <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                  <p className = "text-red-500 font-bold input-error"> {state.tagsColor.error[0]} </p>
+                  <p className = "text-red-500 font-bold input-error"> {state.tagsColor.error} </p>
                </div>
             }
          </div>
@@ -277,7 +277,7 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
    // Handle adding or removing a selected tag
    const handleSelectWorkoutTag = useCallback((adding: boolean) => {
       dispatch({
-         type: "updateInput",
+         type: "updateState",
          value: {
             ...input,
             data: {
@@ -293,7 +293,7 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
    const handleInitializeTagForm = useCallback(() => {
       // Update edit tag information state
       dispatch({
-         type: "updateInputs",
+         type: "updateStates",
          value: {
             ...state,
             tagsTitle: {

@@ -98,7 +98,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
 
          // Dispatch the new state with updated workouts
          dispatch({
-            type: "updateInput",
+            type: "updateState",
             value: {
                ...state.workouts,
                data: {
@@ -204,10 +204,11 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   onClick = {() => reset(false)}
                   className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
-               <Input input = {state.title} label = "Title" icon = {faSignature} dispatch = {dispatch} />
-               <Input input = {state.date} label = "Date" icon = {faCalendar} dispatch = {dispatch} />
+               <Input id = "title" type = "text" label = "Title" icon = {faSignature} input = {state.title} dispatch = {dispatch} autoFocus required />
+               <Input id = "date" type = "date" label = "Title" icon = {faCalendar} input = {state.date} dispatch = {dispatch} autoFocus required />
+
                <TagSelection input = {state.tags} label = "Tags " dispatch = {dispatch} state = {state} />
-               <TextArea input = {state.description} label = "Description" icon = {faBook} dispatch = {dispatch} />
+               <TextArea id = "description" type = "text" label = "Description" icon = {faBook} input = {state.description} dispatch = {dispatch} />
                <ImageSelection input = {state.image} label = "URL" icon = {faLink} dispatch = {dispatch} />
                {
                   workout !== undefined && editingWorkout !== undefined && (
@@ -266,7 +267,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                </Button>
                {
                   editingWorkout !== undefined && (
-                     <Exercises workout = {editingWorkout} state = {state} dispatch = {dispatch} setEditingWorkout = {setEditingWorkout} />
+                     <Exercises workout = {editingWorkout} globalState = {state} globalDispatch = {dispatch} setEditingWorkout = {setEditingWorkout} />
                   )
                }
             </div>

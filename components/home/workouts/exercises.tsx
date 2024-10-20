@@ -2,10 +2,10 @@
 import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import TextArea from "@/components/global/textarea";
-import { VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/state";
+import { formReducer, VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
 import { faClock, faCloudArrowUp, faFeather, faHashtag, faPencil, faPlus, faRotateLeft, faTrash, faWeight } from "@fortawesome/free-solid-svg-icons";
-import { Dispatch, useCallback, useContext, useState } from "react";
+import { Dispatch, useCallback, useContext, useReducer, useState } from "react";
 import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises, addExerciseSet } from "@/lib/workouts/exercises";
 import { NotificationContext } from "@/app/layout";
 import {
@@ -78,18 +78,9 @@ const exercise: VitalityState = {
       error: null,
       data: {}
    }
-}
+};
 
-interface ExerciseInputProps {
-   workout: Workout;
-   state: VitalityState;
-   dispatch: Dispatch<VitalityAction<any>>;
-   onBlur?: () => void;
-   onWorkoutSave?: (_exercises: Exercise[]) => void;
-   setEditingWorkout: (_workout: Workout) => void;
-}
-
-function NewExerciseInput(props: ExerciseInputProps): JSX.Element {
+function NewExerciseInput(props: ExerciseProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
    const { workout, state, dispatch, onWorkoutSave } = props;
 
@@ -147,8 +138,7 @@ function NewExerciseInput(props: ExerciseInputProps): JSX.Element {
    );
 }
 
-interface SetProps extends ExerciseInputProps {
-   exercise: Exercise;
+interface SetProps extends ExerciseProps {
    set: ExerciseSet | undefined;
 }
 
@@ -325,8 +315,10 @@ function SetContainer(props: SetProps): JSX.Element {
    );
 }
 
-interface ExerciseProps extends ExerciseInputProps {
+interface ExerciseProps extends ExercisesProps {
    exercise: Exercise;
+   localState: VitalityState;
+   localDispatch: Dispatch<VitalityAction<any>>;
 }
 
 function ExerciseContainer(props: ExerciseProps): JSX.Element {
@@ -373,7 +365,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       } else {
          // Add error message
          dispatch({
-            type: "updateInput",
+            type: "updateState",
             value: {
                ...state.exerciseTitle,
                error: [response.body.message]
@@ -402,7 +394,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
    const handleInitializeEditExerciseName = useCallback(() => {
       dispatch({
-         type: "updateInput",
+         type: "updateState",
          value: {
             ...state.exerciseTitle,
             value: exercise.title,
@@ -469,7 +461,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
             onClick = {(event) => {
                event.stopPropagation();
                dispatch({
-                  type: "updateInput",
+                  type: "updateState",
                   value: {
                      ...state.exerciseId,
                      value: exercise.id,
@@ -487,11 +479,23 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    );
 }
 
-export default function Exercises(props: ExerciseInputProps): JSX.Element {
-   const { workout, state, dispatch, setEditingWorkout } = props;
-   const { id, edit } = state.exerciseTitle.data;
+interface ExercisesProps {
+   workout: Workout;
+   globalState: VitalityState;
+   globalDispatch: Dispatch<VitalityAction<any>>;
+   onBlur?: () => void;
+   onWorkoutSave?: (_exercises: Exercise[]) => void;
+   setEditingWorkout: (_workout: Workout) => void;
+}
+
+export default function Exercises(props: ExercisesProps): JSX.Element {
+   const { workout, globalState, globalDispatch, setEditingWorkout } = props;
    const { updateNotification } = useContext(NotificationContext);
+   const [localState, localDispatch] = useReducer(formReducer, exercise);
    const [addExercise, setAddExercise] = useState(false);
+   const id = state.exerciseTitle.data.id;
+   const edit = state.exerciseTitle.data.id;
+
    const sensors = useSensors(
       useSensor(PointerSensor),
       useSensor(KeyboardSensor, {
@@ -503,7 +507,7 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
 
    const handleInitializeNewExerciseInput = useCallback(() => {
       dispatch({
-         type: "updateInput",
+         type: "updateState",
          value: {
             ...state.exerciseTitle,
             value: "",
@@ -526,10 +530,10 @@ export default function Exercises(props: ExerciseInputProps): JSX.Element {
          // Update front-end state on success
          const newWorkouts: Workout[] = [...state.workouts.value].map((w) => w.id !== workout.id ? w : workout);
 
-         dispatch({
-            type: "updateInput",
+         globalDispatch({
+            type: "updateState",
             value: {
-               ...state.workouts,
+               ...globalState.workouts,
                value: newWorkouts
             }
          });

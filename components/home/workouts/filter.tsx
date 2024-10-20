@@ -172,7 +172,7 @@ export function FilterByDate(props: FilterProps): JSX.Element {
       if (filteredWorkouts !== null) {
          // Update filtered state
          dispatch({
-            type: "updateInput",
+            type: "updateState",
             value: {
                ...state.workouts,
                data: {
@@ -251,7 +251,7 @@ export function FilterByTags(props: FilterProps): JSX.Element {
    const handleInitializeFilteredTags = useCallback(() => {
       // Selected tags are applied from prior filter form selection
       dispatch({
-         type: "updateInput",
+         type: "updateState",
          value: {
             ...state.tags,
             data: {
@@ -269,7 +269,7 @@ export function FilterByTags(props: FilterProps): JSX.Element {
       if (filteredWorkouts !== null) {
          // Update filtered state
          dispatch({
-            type: "updateInput",
+            type: "updateState",
             value: {
                ...state.workouts,
                data: {
@@ -282,7 +282,7 @@ export function FilterByTags(props: FilterProps): JSX.Element {
 
          // Cache filtered tags selection
          dispatch({
-            type: "updateInput",
+            type: "updateState",
             value: {
                ...state.tags,
                data: {

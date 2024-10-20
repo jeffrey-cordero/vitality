@@ -1,25 +1,32 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
-import { ChangeEvent, Dispatch, useCallback, useRef } from "react";
+import { ChangeEvent, Dispatch, useCallback, useEffect, useRef } from "react";
 import { faEye, faEyeSlash, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { VitalityAction, VitalityState, VitalityInputState } from "@/lib/global/state";
+import { VitalityAction, VitalityInputState } from "@/lib/global/state";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
+   type: string;
+   id: string;
    label: string;
-   icon?: IconProp;
    input: VitalityInputState;
    dispatch: Dispatch<VitalityAction<any>>;
+   icon?: IconProp;
    onBlur?: () => void;
-   state?: VitalityState;
-   data?: { [key: string]: any };
 }
 
 export default function Input({ ...props }: VitalityInputProps): JSX.Element {
-   const { label, icon, placeholder, input, dispatch, onChange } = props;
+   const { id, label, icon, placeholder, className, autoFocus, onChange, onBlur, required, input, dispatch } = props;
+   const type = input.data.type ?? props.type;
    const inputRef = useRef<HTMLInputElement>(null);
    const passwordButton = useRef<SVGSVGElement | null>(null);
+
+   useEffect(() => {
+      if (inputRef.current && autoFocus) {
+         inputRef.current.focus();
+      }
+   }, [autoFocus]);
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
       if (input.data.handlesChanges !== undefined) {
@@ -28,42 +35,52 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
       } else {
          // Simple state
          dispatch({
-            type: "updateInput",
+            type: "updateState",
             value: {
-               ...input,
-               value: event.target.value,
-               error: null
+               id: id,
+               input: {
+                  ...input,
+                  value: event.target.value,
+                  error: null
+               }
             }
          });
       }
-   }, [dispatch, input, onChange]);
+   }, [dispatch, input, id, onChange]);
 
    const handlePasswordIconClick = useCallback(() => {
       if (passwordButton.current !== null) {
          inputRef.current?.focus();
 
-         if (input.type === "password") {
+         if (type === "password") {
             passwordButton.current.classList.add("text-primary");
          } else {
             passwordButton.current.classList.remove("text-primary");
 
          }
-
          dispatch({
-            type: "updateInput",
+            type: "updateState",
             value: {
-               ...input,
-               type: input.type === "password" ? "text" : "password"
+               id: id,
+               input: {
+                  ...input,
+                  data: {
+                     ...input.data,
+                     type: type === "password" ? "text" : "password"
+                  }
+               }
             }
          });
+
+
       }
-   }, [dispatch, input]);
+   }, [dispatch, input, id, type]);
 
    return (
       <div className = "relative">
          <input
-            type = {input.type ?? ""}
-            id = {input.id}
+            id = {id}
+            type = {type}
             value = {input.value}
             ref = {inputRef}
             placeholder = {placeholder ?? ""}
@@ -71,14 +88,14 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
                {
                   "border-gray-200 border-[1.5px]": input.error === null,
                   "border-red-500 border-[1.5px]": input.error !== null,
-                  "focus:border-gray-200 focus:ring-gray-200": props.onBlur
-               }, props.className)}
+                  "focus:border-gray-200 focus:ring-gray-200": onBlur
+               }, className)}
             onChange = {(event: ChangeEvent<HTMLInputElement>) => handleInputChange(event)}
          />
-         {(input.type === "password" || passwordButton.current !== null) &&
-            <Button type = "button" className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
+         {(type === "password" || passwordButton.current !== null) &&
+            <Button tabIndex={-1} type = "button" className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
                <FontAwesomeIcon
-                  icon = {input.type == "password" ? faEye : faEyeSlash}
+                  icon = {type == "password" ? faEye : faEyeSlash}
                   className = "flex-shrink-0 size-3.5 password-icon"
                   ref = {passwordButton}
                   onClick = {handlePasswordIconClick} />
@@ -87,7 +104,7 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
          {
             input.data.validIcon !== undefined &&
             (input.data.validIcon || !(input.data.validIcon !== undefined) && input.error != null) && (
-               <Button type = "button" className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
+               <Button tabIndex={-1} type = "button" className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
                   <FontAwesomeIcon
                      icon = {input.data.validIcon ? faCircleCheck : faCircleXmark}
                      className = {clsx("flex-shrink-0 size-3.5 password-icon", {
@@ -99,26 +116,29 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             )
          }
          <label
-            htmlFor = {input.id}
-            className = {clsx("absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-gray-500 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500", {
-               "font-bold": label.includes("*")
-            })}>
+            htmlFor = {id}
+            className = {clsx(
+               "absolute top-0 start-0 p-4 h-full text-sm text-black truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-gray-500 peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-black peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500",
+               {
+                  "font-bold": required
+               }
+            )}>
             {icon && <FontAwesomeIcon icon = {icon} />} {label}
          </label>
          {input.error !== null &&
             // Display current errors, if any
             <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-               <p className = "text-red-500 font-bold input-error"> {input.error[0]} </p>
+               <p className = "text-red-500 font-bold input-error"> {input.error} </p>
             </div>
          }
          {
-            props.onBlur && (
+            onBlur && (
                // Close icon for accessibility purposes when onBlur is defined
                <Button type = "button" className = "absolute top-[-20px] right-[-30px] z-50 p-3.5 rounded-e-md">
                   <FontAwesomeIcon
                      icon = {faCircleXmark}
                      className = "cursor-pointer flex-shrink-0 size-3.5 text-red-500 text-md"
-                     onClick = {props.onBlur} />
+                     onClick = {onBlur} />
                </Button>
             )
          }
