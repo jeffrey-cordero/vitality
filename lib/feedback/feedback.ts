@@ -37,7 +37,7 @@ export async function sendFeedback(
    try {
       // Add new feedback into the database for further improvement of the application
       await prisma.feedback.create({
-         data: null
+         data: feedback
       });
 
       return sendSuccessMessage("Successfully received your feedback!", null);

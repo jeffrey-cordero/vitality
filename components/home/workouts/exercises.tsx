@@ -2,7 +2,7 @@
 import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import TextArea from "@/components/global/textarea";
-import { formReducer, VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/state";
+import { formReducer, VitalityAction, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
 import { faClock, faCloudArrowUp, faFeather, faHashtag, faPencil, faPlus, faRotateLeft, faTrash, faWeight } from "@fortawesome/free-solid-svg-icons";
 import { Dispatch, useCallback, useContext, useReducer, useState } from "react";
@@ -107,7 +107,7 @@ function NewExerciseInput(props: ExerciseProps): JSX.Element {
          }
 
          dispatch({
-            type: "displayErrors",
+            type: "updateErrors",
             value: response
          });
       }
@@ -188,7 +188,7 @@ function SetContainer(props: SetProps): JSX.Element {
       } else if (response.status === "Error" && !(Object.keys(response.body.errors).length === 0)) {
          // Display errors
          dispatch({
-            type: "displayErrors",
+            type: "updateErrors",
             value: response
          });
       } else {
@@ -479,13 +479,10 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    );
 }
 
-interface ExercisesProps {
+interface ExercisesProps extends VitalityProps {
    workout: Workout;
-   globalState: VitalityState;
-   globalDispatch: Dispatch<VitalityAction<any>>;
    onBlur?: () => void;
    onWorkoutSave?: (_exercises: Exercise[]) => void;
-   setEditingWorkout: (_workout: Workout) => void;
 }
 
 export default function Exercises(props: ExercisesProps): JSX.Element {
@@ -548,7 +545,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
       } else if (response.status === "Error") {
          // Display errors
          dispatch({
-            type: "displayErrors",
+            type: "updateErrors",
             value: response
          });
       } else {

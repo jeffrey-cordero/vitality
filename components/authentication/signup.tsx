@@ -6,7 +6,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faIdCard, faDoorOpen, faFeather, faKey, faEnvelope, faPhone, faUserSecret, faCalendar } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/state";
+import { VitalityState, formReducer, VitalityResponse, useHandleResponse } from "@/lib/global/state";
 import { login } from "@/lib/authentication/login";
 import { signup, Registration } from "@/lib/authentication/signup";
 import { NotificationContext } from "@/app/layout";
@@ -67,8 +67,8 @@ function Form(): JSX.Element {
          };
          const response: VitalityResponse<null> = await signup(registration);
 
-         if (response.status !== "Error") {
-            // Display the success or failure notification to the user
+         const successMethod = () => {
+            // Display login notification
             updateNotification({
                status: response.status,
                message: response.body.message,
@@ -92,12 +92,9 @@ function Form(): JSX.Element {
                   </Link>
                )
             });
-         } else {
-            dispatch({
-               type: "displayErrors",
-               value: response
-            });
-         }
+         };
+
+         useHandleResponse(dispatch, response, successMethod, updateNotification);
       } catch (error) {
          console.error(error);
       }

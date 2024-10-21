@@ -3,7 +3,7 @@ import Image from "next/image";
 import WorkoutForm from "./form";
 import Loading from "@/components/global/loading";
 import { Dispatch } from "react";
-import { VitalityAction, VitalityState } from "@/lib/global/state";
+import { VitalityAction, VitalityProps, VitalityState } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
 import { getWorkoutDate } from "@/lib/workouts/shared";
 
@@ -45,10 +45,8 @@ function WorkoutCard(props: WorkoutCardProps): JSX.Element {
    );
 };
 
-interface WorkoutCardsProps {
+interface WorkoutCardsProps extends VitalityProps {
    workouts: Workout[];
-   state: VitalityState;
-   dispatch: Dispatch<VitalityAction<Workout | null>>;
    reset: (_filterReset: boolean) => void;
 }
 

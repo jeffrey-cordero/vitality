@@ -6,7 +6,7 @@ import Input from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faKey, faUnlockKeyhole, faUserSecret } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/state";
+import { VitalityState, formReducer, VitalityResponse, useHandleResponse } from "@/lib/global/state";
 import { login, Credentials } from "@/lib/authentication/login";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 
@@ -36,25 +36,18 @@ export default function Login(): JSX.Element {
       event.preventDefault();
 
       try {
-         const payload: Credentials = {
+         const credentials: Credentials = {
             username: state.username.value.trim(),
             password: state.password.value.trim()
          };
 
-         const response: VitalityResponse<null> = await login(payload);
+         const response: VitalityResponse<null> = await login(credentials);
 
-         if (response.status === "Error") {
-            dispatch({
-               type: "displayErrors",
-               value: response
-            });
-         } else if (response.status === "Failure") {
-            // Display the failure notification to the user
-            updateNotification({
-               status: response.status,
-               message: response.body.message
-            });
-         }
+         const successMethod = () => {
+            window.location.reload();
+         };
+
+         useHandleResponse(dispatch, response, successMethod, updateNotification);
       } catch (error) {
          console.error(error);
       }

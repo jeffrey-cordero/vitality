@@ -104,13 +104,13 @@ export function getFilteredDateWorkouts(props: FilterProps): Workout[] | null {
    if (Object.keys(errors).length > 0) {
       // Display all errors
       dispatch({
-         type: "displayErrors",
+         type: "updateErrors",
          value: sendErrorMessage<null>("Error", "Invalid Date filter(s)", null, errors)
       });
    } else {
       // Remove all errors, if any, and apply filter all available workouts
       dispatch({
-         type: "displayErrors",
+         type: "updateErrors",
          value: sendSuccessMessage<null>("Success", null)
       });
 

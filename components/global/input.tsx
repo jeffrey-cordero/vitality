@@ -93,7 +93,7 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             onChange = {(event: ChangeEvent<HTMLInputElement>) => handleInputChange(event)}
          />
          {(type === "password" || passwordButton.current !== null) &&
-            <Button tabIndex={-1} type = "button" className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
+            <Button tabIndex = {-1} type = "button" className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
                <FontAwesomeIcon
                   icon = {type == "password" ? faEye : faEyeSlash}
                   className = "flex-shrink-0 size-3.5 password-icon"
@@ -104,7 +104,7 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
          {
             input.data.validIcon !== undefined &&
             (input.data.validIcon || !(input.data.validIcon !== undefined) && input.error != null) && (
-               <Button tabIndex={-1} type = "button" className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
+               <Button tabIndex = {-1} type = "button" className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
                   <FontAwesomeIcon
                      icon = {input.data.validIcon ? faCircleCheck : faCircleXmark}
                      className = {clsx("flex-shrink-0 size-3.5 password-icon", {

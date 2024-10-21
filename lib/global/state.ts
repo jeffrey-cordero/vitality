@@ -1,4 +1,6 @@
+import { NotificationProps } from "@/components/global/notification";
 import { produce } from "immer";
+import { Dispatch } from "react";
 
 export interface VitalityInputState {
   value: any;
@@ -8,6 +10,11 @@ export interface VitalityInputState {
 
 export type VitalityState = { [key: string]: VitalityInputState };
 export type VitalityUpdateState = { id: string; input: VitalityInputState };
+
+export interface VitalityProps {
+   globalState: VitalityState;
+   globalDispatch: Dispatch<VitalityAction<any>>;
+}
 
 export interface VitalityResponse<T> {
   status: "Success" | "Error" | "Failure";
@@ -30,7 +37,7 @@ export interface VitalityAction<T> {
     | "initializeState"
     | "updateState"
     | "updateStates"
-    | "displayErrors"
+    | "updateErrors"
     | "resetState";
   value:
     | VitalityState
@@ -62,7 +69,7 @@ export function formReducer(
       case "updateStates":
          Object.assign(draft, action.value as VitalityState);
          break;
-      case "displayErrors":
+      case "updateErrors":
          const response = action.value as VitalityResponse<any>;
 
          for (const key in state) {
@@ -113,4 +120,28 @@ export function sendErrorMessage<T>(
          errors: errors ?? {}
       }
    };
+}
+
+export function useHandleResponse(
+   dispatch: Dispatch<VitalityAction<any>>,
+   response: VitalityResponse<any>,
+   successMethod: () => void,
+   updateNotification: (_notification: NotificationProps) => void
+): void {
+   if (response.status === "Success") {
+      // Call success method appropriately
+      successMethod.call(null);
+   } else if (response.status === "Error") {
+      // Update state to display all errors relative to the response
+      dispatch({
+         type: "updateErrors",
+         value: response
+      });
+   } else {
+      // Display failure notification to the user
+      updateNotification({
+         status: response.status,
+         message: response.body.message
+      });
+   }
 }

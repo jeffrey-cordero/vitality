@@ -1,16 +1,14 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
 import Select from "@/components/global/select";
-import { VitalityAction, VitalityState } from "@/lib/global/state";
+import { VitalityAction, VitalityProps, VitalityState } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
 import { faCircleChevronLeft, faCircleChevronRight, faTabletScreenButton } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ChangeEvent, Dispatch, useCallback } from "react";
 
-interface PaginationProps {
+interface PaginationProps extends VitalityProps {
    workouts: Workout[];
-   state: VitalityState;
-   dispatch: Dispatch<VitalityAction<Workout>>;
 }
 
 export default function Pagination(props: PaginationProps): JSX.Element {

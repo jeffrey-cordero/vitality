@@ -46,7 +46,7 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
       if (!(response.status === "Success")) {
          // Display the respective error message
          dispatch({
-            type: "displayErrors",
+            type: "updateErrors",
             value: response
          });
       } else {
@@ -357,7 +357,7 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
 };
 
 export interface TagSelectionProps extends VitalityInputProps {
-   state: VitalityState;
+   globalState: VitalityState;
 }
 
 export function TagSelection(props: TagSelectionProps): JSX.Element {

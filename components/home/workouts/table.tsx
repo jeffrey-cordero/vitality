@@ -3,7 +3,7 @@ import Image from "next/image";
 import Button from "@/components/global/button";
 import WorkoutForm from "@/components/home/workouts/form";
 import Loading from "@/components/global/loading";
-import { VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/state";
+import { VitalityAction, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { removeWorkouts, Workout } from "@/lib/workouts/workouts";
@@ -214,10 +214,8 @@ function WorkoutRow(props: WorkoutRowProps) {
    );
 }
 
-interface WorkoutTableProps {
+interface WorkoutTableProps extends VitalityProps {
    workouts: Workout[];
-   state: VitalityState;
-   dispatch: Dispatch<VitalityAction<Workout | null>>;
    reset: (_filterReset: boolean) => void;
 }
 

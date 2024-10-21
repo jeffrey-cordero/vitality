@@ -6,7 +6,7 @@ import Input from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faBook, faEnvelope, faFeather } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { VitalityState, formReducer, VitalityResponse } from "@/lib/global/state";
+import { VitalityState, formReducer, VitalityResponse, useHandleResponse } from "@/lib/global/state";
 import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
 import { NotificationContext } from "@/app/layout";
 
@@ -41,20 +41,18 @@ function Form(): JSX.Element {
             email: state.email.value.trim(),
             message: state.message.value.trim()
          };
+
          const response: VitalityResponse<null> = await sendFeedback(payload);
 
-         if (response.status !== "Error") {
-            // Display the success or failure notification to the user
+         const successMethod = () => {
+            // Display successful response notification
             updateNotification({
                status: response.status,
                message: response.body.message
             });
-         } else {
-            dispatch({
-               type: "displayErrors",
-               value: response
-            });
-         }
+         };
+
+         useHandleResponse(dispatch, response, successMethod, updateNotification);
       } catch (error) {
          console.error(error);
       }
