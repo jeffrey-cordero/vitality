@@ -71,7 +71,6 @@ function WorkoutRow(props: WorkoutRowProps) {
          globalDispatch({
             type: "updateStates",
             value: {
-               ...globalState,
                workouts: {
                   ...globalState.workouts,
                   value: newWorkouts,
@@ -130,7 +129,9 @@ function WorkoutRow(props: WorkoutRowProps) {
                />
             </div>
          </td>
-         <th scope = "row" className = "px-6 py-4 font-normal whitespace-nowrap overflow-hidden text-ellipsis max-w-[10rem]">
+         <th
+            scope = "row"
+            className = "px-6 py-4 font-normal whitespace-nowrap overflow-hidden text-ellipsis max-w-[10rem]">
             {workout.title}
          </th>
          <td className = "px-6 py-4">
@@ -141,7 +142,9 @@ function WorkoutRow(props: WorkoutRowProps) {
                {workoutTags}
             </div>
          </td>
-         <th scope = "row" className = "w-[8rem] h-[8rem] p-3 font-normal whitespace-nowrap overflow-hidden text-ellipsis">
+         <th
+            scope = "row"
+            className = "w-[8rem] h-[8rem] p-3 font-normal whitespace-nowrap overflow-hidden text-ellipsis">
             {
                workout.image ? (
                   <Image
@@ -192,7 +195,9 @@ function WorkoutRow(props: WorkoutRowProps) {
                      }
                   >
                      <div className = "flex flex-col justify-center items-center gap-4">
-                        <FontAwesomeIcon icon = {faTrashCan} className = "text-red-500 text-4xl" />
+                        <FontAwesomeIcon
+                           icon = {faTrashCan}
+                           className = "text-red-500 text-4xl" />
                         <p className = "font-bold">
                            {
 
@@ -286,7 +291,9 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
                   <table className = "w-full text-sm text-left rtl:text-right">
                      <thead className = "text-xs uppercase bg-gray-50">
                         <tr>
-                           <th scope = "col" className = "p-4">
+                           <th
+                              scope = "col"
+                              className = "p-4">
                               <div className = "flex items-center">
                                  <input
                                     id = "workout-select-all"
@@ -297,25 +304,39 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
                                  />
                               </div>
                            </th>
-                           <th scope = "col" className = "text-base p-6">
+                           <th
+                              scope = "col"
+                              className = "text-base p-6">
                               Title
                            </th>
-                           <th scope = "col" className = "text-base p-6">
+                           <th
+                              scope = "col"
+                              className = "text-base p-6">
                               Date
                            </th>
-                           <th scope = "col" className = "text-base p-6">
+                           <th
+                              scope = "col"
+                              className = "text-base p-6">
                               Tags
                            </th>
-                           <th scope = "col" className = "text-base text-center p-6">
+                           <th
+                              scope = "col"
+                              className = "text-base text-center p-6">
                               Image
                            </th>
-                           <th scope = "col" className = "text-base p-6">
+                           <th
+                              scope = "col"
+                              className = "text-base p-6">
                            </th>
                         </tr>
                      </thead>
                      <tbody>
                         {workouts.map((workout: Workout) => (
-                           <WorkoutRow workout = {workout} globalState = {globalState} globalDispatch = {globalDispatch} key = {workout.id} />
+                           <WorkoutRow
+                              workout = {workout}
+                              globalState = {globalState}
+                              globalDispatch = {globalDispatch}
+                              key = {workout.id} />
                         ))}
                      </tbody>
                   </table>

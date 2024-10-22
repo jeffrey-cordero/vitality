@@ -125,7 +125,12 @@ function NewExerciseInput(props: ExerciseProps): JSX.Element {
 
    return (
       <div className = "w-full mb-2 mx-auto text-left" >
-         <Input input = {state.exerciseTitle} label = "Title" icon = {faFeather} dispatch = {dispatch} onBlur = {props.onBlur} />
+         <Input
+            input = {state.exerciseTitle}
+            label = "Title"
+            icon = {faFeather}
+            dispatch = {dispatch}
+            onBlur = {props.onBlur} />
          <Button
             type = "button"
             className = "w-full bg-green-600 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
@@ -254,14 +259,38 @@ function SetContainer(props: SetProps): JSX.Element {
    return (
       displayEditInputs ? (
          <li className = "flex flex-col justify-start gap-2 w-full mx-auto pt-2 text-left">
-            <Input input = {state.weight} label = "Weight" icon = {faWeight} dispatch = {dispatch} />
-            <Input input = {state.repetitions} label = "Repetitions" icon = {faHashtag} dispatch = {dispatch} />
+            <Input
+               input = {state.weight}
+               label = "Weight"
+               icon = {faWeight}
+               dispatch = {dispatch} />
+            <Input
+               input = {state.repetitions}
+               label = "Repetitions"
+               icon = {faHashtag}
+               dispatch = {dispatch} />
             <div className = "flex justify-start items-center gap-2">
-               <Input input = {state.hours} label = "Hours" icon = {faClock} dispatch = {dispatch} />
-               <Input input = {state.minutes} label = "Minutes" icon = {faClock} dispatch = {dispatch} />
-               <Input input = {state.seconds} label = "Seconds" icon = {faClock} dispatch = {dispatch} />
+               <Input
+                  input = {state.hours}
+                  label = "Hours"
+                  icon = {faClock}
+                  dispatch = {dispatch} />
+               <Input
+                  input = {state.minutes}
+                  label = "Minutes"
+                  icon = {faClock}
+                  dispatch = {dispatch} />
+               <Input
+                  input = {state.seconds}
+                  label = "Seconds"
+                  icon = {faClock}
+                  dispatch = {dispatch} />
             </div>
-            <TextArea input = {state.text} label = "Text" icon = {faPencil} dispatch = {dispatch} />
+            <TextArea
+               input = {state.text}
+               label = "Text"
+               icon = {faPencil}
+               dispatch = {dispatch} />
             <Button
                type = "button"
                className = "w-full bg-grey-200 mb-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
@@ -317,8 +346,8 @@ function SetContainer(props: SetProps): JSX.Element {
 
 interface ExerciseProps extends ExercisesProps {
    exercise: Exercise;
-   localState: VitalityState;
-   localDispatch: Dispatch<VitalityAction<any>>;
+   // localState: VitalityState;
+   // localDispatch: Dispatch<VitalityAction<any>>;
 }
 
 function ExerciseContainer(props: ExerciseProps): JSX.Element {
@@ -420,7 +449,13 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          {
             displayEditTitle ? (
                <div>
-                  <Input className = "mb-2" input = {state.exerciseTitle} label = "Title" icon = {faFeather} dispatch = {dispatch} onBlur = {() => setEditTitle(false)} />
+                  <Input
+                     className = "mb-2"
+                     input = {state.exerciseTitle}
+                     label = "Title"
+                     icon = {faFeather}
+                     dispatch = {dispatch}
+                     onBlur = {() => setEditTitle(false)} />
                   <Button
                      type = "button"
                      className = "w-full bg-green-600 text-white text-md  mt-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
@@ -439,18 +474,26 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   </Button>
                </div>
             ) : (
-               <h1 onDoubleClick = {handleInitializeEditExerciseName} className = "text-xl mb-2">{exercise.title}</h1>
+               <h1
+                  onDoubleClick = {handleInitializeEditExerciseName}
+                  className = "text-xl mb-2">{exercise.title}</h1>
             )
          }
          <ul className = "list-disc text-black flex flex-col gap-2">
             {
                exercise.sets.map((set: ExerciseSet) => {
-                  return (<SetContainer {...props} set = {set} key = {set.id} />);
+                  return (<SetContainer
+                     {...props}
+                     set = {set}
+                     key = {set.id} />);
                })
             }
             {
                addSet && (
-                  <SetContainer {...props} set = {undefined} onBlur = {() => setAddSet(false)} />
+                  <SetContainer
+                     {...props}
+                     set = {undefined}
+                     onBlur = {() => setAddSet(false)} />
                )
             }
          </ul>
@@ -599,7 +642,8 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
       <div className = "w-full mx-auto text-center font-bold flex flex-col justify-center items-center">
          {
             displayNewTitle &&
-            <NewExerciseInput {...props}
+            <NewExerciseInput
+               {...props}
                onWorkoutSave = {handleSaveWorkout}
                onBlur = {() => {
                   setAddExercise(false);
@@ -620,12 +664,18 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
             collisionDetection = {closestCenter}
             onDragEnd = {handleDragEnd}
          >
-            <SortableContext items = {exercises.map((exercise) => exercise.id)} strategy = {verticalListSortingStrategy}>
+            <SortableContext
+               items = {exercises.map((exercise) => exercise.id)}
+               strategy = {verticalListSortingStrategy}>
                <ol className = "w-full mx-auto list-decimal pl-6 mt-2">
                   {
                      workout.exercises.map((exercise: Exercise) => {
                         return (
-                           <ExerciseContainer {...props} exercise = {exercise} key = {exercise.id} onWorkoutSave = {handleSaveWorkout} />
+                           <ExerciseContainer
+                              {...props}
+                              exercise = {exercise}
+                              key = {exercise.id}
+                              onWorkoutSave = {handleSaveWorkout} />
                         );
                      })
 

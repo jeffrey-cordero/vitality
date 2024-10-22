@@ -55,9 +55,13 @@ export default function Login(): JSX.Element {
 
    return (
       <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
-         <Heading title = "Log In" description = "Enter valid credentials to enter" />
+         <Heading
+            title = "Log In"
+            description = "Enter valid credentials to enter" />
          <div className = "w-10/12 lg:w-1/2 mx-auto">
-            <form className = "relative w-full flex flex-col justify-center align-center gap-3" onSubmit = {handleSubmit}>
+            <form
+               className = "relative w-full flex flex-col justify-center align-center gap-3"
+               onSubmit = {handleSubmit}>
                <FontAwesomeIcon
                   icon = {faArrowRotateLeft}
                   onClick = {() => dispatch({
@@ -65,13 +69,33 @@ export default function Login(): JSX.Element {
                   })}
                   className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
-               <Input id = "username" type = "text" label = "Username" icon = {faUserSecret} input = {state.username} dispatch = {dispatch} autoFocus required />
-               <Input id = "password" type = "password" label = "Password" icon = {faKey} input = {state.password} dispatch = {dispatch} required />
-               <Button type = "submit" className = "bg-primary text-white h-[2.6rem]" icon = {faUnlockKeyhole}>
+               <Input
+                  id = "username"
+                  type = "text"
+                  label = "Username"
+                  icon = {faUserSecret}
+                  input = {state.username}
+                  dispatch = {dispatch}
+                  autoFocus
+                  required />
+               <Input
+                  id = "password"
+                  type = "password"
+                  label = "Password"
+                  icon = {faKey}
+                  input = {state.password}
+                  dispatch = {dispatch}
+                  required />
+               <Button
+                  type = "submit"
+                  className = "bg-primary text-white h-[2.6rem]"
+                  icon = {faUnlockKeyhole}>
                Submit
                </Button>
             </form>
-            <p className = "mt-4">Don&apos;t have an account? <Link href = "/signup" className = "text-primary font-bold">Register</Link></p>
+            <p className = "mt-4">Don&apos;t have an account? <Link
+               href = "/signup"
+               className = "text-primary font-bold">Register</Link></p>
          </div>
       </div>
    );

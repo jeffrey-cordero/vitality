@@ -21,6 +21,10 @@
     "space-before-function-paren": ["error", "never"],
     "object-curly-spacing": ["error", "always"],
     "react/jsx-uses-react": "error",   
-    "react/jsx-uses-vars": "error"
+    "react/jsx-uses-vars": "error",
+    "react/jsx-first-prop-new-line": [2, "multiline"],
+    "react/jsx-max-props-per-line": [2, { "maximum": 1 }],
+    "react/jsx-indent-props": [2, 3]
+    // "max-len": ["error", { "code": 80, "ignoreUrls": true }]
   }
 }

@@ -71,10 +71,34 @@ function Form(): JSX.Element {
                })}
                className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
-            <Input id = "name" type = "text" label = "Name" icon = {faFeather} input = {state.name} dispatch = {dispatch} autoFocus required />
-            <Input id = "email" type = "text" label = "Email" icon = {faEnvelope} input = {state.email} dispatch = {dispatch} required />
-            <TextArea id = "message" type = "text" label = "Message" icon = {faBook} input = {state.message} dispatch = {dispatch} required />
-            <Button type = "submit" className = "bg-primary text-white h-[2.6rem]">
+            <Input
+               id = "name"
+               type = "text"
+               label = "Name"
+               icon = {faFeather}
+               input = {state.name}
+               dispatch = {dispatch}
+               autoFocus
+               required />
+            <Input
+               id = "email"
+               type = "text"
+               label = "Email"
+               icon = {faEnvelope}
+               input = {state.email}
+               dispatch = {dispatch}
+               required />
+            <TextArea
+               id = "message"
+               type = "text"
+               label = "Message"
+               icon = {faBook}
+               input = {state.message}
+               dispatch = {dispatch}
+               required />
+            <Button
+               type = "submit"
+               className = "bg-primary text-white h-[2.6rem]">
                Submit
             </Button>
          </form>

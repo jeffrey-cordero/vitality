@@ -94,7 +94,10 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             onChange = {(event: ChangeEvent<HTMLInputElement>) => handleInputChange(event)}
          />
          {(type === "password" || passwordButton.current !== null) &&
-            <Button tabIndex = {-1} type = "button" className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
+            <Button
+               tabIndex = {-1}
+               type = "button"
+               className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
                <FontAwesomeIcon
                   icon = {type == "password" ? faEye : faEyeSlash}
                   className = "flex-shrink-0 size-3.5 password-icon"
@@ -104,7 +107,10 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
          }
          {
             input.data.valid !== undefined && (
-               <Button tabIndex = {-1} type = "button" className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
+               <Button
+                  tabIndex = {-1}
+                  type = "button"
+                  className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
                   <FontAwesomeIcon
                      icon = {input.data.valid ? faCircleCheck : faCircleXmark}
                      className = {clsx("flex-shrink-0 size-3.5 password-icon", {
@@ -134,7 +140,9 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
          {
             onBlur && (
                // Close icon for accessibility purposes when onBlur is defined
-               <Button type = "button" className = "absolute top-[-20px] right-[-30px] z-50 p-3.5 rounded-e-md">
+               <Button
+                  type = "button"
+                  className = "absolute top-[-20px] right-[-30px] z-50 p-3.5 rounded-e-md">
                   <FontAwesomeIcon
                      icon = {faCircleXmark}
                      className = "cursor-pointer flex-shrink-0 size-3.5 text-red-500 text-md"

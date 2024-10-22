@@ -18,7 +18,9 @@ const people: TestimonialProps[] = testimonialData;
 function Testimonial(props: TestimonialProps): JSX.Element {
    return (
       <div className = "flex flex-col box-border gap-1 justify-center align-center w-full min-h-[25rem] max-h-full mx-auto">
-         <FontAwesomeIcon icon = {faQuoteLeft} className = "text-4xl text-primary" />
+         <FontAwesomeIcon
+            icon = {faQuoteLeft}
+            className = "text-4xl text-primary" />
          <p className = "font-semibold text-md w-3/4 mx-auto my-4">{props.testimonial}</p>
          <div>
             <div className = "flex flex-row flex-wrap gap-3 justify-center items-center w-full mx-auto p-5">
@@ -34,10 +36,13 @@ function Testimonial(props: TestimonialProps): JSX.Element {
                   <p className = "font-semibold text-md">{props.name}</p>
                   {
                      props.stars.map((rating, index) => {
-                        return <FontAwesomeIcon key = {index} icon = {faStar} className = {clsx("text-lg my-2", {
-                           "text-yellow-500": rating,
-                           "text-slate-500": !rating
-                        })} />;
+                        return <FontAwesomeIcon
+                           key = {index}
+                           icon = {faStar}
+                           className = {clsx("text-lg my-2", {
+                              "text-yellow-500": rating,
+                              "text-slate-500": !rating
+                           })} />;
                      })
                   }
                </div>
@@ -50,7 +55,9 @@ function Testimonial(props: TestimonialProps): JSX.Element {
 export default function Testimonials(): JSX.Element {
    const testimonialElements: JSX.Element[] = people.map((person, index) => {
       return (
-         <Testimonial {...person} key = {index} />
+         <Testimonial
+            {...person}
+            key = {index} />
       );
    });
 
@@ -61,7 +68,9 @@ export default function Testimonials(): JSX.Element {
             description = "Discover the firsthand experiences of our valued users as they share insights into their fitness journey with our app"
          />
          <div className = "w-10/12 md:w-8/12 mx-auto">
-            <Carousel items = {testimonialElements} columns = {1} />
+            <Carousel
+               items = {testimonialElements}
+               columns = {1} />
          </div>
       </div>
    );

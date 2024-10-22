@@ -46,15 +46,18 @@ export default function Notification(props: NotificationProps): JSX.Element {
                ref = {notificationRef}
             >
                <div className = "text-left">
-                  <div className = {clsx("w-full border-stroke flex items-center rounded-lg border border-l-[8px] bg-white pl-4", {
-                     "border-l-green-600": props.status === "Success",
-                     "border-l-red-600": props.status !== "Success"
-                  })}>
+                  <div
+                     className = {clsx("w-full border-stroke flex items-center rounded-lg border border-l-[8px] bg-white pl-4", {
+                        "border-l-green-600": props.status === "Success",
+                        "border-l-red-600": props.status !== "Success"
+                     })}>
                      <div className = "flex items-center justify-center rounded-full">
-                        <FontAwesomeIcon icon = {icon} className = {clsx("text-3xl", {
-                           "text-green-600": props.status === "Success",
-                           "text-red-600": props.status !== "Success"
-                        })} />
+                        <FontAwesomeIcon
+                           icon = {icon}
+                           className = {clsx("text-3xl", {
+                              "text-green-600": props.status === "Success",
+                              "text-red-600": props.status !== "Success"
+                           })} />
                      </div>
                      <div className = "flex w-full items-center justify-between p-4">
                         <div>

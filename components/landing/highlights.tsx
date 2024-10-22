@@ -14,7 +14,9 @@ function Card(props: CardProps): JSX.Element {
       <div className = "flex justify-center w-[21rem] h-[26rem] max-w-[90%] text-center rounded-2xl border border-gray-200 bg-white shadow-md">
          <div className = "flex flex-col text-center justify-center items-center gap-8 px-8 text-black">
             <div>
-               <FontAwesomeIcon icon = {props.icon} className = "text-4xl text-primary" />
+               <FontAwesomeIcon
+                  icon = {props.icon}
+                  className = "text-4xl text-primary" />
                <h1 className = "font-bold text-2xl md:text-3xl text-primary mt-8">{props.title}</h1>
             </div>
             <div>

@@ -11,7 +11,7 @@ import { fetchWorkouts, Workout } from "@/lib/workouts/workouts";
 import { fetchWorkoutTags } from "@/lib/workouts/tags";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
-import { getWorkoutDate, searchForTitle } from "@/lib/workouts/shared";
+import { searchForTitle } from "@/lib/workouts/shared";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const workouts: VitalityState = {
@@ -48,23 +48,6 @@ const workouts: VitalityState = {
          handlesChanges: true
       }
    },
-   tagsTitle: {
-      value: "",
-      error: null,
-      data: {}
-   },
-   tagsColor: {
-      value: null,
-      error: null,
-      data: {
-         handlesChanges: true
-      }
-   },
-   tagsSearch: {
-      value: "",
-      error: null,
-      data: {}
-   },
    // Current editing workout
    workout: {
       value: {
@@ -98,7 +81,6 @@ const workouts: VitalityState = {
       error: null,
       data: {
          page: 0,
-         options: [5, 10, 25, 50, 100, 500, 1000],
          handlesChanges: true
       }
    },
@@ -247,7 +229,10 @@ export default function Page(): JSX.Element {
                globalState = {globalState}
                globalDispatch = {globalDispatch}
                cover = {
-                  <Button type = "button" className = "bg-primary text-white w-full h-[2.6rem] p-4" icon = {faPlus}
+                  <Button
+                     type = "button"
+                     className = "bg-primary text-white w-full h-[2.6rem] p-4"
+                     icon = {faPlus}
                      onClick = {() => {
                         globalDispatch({
                            type: "updateState",
@@ -278,7 +263,9 @@ export default function Page(): JSX.Element {
          {
             <div className = "w-full mx-auto flex flex-col justify-center items-center">
                <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 my-2">
-                  <WorkoutFiltering globalState = {globalState} globalDispatch = {globalDispatch} />
+                  <WorkoutFiltering
+                     globalState = {globalState}
+                     globalDispatch = {globalDispatch} />
                </div>
                <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 mt-2">
                   <Button
@@ -296,19 +283,27 @@ export default function Page(): JSX.Element {
                      Cards
                   </Button>
                </div>
-               <WorkoutTable workouts = {workoutsSection} globalState = {globalState} globalDispatch = {globalDispatch}  />
-               {/* {
+               {
                   view === "table" ? (
-                     <WorkoutTable workouts = {workoutsSection} globalState = {globalState} globalDispatch = {globalDispatch} reset = {handleReset} />
+                     <WorkoutTable
+                        workouts = {workoutsSection}
+                        globalState = {globalState}
+                        globalDispatch = {globalDispatch} />
                   ) : (
-                     <WorkoutCards workouts = {workoutsSection} globalState = {globalState} globalDispatch = {globalDispatch} reset = {handleReset} />
+                     <WorkoutCards
+                        workouts = {workoutsSection}
+                        globalState = {globalState}
+                        globalDispatch = {globalDispatch} />
                   )
                }
                {
                   results.length > 0 && (
-                     <Pagination workouts = {results} globalState = {globalState} globalDispatch = {globalDispatch} />
+                     <Pagination
+                        workouts = {results}
+                        globalState = {globalState}
+                        globalDispatch = {globalDispatch} />
                   )
-               } */}
+               }
             </div>
          }
       </main >

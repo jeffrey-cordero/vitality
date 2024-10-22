@@ -16,6 +16,11 @@ export interface VitalityProps {
    globalDispatch: Dispatch<VitalityAction<any>>;
 }
 
+export interface VitalityChildProps extends VitalityProps {
+   localState: VitalityState;
+   localDispatch: Dispatch<VitalityAction<any>>;
+}
+
 export interface VitalityResponse<T> {
   status: "Success" | "Error" | "Failure";
   body: {
@@ -67,7 +72,12 @@ export function formReducer(
 
             break;
          case "updateStates":
-            Object.assign(draft, action.value as VitalityState);
+            const updates = action.value as VitalityState;
+
+            for (const key in state) {
+               draft[key] = updates[key] ?? state[key];
+            }
+
             break;
          case "updateErrors":
             const response = action.value as VitalityResponse<any>;

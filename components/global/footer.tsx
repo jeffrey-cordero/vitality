@@ -11,39 +11,67 @@ export default function Footer(): JSX.Element {
                <div>
                   <ul className = "flex flex-row gap-6 text-sm font-bold">
                      <li>
-                        <Link className = "hover:text-slate-500" href = "http://localhost:3000/#">About</Link>
+                        <Link
+                           className = "hover:text-slate-500"
+                           href = "http://localhost:3000/#">About</Link>
                      </li>
                      <li>
-                        <Link className = "hover:text-slate-500" href = "http://localhost:3000/#">Privacy</Link>
+                        <Link
+                           className = "hover:text-slate-500"
+                           href = "http://localhost:3000/#">Privacy</Link>
                      </li>
                      <li>
-                        <Link className = "hover:text-slate-500" href = "http://localhost:3000/#">Policy</Link>
+                        <Link
+                           className = "hover:text-slate-500"
+                           href = "http://localhost:3000/#">Policy</Link>
                      </li>
                      <li>
-                        <Link className = "hover:text-slate-500" href = "http://localhost:3000/#">Contact</Link>
+                        <Link
+                           className = "hover:text-slate-500"
+                           href = "http://localhost:3000/#">Contact</Link>
                      </li>
                   </ul>
                </div>
                <div>
                   <ul className = "flex flex-row gap-6 text-sm font-bold">
                      <li>
-                        <Link href = "https://github.com/jeffrey-asm/vitality" target = "_blank" className = "text-black hover:text-slate-500">
-                           <FontAwesomeIcon icon = {faGithub} className = "text-2xl" />
+                        <Link
+                           href = "https://github.com/jeffrey-asm/vitality"
+                           target = "_blank"
+                           className = "text-black hover:text-slate-500">
+                           <FontAwesomeIcon
+                              icon = {faGithub}
+                              className = "text-2xl" />
                         </Link>
                      </li>
                      <li>
-                        <Link href = "https://twitter.com/" target = "_blank" className = "text-black hover:text-slate-500">
-                           <FontAwesomeIcon icon = {faXTwitter} className = "text-2xl" />
+                        <Link
+                           href = "https://twitter.com/"
+                           target = "_blank"
+                           className = "text-black hover:text-slate-500">
+                           <FontAwesomeIcon
+                              icon = {faXTwitter}
+                              className = "text-2xl" />
                         </Link>
                      </li>
                      <li>
-                        <Link href = "https://meta.com/" target = "_blank" className = "text-black hover:text-slate-500">
-                           <FontAwesomeIcon icon = {faMeta} className = "text-2xl" />
+                        <Link
+                           href = "https://meta.com/"
+                           target = "_blank"
+                           className = "text-black hover:text-slate-500">
+                           <FontAwesomeIcon
+                              icon = {faMeta}
+                              className = "text-2xl" />
                         </Link>
                      </li>
                      <li>
-                        <Link href = "https://youtube.com/" target = "_blank" className = "text-black hover:text-slate-500">
-                           <FontAwesomeIcon icon = {faYoutube} className = "text-2xl" />
+                        <Link
+                           href = "https://youtube.com/"
+                           target = "_blank"
+                           className = "text-black hover:text-slate-500">
+                           <FontAwesomeIcon
+                              icon = {faYoutube}
+                              className = "text-2xl" />
                         </Link>
                      </li>
                   </ul>

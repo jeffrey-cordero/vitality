@@ -121,12 +121,15 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
          const newWorkouts: Workout[] = updateWorkouts(globalState.workouts.value, returnedWorkout, method);
          const newFiltered: Workout[] = updateFilteredWorkouts(globalState, globalState.workouts.data.filtered, returnedWorkout, method);
 
-         // New overall workouts state updates
+         // Update editing workout and overall workouts global state
          globalDispatch({
-            type: "updateState",
+            type: "updateStates",
             value: {
-               id: "workouts",
-               input: {
+               workout: {
+                  ...globalState.workout,
+                  value: returnedWorkout
+               },
+               workouts: {
                   ...globalState.workouts,
                   value: newWorkouts,
                   data: {
@@ -161,8 +164,8 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   selected: workout.tagIds.map((tagId: string) => globalState.tags.data.dictionary[tagId]) ?? []
                }
             },
-            tagsSearch: {
-               ...globalState.tagsSearch,
+            tagSearch: {
+               ...globalState.tagSearch,
                value: ""
             }
          }
@@ -200,7 +203,20 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
       });
 
       // Reset current selected tags
-   }, [localDispatch]);
+      globalDispatch({
+         type: "updateState",
+         value: {
+            id: "tags",
+            input: {
+               ...globalState.tags,
+               data: {
+                  ...globalState.tags.data,
+                  selected: []
+               }
+            }
+         }
+      });
+   }, [globalDispatch, localDispatch, globalState.tags]);
 
    return (
       <PopUp
@@ -249,12 +265,38 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   onClick = {handleReset}
                   className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
-               <Input id = "title" type = "text" label = "Title" icon = {faSignature} input = {localState.title} dispatch = {localDispatch} autoFocus required />
-               <Input id = "date" type = "date" label = "Title" icon = {faCalendar} input = {localState.date} dispatch = {localDispatch} required />
-
-               {/* <TagSelection id = "title" type = "text" label = "Title" icon = {faSignature} input = {localState.title} globalState = {globalState} dispatch = {localDispatch} /> */}
-               <TextArea id = "description" type = "text" label = "Description" icon = {faBook} input = {localState.description} dispatch = {localDispatch} />
-               <ImageSelection id = "image" type = "text" label = "URL" icon = {faLink} input = {localState.image} dispatch = {localDispatch} />
+               <Input
+                  id = "title"
+                  type = "text"
+                  label = "Title"
+                  icon = {faSignature}
+                  input = {localState.title}
+                  dispatch = {localDispatch}
+                  autoFocus
+                  required />
+               <Input
+                  id = "date"
+                  type = "date"
+                  label = "Title"
+                  icon = {faCalendar}
+                  input = {localState.date}
+                  dispatch = {localDispatch}
+                  required />
+               <TagSelection {...props} />
+               <TextArea
+                  id = "description"
+                  type = "text"
+                  label = "Description"
+                  icon = {faBook}
+                  input = {localState.description}
+                  dispatch = {localDispatch} />
+               <ImageSelection
+                  id = "image"
+                  type = "text"
+                  label = "URL"
+                  icon = {faLink}
+                  input = {localState.image}
+                  dispatch = {localDispatch} />
                {
                   !(isNewWorkout) && (
                      <PopUp
@@ -271,7 +313,9 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                         }
                      >
                         <div className = "flex flex-col justify-center items-center gap-4">
-                           <FontAwesomeIcon icon = {faTrashCan} className = "text-red-500 text-4xl" />
+                           <FontAwesomeIcon
+                              icon = {faTrashCan}
+                              className = "text-red-500 text-4xl" />
                            <p className = "font-bold">
                               Are you sure you want to delete this workout
                            </p>

@@ -67,15 +67,29 @@ export default function Layout({
    }, []);
 
    return (
-      <html lang = "en" className = "m-0 p-0 overflow-x-hidden w-full">
+      <html
+         lang = "en"
+         className = "m-0 p-0 overflow-x-hidden w-full">
          <head>
             <title>Vitality</title>
-            <meta name = "description" content = "A modern fitness tracker to fuel your fitness goals" />
-            <meta name = "author" content = "Jeffrey Cordero" />
-            <meta name = "keywords" content = "fitness, tracker, health, wellness, vitality" />
-            <meta name = "robots" content = "index, follow" />
-            <link rel = "icon" href = "favcon.ico" />
-            <meta name = "viewport" content = "width=device-width, initial-scale=1.0" />
+            <meta
+               name = "description"
+               content = "A modern fitness tracker to fuel your fitness goals" />
+            <meta
+               name = "author"
+               content = "Jeffrey Cordero" />
+            <meta
+               name = "keywords"
+               content = "fitness, tracker, health, wellness, vitality" />
+            <meta
+               name = "robots"
+               content = "index, follow" />
+            <link
+               rel = "icon"
+               href = "favcon.ico" />
+            <meta
+               name = "viewport"
+               content = "width=device-width, initial-scale=1.0" />
          </head>
          <body
             className = {cx(sfPro.variable, inter.variable, "box-border m-0 p-0  overflow-x-hidden w-full max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black")}

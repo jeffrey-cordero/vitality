@@ -46,7 +46,6 @@ function WorkoutCard(props: WorkoutCardProps): JSX.Element {
 
 interface WorkoutCardsProps extends VitalityProps {
    workouts: Workout[];
-   reset: (_filterReset: boolean) => void;
 }
 
 export default function WorkoutCards(props: WorkoutCardsProps): JSX.Element {
@@ -59,7 +58,10 @@ export default function WorkoutCards(props: WorkoutCardsProps): JSX.Element {
             workouts.length > 0 ? (
                <div className = "w-10/12 mx-auto flex flex-wrap justify-center gap-6 mt-6">
                   {workouts.map((workout: Workout) => (
-                     <WorkoutCard {...props} workout = {workout} key = {workout.id} />
+                     <WorkoutCard
+                        {...props}
+                        workout = {workout}
+                        key = {workout.id} />
                   ))}
                </div>
             ) : (

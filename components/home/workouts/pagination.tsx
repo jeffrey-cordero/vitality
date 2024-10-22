@@ -1,35 +1,38 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
 import Select from "@/components/global/select";
-import { VitalityAction, VitalityProps, VitalityState } from "@/lib/global/state";
+import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
 import { faCircleChevronLeft, faCircleChevronRight, faTabletScreenButton } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ChangeEvent, Dispatch, useCallback } from "react";
+import { ChangeEvent, useCallback } from "react";
 
 interface PaginationProps extends VitalityProps {
    workouts: Workout[];
 }
 
 export default function Pagination(props: PaginationProps): JSX.Element {
-   const { state, dispatch, workouts } = props;
+   const { globalState, globalDispatch, workouts } = props;
 
    // Hold total table/cards pages and current page index
-   const pages: number = Math.ceil(workouts.length / state.paging.value);
-   const page: number = state.paging.data.page;
+   const pages: number = Math.ceil(workouts.length / globalState.paging.value);
+   const page: number = globalState.paging.data.page;
 
    const handlePageClick = useCallback((page: number) => {
-      dispatch({
+      globalDispatch({
          type: "updateState",
          value: {
-            ...state.paging,
-            data: {
-               ...state.paging.data,
-               page: page
+            id : "paging",
+            input: {
+               ...globalState.paging,
+               data: {
+                  ...globalState.paging.data,
+                  page: page
+               }
             }
          }
       });
-   }, [dispatch, state.paging]);
+   }, [globalDispatch, globalState.paging]);
 
    if (page >= pages) {
       // Ensure current page index is within range, especially when deleting workouts
@@ -46,24 +49,30 @@ export default function Pagination(props: PaginationProps): JSX.Element {
 
    const handleEntriesOnChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
       // When total visible entries are changed, ensure to reset page index to first page
-      dispatch({
+      globalDispatch({
          type: "updateState",
          value: {
-            ...state.paging,
-            value: event.target.value,
-            error: null,
-            data: {
-               ...state.paging.data,
-               page: 0
+            id: "paging",
+            input: {
+               ...globalState.paging,
+               value: event.target.value,
+               error: null,
+               data: {
+                  ...globalState.paging.data,
+                  page: 0
+               }
             }
          }
       });
-   }, [dispatch, state.paging]);
+   }, [globalDispatch, globalState.paging]);
 
    return (
       <div className = "mt-6 text-lg">
          <div className = "flex flex-row justify-center items-center mb-2">
-            <FontAwesomeIcon icon = {faCircleChevronLeft} className = "cursor-pointer text-primary text-xl mr-2" onClick = {handleLeftClick} />
+            <FontAwesomeIcon
+               icon = {faCircleChevronLeft}
+               className = "cursor-pointer text-primary text-xl mr-2"
+               onClick = {handleLeftClick} />
             {Array.from({ length: pages }, (_, index) => (
                <Button
                   key = {index}
@@ -75,10 +84,21 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   {index + 1}
                </Button>
             ))}
-            <FontAwesomeIcon icon = {faCircleChevronRight} className = "cursor-pointer text-primary text-xl ml-2" onClick = {handleRightClick} />
+            <FontAwesomeIcon
+               icon = {faCircleChevronRight}
+               className = "cursor-pointer text-primary text-xl ml-2"
+               onClick = {handleRightClick} />
          </div>
          <div>
-            <Select label = "Entries" icon = {faTabletScreenButton} input = {state.paging} state = {state} dispatch = {dispatch} className = "min-w-[10rem] max-h-[5rem] mt-4"
+            <Select
+               id = "paging"
+               type = "select"
+               label = "Entries"
+               icon = {faTabletScreenButton}
+               input = {globalState.paging}
+               values = {[5, 10, 25, 50, 100, 500, 1000]}
+               dispatch = {globalDispatch}
+               className = "min-w-[10rem] max-h-[5rem] mt-4"
                onChange = {(event) => handleEntriesOnChange(event)}
             />
          </div>

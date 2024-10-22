@@ -102,7 +102,9 @@ function Form(): JSX.Element {
 
    return (
       <div className = "w-10/12 lg:w-1/2 mx-auto">
-         <form className = "relative w-full mx-auto flex flex-col justify-center align-center gap-3" onSubmit = {handleSubmit}>
+         <form
+            className = "relative w-full mx-auto flex flex-col justify-center align-center gap-3"
+            onSubmit = {handleSubmit}>
             <FontAwesomeIcon
                icon = {faArrowRotateLeft}
                onClick = {() => dispatch({
@@ -110,18 +112,72 @@ function Form(): JSX.Element {
                })}
                className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
-            <Input id = "username" type = "text" label = "Username" icon = {faUserSecret} input = {state.username} dispatch = {dispatch} autoFocus required />
-            <Input id = "password" type = "password" label = "Password" icon = {faKey} input = {state.password} dispatch = {dispatch} required />
-            <Input id = "confirmPassword" type = "password" label = "Confirm Password" icon = {faKey}input = {state.confirmPassword} dispatch = {dispatch} required />
-            <Input id = "name" type = "text" label = "Name" icon = {faFeather} input = {state.name} dispatch = {dispatch} required />
-            <Input id = "birthday" type = "date" label = "Birthday" icon = {faCalendar} input = {state.birthday} dispatch = {dispatch} required />
-            <Input id = "email" type = "email" label = "Email" icon = {faEnvelope} input = {state.email} dispatch = {dispatch} required />
-            <Input id = "phone" type = "tel" label = "Phone" icon = {faPhone} input = {state.phone} dispatch = {dispatch} />
-            <Button type = "submit" className = "bg-primary text-white h-[2.6rem]" icon = {faIdCard}>
+            <Input
+               id = "username"
+               type = "text"
+               label = "Username"
+               icon = {faUserSecret}
+               input = {state.username}
+               dispatch = {dispatch}
+               autoFocus
+               required />
+            <Input
+               id = "password"
+               type = "password"
+               label = "Password"
+               icon = {faKey}
+               input = {state.password}
+               dispatch = {dispatch}
+               required />
+            <Input
+               id = "confirmPassword"
+               type = "password"
+               label = "Confirm Password"
+               icon = {faKey}
+               input = {state.confirmPassword}
+               dispatch = {dispatch}
+               required />
+            <Input
+               id = "name"
+               type = "text"
+               label = "Name"
+               icon = {faFeather}
+               input = {state.name}
+               dispatch = {dispatch}
+               required />
+            <Input
+               id = "birthday"
+               type = "date"
+               label = "Birthday"
+               icon = {faCalendar}
+               input = {state.birthday}
+               dispatch = {dispatch}
+               required />
+            <Input
+               id = "email"
+               type = "email"
+               label = "Email"
+               icon = {faEnvelope}
+               input = {state.email}
+               dispatch = {dispatch}
+               required />
+            <Input
+               id = "phone"
+               type = "tel"
+               label = "Phone"
+               icon = {faPhone}
+               input = {state.phone}
+               dispatch = {dispatch} />
+            <Button
+               type = "submit"
+               className = "bg-primary text-white h-[2.6rem]"
+               icon = {faIdCard}>
                Submit
             </Button>
          </form>
-         <p className = "mt-4">Already have an account? <Link href = "/login" className = "text-primary font-bold">Log In</Link></p>
+         <p className = "mt-4">Already have an account? <Link
+            href = "/login"
+            className = "text-primary font-bold">Log In</Link></p>
       </div>
    );
 }
@@ -129,7 +185,9 @@ function Form(): JSX.Element {
 export default function SignUpForm(): JSX.Element {
    return (
       <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
-         <Heading title = "Sign Up" description = "Create an account to get started" />
+         <Heading
+            title = "Sign Up"
+            description = "Create an account to get started" />
          <Form />
       </div>
    );

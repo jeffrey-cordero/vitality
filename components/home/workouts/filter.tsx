@@ -138,7 +138,14 @@ function DateInput(props: DateInputProps) {
             />
          </div>
          <div className = "w-full mx-auto">
-            <Input id = {isMinDate ? "min" : "max"} type = "date" label = "Title" icon = {faCalendar} input = {input} dispatch = {globalDispatch} required />
+            <Input
+               id = {isMinDate ? "min" : "max"}
+               type = "date"
+               label = "Title"
+               icon = {faCalendar}
+               input = {input}
+               dispatch = {globalDispatch}
+               required />
          </div>
       </div>
    );
@@ -196,7 +203,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
       });
 
       globalDispatch({
-         type: "resetState",
+         type: "updateStates",
          value: {
             // Reset global filtered workouts
             workouts: {
@@ -231,7 +238,8 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          }
       });
    }, [globalDispatch, globalState.max, globalState.min, globalState.tags.data.selected,
-      globalState.type, globalState.workouts.data, globalState.workouts.value]);
+      globalState.type, globalState.workouts.data, globalState.workouts.value,
+      globalState.paging.data, globalState.paging.value]);
 
    return (
       <PopUp
@@ -241,7 +249,9 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                type = "button"
                className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.9rem] text-sm"
             >
-               <FontAwesomeIcon icon = {faCalendar} className = "text-xs" />
+               <FontAwesomeIcon
+                  icon = {faCalendar}
+                  className = "text-xs" />
                Filter by Date
             </Button>
          }
@@ -260,22 +270,45 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                   onClick = {handleReset}
                   className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
-               <Select id = "type" type = "select" values = {["Is on or after", "Is on or before", "Is between"]} input = {globalState.type} label = "Type" icon = {faCalendar} dispatch = {globalDispatch} />
+               <Select
+                  id = "type"
+                  type = "select"
+                  values = {["Is on or after", "Is on or before", "Is between"]}
+                  input = {globalState.type}
+                  label = "Type"
+                  icon = {faCalendar}
+                  dispatch = {globalDispatch} />
                {
                   input !== undefined ? (
                      // Min or max
                      <div>
-                        <DateInput {...props} input = {input} />
+                        <DateInput
+                           {...props}
+                           input = {input} />
                      </div>
                   ) : (
                      // Range (Min and Max Date Input's)
                      <div className = "my-2">
-                        <Input id = "min" type = "date" label = "Min" icon = {faCalendar} input = {globalState.min} dispatch = {globalDispatch} required />
+                        <Input
+                           id = "min"
+                           type = "date"
+                           label = "Min"
+                           icon = {faCalendar}
+                           input = {globalState.min}
+                           dispatch = {globalDispatch}
+                           required />
                         <FontAwesomeIcon
                            icon = {faArrowsUpDown}
                            className = "text-lg text-primary my-2"
                         />
-                        <Input id = "max" type = "date" label = "Max" icon = {faCalendar} input = {globalState.max} dispatch = {globalDispatch} required />
+                        <Input
+                           id = "max"
+                           type = "date"
+                           label = "Max"
+                           icon = {faCalendar}
+                           input = {globalState.max}
+                           dispatch = {globalDispatch}
+                           required />
                      </div>
                   )
                }
@@ -353,7 +386,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
       });
 
       globalDispatch({
-         type: "resetState",
+         type: "updateStates",
          value: {
             // Reset global filtered workouts
             workouts: {
@@ -386,7 +419,9 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.9rem] text-sm"
                onClick = {handleInitializeFilteredTags}
             >
-               <FontAwesomeIcon icon = {faTag} className = "text-xs" />
+               <FontAwesomeIcon
+                  icon = {faTag}
+                  className = "text-xs" />
                Filter by Tags
             </Button>
          }
@@ -428,7 +463,14 @@ export default function WorkoutFiltering(props: VitalityProps): JSX.Element {
 
    return (
       <div className = "w-full flex flex-col justify-start  gap-2">
-         <Input id = "search" type = "text" label = "Search" icon = {faPersonRunning} input = {globalState.search} dispatch = {globalDispatch} autoFocus />
+         <Input
+            id = "search"
+            type = "text"
+            label = "Search"
+            icon = {faPersonRunning}
+            input = {globalState.search}
+            dispatch = {globalDispatch}
+            autoFocus />
          <div className = "w-full flex flex-row justify-between items-center gap-2">
             <div className = "flex flex-row gap-2">
                <FilterByDate {...props} />
