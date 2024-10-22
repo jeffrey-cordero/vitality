@@ -15,21 +15,21 @@ export default function Pagination(props: PaginationProps): JSX.Element {
    const { state, dispatch, workouts } = props;
 
    // Hold total table/cards pages and current page index
-   const pages: number = Math.ceil(workouts.length / state.workoutsPaging.value);
-   const page: number = state.workoutsPaging.data.page;
+   const pages: number = Math.ceil(workouts.length / state.paging.value);
+   const page: number = state.paging.data.page;
 
    const handlePageClick = useCallback((page: number) => {
       dispatch({
          type: "updateState",
          value: {
-            ...state.workoutsPaging,
+            ...state.paging,
             data: {
-               ...state.workoutsPaging.data,
+               ...state.paging.data,
                page: page
             }
          }
       });
-   }, [dispatch, state.workoutsPaging]);
+   }, [dispatch, state.paging]);
 
    if (page >= pages) {
       // Ensure current page index is within range, especially when deleting workouts
@@ -49,16 +49,16 @@ export default function Pagination(props: PaginationProps): JSX.Element {
       dispatch({
          type: "updateState",
          value: {
-            ...state.workoutsPaging,
+            ...state.paging,
             value: event.target.value,
             error: null,
             data: {
-               ...state.workoutsPaging.data,
+               ...state.paging.data,
                page: 0
             }
          }
       });
-   }, [dispatch, state.workoutsPaging]);
+   }, [dispatch, state.paging]);
 
    return (
       <div className = "mt-6 text-lg">
@@ -78,7 +78,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
             <FontAwesomeIcon icon = {faCircleChevronRight} className = "cursor-pointer text-primary text-xl ml-2" onClick = {handleRightClick} />
          </div>
          <div>
-            <Select label = "Entries" icon = {faTabletScreenButton} input = {state.workoutsPaging} state = {state} dispatch = {dispatch} className = "min-w-[10rem] max-h-[5rem] mt-4"
+            <Select label = "Entries" icon = {faTabletScreenButton} input = {state.paging} state = {state} dispatch = {dispatch} className = "min-w-[10rem] max-h-[5rem] mt-4"
                onChange = {(event) => handleEntriesOnChange(event)}
             />
          </div>

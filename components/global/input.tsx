@@ -58,6 +58,7 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             passwordButton.current.classList.remove("text-primary");
 
          }
+
          dispatch({
             type: "updateState",
             value: {
@@ -102,14 +103,13 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             </Button>
          }
          {
-            input.data.validIcon !== undefined &&
-            (input.data.validIcon || !(input.data.validIcon !== undefined) && input.error != null) && (
+            input.data.valid !== undefined && (
                <Button tabIndex = {-1} type = "button" className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
                   <FontAwesomeIcon
-                     icon = {input.data.validIcon ? faCircleCheck : faCircleXmark}
+                     icon = {input.data.valid ? faCircleCheck : faCircleXmark}
                      className = {clsx("flex-shrink-0 size-3.5 password-icon", {
-                        "text-green-500": input.data.validIcon,
-                        "text-red-500": !(input.data.validIcon)
+                        "text-green-500": input.data.valid,
+                        "text-red-500": !(input.data.valid)
                      })}
                   />
                </Button>

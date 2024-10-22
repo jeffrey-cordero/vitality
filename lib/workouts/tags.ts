@@ -128,33 +128,33 @@ export async function updateWorkoutTag(
    try {
       // Handle update/delete workout tags
       switch (method) {
-      case "update":
-         const newTag = await prisma.workout_tags.update({
-            where: {
-               id: tag.id
-            },
-            data: tag
-         });
+         case "update":
+            const newTag = await prisma.workout_tags.update({
+               where: {
+                  id: tag.id
+               },
+               data: tag
+            });
 
-         return sendSuccessMessage("Successfully updated workout tag", newTag);
-      case "delete":
-         const deletedTag = await prisma.workout_tags.delete({
-            where: {
-               id: tag.id
-            }
-         });
+            return sendSuccessMessage("Successfully updated workout tag", newTag);
+         case "delete":
+            const deletedTag = await prisma.workout_tags.delete({
+               where: {
+                  id: tag.id
+               }
+            });
 
-         return sendSuccessMessage(
-            "Successfully deleted workout tag",
-            deletedTag
-         );
-      default:
-         return sendErrorMessage(
-            "Failure",
-            "Invalid Workout Tag Update Method",
-            tag,
-            {}
-         );
+            return sendSuccessMessage(
+               "Successfully deleted workout tag",
+               deletedTag
+            );
+         default:
+            return sendErrorMessage(
+               "Failure",
+               "Invalid Workout Tag Update Method",
+               tag,
+               {}
+            );
       }
    } catch (error) {
       console.error(error);

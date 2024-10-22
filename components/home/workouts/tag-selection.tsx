@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/workouts/tags";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { Dispatch, useCallback, useContext, useMemo } from "react";
-import { VitalityAction, VitalityResponse, VitalityState } from "@/lib/global/state";
+import { VitalityAction, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
 import { PopUp } from "@/components/global/popup";
 import { searchForTitle } from "@/lib/workouts/shared";
 
@@ -30,7 +30,7 @@ interface CreateWorkoutTagProps extends VitalityInputProps {
 }
 
 function CreateWorkoutTag(props: CreateWorkoutTagProps) {
-   const { input, search, userId, dispatch } = props;
+   const { input, search, userId, globalDispatch } = props;
 
    const handleNewWorkoutTagSubmission = useCallback(async() => {
       // Default tags have gray color option
@@ -45,7 +45,7 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
 
       if (!(response.status === "Success")) {
          // Display the respective error message
-         dispatch({
+         globalDispatch({
             type: "updateErrors",
             value: response
          });
@@ -60,8 +60,8 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
          const newDictionary: { [key: string]: Tag } = Object.fromEntries(newOptions.map(tag => [tag.id, tag]));
          newDictionary[newOption.id] = newOption;
 
-         dispatch({
-            type: "updateState",
+         globalDispatch({
+            type: "updateglobalState",
             value: {
                ...input,
                data: {
@@ -74,7 +74,7 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
             }
          });
       }
-   }, [dispatch, input, search, userId]);
+   }, [globalDispatch, input, search, userId]);
 
    return (
       <div
@@ -95,29 +95,29 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
 }
 
 interface TagColorPickerProps {
-   state: VitalityState;
-   dispatch: Dispatch<VitalityAction<Tag>>;
+   globalState: VitalityState;
+   globalDispatch: globalDispatch<VitalityAction<Tag>>;
 }
 
 function TagColorPicker(props: TagColorPickerProps) {
-   const { state, dispatch } = props;
+   const { globalState, globalDispatch } = props;
 
    const colorNames = useMemo(() => Object.keys(colors), []);
 
    const handleChangeColor = useCallback((color: string) => {
       // Update editing color value for the current tag
-      dispatch({
-         type: "updateStates",
+      globalDispatch({
+         type: "updateglobalStates",
          value: {
-            ...state,
+            ...globalState,
             tagsColor: {
-               ...state.tagsColor,
+               ...globalState.tagsColor,
                value: color,
                error: null
             }
          }
       });
-   }, [dispatch, state]);
+   }, [globalDispatch, globalState]);
 
    return (
       <>
@@ -128,8 +128,8 @@ function TagColorPicker(props: TagColorPickerProps) {
                <div
                   style = {{ backgroundColor: color }}
                   className = {clsx("cursor-pointer w-full h-[3rem] border-[3px] rounded-sm p-3 text-white text-center", {
-                     "border-primary scale-[1.02] shadow-2xl": state.tagsColor.value === color,
-                     "border-white": state.tagsColor.value !== color
+                     "border-primary scale-[1.02] shadow-2xl": globalState.tagsColor.value === color,
+                     "border-white": globalState.tagsColor.value !== color
                   })}
                   onClick = {() => handleChangeColor(color)}
                   key = {name}
@@ -143,32 +143,32 @@ function TagColorPicker(props: TagColorPickerProps) {
 };
 
 function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
-   const { tag, state, dispatch } = props;
+   const { tag, globalState, globalDispatch } = props;
    const { updateNotification } = useContext(NotificationContext);
 
    const handleEditWorkoutTagSubmission = useCallback(async(method: "update" | "delete") => {
       const payload: Tag = {
          user_id: tag.user_id,
          id: tag.id,
-         title: state.tagsTitle.value.trim(),
-         color: state.tagsColor.value.trim()
+         title: globalState.tagsTitle.value.trim(),
+         color: globalState.tagsColor.value.trim()
       };
 
       const response: VitalityResponse<Tag> = await updateWorkoutTag(payload, method);
 
       if (response.status !== "Success") {
          // Add respective errors, if any
-         dispatch({
-            type: "updateStates",
+         globalDispatch({
+            type: "updateglobalStates",
             value: {
-               ...state,
+               ...globalState,
 
                tagsTitle: {
-                  ...state.tagsTitle,
+                  ...globalState.tagsTitle,
                   error: response.body.errors["title"] ?? null
                },
                tagsColor: {
-                  ...state.tagsColor,
+                  ...globalState.tagsColor,
                   error: response.body.errors["color"] ?? null
                }
 
@@ -177,7 +177,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
          });
       } else {
          // Display simple success message and update tag options (update or delete)
-         const { options, selected } = state.tags.data;
+         const { options, selected } = globalState.tags.data;
          const returnedTag = response.body.data;
 
          const mapOrFilter = method === "update" ?
@@ -196,14 +196,14 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
             delete newDictionary[returnedTag.id];
          }
 
-         dispatch({
-            type: "updateStates",
+         globalDispatch({
+            type: "updateglobalStates",
             value: {
-               ...state,
+               ...globalState,
                tags: {
-                  ...state.tags,
+                  ...globalState.tags,
                   data: {
-                     ...state.tags.data,
+                     ...globalState.tags.data,
                      options: newOptions,
                      selected: newSelected,
                      dictionary: newDictionary
@@ -221,7 +221,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
             timer: 1250
          });
       }
-   }, [dispatch, state, tag.id, tag.user_id, updateNotification]);
+   }, [globalDispatch, globalState, tag.id, tag.user_id, updateNotification]);
 
    return (
       <div className = "flex flex-col justify-center align-center text-center gap-3 text-black">
@@ -235,13 +235,13 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
             </h1>
          </div>
          {/* Nested input props */}
-         <Input input = {state.tagsTitle} label = "Title" icon = {faTag} dispatch = {dispatch} />
+         <Input input = {globalState.tagsTitle} label = "Title" icon = {faTag} globalDispatch = {globalDispatch} />
          <div className = "flex flex-col justify-center items-center gap-2">
-            <TagColorPicker state = {state} dispatch = {dispatch} />
+            <TagColorPicker globalState = {globalState} globalDispatch = {globalDispatch} />
             {/* Potential error message for invalid color passed to tag form submission from frontend */}
-            {state.tagsColor.error !== null &&
+            {globalState.tagsColor.error !== null &&
                <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                  <p className = "text-red-500 font-bold input-error"> {state.tagsColor.error} </p>
+                  <p className = "text-red-500 font-bold input-error"> {globalState.tagsColor.error} </p>
                </div>
             }
          </div>
@@ -266,18 +266,18 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
 }
 
 export interface WorkoutTagProps extends VitalityInputProps {
-   state: VitalityState;
+   globalState: VitalityState;
    tag: Tag;
    selected: boolean;
 }
 
 export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
-   const { input, tag, selected, state, dispatch } = props;
+   const { input, tag, selected, globalState, globalDispatch } = props;
 
    // Handle adding or removing a selected tag
    const handleSelectWorkoutTag = useCallback((adding: boolean) => {
-      dispatch({
-         type: "updateState",
+      globalDispatch({
+         type: "updateglobalState",
          value: {
             ...input,
             data: {
@@ -288,27 +288,27 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
             }
          }
       });
-   }, [dispatch, input, tag]);
+   }, [globalDispatch, input, tag]);
 
    const handleInitializeTagForm = useCallback(() => {
-      // Update edit tag information state
-      dispatch({
-         type: "updateStates",
+      // Update edit tag information globalState
+      globalDispatch({
+         type: "updateglobalStates",
          value: {
-            ...state,
+            ...globalState,
             tagsTitle: {
-               ...state.tagsTitle,
+               ...globalState.tagsTitle,
                value: tag.title,
                error: null
             },
             tagsColor: {
-               ...state.tagsColor,
+               ...globalState.tagsColor,
                value: tag.color,
                error: null
             }
          }
       });
-   }, [dispatch, state, tag.color, tag.title]);
+   }, [globalDispatch, globalState, tag.color, tag.title]);
 
    return (
       <li
@@ -356,23 +356,19 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
    );
 };
 
-export interface TagSelectionProps extends VitalityInputProps {
-   globalState: VitalityState;
-}
-
-export function TagSelection(props: TagSelectionProps): JSX.Element {
-   const { input, state, dispatch } = props;
+export function TagSelection(props: VitalityProps): JSX.Element {
+   const { globalState, globalDispatch } = props;
 
    // Fetch user information from context
    const { user } = useContext(AuthenticationContext);
 
    // Store overall and selected tags
-   const { options, selected } = input.data;
+   const { options, selected } = globalState.tags.data;
 
    // Convert search string to lower case for case-insensitive comparison
    const search: string = useMemo(() => {
-      return state.tagsSearch.value.trim().toLowerCase();
-   }, [state.tagsSearch]);
+      return globalState.search.value.trim().toLowerCase();
+   }, [globalState.search]);
 
    // Differentiate between selected and unselected options
    const selectedOptions: Set<Tag> = useMemo(() => {
@@ -403,23 +399,24 @@ export function TagSelection(props: TagSelectionProps): JSX.Element {
       <div>
          <div className = "flex flex-col flex-wrap justify-center items-center">
             <ul className = {clsx("flex flex-row flex-wrap justify-center items-center", {
-               "pb-3": state.tags.data.selected.length > 0
+               "pb-3": globalState.tags.data.selected.length > 0
             })}>
                {
-                  state.tags.data.selected.map((selected: Tag) => {
+                  globalState.tags.data.selected.map((selected: Tag) => {
                      return (
                         selected !== undefined &&
-                        <WorkoutTag input = {state.tags} label = "Tags" state = {state} dispatch = {dispatch} tag = {selected} selected = {true} key = {selected.id} />
+                        <WorkoutTag input = {globalState.tags} label = "Tags" globalState = {globalState} dispatch = {globalDispatch} tag = {selected} selected = {true} key = {selected.id} />
                      );
                   })
                }
             </ul>
             <div className = "w-full mx-auto">
                <Input
-                  input = {state.tagsSearch}
+                  id = "search"
+                  input = {globalState.search}
                   label = "Tags"
                   icon = {faTag}
-                  dispatch = {dispatch}
+                  dispatch = {globalDispatch}
                />
             </div>
             <ul className = {clsx("flex flex-row flex-wrap justify-center items-center", {
@@ -427,7 +424,7 @@ export function TagSelection(props: TagSelectionProps): JSX.Element {
             })}>
                {
                   results.length > 0 ? results.map((tag: Tag) => {
-                     return <WorkoutTag {...props} state = {state} dispatch = {dispatch} tag = {tag} selected = {false} key = {tag.id} />;
+                     return <WorkoutTag {...props} globalState = {globalState} globalDispatch = {globalDispatch} tag = {tag} selected = {false} key = {tag.id} />;
                   }) : search.trim().length > 0 && user !== undefined && tagsByTitle[search] === undefined && (
                      <CreateWorkoutTag {...props} search = {search} userId = {user.id} />
                   )

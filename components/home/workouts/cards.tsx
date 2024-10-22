@@ -2,8 +2,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import WorkoutForm from "./form";
 import Loading from "@/components/global/loading";
-import { Dispatch } from "react";
-import { VitalityAction, VitalityProps, VitalityState } from "@/lib/global/state";
+import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
 import { getWorkoutDate } from "@/lib/workouts/shared";
 
@@ -51,8 +50,8 @@ interface WorkoutCardsProps extends VitalityProps {
 }
 
 export default function WorkoutCards(props: WorkoutCardsProps): JSX.Element {
-   const { workouts, state } = props;
-   const fetched: boolean = state.workouts.data.fetched;
+   const { workouts, globalState } = props;
+   const fetched: boolean = globalState.workouts.data.fetched;
 
    return (
       <div className = "relative w-full">

@@ -53,45 +53,45 @@ export function formReducer(
 ): VitalityState {
    return produce(state, (draft) => {
       switch (action.type) {
-      case "initializeState":
-         const inputs = action.value as VitalityState;
+         case "initializeState":
+            const inputs = action.value as VitalityState;
 
-         for (const key of Object.keys(inputs)) {
-            draft[key] = inputs[key];
-         }
+            for (const key of Object.keys(inputs)) {
+               draft[key] = inputs[key];
+            }
 
-         break;
-      case "updateState":
-         const { id, input } = action.value as VitalityUpdateState;
-         draft[id] = input;
+            break;
+         case "updateState":
+            const { id, input } = action.value as VitalityUpdateState;
+            draft[id] = input;
 
-         break;
-      case "updateStates":
-         Object.assign(draft, action.value as VitalityState);
-         break;
-      case "updateErrors":
-         const response = action.value as VitalityResponse<any>;
+            break;
+         case "updateStates":
+            Object.assign(draft, action.value as VitalityState);
+            break;
+         case "updateErrors":
+            const response = action.value as VitalityResponse<any>;
 
-         for (const key in state) {
-            draft[key].error = response.body.errors[key]?.[0] ?? null;
-         }
+            for (const key in state) {
+               draft[key].error = response.body.errors[key]?.[0] ?? null;
+            }
 
-         break;
-      case "resetState":
-         const reset = action.value as VitalityResetState;
+            break;
+         case "resetState":
+            const reset = action.value as VitalityResetState;
 
-         for (const key in state) {
-            draft[key] = {
-               ...state[key],
-               value: reset[key]?.value ?? "",
-               error: null,
-               data: reset[key]?.data ?? state[key].data
-            };
-         }
+            for (const key in state) {
+               draft[key] = {
+                  ...state[key],
+                  value: reset[key]?.value ?? "",
+                  error: null,
+                  data: reset[key]?.data ?? state[key].data
+               };
+            }
 
-         break;
-      default:
-         return state;
+            break;
+         default:
+            return state;
       }
    });
 }
@@ -122,7 +122,7 @@ export function sendErrorMessage<T>(
    };
 }
 
-export function useHandleResponse(
+export function handleResponse(
    dispatch: Dispatch<VitalityAction<any>>,
    response: VitalityResponse<any>,
    successMethod: () => void,

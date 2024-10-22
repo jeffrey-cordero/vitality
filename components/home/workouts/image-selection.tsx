@@ -3,14 +3,13 @@ import ToolTip from "@/components/global/tooltip";
 import clsx from "clsx";
 import Button from "@/components/global/button";
 import Input, { VitalityInputProps } from "@/components/global/input";
-import { Dispatch, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { PopUp } from "@/components/global/popup";
-import { faPaperclip, faPenToSquare, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faPaperclip, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { VitalityState } from "@/lib/global/state";
 
 const defaultImages = ["bike.png", "cardio.png", "default.png", "hike.png", "legs.png", "lift.png", "machine.png", "run.png", "swim.png", "weights.png"];
-const urlRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
+const urlRegex = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg))$/i;
 const nextMediaRegex = /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
 
 function verifyURL(url: string): boolean {
@@ -18,54 +17,46 @@ function verifyURL(url: string): boolean {
    return urlRegex.test(url) || nextMediaRegex.test(url);
 }
 
-interface ImageSelectionFormProps extends VitalityInputProps {
-   isValidImage: boolean;
-   setIsValidImage: Dispatch<boolean>;
-}
-
-function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
-   const { input, dispatch, isValidImage, setIsValidImage } = props;
+function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
+   const { input, dispatch } = props;
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(true);
+   const isValidImage = input.data.valid;
 
    const handleImageURLSubmission = useCallback(() => {
       const isValidURL = verifyURL(input.value);
 
-      if (!(isValidURL)) {
-         setIsValidImage(false);
-      } else if (!(isValidImage)) {
-         setIsValidImage(true);
-      }
-
       dispatch({
          type: "updateState",
          value: {
-            ...input,
-            error: isValidURL ? null : ["Invalid image URL"],
-            data: {
-               validIcon: isValidURL
+            id: "image",
+            input: {
+               ...input,
+               error: isValidURL ? null : "Invalid image URL",
+               data: {
+                  valid: isValidURL
+               }
             }
          }
       });
-   }, [dispatch, input, isValidImage, setIsValidImage]);
+   }, [dispatch, input]);
 
    const handleDefaultImageSelection = useCallback((source: string) => {
       // All default images are valid images
-      if (!(isValidImage)) {
-         setIsValidImage(true);
-      }
-
       dispatch({
          type: "updateState",
          value: {
-            ...input,
-            value: source,
-            error: null,
-            data: {
-               validIcon: true
+            id: "image",
+            input: {
+               ...input,
+               value: source,
+               error: null,
+               data: {
+                  valid: true
+               }
             }
          }
       });
-   }, [dispatch, input, isValidImage, setIsValidImage]);
+   }, [dispatch, input]);
 
    return (
       <div className = "flex flex-col gap-3">
@@ -122,7 +113,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                      }
                   }}>
                   {
-                     isValidImage ? (
+                     isValidImage && (
                         <div className = "flex justify-center m-6">
                            <Image
                               width = {1000}
@@ -131,36 +122,41 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                               src = {input.value}
                               onError = {() => {
                                  // Resource removed, moved temporarily, etc.
-                                 setIsValidImage(false);
+                                 dispatch({
+                                    type: "updateState",
+                                    value: {
+                                       id: "image",
+                                       input: {
+                                          ...input,
+                                          error: "Failed to fetch your desired image resource. Please ensure the link is valid.",
+                                          data: {
+                                             valid: false
+                                          }
+                                       }
+                                    }
+                                 });
                               }}
                               alt = "workout-image"
                               className = {clsx("w-[20rem] h-[20rem] object-cover object-center rounded-xl cursor-pointer transition duration-300 ease-in-out")}
                            />
                         </div>
-                     ) :
-                        // Show resource error on a valid image URL
-                        verifyURL(input.value) &&
-                        <div className = "flex flex-col justify-center items-center text-center gap-4 m-6 font-bold">
-                           <FontAwesomeIcon className = "text-red-500 text-4xl" icon = {faTriangleExclamation} />
-                           <h2>Failed to fetch the desired image resource. Please try again.</h2>
-                        </div>
+                     )
                   }
                   <Input
                      {...props}
                      onChange = {(event: React.ChangeEvent<HTMLInputElement>) => {
                         // Ensure any changes to URL are verified on a new submission
-                        if (isValidImage) {
-                           setIsValidImage(false);
-                        }
-
                         dispatch({
                            type: "updateState",
                            value: {
-                              ...input,
-                              value: event.target.value,
-                              error: null,
-                              data: {
-                                 validIcon: false
+                              id: "image",
+                              input: {
+                                 ...input,
+                                 value: event.target.value,
+                                 error: null,
+                                 data: {
+                                    valid: false
+                                 }
                               }
                            }
                         });
@@ -181,8 +177,8 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
 }
 
 export default function ImageSelection(props: VitalityInputProps): JSX.Element {
-   const { input } = props;
-   const [isValidImage, setIsValidImage] = useState<boolean>(verifyURL(input.value));
+   const { input, dispatch } = props;
+   const isValidImage: boolean = input.data.valid;
    const selected = input.value !== "";
 
    return (
@@ -196,12 +192,23 @@ export default function ImageSelection(props: VitalityInputProps): JSX.Element {
                      quality = {100}
                      src = {input.value}
                      onError = {() => {
-                        setIsValidImage(false);
+                        dispatch({
+                           type: "updateState",
+                           value: {
+                              id: "image",
+                              input: {
+                                 ...input,
+                                 error: "Failed to fetch your desired image resource. Please ensure the link is valid.",
+                                 data: {
+                                    valid: false
+                                 }
+                              }
+                           }
+                        });
                      }}
                      alt = "workout-image"
-                     className = {clsx("w-[12rem] h-[12rem] object-cover object-center rounded-2xl")}
-                  />
-                  : null}
+                     className = {clsx("w-[13rem] h-[13rem] object-cover object-center rounded-2xl")}
+                  /> : null}
          >
             <PopUp
                cover = {
@@ -220,7 +227,7 @@ export default function ImageSelection(props: VitalityInputProps): JSX.Element {
                   </div>
                }
                className = "max-w-[80%]">
-               <ImageSelectionForm {...props} isValidImage = {isValidImage} setIsValidImage = {setIsValidImage} />
+               <ImageSelectionForm {...props} />
             </PopUp>
          </ToolTip>
       </div>

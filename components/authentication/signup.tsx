@@ -6,7 +6,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faIdCard, faDoorOpen, faFeather, faKey, faEnvelope, faPhone, faUserSecret, faCalendar } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { VitalityState, formReducer, VitalityResponse, useHandleResponse } from "@/lib/global/state";
+import { VitalityState, formReducer, VitalityResponse, handleResponse } from "@/lib/global/state";
 import { login } from "@/lib/authentication/login";
 import { signup, Registration } from "@/lib/authentication/signup";
 import { NotificationContext } from "@/app/layout";
@@ -94,7 +94,7 @@ function Form(): JSX.Element {
             });
          };
 
-         useHandleResponse(dispatch, response, successMethod, updateNotification);
+         handleResponse(dispatch, response, successMethod, updateNotification);
       } catch (error) {
          console.error(error);
       }

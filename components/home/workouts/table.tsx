@@ -3,28 +3,25 @@ import Image from "next/image";
 import Button from "@/components/global/button";
 import WorkoutForm from "@/components/home/workouts/form";
 import Loading from "@/components/global/loading";
-import { VitalityAction, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { VitalityProps, VitalityResponse } from "@/lib/global/state";
+import { faPencil, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { removeWorkouts, Workout } from "@/lib/workouts/workouts";
 import { getWorkoutDate } from "@/lib/workouts/shared";
 import { Tag } from "@/lib/workouts/tags";
-import { Dispatch, useCallback, useContext, useMemo, useRef } from "react";
+import { useCallback, useContext, useMemo, useRef } from "react";
 import { NotificationContext } from "@/app/layout";
 import { PopUp } from "@/components/global/popup";
 
-interface WorkoutRowProps {
+interface WorkoutRowProps extends VitalityProps {
    workout: Workout;
-   state: VitalityState;
-   dispatch: Dispatch<VitalityAction<Workout | null>>;
-   reset: (_filterReset: boolean) => void;
 }
 
 function WorkoutRow(props: WorkoutRowProps) {
-   const { workout, state, dispatch, reset } = props;
+   const { workout, globalState, globalDispatch } = props;
    const { updateNotification } = useContext(NotificationContext);
    const deletePopUpRef = useRef<{ close: () => void }>(null);
-   const selected: Set<Workout> = state.workouts.data.selected;
+   const selected: Set<Workout> = globalState.workouts.data.selected;
    const formattedDate = useMemo(() => getWorkoutDate(new Date(workout.date)), [workout.date]);
 
    const handleWorkoutToggle = useCallback(() => {
@@ -37,17 +34,20 @@ function WorkoutRow(props: WorkoutRowProps) {
          newSelected.add(workout);
       }
 
-      dispatch({
+      globalDispatch({
          type: "updateState",
          value: {
-            ...state.workouts,
-            data: {
-               ...state.workouts.data,
-               selected: newSelected
+            id: "workouts",
+            input: {
+               ...globalState.workouts,
+               data: {
+                  ...globalState.workouts.data,
+                  selected: newSelected
+               }
             }
          }
       });
-   }, [dispatch, selected, state.workouts, workout]);
+   }, [globalDispatch, selected, globalState.workouts, workout]);
 
    const handleWorkoutDelete = useCallback(async() => {
       // Remove the current or selected set of workout's
@@ -58,25 +58,25 @@ function WorkoutRow(props: WorkoutRowProps) {
 
       if (response.body.data === size) {
          // Clear selected and filter workouts list
-         const newWorkouts = [...state.workouts.value].filter((w: Workout) => {
+         const newWorkouts = [...globalState.workouts.value].filter((w: Workout) => {
             // Remove single or multiple workouts
             return size == 1 ? workout.id !== w.id : !(selected.has(w));
          });
 
-         const newFiltered = [...state.workouts.data.filtered].filter((w: Workout) => {
+         const newFiltered = [...globalState.workouts.data.filtered].filter((w: Workout) => {
             // Remove single or multiple workouts
             return size == 1 ? workout.id !== w.id : !(selected.has(w));
          });
 
-         dispatch({
+         globalDispatch({
             type: "updateStates",
             value: {
-               ...state,
+               ...globalState,
                workouts: {
-                  ...state.workouts,
+                  ...globalState.workouts,
                   value: newWorkouts,
                   data: {
-                     ...state.workouts.data,
+                     ...globalState.workouts.data,
                      // Clear selected workouts
                      filtered: newFiltered,
                      selected: new Set<Workout>()
@@ -92,12 +92,12 @@ function WorkoutRow(props: WorkoutRowProps) {
          message: response.body.message
       });
 
-   }, [dispatch, selected, state, updateNotification,  workout]);
+   }, [globalDispatch, selected, globalState, updateNotification, workout]);
 
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
          // Fetch tag using id
-         const tag: Tag = state.tags.data.dictionary[tagId];
+         const tag: Tag = globalState.tags.data.dictionary[tagId];
 
          return (
             // Undefined in case of removal
@@ -113,7 +113,7 @@ function WorkoutRow(props: WorkoutRowProps) {
                </div>
          );
       });
-   }, [workout, state.tags.data.dictionary]);
+   }, [workout, globalState.tags.data.dictionary]);
 
    return (
       <tr
@@ -125,7 +125,7 @@ function WorkoutRow(props: WorkoutRowProps) {
                   id = {`workout-select-${workout.id}`}
                   type = "checkbox"
                   className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                  checked = {state.workouts.data.selected.has(workout)}
+                  checked = {globalState.workouts.data.selected.has(workout)}
                   onChange = {() => handleWorkoutToggle()}
                />
             </div>
@@ -159,54 +159,72 @@ function WorkoutRow(props: WorkoutRowProps) {
          </th>
          <td className = "px-6 py-4 min-w-[10rem]">
             <div className = "flex justify-end pr-12 items-center gap-4">
-               <WorkoutForm {...props} reset = {reset} />
-               {
-                  workout !== undefined && (
-                     <PopUp
-                        className = "max-w-xl"
-                        ref = {deletePopUpRef}
-                        cover = {
-                           <FontAwesomeIcon
-                              className = "text-red-500 cursor-pointer text-lg hover:scale-125 transition duration-300 ease-in-out"
-                              icon = {faTrashCan}
-                           />
-                        }
-                     >
-                        <div className = "flex flex-col justify-center items-center gap-4">
-                           <FontAwesomeIcon icon = {faTrashCan} className = "text-red-500 text-4xl" />
-                           <p className = "font-bold">
-                              {
-
-                                 selected.size === 0 ?
-                                    "Are you sure you want to delete this workout?"
-                                    :
-                                    `Are you sure you want to delete ${selected.size} workout${selected.size === 1 ? "" : "s"}?`
+               <WorkoutForm
+                  {...props}
+                  cover = {(
+                     <FontAwesomeIcon
+                        icon = {faPencil}
+                        className = "text-primary cursor-pointer text-lg hover:scale-125 transition duration-300 ease-in-out"
+                        onClick = {() => {
+                           globalDispatch({
+                              type: "updateState",
+                              value: {
+                                 id : "workout",
+                                 input: {
+                                    ...globalState.workout,
+                                    value: workout
+                                 }
                               }
-                           </p>
-                           <div className = "flex flex-row justify-center items-center gap-4 flex-1">
-                              <Button
-                                 type = "button"
-                                 className = "w-[10rem] bg-gray-100 text-black mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
-                                 onClick = {() => {
-                                    // Close the popup for deletion confirmation
-                                    if (deletePopUpRef.current) {
-                                       deletePopUpRef.current.close();
-                                    }
-                                 }}
-                              >
-                                 No, cancel
-                              </Button>
-                              <Button
-                                 type = "button"
-                                 className = "w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
-                                 onClick = {async() => handleWorkoutDelete()}
-                              >
-                                 Yes, I&apos;m sure
-                              </Button>
-                           </div>
+                           });
+                        }}
+                     />
+                  )}
+               />
+               {
+                  <PopUp
+                     className = "max-w-xl"
+                     ref = {deletePopUpRef}
+                     cover = {
+                        <FontAwesomeIcon
+                           className = "text-red-500 cursor-pointer text-lg hover:scale-125 transition duration-300 ease-in-out"
+                           icon = {faTrashCan}
+                        />
+                     }
+                  >
+                     <div className = "flex flex-col justify-center items-center gap-4">
+                        <FontAwesomeIcon icon = {faTrashCan} className = "text-red-500 text-4xl" />
+                        <p className = "font-bold">
+                           {
+
+                              selected.size === 0 ?
+                                 "Are you sure you want to delete this workout?"
+                                 :
+                                 `Are you sure you want to delete ${selected.size} workout${selected.size === 1 ? "" : "s"}?`
+                           }
+                        </p>
+                        <div className = "flex flex-row justify-center items-center gap-4 flex-1">
+                           <Button
+                              type = "button"
+                              className = "w-[10rem] bg-gray-100 text-black mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
+                              onClick = {() => {
+                                 // Close the popup for deletion confirmation
+                                 if (deletePopUpRef.current) {
+                                    deletePopUpRef.current.close();
+                                 }
+                              }}
+                           >
+                              No, cancel
+                           </Button>
+                           <Button
+                              type = "button"
+                              className = "w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] min-h-[2.7rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
+                              onClick = {async() => handleWorkoutDelete()}
+                           >
+                              Yes, I&apos;m sure
+                           </Button>
                         </div>
-                     </PopUp>
-                  )
+                     </div>
+                  </PopUp>
                }
             </div>
          </td>
@@ -216,13 +234,12 @@ function WorkoutRow(props: WorkoutRowProps) {
 
 interface WorkoutTableProps extends VitalityProps {
    workouts: Workout[];
-   reset: (_filterReset: boolean) => void;
 }
 
 export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
-   const { workouts, state, dispatch, reset } = props;
-   const selected: Set<Workout> = state.workouts.data.selected;
-   const fetched: boolean = state.workouts.data.fetched;
+   const { workouts, globalState, globalDispatch } = props;
+   const selected: Set<Workout> = globalState.workouts.data.selected;
+   const fetched: boolean = globalState.workouts.data.fetched;
 
    // Visible workouts that have been selected
    const visible = useMemo(() => {
@@ -232,19 +249,22 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
    // Check if all visible workouts are selected
    const allVisibleSelected: boolean = workouts.length > 0 && workouts.every(workout => selected.has(workout));
 
-   // Function to update selected workouts in the state
+   // Function to update selected workouts in the globalState
    const handleUpdateSelectedWorkouts = useCallback((newSelected: Set<Workout>) => {
-      dispatch({
+      globalDispatch({
          type: "updateState",
          value: {
-            ...state.workouts,
-            data: {
-               ...state.workouts.data,
-               selected: newSelected
+            id : "workouts",
+            input: {
+               ...globalState.workouts,
+               data: {
+                  ...globalState.workouts.data,
+                  selected: newSelected
+               }
             }
          }
       });
-   }, [dispatch, state.workouts]);
+   }, [globalDispatch, globalState.workouts]);
 
    const handleWorkoutToggle = useMemo(() => {
       return () => {
@@ -295,7 +315,7 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
                      </thead>
                      <tbody>
                         {workouts.map((workout: Workout) => (
-                           <WorkoutRow workout = {workout} state = {state} dispatch = {dispatch} key = {workout.id} reset = {reset} />
+                           <WorkoutRow workout = {workout} globalState = {globalState} globalDispatch = {globalDispatch} key = {workout.id} />
                         ))}
                      </tbody>
                   </table>

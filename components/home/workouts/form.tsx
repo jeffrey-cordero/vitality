@@ -5,12 +5,12 @@ import ImageSelection from "@/components/home/workouts/image-selection";
 import Exercises from "@/components/home/workouts/exercises";
 import { TagSelection } from "@/components/home/workouts/tag-selection";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { formReducer, useHandleResponse, VitalityAction, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
+import { formReducer, handleResponse, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
 import { addWorkout, updateWorkout, Workout } from "@/lib/workouts/workouts";
 import { Tag } from "@/lib/workouts/tags";
-import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTrash, faPencil, faPlus, faTrashCan, faSignature, faCalendar, faBook, faLink, faTag } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTrash, faPlus, faTrashCan, faSignature, faCalendar, faBook, faLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Dispatch, useCallback, useContext, useMemo, useReducer, useRef, useState } from "react";
+import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
 import { filterWorkout } from "@/components/home/workouts/filter";
 import { PopUp } from "@/components/global/popup";
 
@@ -35,7 +35,8 @@ const form: VitalityState = {
       value: "",
       error: null,
       data: {
-         handlesChanges: true
+         handlesChanges: true,
+         valid: false
       }
    }
 };
@@ -45,15 +46,15 @@ function updateWorkouts(currentWorkouts: Workout[], returnedWorkout: Workout, me
    let newWorkouts: Workout[] = [];
 
    switch (method) {
-   case "delete":
-      newWorkouts = [...currentWorkouts].filter(workout => workout.id !== returnedWorkout.id);
-      break;
-   case "update":
-      newWorkouts = [...currentWorkouts].map(workout => (workout.id === returnedWorkout.id ? returnedWorkout : workout));
-      break;
-   default:
-      newWorkouts = [...currentWorkouts, returnedWorkout];
-      break;
+      case "delete":
+         newWorkouts = [...currentWorkouts].filter(workout => workout.id !== returnedWorkout.id);
+         break;
+      case "update":
+         newWorkouts = [...currentWorkouts].map(workout => (workout.id === returnedWorkout.id ? returnedWorkout : workout));
+         break;
+      default:
+         newWorkouts = [...currentWorkouts, returnedWorkout];
+         break;
    }
 
    return newWorkouts.sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -73,21 +74,20 @@ function updateFilteredWorkouts(globalState: VitalityState, currentFiltered: Wor
 };
 
 interface WorkoutFormProps extends VitalityProps {
+   workout: Workout;
    cover: React.ReactNode | null;
-   reset: (_filterReset: boolean) => void;
 }
 
 export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
-   const { cover, globalState, globalDispatch, reset } = props;
+   const { workout, cover, globalState, globalDispatch } = props;
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
 
    // Basic workout inputs like title, date, description, and image URL stored locally
    const [localState, localDispatch] = useReducer(formReducer, form);
 
-   // Fetch current editing workout store in state
-   const workout: Workout = globalState.workout.value;
-   const isNewWorkout: boolean = workout.id.trim().length === 0;
+   // Empty ID implies new workout
+   const isNewWorkout: boolean = workout.id?.trim().length === 0;
 
    // Pop-up relating to workout deletion confirmation message
    const deletePopUpRef = useRef<{ close: () => void }>(null);
@@ -145,7 +145,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
          });
       };
 
-      useHandleResponse(globalDispatch, response, successMethod, updateNotification);
+      handleResponse(globalDispatch, response, successMethod, updateNotification);
    };
 
    const handleInitializeWorkoutState = () => {
@@ -173,60 +173,65 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
          value: {
             title: {
                ...localState.title,
-               value: workout.title ?? ""
+               value: workout.title
             },
             date: {
                ...localState.date,
                // Convert to form MM-DD-YYYY for input value
-               value: isNewWorkout ? defaultDate: workout.date.toISOString().split("T")[0]
+               value: isNewWorkout ? defaultDate : workout.date.toISOString().split("T")[0]
             },
             image: {
                ...localState.image,
-               value: workout.image ?? ""
+               value: workout.image
             },
             description: {
                ...localState.description,
-               value: workout.description ?? ""
+               value: workout.description
             }
          }
       });
    };
 
+   const handleReset = useCallback(() => {
+      // Reset basic form inputs
+      localDispatch({
+         type: "resetState",
+         value: {}
+      });
+
+      // Reset current selected tags
+   }, [localDispatch]);
 
    return (
       <PopUp
-         text = {isNewWorkout ? "Edit Workout" : "New Workout"}
+         text = {isNewWorkout ? "New Workout" : "Edit Workout"}
          className = "max-w-3xl"
          buttonClassName = "w-[9.5rem] h-[2.9rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out"
          icon = {faPlus}
          onClose = {() => {
-            if (isNewWorkout) {
-               // Cleanup new workout form component for future "New Workout" usage by resetting global editing workout
-               globalDispatch({
-                  type: "updateState",
-                  value: {
-                     id: "workout",
-                     input: {
-                        ...globalState.workout,
-                        value: {
-                           id: "",
-                           user_id: user.id,
-                           title: "",
-                           date: "",
-                           image: "",
-                           description: "",
-                           tagIds: [],
-                           exercises: []
-                        }
+            // Cleanup workout form component for future usage
+            globalDispatch({
+               type: "updateState",
+               value: {
+                  id: "workout",
+                  input: {
+                     ...globalState.workout,
+                     value: {
+                        id: "",
+                        user_id: user.id,
+                        title: "",
+                        date: "",
+                        image: "",
+                        description: "",
+                        tagIds: [],
+                        exercises: []
                      }
                   }
-               });
-            }
+               }
+            });
          }}
          onClick = {handleInitializeWorkoutState}
-         cover = {
-            cover ?? <FontAwesomeIcon icon = {faPencil} className = "text-primary cursor-pointer text-lg hover:scale-125 transition duration-300 ease-in-out" />
-         }
+         cover = {cover}
       >
          <div className = "relative">
             <div className = "flex flex-col justify-center align-center text-center gap-3">
@@ -235,13 +240,13 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   className = "text-6xl text-primary mt-1"
                />
                <h1 className = "text-3xl font-bold text-black mb-2">
-                  {isNewWorkout !== undefined ? "Edit" : "New"} Workout
+                  {isNewWorkout ? "New" : "Edit"} Workout
                </h1>
             </div>
             <div className = "relative mt-2 w-full flex flex-col justify-center align-center text-left gap-3">
                <FontAwesomeIcon
                   icon = {faArrowRotateLeft}
-                  onClick = {() => reset(false)}
+                  onClick = {handleReset}
                   className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
                <Input id = "title" type = "text" label = "Title" icon = {faSignature} input = {localState.title} dispatch = {localDispatch} autoFocus required />
@@ -249,7 +254,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
 
                {/* <TagSelection id = "title" type = "text" label = "Title" icon = {faSignature} input = {localState.title} globalState = {globalState} dispatch = {localDispatch} /> */}
                <TextArea id = "description" type = "text" label = "Description" icon = {faBook} input = {localState.description} dispatch = {localDispatch} />
-               {/* <ImageSelection id = "image" type = "text" label = "URL" icon = {faLink} input = {localState.image} dispatch = {localDispatch} /> */}
+               <ImageSelection id = "image" type = "text" label = "URL" icon = {faLink} input = {localState.image} dispatch = {localDispatch} />
                {
                   !(isNewWorkout) && (
                      <PopUp
@@ -302,7 +307,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   onClick = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
                >
                   {
-                     isNewWorkout !== undefined ? "Save" : "Create"
+                     isNewWorkout ? "Create" : "Save"
                   }
                </Button>
                {/* {

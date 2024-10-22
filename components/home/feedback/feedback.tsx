@@ -6,7 +6,7 @@ import Input from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRotateLeft, faBook, faEnvelope, faFeather } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { VitalityState, formReducer, VitalityResponse, useHandleResponse } from "@/lib/global/state";
+import { VitalityState, formReducer, VitalityResponse, handleResponse } from "@/lib/global/state";
 import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
 import { NotificationContext } from "@/app/layout";
 
@@ -52,7 +52,7 @@ function Form(): JSX.Element {
             });
          };
 
-         useHandleResponse(dispatch, response, successMethod, updateNotification);
+         handleResponse(dispatch, response, successMethod, updateNotification);
       } catch (error) {
          console.error(error);
       }

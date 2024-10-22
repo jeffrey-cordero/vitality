@@ -1,44 +1,42 @@
 "use client";
+import WorkoutFiltering from "@/components/home/workouts/filter";
 import WorkoutForm from "@/components/home/workouts/form";
 import WorkoutTable from "@/components/home/workouts/table";
 import WorkoutCards from "@/components/home/workouts/cards";
 import Button from "@/components/global/button";
 import Pagination from "@/components/home/workouts/pagination";
 import clsx from "clsx";
-import Input from "@/components/global/input";
 import { AuthenticationContext } from "@/app/layout";
 import { fetchWorkouts, Workout } from "@/lib/workouts/workouts";
 import { fetchWorkoutTags } from "@/lib/workouts/tags";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { getWorkoutDate, searchForTitle } from "@/lib/workouts/shared";
-import { faPersonRunning, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FilterByDate, FilterByTags } from "@/components/home/workouts/filter";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const workouts: VitalityState = {
-   title: {
+   // Global filtering inputs
+   search: {
       value: "",
       error: null,
       data: {}
    },
-   date: {
+   type: {
+      value: "Is on or after",
+      error: null,
+      data: {}
+   },
+   min: {
       value: "",
       error: null,
       data: {}
    },
-   description: {
+   max: {
       value: "",
       error: null,
       data: {}
    },
-   image: {
-      value: "",
-      error: null,
-      data: {
-         handlesChanges: true
-      }
-   },
-   // Tag form
+   // User tags
    tags: {
       value: null,
       error: null,
@@ -67,6 +65,7 @@ const workouts: VitalityState = {
       error: null,
       data: {}
    },
+   // Current editing workout
    workout: {
       value: {
          id: "",
@@ -81,6 +80,7 @@ const workouts: VitalityState = {
       error: null,
       data: {}
    },
+   // User workouts
    workouts: {
       value: [],
       error: null,
@@ -93,30 +93,7 @@ const workouts: VitalityState = {
          filtered: []
       }
    },
-   // Filter form
-   workoutsSearch: {
-      value: "",
-      error: null,
-      data: {}
-   },
-   workoutsDateFilter: {
-      value: "Is on or after",
-      error: null,
-      data: {
-         options: ["Is on or after", "Is on or before", "Is between"]
-      }
-   },
-   workoutsMinDate: {
-      value: getWorkoutDate(new Date()),
-      error: null,
-      data: {}
-   },
-   workoutsMaxDate: {
-      value: getWorkoutDate(new Date()),
-      error: null,
-      data: {}
-   },
-   workoutsPaging: {
+   paging: {
       value: 10,
       error: null,
       data: {
@@ -182,8 +159,8 @@ export default function Page(): JSX.Element {
 
    // Convert search string to lower case for case-insensitive comparison
    const search: string = useMemo(() => {
-      return globalState.workoutsSearch.value.trim().toLowerCase();
-   }, [globalState.workoutsSearch]);
+      return globalState.search.value.trim().toLowerCase();
+   }, [globalState.search]);
 
    // Filtered based on selected tags or date intervals
    const filtered: Workout[] = globalState.workouts.data.filtered;
@@ -193,8 +170,8 @@ export default function Page(): JSX.Element {
       return searchForTitle(filtered, search);
    }, [filtered, search]);
 
-   const pages: number = globalState.workoutsPaging.value;
-   const page: number = globalState.workoutsPaging.data.page;
+   const pages: number = globalState.paging.value;
+   const page: number = globalState.paging.data.page;
 
    const low: number = page * pages;
    const high = low + pages - 1;
@@ -250,50 +227,7 @@ export default function Page(): JSX.Element {
             console.error(error);
          }
       }
-   }, [globalState.tags, globalState.workouts, user]);
-
-
-   const handleReset = (filterReset: boolean) => {
-      globalDispatch({
-         // Reset state for new workout form
-         type: "resetState",
-         value: {
-            // Reset selected tags data
-            tags: {
-               data: {
-                  ...globalState.tags.data,
-                  selected: [],
-                  filteredSelected: []
-               },
-               value: globalState.tags.value
-            },
-            workouts: {
-               data: {
-                  ...globalState.workouts.data,
-                  // Hitting reset icon for filter forms should reset filtering options
-                  tagsFiltered: filterReset ? false : globalState.workouts.data.tagsFiltered,
-                  dateFiltered: filterReset ? false : globalState.workouts.data.dateFiltered,
-                  filtered: filterReset ? globalState.workouts.value : globalState.workouts.data.filtered,
-                  selected: filterReset ? new Set<Workout>() :  globalState.workouts.data.selected
-               },
-               value: globalState.workouts.value
-            },
-            workoutsDateFilter: {
-               data: {
-                  ...globalState.workoutsDateFilter.data
-               },
-               value: globalState.workoutsDateFilter.value
-            },
-            workoutsPaging: {
-               data: {
-                  ...globalState.workoutsPaging.data,
-                  page: 0
-               },
-               value: globalState.workoutsPaging.value
-            }
-         }
-      });
-   };
+   }, [globalState.tags, globalState.workout.data, globalState.workout.value, globalState.workouts, user]);
 
    useEffect(() => {
       if (!(globalState.workouts.data.fetched)) {
@@ -307,28 +241,35 @@ export default function Page(): JSX.Element {
             <h1 className = "text-4xl font-bold mt-8">Welcome Back, Champion!</h1>
             <p className = "text-lg text-gray-700 mt-4 max-w-[25rem] mx-auto">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
          </div>
-         <div
-            onClick = {() => {
-               globalDispatch({
-                  type: "updateState",
-                  value: {
-                     id: "workout",
-                     input: {
-                        ...globalState.workout,
-                        value: {
-
-                        }
-                     }
-                  }
-               });
-            }}
-            className = "flex justify-center w-full mx-auto">
+         <div className = "flex justify-center w-full mx-auto">
             <WorkoutForm
+               workout = {globalState.workout.value}
                globalState = {globalState}
                globalDispatch = {globalDispatch}
-               reset = {handleReset}
                cover = {
-                  <Button type = "button" className = "bg-primary text-white w-full h-[2.6rem] p-4" icon = {faPlus}>
+                  <Button type = "button" className = "bg-primary text-white w-full h-[2.6rem] p-4" icon = {faPlus}
+                     onClick = {() => {
+                        globalDispatch({
+                           type: "updateState",
+                           value: {
+                              id: "workout",
+                              input: {
+                                 ...globalState.workout,
+                                 value: {
+                                    id: "",
+                                    user_id: user?.id ?? "",
+                                    title: "",
+                                    date: new Date(),
+                                    image: "",
+                                    description: "",
+                                    tagIds: [],
+                                    exercises: []
+                                 }
+                              }
+                           }
+                        });
+                     }}
+                  >
                      New Workout
                   </Button>
                }
@@ -337,15 +278,7 @@ export default function Page(): JSX.Element {
          {
             <div className = "w-full mx-auto flex flex-col justify-center items-center">
                <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 my-2">
-                  <div className = "w-full flex flex-col justify-start  gap-2">
-                     <Input id = "workoutsSearch" type = "text" label = "Search" icon = {faPersonRunning} input = {globalState.workoutsSearch} dispatch = {globalDispatch} autoFocus />
-                     <div className = "w-full flex flex-row justify-between items-center gap-2">
-                        <div className = "flex flex-row gap-2">
-                           <FilterByDate state = {globalState} dispatch = {globalDispatch} reset = {handleReset} />
-                           <FilterByTags state = {globalState} dispatch = {globalDispatch} reset = {handleReset} />
-                        </div>
-                     </div>
-                  </div>
+                  <WorkoutFiltering globalState = {globalState} globalDispatch = {globalDispatch} />
                </div>
                <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 mt-2">
                   <Button
@@ -363,6 +296,7 @@ export default function Page(): JSX.Element {
                      Cards
                   </Button>
                </div>
+               <WorkoutTable workouts = {workoutsSection} globalState = {globalState} globalDispatch = {globalDispatch}  />
                {/* {
                   view === "table" ? (
                      <WorkoutTable workouts = {workoutsSection} globalState = {globalState} globalDispatch = {globalDispatch} reset = {handleReset} />

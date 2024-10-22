@@ -20,11 +20,11 @@ export async function login(credentials: Credentials): Promise<VitalityResponse<
 
       if (error instanceof AuthError) {
          switch (error.type) {
-         case "CallbackRouteError":
-         case "CredentialsSignin":
-            return sendErrorMessage("Error", "Invalid credentials", null, { username : ["Invalid credentials"], password: ["Invalid credentials"] });
-         default:
-            return sendErrorMessage("Failure", "Internal Server Authentication Error. Please try again later.", null, {});
+            case "CallbackRouteError":
+            case "CredentialsSignin":
+               return sendErrorMessage("Error", "Invalid credentials", null, { username : ["Invalid credentials"], password: ["Invalid credentials"] });
+            default:
+               return sendErrorMessage("Failure", "Internal Server Authentication Error. Please try again later.", null, {});
          }
       }
 
