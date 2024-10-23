@@ -3,7 +3,7 @@ import ToolTip from "@/components/global/tooltip";
 import clsx from "clsx";
 import Button from "@/components/global/button";
 import Input, { VitalityInputProps } from "@/components/global/input";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PopUp } from "@/components/global/popup";
 import { faPaperclip, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -185,7 +185,11 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             },
             image: {
                ...localState.image,
-               value: workout.image
+               value: workout.image,
+               data: {
+                  valid: true,
+                  error: false
+               }
             },
             description: {
                ...localState.description,
@@ -354,11 +358,14 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                      isNewWorkout ? "Create" : "Save"
                   }
                </Button>
-               {/* {
-                  isNewWorkout !== undefined && (
-                     <Exercises workout = {workout} globalState = {globalState} globalDispatch = {globalDispatch} />
+               {
+                  !(isNewWorkout) && (
+                     <Exercises
+                        workout = {workout}
+                        globalState = {globalState}
+                        globalDispatch = {globalDispatch} />
                   )
-               } */}
+               }
             </div>
          </div>
       </PopUp>

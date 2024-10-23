@@ -2,10 +2,10 @@
 import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import TextArea from "@/components/global/textarea";
-import { formReducer, VitalityAction, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
+import { formReducer, handleResponse, VitalityChildProps, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
 import { faClock, faCloudArrowUp, faFeather, faHashtag, faPencil, faPlus, faRotateLeft, faTrash, faWeight } from "@fortawesome/free-solid-svg-icons";
-import { Dispatch, useCallback, useContext, useReducer, useState } from "react";
+import { CSSProperties, use, useCallback, useContext, useReducer, useRef, useState } from "react";
 import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises, addExerciseSet } from "@/lib/workouts/exercises";
 import { NotificationContext } from "@/app/layout";
 import {
@@ -25,10 +25,8 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-const exercise: VitalityState = {
-   exerciseTitle: {
-      type: "text",
-      id: "exerciseTitle",
+const form: VitalityState = {
+   name: {
       value: "",
       error: null,
       data: {
@@ -37,100 +35,79 @@ const exercise: VitalityState = {
       }
    },
    weight: {
-      type: "number",
-      id: "weight",
       value: "",
       error: null,
       data: {}
    },
    repetitions: {
-      type: "number",
-      id: "repetitions",
       value: "",
       error: null,
       data: {}
    },
    hours: {
-      type: "number",
-      id: "hours",
       value: "",
       error: null,
       data: {}
    },
    minutes: {
-      type: "number",
-      id: "minutes",
       value: "",
       error: null,
       data: {}
    },
    seconds: {
-      type: "number",
-      id: "seconds",
       value: "",
       error: null,
       data: {}
    },
    text: {
-      type: "text",
-      id: "text",
       value: "",
       error: null,
       data: {}
+   },
+   exerciseId: {
+      value: null,
+      error: null,
+      data: {
+         setId: ""
+      }
    }
 };
 
 function NewExerciseInput(props: ExerciseProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
-   const { workout, state, dispatch, onWorkoutSave } = props;
+   const { workout, localState, localDispatch, saveExercises } = props;
 
    const handleCreateNewExercise = useCallback(async() => {
       const payload: Exercise = {
          id: "",
          workout_id: workout.id,
-         title: state.exerciseTitle.value.trim(),
+         name: localState.name.value.trim(),
          exercise_order: workout.exercises.length,
          sets: []
       };
 
       const response: VitalityResponse<Exercise> = await addExercise(payload);
-      const returnedExercise: Exercise = response.body.data;
 
-      if (response.status === "Success") {
-         const newExercises: Exercise[] = [...workout.exercises, returnedExercise];
-         onWorkoutSave(newExercises);
-      } else {
-         // Display all errors, where title entry is replaced by exerciseTitle
-         if (response.body.errors.title) {
-            response.body.errors.exerciseTitle = response.body.errors.title;
-            delete response.body.errors.title;
-         }
+      const successMethod = () => {
+         // Simply add the new exercise to array of exercises in editing workout
+         const newExercises: Exercise[] = [...workout.exercises, response.body.data];
+         saveExercises(newExercises);
+      };
 
-         dispatch({
-            type: "updateErrors",
-            value: response
-         });
-      }
-
-      if (response.status === "Failure") {
-         // Display failure notification to the user, if any
-         updateNotification({
-            status: response.status,
-            message: response.body.message,
-            timer: 1250
-         });
-      }
-   }, [onWorkoutSave, dispatch, workout, state.exerciseTitle.value,
-      updateNotification]);
+      handleResponse(localDispatch, response, successMethod, updateNotification, 1250);
+   }, [localDispatch, localState.name.value, saveExercises, updateNotification, workout.exercises, workout.id]);
 
    return (
       <div className = "w-full mb-2 mx-auto text-left" >
          <Input
-            input = {state.exerciseTitle}
-            label = "Title"
+            id = "name"
+            type = "text"
+            label = "Name"
             icon = {faFeather}
-            dispatch = {dispatch}
-            onBlur = {props.onBlur} />
+            input = {localState.name}
+            dispatch = {localDispatch}
+            autoFocus
+            required />
          <Button
             type = "button"
             className = "w-full bg-green-600 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
@@ -148,17 +125,15 @@ interface SetProps extends ExerciseProps {
 }
 
 function SetContainer(props: SetProps): JSX.Element {
-   const { workout, exercise, set, state, dispatch, onBlur, onWorkoutSave } = props;
+   const { workout, exercise, set, localState, localDispatch, onBlur, saveExercises } = props;
    const { updateNotification } = useContext(NotificationContext);
    const [editSet, setEditSet] = useState(set === undefined);
-   const editingExerciseId: string = state.exerciseId.value;
-   const editingExerciseSetId: string = state.exerciseId.data.setId;
+   const editingExerciseId: string = localState.exerciseId.value;
+   const editingExerciseSetId: string = localState.exerciseId.data.setId;
    const displayEditInputs = editSet
       && editingExerciseId === exercise.id
-      && (set === undefined &&  editingExerciseSetId === "" || set.id === editingExerciseSetId);
-
-   console.log(editingExerciseId);
-   console.log(editingExerciseSetId);
+      && (set === undefined && editingExerciseSetId === ""
+         || set?.id === editingExerciseSetId);
 
    // Construct payload exercise set with valid numeric inputs
    const constructNewExerciseSet = useCallback(() => {
@@ -172,125 +147,128 @@ function SetContainer(props: SetProps): JSX.Element {
          id: set !== undefined ? set.id : "",
          exercise_id: exercise.id,
          set_order: set !== undefined ? set.set_order : exercise.sets.length,
-         weight: parseNumber(state.weight.value),
-         repetitions: parseNumber(state.repetitions.value),
-         hours: parseNumber(state.hours.value),
-         minutes: parseNumber(state.minutes.value),
-         seconds: parseNumber(state.seconds.value),
-         text: state.text.value
+         weight: parseNumber(localState.weight.value),
+         repetitions: parseNumber(localState.repetitions.value),
+         hours: parseNumber(localState.hours.value),
+         minutes: parseNumber(localState.minutes.value),
+         seconds: parseNumber(localState.seconds.value),
+         text: localState.text.value
       };
-   }, [exercise.sets.length, exercise.id, set, state.hours.value, state.minutes.value, state.repetitions.value, state.seconds.value, state.text.value, state.weight.value]);
+   }, [exercise.id, exercise.sets.length, localState.hours.value, localState.minutes.value,
+      localState.repetitions.value, localState.seconds.value, localState.text.value,
+      localState.weight.value, set]);
 
    const handleExerciseSetSubmission = useCallback(async(method: "add" | "update" | "delete") => {
       const newSet: ExerciseSet = constructNewExerciseSet();
       const response: VitalityResponse<Exercise> = await addExerciseSet(newSet);
 
-      if (response.status === "Success") {
+      const successMethod = () => {
+         // Update editing exercise
          const newExercises: Exercise[] = [...workout.exercises].map((e) => e.id === exercise.id ? response.body.data : e);
-
-         onWorkoutSave(newExercises);
+         saveExercises(newExercises);
          onBlur();
-      } else if (response.status === "Error" && !(Object.keys(response.body.errors).length === 0)) {
-         // Display errors
-         dispatch({
-            type: "updateErrors",
-            value: response
-         });
-      } else {
-         // Display failure message
-         updateNotification({
-            status: response.status,
-            message: response.body.message
-         });
-      }
+      };
 
-   }, [constructNewExerciseSet, dispatch, exercise, onWorkoutSave, onBlur, updateNotification, workout.exercises]);
+      handleResponse(localDispatch, response, successMethod, updateNotification, 1250);
+   }, [constructNewExerciseSet, exercise.id, localDispatch, onBlur, saveExercises, updateNotification, workout.exercises]);
 
    const handleInitializeEditSet = useCallback((event) => {
       event.stopPropagation();
+      event.preventDefault();
 
       // Update exercise inputs
-      dispatch({
+      localDispatch({
          type: "initializeState",
          value: {
             exerciseId: {
-               ...state.exerciseId,
+               ...localState.exerciseId,
                value: exercise.id,
                data: {
                   setId: set?.id ?? ""
                }
             },
             weight: {
-               ...state.weight,
+               ...localState.weight,
                value: set?.weight ?? ""
             },
             repetitions: {
-               ...state.repetitions,
+               ...localState.repetitions,
                value: set?.repetitions ?? ""
             },
             hours: {
-               ...state.hours,
+               ...localState.hours,
                value: set?.hours ?? ""
             },
             minutes: {
-               ...state.minutes,
+               ...localState.minutes,
                value: set?.minutes ?? ""
             },
             seconds: {
-               ...state.seconds,
+               ...localState.seconds,
                value: set?.seconds ?? ""
             },
             text: {
-               ...state.text,
+               ...localState.text,
                value: set?.text ?? ""
-            },
-            setId: {
-               ...state.setId,
-               value: set?.id ?? ""
             }
          }
       });
 
       // Display inputs
       setEditSet(true);
-   }, [dispatch, set?.hours, set?.minutes, set?.repetitions, set?.seconds, set?.text, set?.weight, state.hours,
-      state.minutes, state.repetitions, state.seconds, state.text, state.weight, set?.id, state.setId, state.exerciseId, exercise.id]);
+   }, [exercise.id, localDispatch, localState.exerciseId, localState.hours, localState.minutes, localState.repetitions,
+      localState.seconds, localState.text, localState.weight, set?.hours, set?.id, set?.minutes, set?.repetitions,
+      set?.seconds, set?.text, set?.weight]);
 
    return (
       displayEditInputs ? (
          <li className = "flex flex-col justify-start gap-2 w-full mx-auto pt-2 text-left">
             <Input
-               input = {state.weight}
+               id = "weight"
+               type = "number"
                label = "Weight"
                icon = {faWeight}
-               dispatch = {dispatch} />
+               input = {localState.weight}
+               dispatch = {localDispatch}
+               autoFocus />
             <Input
-               input = {state.repetitions}
+               id = "repetitions"
+               type = "number"
                label = "Repetitions"
                icon = {faHashtag}
-               dispatch = {dispatch} />
+               input = {localState.repetitions}
+               dispatch = {localDispatch} />
             <div className = "flex justify-start items-center gap-2">
                <Input
-                  input = {state.hours}
+                  id = "hours"
+                  type = "number"
                   label = "Hours"
                   icon = {faClock}
-                  dispatch = {dispatch} />
+                  input = {localState.hours}
+                  dispatch = {localDispatch} />
                <Input
-                  input = {state.minutes}
+                  id = "minutes"
+                  type = "number"
                   label = "Minutes"
                   icon = {faClock}
-                  dispatch = {dispatch} />
+                  input = {localState.minutes}
+                  dispatch = {localDispatch} />
                <Input
-                  input = {state.seconds}
+                  id = "seconds"
+                  type = "number"
                   label = "Seconds"
                   icon = {faClock}
-                  dispatch = {dispatch} />
+                  input = {localState.seconds}
+                  dispatch = {localDispatch} />
             </div>
             <TextArea
-               input = {state.text}
+               id = "text"
+               type = "text"
                label = "Text"
                icon = {faPencil}
-               dispatch = {dispatch} />
+               input = {localState.text}
+               dispatch = {localDispatch}
+               required />
             <Button
                type = "button"
                className = "w-full bg-grey-200 mb-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
@@ -344,19 +322,19 @@ function SetContainer(props: SetProps): JSX.Element {
    );
 }
 
-interface ExerciseProps extends ExercisesProps {
+interface ExerciseProps extends ExercisesProps, VitalityChildProps {
    exercise: Exercise;
-   // localState: VitalityState;
-   // localDispatch: Dispatch<VitalityAction<any>>;
+   saveExercises: (_updatingExercises: Exercise[]) => void;
+   onBlur?: () => void;
 }
 
 function ExerciseContainer(props: ExerciseProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
-   const { workout, exercise, state, dispatch, onWorkoutSave } = props;
-   const { edit, id } = state.exerciseTitle.data;
-   const [editTitle, setEditTitle] = useState<boolean>(false);
+   const { workout, exercise, localState, localDispatch, saveExercises } = props;
+   const { edit, id } = localState.name.data;
+   const [editName, setEditName] = useState<boolean>(false);
    const [addSet, setAddSet] = useState<boolean>(false);
-   const displayEditTitle = editTitle && edit && id === exercise.id;
+   const displayEditName = editName && edit && id === exercise.id;
 
    // Prevent drag and drop mechanisms when user is editing exercise information
    const {
@@ -365,7 +343,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       setNodeRef,
       transform,
       transition
-   } = useSortable({ id: exercise.id, disabled: displayEditTitle || addSet });
+   } = useSortable({ id: exercise.id, disabled: displayEditName || addSet });
 
    const style = {
       transform: CSS.Transform.toString(transform),
@@ -374,88 +352,116 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
    const handleSaveExerciseName = useCallback(async() => {
       // Construct new exercise for update method
-      const newTitle: string = state.exerciseTitle.value.trim();
-      const newExercise: Exercise = { ...exercise, title: newTitle };
-      const response: VitalityResponse<Exercise> = await updateExercise(newExercise, "title");
+      const newName: string = localState.name.value.trim();
+      const newExercise: Exercise = { ...exercise, name: newName };
+      const response: VitalityResponse<Exercise> = await updateExercise(newExercise, "name");
 
-      if (response.status === "Success") {
+      const successMethod = () => {
          // Update the overall workout exercises
          const newExercises: Exercise[] = [...workout.exercises].map((e) => e.id !== exercise.id ? e : newExercise);
+         setEditName(false);
+         saveExercises(newExercises);
+      };
 
-         setEditTitle(false);
-         onWorkoutSave(newExercises);
-      } else if (response.status === "Failure") {
-         // Display failure notification to the user, if any
-         updateNotification({
-            status: response.status,
-            message: response.body.message,
-            timer: 1250
-         });
-      } else {
-         // Add error message
-         dispatch({
-            type: "updateState",
-            value: {
-               ...state.exerciseTitle,
-               error: [response.body.message]
-            }
-         });
-      }
-   }, [dispatch, exercise, onWorkoutSave, workout,
-      state.exerciseTitle, updateNotification]);
+      handleResponse(localDispatch, response, successMethod, updateNotification, 1250);
+   }, [exercise, localDispatch, localState.name.value, saveExercises, updateNotification, workout.exercises]);
 
    const handleDeleteExercise = useCallback(async() => {
       const newExercises: Exercise[] = [...workout.exercises].filter((e) => e.id !== exercise.id);
       const response: VitalityResponse<Exercise[]> = await updateExercises(workout.id, newExercises);
 
-      if (response.status === "Success") {
+      const successMethod = () => {
          // Update the overall workout exercises with new exercises from backend response
-         onWorkoutSave(response.body.data as Exercise[]);
-      } else {
-         // Display error or failure notification to the user, if any
-         updateNotification({
-            status: response.status,
-            message: response.body.message,
-            timer: 1250
-         });
-      }
-   }, [exercise.id, onWorkoutSave, updateNotification, workout.exercises, workout.id]);
+         saveExercises(response.body.data);
+      };
+
+      handleResponse(localDispatch, response, successMethod, updateNotification, 1250);
+   }, [exercise.id, localDispatch, saveExercises, updateNotification, workout.exercises, workout.id]);
+
 
    const handleInitializeEditExerciseName = useCallback(() => {
-      dispatch({
+      localDispatch({
          type: "updateState",
          value: {
-            ...state.exerciseTitle,
-            value: exercise.title,
-            error: null,
-            data: {
-               edit: true,
-               id: exercise.id
+            id: "name",
+            input: {
+               ...localState.name,
+               value: exercise.name,
+               error: null,
+               data: {
+                  edit: true,
+                  id: exercise.id
+               }
             }
          }
       });
 
-      setEditTitle(true);
-   }, [dispatch, exercise.title, state.exerciseTitle, exercise.id]);
+      setEditName(true);
+   }, [exercise.id, exercise.name, localDispatch, localState.name]);
+
+   const handleInitializeNewSet = useCallback(() => {
+      // Reset exercise inputs
+      localDispatch({
+         type: "updateStates",
+         value: {
+            exerciseId: {
+               ...localState.exerciseId,
+               value: exercise.id,
+               data: {
+                  setId: ""
+               }
+            },
+            weight: {
+               ...localState.weight,
+               value: ""
+            },
+            repetitions: {
+               ...localState.repetitions,
+               value: ""
+            },
+            hours: {
+               ...localState.hours,
+               value: ""
+            },
+            minutes: {
+               ...localState.minutes,
+               value: ""
+            },
+            seconds: {
+               ...localState.seconds,
+               value: ""
+            },
+            text: {
+               ...localState.text,
+               value: ""
+            }
+         }
+      });
+
+      setAddSet(true);
+   }, [exercise.id, localDispatch, localState.exerciseId, localState.hours, localState.minutes,
+      localState.repetitions, localState.seconds, localState.text, localState.weight]);
 
    return (
       <li
          className = "w-full mx-auto p-4 text-left focus:cursor-move"
-         ref = {setNodeRef}
          style = {style}
-         {...attributes}
-         {...listeners}
+         ref = {setNodeRef}
       >
          {
-            displayEditTitle ? (
+            displayEditName ? (
                <div>
                   <Input
+                     id = "name"
+                     type = "text"
                      className = "mb-2"
-                     input = {state.exerciseTitle}
-                     label = "Title"
+                     label = "Name"
                      icon = {faFeather}
-                     dispatch = {dispatch}
-                     onBlur = {() => setEditTitle(false)} />
+                     input = {localState.name}
+                     dispatch = {localDispatch}
+                     onBlur = {() => setEditName(false)}
+                     autoFocus
+                     required />
                   <Button
                      type = "button"
                      className = "w-full bg-green-600 text-white text-md  mt-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
@@ -476,7 +482,10 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
             ) : (
                <h1
                   onDoubleClick = {handleInitializeEditExerciseName}
-                  className = "text-xl mb-2">{exercise.title}</h1>
+                  className = "text-xl mb-2"
+                  {...attributes}
+                  {...listeners}
+               >{exercise.exercise_order + 1}. {exercise.name}</h1>
             )
          }
          <ul className = "list-disc text-black flex flex-col gap-2">
@@ -490,10 +499,12 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
             }
             {
                addSet && (
-                  <SetContainer
-                     {...props}
-                     set = {undefined}
-                     onBlur = {() => setAddSet(false)} />
+                  <div>
+                     <SetContainer
+                        {...props}
+                        set = {undefined}
+                        onBlur = {() => setAddSet(false)} />
+                  </div>
                )
             }
          </ul>
@@ -501,20 +512,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
             type = "button"
             className = "z-50 w-full bg-white text-black text-md mt-6 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
             icon = {faPlus}
-            onClick = {(event) => {
-               event.stopPropagation();
-               dispatch({
-                  type: "updateState",
-                  value: {
-                     ...state.exerciseId,
-                     value: exercise.id,
-                     data: {
-                        setId: ""
-                     }
-                  }
-               });
-               setAddSet(true);
-            }}
+            onClick = {handleInitializeNewSet}
          >
             New Set
          </Button>
@@ -524,17 +522,14 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
 interface ExercisesProps extends VitalityProps {
    workout: Workout;
-   onBlur?: () => void;
-   onWorkoutSave?: (_exercises: Exercise[]) => void;
 }
 
 export default function Exercises(props: ExercisesProps): JSX.Element {
-   const { workout, globalState, globalDispatch, setEditingWorkout } = props;
-   const { updateNotification } = useContext(NotificationContext);
-   const [localState, localDispatch] = useReducer(formReducer, exercise);
+   const { workout, globalState, globalDispatch } = props;
+   const [localState, localDispatch] = useReducer(formReducer, form);
    const [addExercise, setAddExercise] = useState(false);
-   const id = state.exerciseTitle.data.id;
-   const edit = state.exerciseTitle.data.id;
+   const id = localState.name.data.id;
+   const edit = localState.name.data.id;
 
    const sensors = useSensors(
       useSensor(PointerSensor),
@@ -542,63 +537,59 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
          coordinateGetter: sortableKeyboardCoordinates
       })
    );
-   const displayNewTitle: boolean = addExercise && !(edit);
+   const displayNewName: boolean = addExercise && !(edit);
    const exercises: Exercise[] = workout.exercises;
 
    const handleInitializeNewExerciseInput = useCallback(() => {
-      dispatch({
+      localDispatch({
          type: "updateState",
          value: {
-            ...state.exerciseTitle,
-            value: "",
-            error: null,
-            data: {
-               id: "",
-               edit: false
+            id: "name",
+            input: {
+               ...localState.name,
+               value: "",
+               error: null,
+               data: {
+                  id: "",
+                  edit: false
+               }
             }
          }
       });
 
       setAddExercise(true);
-   }, [dispatch, state.exerciseTitle]);
+   }, [localDispatch, localState.name]);
 
-   const handleSaveWorkout = useCallback(async(updatingExercises: Exercise[]) => {
-      // Update workout entry in database
-      const response: VitalityResponse<Exercise[]> = await updateExercises(workout.id, updatingExercises);
+   const handleSaveExercises = useCallback(async(updatingExercises: Exercise[]) => {
+      // Update editing and overall workouts
+      const newWorkout: Workout = { ...workout, exercises: updatingExercises };
+      const newWorkouts: Workout[] = [...globalState.workouts.value].map((w) => w.id !== newWorkout.id ? w : newWorkout);
+      const newFiltered: Workout[] = [...globalState.workouts.data.filtered].map((w) => w.id !== newWorkout.id ? w : newWorkout);
 
-      if (response.status === "Success") {
-         // Update front-end state on success
-         const newWorkouts: Workout[] = [...state.workouts.value].map((w) => w.id !== workout.id ? w : workout);
-
-         globalDispatch({
-            type: "updateState",
-            value: {
+      // Update editing workout and overall workouts global state
+      globalDispatch({
+         type: "updateStates",
+         value: {
+            workout: {
+               ...globalState.workout,
+               value: newWorkout
+            },
+            workouts: {
                ...globalState.workouts,
-               value: newWorkouts
+               value: newWorkouts,
+               data: {
+                  ...globalState.workouts.data,
+                  filtered: newFiltered
+               }
             }
-         });
-
-         // Updating editing workout in main workout component
-         setEditingWorkout({ ...workout, exercises: response.body.data });
-
-         // Remove add exercise input, if applicable
-         if (addExercise) {
-            setAddExercise(false);
          }
-      } else if (response.status === "Error") {
-         // Display errors
-         dispatch({
-            type: "updateErrors",
-            value: response
-         });
-      } else {
-         // Display failure message
-         updateNotification({
-            status: response.status,
-            message: response.body.message
-         });
+      });
+
+      // Remove add exercise input, if applicable
+      if (addExercise) {
+         setAddExercise(false);
       }
-   }, [setEditingWorkout, addExercise, dispatch, state.workouts, updateNotification, workout]);
+   }, [addExercise, globalDispatch, globalState.workout, globalState.workouts, workout]);
 
    const handleDragEnd = (event) => {
       const { active, over } = event;
@@ -617,7 +608,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                oldIndex = exercise.exercise_order;
             }
 
-            if (exercise.id === over.id) {
+            if (exercise.id === over?.id) {
                // Swapping exercise
                newIndex = exercise.exercise_order;
             }
@@ -633,7 +624,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                exercise_order: index
             }));
 
-            handleSaveWorkout(newExercises);
+            handleSaveExercises(newExercises);
          }
       }
    };
@@ -641,10 +632,13 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
    return (
       <div className = "w-full mx-auto text-center font-bold flex flex-col justify-center items-center">
          {
-            displayNewTitle &&
+            displayNewName &&
             <NewExerciseInput
                {...props}
-               onWorkoutSave = {handleSaveWorkout}
+               localState = {localState}
+               localDispatch = {localDispatch}
+               exercise = {null}
+               saveExercises = {handleSaveExercises}
                onBlur = {() => {
                   setAddExercise(false);
                }}
@@ -667,23 +661,24 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
             <SortableContext
                items = {exercises.map((exercise) => exercise.id)}
                strategy = {verticalListSortingStrategy}>
-               <ol className = "w-full mx-auto list-decimal pl-6 mt-2">
+               <ol className = "w-full mx-auto pl-6 mt-2">
                   {
-                     workout.exercises.map((exercise: Exercise) => {
+                     exercises.map((exercise: Exercise) => {
                         return (
                            <ExerciseContainer
                               {...props}
+                              localState = {localState}
+                              localDispatch = {localDispatch}
+                              saveExercises = {handleSaveExercises}
                               exercise = {exercise}
                               key = {exercise.id}
-                              onWorkoutSave = {handleSaveWorkout} />
+                           />
                         );
                      })
-
                   }
                </ol>
             </SortableContext>
          </DndContext>
       </div>
-
    );
 }

@@ -85,7 +85,7 @@ const workouts: VitalityState = {
       }
    },
    // Exercise form
-   exerciseTitle: {
+   name: {
       value: "",
       error: null,
       data: {
@@ -161,6 +161,7 @@ export default function Page(): JSX.Element {
    const workoutsSection: Workout[] = useMemo(() => {
       return results.slice(low, high + 1);
    }, [results, low, high]);
+
 
    const fetchWorkoutsData = useCallback(async() => {
       if (user !== undefined && globalState.workouts.data.fetched === false) {

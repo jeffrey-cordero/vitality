@@ -136,7 +136,8 @@ export function handleResponse(
    dispatch: Dispatch<VitalityAction<any>>,
    response: VitalityResponse<any>,
    successMethod: () => void,
-   updateNotification: (_notification: NotificationProps) => void
+   updateNotification: (_notification: NotificationProps) => void,
+   timer?: number
 ): void {
    if (response.status === "Success") {
       // Call success method appropriately
@@ -151,7 +152,8 @@ export function handleResponse(
       // Display failure notification to the user
       updateNotification({
          status: response.status,
-         message: response.body.message
+         message: response.body.message,
+         timer: timer ?? undefined
       });
    }
 }

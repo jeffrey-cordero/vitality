@@ -44,7 +44,7 @@ const setSchema = z.object({
 export type Exercise = {
   id: string;
   workout_id: string;
-  title: string;
+  name: string;
   exercise_order: number;
   sets: ExerciseSet[];
 };
@@ -52,11 +52,11 @@ export type Exercise = {
 const exerciseSchema = z.object({
    id: z.string(),
    workout_id: z.string(),
-   title: z
+   name: z
       .string()
       .trim()
-      .min(1, { message: "A title must be at least 1 character." })
-      .max(50, { message: "A title must be at most 50 characters." }),
+      .min(1, { message: "A name must be at least 1 character." })
+      .max(50, { message: "A name must be at most 50 characters." }),
    sets: z.array(setSchema)
 });
 
@@ -78,7 +78,7 @@ export async function addExercise(
       const newExercise = await prisma.exercises.create({
          data: {
             workout_id: exercise.workout_id,
-            title: exercise.title,
+            name: exercise.name,
             exercise_order: exercise.exercise_order
          }
       });
@@ -162,29 +162,29 @@ export async function addExerciseSet(set: ExerciseSet): Promise<VitalityResponse
 }
 
 export async function updateExercise(
-   exercise: Exercise, method: "title" | "sets"
+   exercise: Exercise, method: "name" | "sets"
 ): Promise<VitalityResponse<Exercise>> {
    try {
-      if (method === "title") {
-         // Update exercise title
-         const title = exercise.title.trim();
+      if (method === "name") {
+         // Update exercise name
+         const name = exercise.name.trim();
 
-         if (title.length === 0) {
-            const error: string = "A title must be at least 1 character";
+         if (name.length === 0) {
+            const error: string = "A name must be at least 1 character";
 
-            return sendErrorMessage("Error", error, null, null);
-         } else if (title.length > 50) {
-            const error: string = "A title must be at most 50 characters";
+            return sendErrorMessage("Error", error, null, { name: [error] });
+         } else if (name.length > 50) {
+            const error: string = "A name must be at most 50 characters";
 
-            return sendErrorMessage("Error", error, null, null);
+            return sendErrorMessage("Error", error, null, { name: [error] });
          } else {
-            // Update exercise with new title
+            // Update exercise with new name
             await prisma.exercises.update({
                where: {
                   id: exercise.id
                },
                data: {
-                  title: exercise.title
+                  name: exercise.name
                }
             });
 

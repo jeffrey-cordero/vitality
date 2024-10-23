@@ -33,7 +33,7 @@ CREATE TABLE "exercises" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       workout_id UUID NOT NULL REFERENCES "workouts"(id) ON DELETE CASCADE ON UPDATE CASCADE,
       exercise_order INTEGER NOT NULL,
-      title VARCHAR(50) NOT NULL
+      name VARCHAR(50) NOT NULL
 );
 
 CREATE INDEX "exercises_workout_index" ON "exercises" (workout_id);

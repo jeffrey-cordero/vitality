@@ -37,7 +37,7 @@ export function formatExercise(exercise): Exercise {
       id: exercise.id,
       workout_id: exercise.workout_id,
       exercise_order: exercise.exercise_order,
-      title: exercise.title,
+      name: exercise.name,
       sets: exercise.sets ?? []
    };
 }
