@@ -6,7 +6,7 @@ import {
    sendSuccessMessage,
    sendErrorMessage
 } from "@/lib/global/state";
-import { formatExercise, formatWorkout } from "./shared";
+import { formatWorkout } from "./shared";
 
 export type ExerciseSet = {
   id: string;
@@ -20,25 +20,62 @@ export type ExerciseSet = {
   text?: string;
 };
 
+const MAX_INTEGER = 2147483647;
+
 const setSchema = z.object({
    id: z.string(),
    exercise_id: z.string(),
-   hours: z.number().min(0, {
-      message: "Hours must be non-negative."
-   }).optional(),
-   minutes: z.number().min(0, {
-      message: "Minutes must be non-negative."
-   }).optional(),
-   seconds:z.number().min(0, {
-      message: "Seconds must be non-negative."
-   }).optional(),
-   weight: z.number().min(0, {
-      message: "Weight must be non-negative."
-   }).optional(),
-   repetitions: z.number().min(0, {
-      message: "Repetitions must be non-negative."
-   }).optional(),
-   text: z.string().optional()
+   hours: z
+      .number()
+      .min(0, {
+         message: "Hours must be non-negative."
+      })
+      .max(MAX_INTEGER, {
+         message: "Hours exceeds the maximum limit for a number."
+      })
+      .optional()
+      .nullable(),
+   minutes: z
+      .number()
+      .min(0, {
+         message: "Minutes must be non-negative."
+      })
+      .max(60, {
+         message: "Minutes cannot exceed 60."
+      })
+      .optional()
+      .nullable(),
+   seconds: z
+      .number()
+      .min(0, {
+         message: "Seconds must be non-negative."
+      })
+      .max(60, {
+         message: "Seconds cannot exceed 60."
+      })
+      .optional()
+      .nullable(),
+   weight: z
+      .number()
+      .min(0, {
+         message: "Weight must be non-negative."
+      })
+      .max(MAX_INTEGER, {
+         message: "Weight exceeds the maximum limit for a number."
+      })
+      .optional()
+      .nullable(),
+   repetitions: z
+      .number()
+      .min(0, {
+         message: "Repetitions must be non-negative."
+      })
+      .max(MAX_INTEGER, {
+         message: "Repetitions exceeds the maximum limit for a number."
+      })
+      .optional()
+      .nullable(),
+   text: z.string().optional().nullable()
 });
 
 export type Exercise = {
@@ -61,17 +98,17 @@ const exerciseSchema = z.object({
 });
 
 export async function addExercise(
-   exercise: Exercise
+   exercise: Exercise,
 ): Promise<VitalityResponse<Exercise>> {
    try {
       const fields = exerciseSchema.safeParse(exercise);
 
-      if (!(fields.success)) {
+      if (!fields.success) {
          return sendErrorMessage(
             "Error",
             "Invalid exercise fields",
             exercise,
-            fields.error.flatten().fieldErrors
+            fields.error.flatten().fieldErrors,
          );
       }
 
@@ -90,83 +127,19 @@ export async function addExercise(
    } catch (error) {
       console.error(error);
 
-      return sendErrorMessage(
-         "Failure",
-         error.meta?.message,
-         exercise,
-         { system: error.meta?.message }
-      );
-   }
-}
-
-export async function addExerciseSet(set: ExerciseSet): Promise<VitalityResponse<Exercise | null>> {
-   try {
-      const fields = setSchema.safeParse(set);
-
-      if (!(fields.success)) {
-         return sendErrorMessage(
-            "Error",
-            "Invalid exercise set fields",
-            null,
-            fields.error.flatten().fieldErrors
-         );
-      } else if (Object.keys(set).length <= 3 || set.text?.trim().length === 0) {
-         // Ensure at least one of the exercise fields are being used
-         return sendErrorMessage(
-            "Error",
-            "Exercise set must use at least of one the provided inputs.",
-            null,
-            null
-         );
-      }
-
-      const newExercise = await prisma.exercises.update({
-         where: {
-            id: set.exercise_id
-         },
-         data: {
-            sets: {
-               create: {
-                  set_order: set.set_order,
-                  weight: set.weight,
-                  hours: set.hours,
-                  minutes: set.minutes,
-                  seconds: set.seconds,
-                  repetitions: set.repetitions,
-                  text: set.text
-               }
-            }
-         },
-         include: {
-            sets: {
-               orderBy: {
-                  set_order: "asc"
-               }
-            }
-         }
+      return sendErrorMessage("Failure", error.meta?.message, exercise, {
+         system: error.meta?.message
       });
-
-      console.log(newExercise);
-
-      return sendSuccessMessage("Successfully added new exercise set", formatExercise(newExercise));
-   } catch (error) {
-      console.error(error);
-
-      return sendErrorMessage(
-         "Failure",
-         error.meta?.message,
-         null,
-         { system: error.meta?.message }
-      );
    }
 }
 
 export async function updateExercise(
-   exercise: Exercise, method: "name" | "sets"
+   exercise: Exercise,
+   method: "name" | "sets",
 ): Promise<VitalityResponse<Exercise>> {
    try {
       if (method === "name") {
-         // Update exercise name
+      // Update exercise name
          const name = exercise.name.trim();
 
          if (name.length === 0) {
@@ -191,6 +164,38 @@ export async function updateExercise(
             return sendSuccessMessage("Successfully updated exercise name", null);
          }
       } else {
+         const containsNoInputs = (set: ExerciseSet) => {
+            return (
+               set.weight === null &&
+          set.repetitions === null &&
+          set.hours === null &&
+          set.minutes === null &&
+          set.seconds === null &&
+          set.text?.trim() === ""
+            );
+         };
+
+         for (const set of exercise.sets) {
+            const fields = setSchema.safeParse(set);
+
+            if (!fields.success) {
+               return sendErrorMessage(
+                  "Error",
+                  `Invalid exercise set fields for set ID ${set.id}`,
+                  null,
+                  fields.error.flatten().fieldErrors,
+               );
+            } else if (containsNoInputs(set)) {
+               console.log(set);
+               return sendErrorMessage(
+                  "Error",
+                  "Every exercise set must contain at least 1 valid input.",
+                  null,
+                  null,
+               );
+            }
+         }
+
          // Update exercise sets
          const existingExercise = await prisma.exercises.findUnique({
             where: {
@@ -205,12 +210,17 @@ export async function updateExercise(
             }
          });
 
-         const existingExerciseSetIdsArray: string[] = existingExercise?.sets.map((set) => set.id) || [];
-         const newExerciseSetIdsArray: string[] = exercise.sets.map((set) => set.id);
+         const existingExerciseSetIdsArray: string[] =
+        existingExercise?.sets.map((set) => set.id) || [];
+         const newExerciseSetIdsArray: string[] = exercise.sets.map(
+            (set) => set.id,
+         );
          const newExerciseSetIdsSet: Set<string> = new Set(newExerciseSetIdsArray);
 
          // Determine IDs to remove
-         const exerciseIdsToRemove: string[] = existingExerciseSetIdsArray.filter(id => !newExerciseSetIdsSet.has(id));
+         const exerciseSetsToRemove: string[] = existingExerciseSetIdsArray.filter(
+            (id) => !newExerciseSetIdsSet.has(id),
+         );
 
          // Determine sets to create or update
          const exerciseSetsToCreate = [];
@@ -222,10 +232,28 @@ export async function updateExercise(
                set_order: i
             };
 
+            // Remove the exercise ID for the Prisma ORM transaction
+            if (exerciseSet.exercise_id !== undefined) {
+               delete exerciseSet.exercise_id;
+            }
+
             if (exerciseSet.id === undefined || exerciseSet.id.trim() === "") {
-               exerciseSetsToCreate.push(exerciseSet);
+               exerciseSetsToCreate.push({
+                  set_order: exerciseSet.set_order,
+                  weight: exerciseSet.weight,
+                  repetitions: exerciseSet.repetitions,
+                  hours: exerciseSet.hours,
+                  minutes: exerciseSet.minutes,
+                  seconds: exerciseSet.seconds,
+                  text: exerciseSet.text
+               });
             } else {
-               exerciseSetsToUpdate.push(exerciseSet);
+               exerciseSetsToUpdate.push({
+                  where: {
+                     id: exerciseSet.id
+                  },
+                  data: exerciseSet
+               });
             }
          }
 
@@ -236,7 +264,7 @@ export async function updateExercise(
             data: {
                sets: {
                   deleteMany: {
-                     id: { in: exerciseIdsToRemove }
+                     id: { in: exerciseSetsToRemove }
                   },
                   createMany: {
                      data: exerciseSetsToCreate
@@ -245,37 +273,45 @@ export async function updateExercise(
                }
             },
             include: {
-               sets: true
+               sets: {
+                  orderBy: {
+                     set_order: "asc"
+                  }
+               }
             }
          });
 
-         return sendSuccessMessage("Missing implementation for update exercise sets", newExercise);
+         return sendSuccessMessage(
+            "Missing implementation for update exercise sets",
+            newExercise,
+         );
       }
    } catch (error) {
       console.error(error);
 
-      return sendErrorMessage(
-         "Failure",
-         error.meta?.message,
-         null,
-         { system: error.meta?.message }
-      );
+      return sendErrorMessage("Failure", error.meta?.message, null, {
+         system: error.meta?.message
+      });
    }
 }
 
-export async function updateExercises(workoutId: string,
-   exercises: Exercise[]): Promise<VitalityResponse<Exercise[]>> {
+export async function updateExercises(
+   workoutId: string,
+   exercises: Exercise[],
+): Promise<VitalityResponse<Exercise[]>> {
    for (const exercise of exercises) {
       const fields = exerciseSchema.safeParse(exercise);
-      if (!(fields.success)) {
+
+      if (!fields.success) {
          return sendErrorMessage(
             "Error",
-            `Invalid exercise fields(ID = ${exercise.id})`,
+            "Invalid exercise fields",
             null,
-            fields.error.flatten().fieldErrors
+            fields.error.flatten().fieldErrors,
          );
       }
    }
+
    try {
       // Fetch existing tags first for data integrity
       const existingWorkout = await prisma.workouts.findUnique({
@@ -296,13 +332,16 @@ export async function updateExercises(workoutId: string,
       });
 
       // Extract exercise IDs
-      const existingExerciseIdsArray: string[] = existingWorkout?.exercises.map((exercise) => exercise.id) ?? [];
-      const newExerciseIdsArray: string[] = exercises.map((exercise) => exercise.id);
+      const existingExerciseIdsArray: string[] =
+      existingWorkout?.exercises.map((exercise) => exercise.id) ?? [];
+      const newExerciseIdsArray: string[] = exercises.map(
+         (exercise) => exercise.id,
+      );
       const newExerciseIdsSet: Set<string> = new Set(newExerciseIdsArray);
 
       // Determine exercise's to remove and update ordering accordingly
       const exerciseIdsToRemove: string[] = existingExerciseIdsArray.filter(
-         (id: string) => !(newExerciseIdsSet.has(id))
+         (id: string) => !newExerciseIdsSet.has(id),
       );
 
       const workout = await prisma.workouts.update({
@@ -339,15 +378,15 @@ export async function updateExercises(workoutId: string,
          }
       });
 
-      return sendSuccessMessage("Successfully updated workout exercises", formatWorkout(workout).exercises);
+      return sendSuccessMessage(
+         "Successfully updated workout exercises",
+         formatWorkout(workout).exercises,
+      );
    } catch (error) {
       console.error(error);
 
-      return sendErrorMessage(
-         "Failure",
-         error.meta?.message,
-         null,
-         { system: error.meta?.message }
-      );
+      return sendErrorMessage("Failure", error.meta?.message, null, {
+         system: error.meta?.message
+      });
    }
 }

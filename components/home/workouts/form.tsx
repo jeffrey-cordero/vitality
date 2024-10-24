@@ -148,7 +148,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
          });
       };
 
-      handleResponse(globalDispatch, response, successMethod, updateNotification);
+      handleResponse(localDispatch, response, successMethod, updateNotification);
    };
 
    const handleInitializeWorkoutState = () => {

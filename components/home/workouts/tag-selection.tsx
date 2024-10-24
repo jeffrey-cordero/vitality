@@ -73,7 +73,7 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
 
          // Dictionary of tags are essential to ignore deleted tags applied to existing workouts
          const newDictionary: { [key: string]: Tag } = Object.fromEntries(newOptions.map(tag => [tag.id, tag]));
-         newDictionary[newOption.id] = newOption;
+
 
          globalDispatch({
             type: "updateState",
@@ -85,7 +85,6 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
                      ...globalState.tags.data,
                      options: newOptions,
                      selected: newSelected,
-
                      dictionary: newDictionary
                   }
                }
@@ -320,6 +319,7 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
    }, [globalDispatch, globalState.tags, tag]);
 
    const handleInitializeTagForm = useCallback(() => {
+      console.log(JSON.stringify(tag));
       // Update edit tag information globalState
       localDispatch({
          type: "updateStates",

@@ -136,13 +136,18 @@ export function handleResponse(
    dispatch: Dispatch<VitalityAction<any>>,
    response: VitalityResponse<any>,
    successMethod: () => void,
-   updateNotification: (_notification: NotificationProps) => void,
-   timer?: number
+   updateNotification: (_notification: NotificationProps) => void
 ): void {
    if (response.status === "Success") {
-      // Call success method appropriately
+      // Remove any existing notifications
+      updateNotification({
+         status: "Initial",
+         message: ""
+      });
+
+      // Call the success method appropriately
       successMethod.call(null);
-   } else if (response.status === "Error") {
+   } else if (response.status === "Error" && Object.keys(response.body.errors).length > 0) {
       // Update state to display all errors relative to the response
       dispatch({
          type: "updateErrors",
@@ -153,7 +158,7 @@ export function handleResponse(
       updateNotification({
          status: response.status,
          message: response.body.message,
-         timer: timer ?? undefined
+         timer: undefined
       });
    }
 }

@@ -17,7 +17,7 @@ export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
 }
 
 export default function Input({ ...props }: VitalityInputProps): JSX.Element {
-   const { id, label, icon, placeholder, className, autoFocus, onChange, onBlur, required, input, dispatch } = props;
+   const { id, label, icon, placeholder, className, autoFocus, onChange, required, input, dispatch } = props;
    const type = input.data.type ?? props.type;
    const inputRef = useRef<HTMLInputElement>(null);
    const passwordButton = useRef<SVGSVGElement | null>(null);
@@ -80,6 +80,7 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
    return (
       <div className = "relative">
          <input
+            {...props}
             id = {id}
             type = {type}
             value = {input.value}
@@ -88,8 +89,7 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             className = {clsx("peer p-4 block w-full rounded-lg text-sm font-semibold border-1 placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2",
                {
                   "border-gray-200 border-[1.5px]": input.error === null,
-                  "border-red-500 border-[1.5px]": input.error !== null,
-                  "focus:border-gray-200 focus:ring-gray-200": onBlur
+                  "border-red-500 border-[1.5px]": input.error !== null
                }, className)}
             onChange = {(event: ChangeEvent<HTMLInputElement>) => handleInputChange(event)}
          />
@@ -136,19 +136,6 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
                <p className = "text-red-500 font-bold input-error"> {input.error} </p>
             </div>
-         }
-         {
-            onBlur && (
-               // Close icon for accessibility purposes when onBlur is defined
-               <Button
-                  type = "button"
-                  className = "absolute top-[-20px] right-[-30px] z-50 p-3.5 rounded-e-md">
-                  <FontAwesomeIcon
-                     icon = {faCircleXmark}
-                     className = "cursor-pointer flex-shrink-0 size-3.5 text-red-500 text-md"
-                     onClick = {onBlur} />
-               </Button>
-            )
          }
       </div>
    );

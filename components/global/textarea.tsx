@@ -54,7 +54,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
             id = {id}
             value = {input.value}
             placeholder = {placeholder ?? ""}
-            className = {clsx("peer p-4 block w-full bg-white border-1 border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2 min-h-[12rem] h-auto bg-transparent resize-none",
+            className = {clsx("peer p-4 block w-full bg-white border-1 border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-7 focus:pb-2 [&:not(:placeholder-shown)]:pt-7 [&:not(:placeholder-shown)]:pb-2 autofill:pt-7 autofill:pb-2 min-h-[12rem] h-auto bg-transparent resize-none overflow-hidden",
                {
                   "border-gray-200": input.error === null,
                   "border-red-500 ": input.error !== null

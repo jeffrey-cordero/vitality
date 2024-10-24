@@ -15,10 +15,11 @@ import { PopUp } from "@/components/global/popup";
 
 interface WorkoutRowProps extends VitalityProps {
    workout: Workout;
+   visibleWorkouts: Set<Workout>;
 }
 
 function WorkoutRow(props: WorkoutRowProps) {
-   const { workout, globalState, globalDispatch } = props;
+   const { workout, visibleWorkouts, globalState, globalDispatch } = props;
    const { updateNotification } = useContext(NotificationContext);
    const deletePopUpRef = useRef<{ close: () => void }>(null);
    const selected: Set<Workout> = globalState.workouts.data.selected;
@@ -50,23 +51,25 @@ function WorkoutRow(props: WorkoutRowProps) {
    }, [globalDispatch, selected, globalState.workouts, workout]);
 
    const handleWorkoutDelete = useCallback(async() => {
-      // Remove the current or selected set of workout's
-      const size = selected.size == 0 ? 1 : selected.size;
+      // Remove the current or visibleWorkouts set of workout's
+      const size = visibleWorkouts.size == 0 ? 1 : visibleWorkouts.size;
 
+      // Remove the singular workout or only the visible workouts in the current view
       const response: VitalityResponse<number> =
-         size == 1 ? await removeWorkouts([workout]) : await removeWorkouts(Array.from(selected));
+         size == 1 ? await removeWorkouts([workout]) : await removeWorkouts(Array.from(visibleWorkouts));
 
       if (response.body.data === size) {
-         // Clear selected and filter workouts list
+         // Remove single or multiple workouts from overall, filtered, and selected workouts
          const newWorkouts = [...globalState.workouts.value].filter((w: Workout) => {
-            // Remove single or multiple workouts
-            return size == 1 ? workout.id !== w.id : !(selected.has(w));
+            return size == 1 ? workout.id !== w.id : !(visibleWorkouts.has(w));
          });
 
          const newFiltered = [...globalState.workouts.data.filtered].filter((w: Workout) => {
-            // Remove single or multiple workouts
-            return size == 1 ? workout.id !== w.id : !(selected.has(w));
+            return size == 1 ? workout.id !== w.id : !(visibleWorkouts.has(w));
          });
+
+         const newSelected = new Set(selected);
+         visibleWorkouts.forEach(workout => newSelected.delete(workout));
 
          globalDispatch({
             type: "updateStates",
@@ -76,9 +79,9 @@ function WorkoutRow(props: WorkoutRowProps) {
                   value: newWorkouts,
                   data: {
                      ...globalState.workouts.data,
-                     // Clear selected workouts
                      filtered: newFiltered,
-                     selected: new Set<Workout>()
+                     // Clear selected workouts
+                     selected: newSelected
                   }
                }
             }
@@ -91,7 +94,7 @@ function WorkoutRow(props: WorkoutRowProps) {
          message: response.body.message
       });
 
-   }, [globalDispatch, selected, globalState, updateNotification, workout]);
+   }, [globalDispatch, selected, globalState, updateNotification, workout, visibleWorkouts]);
 
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
@@ -160,8 +163,8 @@ function WorkoutRow(props: WorkoutRowProps) {
                )
             }
          </th>
-         <td className = "px-6 py-4 min-w-[10rem]">
-            <div className = "flex justify-end pr-12 items-center gap-4">
+         <td className = "px-6 py-4 min-w-[10rem] text-center">
+            <div className = "flex justify-center items-center gap-4">
                <WorkoutForm
                   {...props}
                   cover = {(
@@ -204,7 +207,7 @@ function WorkoutRow(props: WorkoutRowProps) {
                               selected.size === 0 ?
                                  "Are you sure you want to delete this workout?"
                                  :
-                                 `Are you sure you want to delete ${selected.size} workout${selected.size === 1 ? "" : "s"}?`
+                                 `Are you sure you want to delete ${visibleWorkouts.size} workout${visibleWorkouts.size === 1 ? "" : "s"}?`
                            }
                         </p>
                         <div className = "flex flex-row justify-center items-center gap-4 flex-1">
@@ -294,7 +297,7 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
                            <th
                               scope = "col"
                               className = "p-4">
-                              <div className = "flex items-center">
+                              <div className = "relative flex items-center">
                                  <input
                                     id = "workout-select-all"
                                     type = "checkbox"
@@ -326,14 +329,17 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
                            </th>
                            <th
                               scope = "col"
-                              className = "text-base p-6">
+                              className = "text-base text-center p-6">
+                              Action
                            </th>
+
                         </tr>
                      </thead>
                      <tbody>
                         {workouts.map((workout: Workout) => (
                            <WorkoutRow
                               workout = {workout}
+                              visibleWorkouts = {visible}
                               globalState = {globalState}
                               globalDispatch = {globalDispatch}
                               key = {workout.id} />

@@ -2,7 +2,7 @@
 import React, { useRef } from "react";
 import clsx from "clsx";
 import { useContext } from "react";
-import { faCircleCheck, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faTriangleExclamation, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NotificationContext } from "@/app/layout";
 
@@ -59,7 +59,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
                               "text-red-600": props.status !== "Success"
                            })} />
                      </div>
-                     <div className = "flex w-full items-center justify-between p-4">
+                     <div className = "flex w-full items-center justify-between px-4 py-3">
                         <div>
                            <div className = "my-2 flex flex-col gap-2 font-bold">
                               <p>{props.message}</p>
@@ -69,31 +69,15 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      </div>
                   </div>
                </div>
-               <div className = "absolute top-0 right-0 m-[10px]">
-                  <a
-                     className = "hover:text-danger hover:cursor-pointer text-red-600"
+               <div className = "absolute top-[-8px] right-[-3px] z-50 p-3.5 rounded-e-md">
+                  <FontAwesomeIcon
+                     icon = {faXmark}
+                     className = "cursor-pointer flex-shrink-0 size-4.5 text-[18px] text-red-500 text-md font-extrabold"
+                     fill = "black"
                      onClick = {() => {
                         removeNotification();
-                     }}
-                  >
-                     <svg
-                        width = {25}
-                        height = {25}
-                        viewBox = "0 0 24 24"
-                        className = "fill-current"
-                     >
-                        <path
-                           fillRule = "evenodd"
-                           clipRule = "evenodd"
-                           d = "M18.8839 5.11612C19.372 5.60427 19.372 6.39573 18.8839 6.88388L6.88388 18.8839C6.39573 19.372 5.60427 19.372 5.11612 18.8839C4.62796 18.3957 4.62796 17.6043 5.11612 17.1161L17.1161 5.11612C17.6043 4.62796 18.3957 4.62796 18.8839 5.11612Z"
-                        />
-                        <path
-                           fillRule = "evenodd"
-                           clipRule = "evenodd"
-                           d = "M5.11612 5.11612C5.60427 4.62796 6.39573 4.62796 6.88388 5.11612L18.8839 17.1161C19.372 17.6043 19.372 18.3957 18.8839 18.8839C18.3957 19.372 17.6043 19.372 17.1161 18.8839L5.11612 6.88388C4.62796 6.39573 4.62796 5.60427 5.11612 5.11612Z"
-                        />
-                     </svg>
-                  </a>
+                     }} />
+
                </div>
             </div>
          }
