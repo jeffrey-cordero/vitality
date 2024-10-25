@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname } from "next/navigation";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faBars, faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faPersonRunning, faUtensils, faBrain, faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears } from "@fortawesome/free-solid-svg-icons";
+import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faUtensils, faBrain, faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears, faDumbbell, faBarsStaggered } from "@fortawesome/free-solid-svg-icons";
 import { AuthenticationContext } from "@/app/layout";
 
 interface SideBarProps {
@@ -23,7 +23,7 @@ const landingLinks: SideBarProps[] = [
 
 const homeLinks: SideBarProps[] = [
    { name: "Home", href: "/home", icon: faHouse },
-   { name: "Workouts", href: "/home/workouts", icon: faPersonRunning },
+   { name: "Workouts", href: "/home/workouts", icon: faDumbbell },
    { name: "Nutrition", href: "/home/nutrition", icon: faUtensils },
    { name: "Mood", href: "/home/mood", icon: faBrain },
    { name: "Health", href: "/home/health", icon: faHeartCircleBolt },
@@ -36,12 +36,26 @@ const homeLinks: SideBarProps[] = [
 
 function SideBarLinks(): JSX.Element {
    const pathname = usePathname();
-   const { user } = useContext(AuthenticationContext);
-   const [links, setLinks] = useState<SideBarProps[]>(pathname.startsWith("/home") ? homeLinks : landingLinks);
+   const { user, fetched } = useContext(AuthenticationContext);
+   // Initialize links based on localStorage or pathname
+   const [links, setLinks] = useState<SideBarProps[]>(() => {
+      const savedLinkState = window.localStorage.getItem("links");
+      return savedLinkState === "home" || pathname.startsWith("/home") ? homeLinks : landingLinks;
+   });
 
+   // Update links based on user state and store in localStorage on unmount
    useEffect(() => {
-      setLinks(user !== undefined ? homeLinks : landingLinks);
-   }, [user]);
+      // Determine the new links based on user presence
+      const newLinks = user === undefined ? landingLinks : homeLinks;
+
+      if (fetched) {
+         setLinks(newLinks);
+      }
+
+      return () => {
+         window.localStorage.setItem("links", newLinks === homeLinks ? "home" : "landing");
+      };
+   }, [user, fetched, links]);
 
    return (
       <>
@@ -74,16 +88,23 @@ function SideBarLinks(): JSX.Element {
 }
 
 export function SideBar(): JSX.Element {
-   const [visibleSideBar, setVisibleSideBar] = useState<boolean>(false);
+   const [visibleSideBar, setVisibleSideBar] = useState<boolean>(() => {
+      const savedState = localStorage.getItem("visibleSideBar");
+      return savedState === "true";
+   });
+
+   useEffect(() => {
+      localStorage.setItem("visibleSideBar", visibleSideBar.toString());
+   }, [visibleSideBar]);
 
    return (
       <div>
          <div
-            className = "fixed top-0 left-0 w-full z-30">
+            className = "absolute top-0 left-0 z-30">
             <div className = "relative top-0 left-0 transform translate-x-[15px] translate-y-[25px] z-30">
                <FontAwesomeIcon
                   id = "sideBarButton"
-                  icon = {visibleSideBar ? faAnglesRight : faBars}
+                  icon = {visibleSideBar ? faAnglesRight : faBarsStaggered}
                   className = "text-3xl text-black font-extrabold hover:cursor-pointer"
                   onClick = {() => {
                      setVisibleSideBar(!(visibleSideBar));
@@ -91,7 +112,7 @@ export function SideBar(): JSX.Element {
                />
             </div>
          </div>
-         <div className = "fixed z-20">
+         <div className = "absolute z-20">
             <div
                id = "sideBarLinks"
                className = {clsx("relative m-0 top-[10px] w-[4.5rem] hover:w-64 focus:w-64 transition-all duration-1000 ease-in-out", {
@@ -103,9 +124,7 @@ export function SideBar(): JSX.Element {
                   onMouseEnter = {() => {
                      setVisibleSideBar(true);
                   }}
-                  onMouseLeave = {() => {
-                     setVisibleSideBar(false);
-                  }}
+
                >
                   <div className = "flex flex-col space-x-2 space-y-2 justify-center text-center">
                      <div

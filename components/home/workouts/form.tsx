@@ -176,7 +176,8 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
          value: {
             title: {
                ...localState.title,
-               value: workout.title
+               value: workout.title,
+               error: null
             },
             date: {
                ...localState.date,
@@ -186,6 +187,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             image: {
                ...localState.image,
                value: workout.image,
+               error: null,
                data: {
                   valid: true,
                   error: false
@@ -193,6 +195,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             },
             description: {
                ...localState.description,
+               error: null,
                value: workout.description
             }
          }
@@ -263,7 +266,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   {isNewWorkout ? "New" : "Edit"} Workout
                </h1>
             </div>
-            <div className = "relative mt-2 w-full flex flex-col justify-center align-center text-left gap-3">
+            <div className = "relative mt-8 w-full flex flex-col justify-center align-center text-left gap-3">
                <FontAwesomeIcon
                   icon = {faArrowRotateLeft}
                   onClick = {handleReset}

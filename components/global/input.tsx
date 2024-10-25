@@ -26,7 +26,11 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
       if (inputRef.current && autoFocus) {
          inputRef.current.focus();
       }
-   }, [autoFocus]);
+
+      if (inputRef.current && input.error) {
+         inputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+   }, [autoFocus, input.error]);
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
       if (input.data.handlesChanges !== undefined) {
@@ -80,16 +84,17 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
    return (
       <div className = "relative">
          <input
-            {...props}
             id = {id}
             type = {type}
             value = {input.value}
+            autoComplete = {props.autoComplete ?? undefined}
+            min = {props.min ?? undefined}
             ref = {inputRef}
             placeholder = {placeholder ?? ""}
             className = {clsx("peer p-4 block w-full rounded-lg text-sm font-semibold border-1 placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2",
                {
                   "border-gray-200 border-[1.5px]": input.error === null,
-                  "border-red-500 border-[1.5px]": input.error !== null
+                  "border-red-500 border-[1.5px] focus:border-red-500 focus:ring-red-500 ": input.error !== null
                }, className)}
             onChange = {(event: ChangeEvent<HTMLInputElement>) => handleInputChange(event)}
          />

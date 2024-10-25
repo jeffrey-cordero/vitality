@@ -4,9 +4,9 @@ import Select from "@/components/global/select";
 import { PopUp } from "@/components/global/popup";
 import { sendErrorMessage, sendSuccessMessage, VitalityInputState, VitalityProps, VitalityState } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
-import { faCalendar, faMagnifyingGlass, faArrowsUpDown, faArrowRight, faArrowLeft, faArrowRotateLeft, faTag, faPersonRunning } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, faMagnifyingGlass, faArrowsUpDown, faArrowRight, faArrowLeft, faArrowRotateLeft, faTag } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { TagSelection } from "@/components/home/workouts/tag-selection";
 import { Tag } from "@/lib/workouts/tags";
 
@@ -153,6 +153,7 @@ function DateInput(props: DateInputProps) {
 
 function FilterByDate(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
+   const filterPopUpRef = useRef<{ close: () => void }>(null);
    const type: string = globalState.type.value;
 
    const inputs: { [key: string]: VitalityInputState | undefined } = useMemo(() => {
@@ -187,6 +188,9 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                }
             }
          });
+
+         filterPopUpRef.current?.close();
+         document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "center" });
       }
    }, [props, globalState.workouts, globalDispatch]);
 
@@ -244,10 +248,11 @@ function FilterByDate(props: VitalityProps): JSX.Element {
    return (
       <PopUp
          className = "max-w-xl"
+         ref = {filterPopUpRef}
          cover = {
             <Button
                type = "button"
-               className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.9rem] text-sm"
+               className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.5rem] text-sm"
             >
                <FontAwesomeIcon
                   icon = {faCalendar}
@@ -264,7 +269,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
             <h1 className = "text-2xl font-bold text-black mb-2">
                Filter by Date
             </h1>
-            <div className = "relative">
+            <div className = "relative mt-8">
                <FontAwesomeIcon
                   icon = {faArrowRotateLeft}
                   onClick = {handleReset}
@@ -328,6 +333,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
 
 function FilterByTags(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
+   const filterPopUpRef = useRef<{ close: () => void }>(null);
 
    const handleInitializeFilteredTags = useCallback(() => {
       // Selected tags are applied from prior filter form selection
@@ -373,6 +379,9 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                }
             }
          });
+
+         filterPopUpRef.current?.close();
+         document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "center" });
       }
    }, [globalDispatch, globalState.tags, globalState.workouts, props]);
 
@@ -413,10 +422,11 @@ function FilterByTags(props: VitalityProps): JSX.Element {
    return (
       <PopUp
          className = "max-w-xl"
+         ref = {filterPopUpRef}
          cover = {
             <Button
                type = "button"
-               className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.9rem] text-sm"
+               className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.5rem] text-sm"
                onClick = {handleInitializeFilteredTags}
             >
                <FontAwesomeIcon
@@ -434,7 +444,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
             <h1 className = "text-2xl font-bold text-black mb-2">
                Filter by Tags
             </h1>
-            <div className = "relative">
+            <div className = "relative mt-8">
                <FontAwesomeIcon
                   icon = {faArrowRotateLeft}
                   onClick = {handleReset}
@@ -442,7 +452,6 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                />
                <div className = "w-full mx-auto my-2">
                   <TagSelection {...props} />
-
                   <Button
                      type = "button"
                      className = "bg-primary text-white font-bold w-full h-[2.6rem] text-sm mt-3"
@@ -462,17 +471,17 @@ export default function WorkoutFiltering(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
 
    return (
-      <div className = "w-full flex flex-col justify-start  gap-2">
+      <div className = "w-full flex flex-col justify-start gap-2">
          <Input
             id = "search"
             type = "text"
             label = "Search"
-            icon = {faPersonRunning}
+            icon = {faMagnifyingGlass}
             input = {globalState.search}
             dispatch = {globalDispatch}
             autoFocus />
          <div className = "w-full flex flex-row justify-between items-center gap-2">
-            <div className = "flex flex-row gap-2">
+            <div className = "flex flex-row flex-wrap items-center justify-start gap-2 px-1">
                <FilterByDate {...props} />
                <FilterByTags {...props} />
             </div>

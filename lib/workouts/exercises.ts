@@ -186,7 +186,6 @@ export async function updateExercise(
                   fields.error.flatten().fieldErrors,
                );
             } else if (containsNoInputs(set)) {
-               console.log(set);
                return sendErrorMessage(
                   "Error",
                   "Every exercise set must contain at least 1 valid input.",

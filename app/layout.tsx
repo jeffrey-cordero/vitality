@@ -13,6 +13,7 @@ import { NotificationProps } from "@/components/global/notification";
 
 interface AuthenticationContextType {
    user: User | undefined;
+   fetched: boolean;
    updateUser: (_user: SetStateAction<User | undefined>) => void;
 }
 
@@ -23,6 +24,7 @@ interface NotificationContextType {
 
 export const AuthenticationContext = createContext<AuthenticationContextType>({
    user: undefined,
+   fetched: false,
    updateUser: () => {}
 });
 
@@ -42,6 +44,7 @@ export default function Layout({
 }) {
    // Layouts holds context for both user and potential notifications
    const [user, setUser] = useState<User | undefined>(undefined);
+   const [fetched, setFetched] = useState<boolean>(false);
    const [notification, setNotification] = useState<NotificationProps | undefined>(undefined);
 
    const updateUser = (user: SetStateAction<User | undefined>) => {
@@ -52,6 +55,7 @@ export default function Layout({
       try {
          const user = await getAuthentication();
          setUser(user);
+         setFetched(true);
       } catch (error) {
          console.error(error);
          setUser(undefined);
@@ -92,9 +96,9 @@ export default function Layout({
                content = "width=device-width, initial-scale=1.0" />
          </head>
          <body
-            className = {cx(sfPro.variable, inter.variable, "box-border m-0 p-0  overflow-x-hidden w-full max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black")}
+            className = {cx(sfPro.variable, inter.variable, "box-border m-0 p-0 overflow-x-hidden max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black")}
             suppressHydrationWarning = {true}>
-            <AuthenticationContext.Provider value = {{ user, updateUser }}>
+            <AuthenticationContext.Provider value = {{ user, fetched, updateUser }}>
                <SideBar />
                <NotificationContext.Provider value = {{ notification, updateNotification }}>
                   <div>

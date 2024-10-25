@@ -125,7 +125,7 @@ const workouts: VitalityState = {
    },
    // Store editing exercise ID to control interning inputs
    exerciseId: {
-      value : null,
+      value: null,
       error: null,
       data: {
          // Editing set ID to display potential inputs for
@@ -222,7 +222,7 @@ export default function Page(): JSX.Element {
       <main className = "w-full mx-auto my-6 flex min-h-screen flex-col items-center justify-start gap-4 text-center">
          <div>
             <h1 className = "text-4xl font-bold mt-8">Welcome Back, Champion!</h1>
-            <p className = "text-lg text-gray-700 mt-4 max-w-[25rem] mx-auto">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
+            <p className = "text-lg text-gray-700 mt-4 max-w-[90%] mx-auto">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
          </div>
          <div className = "flex justify-center w-full mx-auto">
             <WorkoutForm
@@ -262,13 +262,13 @@ export default function Page(): JSX.Element {
             />
          </div>
          {
-            <div className = "w-full mx-auto flex flex-col justify-center items-center">
-               <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 my-2">
+            <div className = "w-10/12 mx-auto flex flex-col justify-center items-center">
+               <div className = "flex justify-start items-center text-left gap-2 my-2">
                   <WorkoutFiltering
                      globalState = {globalState}
                      globalDispatch = {globalDispatch} />
                </div>
-               <div className = "relative w-10/12 flex justify-start items-center text-left gap-2 mt-2">
+               <div className = "flex justify-start items-center text-left gap-2 mt-2">
                   <Button
                      onClick = {() => setView("table")}
                      className = {clsx("transition duration-300 ease-in-out", {
@@ -284,19 +284,21 @@ export default function Page(): JSX.Element {
                      Cards
                   </Button>
                </div>
-               {
-                  view === "table" ? (
-                     <WorkoutTable
-                        workouts = {workoutsSection}
-                        globalState = {globalState}
-                        globalDispatch = {globalDispatch} />
-                  ) : (
-                     <WorkoutCards
-                        workouts = {workoutsSection}
-                        globalState = {globalState}
-                        globalDispatch = {globalDispatch} />
-                  )
-               }
+               <div id = "workoutsView">
+                  {
+                     view === "table" ? (
+                        <WorkoutTable
+                           workouts = {workoutsSection}
+                           globalState = {globalState}
+                           globalDispatch = {globalDispatch} />
+                     ) : (
+                        <WorkoutCards
+                           workouts = {workoutsSection}
+                           globalState = {globalState}
+                           globalDispatch = {globalDispatch} />
+                     )
+                  }
+               </div>
                {
                   results.length > 0 && (
                      <Pagination

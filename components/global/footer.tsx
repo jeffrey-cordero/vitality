@@ -5,7 +5,7 @@ import { faGithub, faYoutube, faXTwitter, faMeta } from "@fortawesome/free-brand
 export default function Footer(): JSX.Element {
    const year = new Date().getFullYear();
    return (
-      <footer className = "w-full mt-32">
+      <footer className = "w-full">
          <div className = "w-full mx-auto max-w-screen-xl">
             <div className = "flex flex-col sm:flex-row flex-1 justify-center sm:justify-between gap-5 align-middle items-center text-center m-4">
                <div>

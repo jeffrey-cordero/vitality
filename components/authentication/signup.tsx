@@ -116,6 +116,7 @@ function Form(): JSX.Element {
                id = "username"
                type = "text"
                label = "Username"
+               autoComplete = "username"
                icon = {faUserSecret}
                input = {state.username}
                dispatch = {dispatch}
@@ -125,6 +126,7 @@ function Form(): JSX.Element {
                id = "password"
                type = "password"
                label = "Password"
+               autoComplete = "new-password"
                icon = {faKey}
                input = {state.password}
                dispatch = {dispatch}
@@ -133,6 +135,7 @@ function Form(): JSX.Element {
                id = "confirmPassword"
                type = "password"
                label = "Confirm Password"
+               autoComplete = "new-password"
                icon = {faKey}
                input = {state.confirmPassword}
                dispatch = {dispatch}
@@ -141,6 +144,7 @@ function Form(): JSX.Element {
                id = "name"
                type = "text"
                label = "Name"
+               autoComplete = "name"
                icon = {faFeather}
                input = {state.name}
                dispatch = {dispatch}
@@ -149,6 +153,7 @@ function Form(): JSX.Element {
                id = "birthday"
                type = "date"
                label = "Birthday"
+               autoComplete = "bday"
                icon = {faCalendar}
                input = {state.birthday}
                dispatch = {dispatch}
@@ -157,6 +162,7 @@ function Form(): JSX.Element {
                id = "email"
                type = "email"
                label = "Email"
+               autoComplete = "email"
                icon = {faEnvelope}
                input = {state.email}
                dispatch = {dispatch}
@@ -165,6 +171,7 @@ function Form(): JSX.Element {
                id = "phone"
                type = "tel"
                label = "Phone"
+               autoComplete = "tel"
                icon = {faPhone}
                input = {state.phone}
                dispatch = {dispatch} />

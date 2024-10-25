@@ -287,11 +287,11 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
    }, [allVisibleSelected, handleUpdateSelectedWorkouts, workouts, selected, visible]);
 
    return (
-      <div className = "relative w-full">
+      <div className = "relative w-full min-h-full">
          {
             workouts.length > 0 ? (
-               <div className = "w-10/12 mx-auto overflow-x-auto mt-6 rounded-xl shadow-xl">
-                  <table className = "w-full text-sm text-left rtl:text-right">
+               <div className = "mx-auto overflow-x-auto mt-6 rounded-xl shadow-xl">
+                  <table className = "w-full text-sm text-left rtl:text-right lg:text-red-500">
                      <thead className = "text-xs uppercase bg-gray-50">
                         <tr>
                            <th
@@ -332,7 +332,6 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
                               className = "text-base text-center p-6">
                               Action
                            </th>
-
                         </tr>
                      </thead>
                      <tbody>

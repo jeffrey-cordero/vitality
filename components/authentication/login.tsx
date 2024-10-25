@@ -73,6 +73,7 @@ export default function Login(): JSX.Element {
                   id = "username"
                   type = "text"
                   label = "Username"
+                  autoComplete = "username"
                   icon = {faUserSecret}
                   input = {state.username}
                   dispatch = {dispatch}
@@ -82,6 +83,7 @@ export default function Login(): JSX.Element {
                   id = "password"
                   type = "password"
                   label = "Password"
+                  autoComplete = "current-password"
                   icon = {faKey}
                   input = {state.password}
                   dispatch = {dispatch}

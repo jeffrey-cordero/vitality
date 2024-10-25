@@ -157,7 +157,7 @@ function SetContainer(props: SetProps): JSX.Element {
    const constructNewExerciseSet = useCallback(() => {
       const parseNumber = (value) => {
          const num = +value;
-         return isNaN(num) || num === 0 ? null : num;
+         return isNaN(num) || num < 0 ? null : num;
       };
 
       return {
@@ -227,27 +227,33 @@ function SetContainer(props: SetProps): JSX.Element {
             },
             weight: {
                ...localState.weight,
-               value: set?.weight ?? ""
+               value: set?.weight ?? "",
+               error: null
             },
             repetitions: {
                ...localState.repetitions,
-               value: set?.repetitions ?? ""
+               value: set?.repetitions ?? "",
+               error: null
             },
             hours: {
                ...localState.hours,
-               value: set?.hours ?? ""
+               value: set?.hours ?? "",
+               error: null
             },
             minutes: {
                ...localState.minutes,
-               value: set?.minutes ?? ""
+               value: set?.minutes ?? "",
+               error: null
             },
             seconds: {
                ...localState.seconds,
-               value: set?.seconds ?? ""
+               value: set?.seconds ?? "",
+               error: null
             },
             text: {
                ...localState.text,
-               value: set?.text ?? ""
+               value: set?.text ?? "",
+               error: null
             }
          }
       });
@@ -288,31 +294,37 @@ function SetContainer(props: SetProps): JSX.Element {
                      icon = {faArrowUp91}
                      input = {localState.repetitions}
                      dispatch = {localDispatch} />
-                  <div className = "flex justify-start items-center gap-2">
-                     <Input
-                        id = "hours"
-                        type = "number"
-                        label = "Hours"
-                        min = "0"
-                        icon = {faStopwatch}
-                        input = {localState.hours}
-                        dispatch = {localDispatch} />
-                     <Input
-                        id = "minutes"
-                        type = "number"
-                        label = "Minutes"
-                        min = "0"
-                        icon = {faStopwatch}
-                        input = {localState.minutes}
-                        dispatch = {localDispatch} />
-                     <Input
-                        id = "seconds"
-                        type = "number"
-                        label = "Seconds"
-                        min = "0"
-                        icon = {faStopwatch}
-                        input = {localState.seconds}
-                        dispatch = {localDispatch} />
+                  <div className = "flex flex-col sm:flex-row justify-between items-center gap-2">
+                     <div className = "w-full mx-auto">
+                        <Input
+                           id = "hours"
+                           type = "number"
+                           label = "Hours"
+                           min = "0"
+                           icon = {faStopwatch}
+                           input = {localState.hours}
+                           dispatch = {localDispatch} />
+                     </div>
+                     <div className = "w-full mx-auto">
+                        <Input
+                           id = "minutes"
+                           type = "number"
+                           label = "Minutes"
+                           min = "0"
+                           icon = {faStopwatch}
+                           input = {localState.minutes}
+                           dispatch = {localDispatch} />
+                     </div>
+                     <div className = "w-full mx-auto">
+                        <Input
+                           id = "seconds"
+                           type = "number"
+                           label = "Seconds"
+                           min = "0"
+                           icon = {faStopwatch}
+                           input = {localState.seconds}
+                           dispatch = {localDispatch} />
+                     </div>
                   </div>
                   <TextArea
                      id = "text"
@@ -367,7 +379,7 @@ function SetContainer(props: SetProps): JSX.Element {
                         {...listeners}
                      >
                         <div className = "flex flex-col gap-2 pl-6 cursor-pointer">
-                           {set.weight && (
+                           {set.weight !== undefined && (
                               <div className = "flex flex-row items-center justify-start gap-2 font-bold">
                                  <FontAwesomeIcon
                                     className = "self-start pt-1 text-primary"
@@ -375,7 +387,7 @@ function SetContainer(props: SetProps): JSX.Element {
                                  <p>{set.weight}</p>
                               </div>
                            )}
-                           {set.repetitions && (
+                           {set.repetitions !== undefined && (
                               <div className = "flex flex-row items-center justify-start gap-2 font-bold">
                                  <FontAwesomeIcon
                                     className = "self-start pt-1 text-primary"
@@ -383,7 +395,7 @@ function SetContainer(props: SetProps): JSX.Element {
                                  <p>{set.repetitions}</p>
                               </div>
                            )}
-                           {(set.hours || set.minutes || set.seconds) && (
+                           {(set.hours !== undefined || set.minutes !== undefined || set.seconds !== undefined) && (
                               <div className = "flex flex-row items-center justify-start gap-2 font-bold">
                                  <FontAwesomeIcon
                                     className = "self-start pt-1 text-primary"
@@ -400,7 +412,7 @@ function SetContainer(props: SetProps): JSX.Element {
                                  <FontAwesomeIcon
                                     className = "self-start pt-1 text-primary"
                                     icon = {faAlignJustify} />
-                                 <p className="line-clamp-3">{set.text}</p>
+                                 <p className = "line-clamp-3">{set.text}</p>
                               </div>
                            )}
                         </div>
@@ -424,18 +436,22 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    const { edit, id } = localState.name.data;
    const [editName, setEditName] = useState<boolean>(false);
    const [addSet, setAddSet] = useState<boolean>(false);
-   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
-   const editingExerciseSetId = localState.exerciseId.data.setId;
+
+   const collapsedId: string = `collapsed-${exercise.id}`;
+   const [isCollapsed, setIsCollapsed] = useState(() => {
+      return !!localStorage.getItem(collapsedId);
+   });
+   const editingExerciseSetId: string = localState.exerciseId.data.setId;
    const displayEditName = editName && edit && id === exercise.id;
 
-   console.log(localStorage.getItem(`collapsed-${exercise.id}`));
-
    useEffect(() => {
-      // Save collapsed state to local storage
-      return () => {
-        localStorage.setItem(`collapsed-${exercise.id}`, isCollapsed ? "true" : "false");
-      };
-    }, [isCollapsed]);
+      // Save the collapsed state to localStorage whenever it changes
+      if (isCollapsed) {
+         localStorage.setItem(collapsedId, "true");
+      } else {
+         localStorage.removeItem(collapsedId);
+      }
+   }, [isCollapsed, collapsedId]);
 
    // Prevent drag and drop mechanisms when user is editing exercise information
    const {
@@ -536,8 +552,13 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          saveExercises(response.body.data);
       };
 
+      if (window.localStorage.getItem(collapsedId)) {
+         // Remove from localStorage as the exercise no longer exists
+         window.localStorage.removeItem(collapsedId);
+      }
+
       handleResponse(localDispatch, response, successMethod, updateNotification);
-   }, [exercise.id, localDispatch, saveExercises, updateNotification, workout.exercises, workout.id]);
+   }, [exercise.id, localDispatch, saveExercises, updateNotification, workout.exercises, workout.id, collapsedId]);
 
    const handleInitializeEditExerciseName = useCallback(() => {
       localDispatch({
@@ -573,27 +594,33 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
             },
             weight: {
                ...localState.weight,
-               value: ""
+               value: "",
+               error: null
             },
             repetitions: {
                ...localState.repetitions,
-               value: ""
+               value: "",
+               error: null
             },
             hours: {
                ...localState.hours,
-               value: ""
+               value: "",
+               error: null
             },
             minutes: {
                ...localState.minutes,
-               value: ""
+               value: "",
+               error: null
             },
             seconds: {
                ...localState.seconds,
-               value: ""
+               value: "",
+               error: null
             },
             text: {
                ...localState.text,
-               value: ""
+               value: "",
+               error: null
             }
          }
       });
@@ -857,7 +884,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                }}
             />
          }
-         <hr className = "text-black w-full mt-4" />
+         <hr className = "text-black w-full mb-2" />
          <DndContext
             sensors = {sensors}
             collisionDetection = {closestCenter}
@@ -886,7 +913,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
          </DndContext>
          <Button
             type = "button"
-            className = "w-full bg-white text-black px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
+            className = "w-full bg-white text-black px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] mt-2 focus:border-blue-500 focus:ring-blue-500"
             icon = {faPlus}
             onClick = {handleInitializeNewExerciseInput}
          >

@@ -319,7 +319,6 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
    }, [globalDispatch, globalState.tags, tag]);
 
    const handleInitializeTagForm = useCallback(() => {
-      console.log(JSON.stringify(tag));
       // Update edit tag information globalState
       localDispatch({
          type: "updateStates",
@@ -428,9 +427,9 @@ export function TagSelection(props: VitalityProps): JSX.Element {
 
    return (
       <div>
-         <div className = "flex flex-col flex-wrap justify-center items-center">
+         <div className = "w-full mx-auto flex flex-col flex-wrap justify-center items-center">
             <ul
-               className = {clsx("flex flex-row flex-wrap justify-center items-center", {
+               className = {clsx("flex flex-col sm:flex-row flex-wrap justify-center items-center", {
                   "pb-3": globalState.tags.data.selected.length > 0
                })}>
                {
@@ -460,7 +459,7 @@ export function TagSelection(props: VitalityProps): JSX.Element {
                />
             </div>
             <ul
-               className = {clsx("flex flex-row flex-wrap justify-center items-center", {
+               className = {clsx("flex flex-col sm:flex-row flex-wrap justify-center items-center", {
                   "pt-3": results.length > 0 || search.trim().length > 0
                })}>
                {

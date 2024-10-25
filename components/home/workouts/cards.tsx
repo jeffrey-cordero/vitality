@@ -53,10 +53,10 @@ export default function WorkoutCards(props: WorkoutCardsProps): JSX.Element {
    const fetched: boolean = globalState.workouts.data.fetched;
 
    return (
-      <div className = "relative w-full">
+      <div className = "relative w-full mx-auto">
          {
             workouts.length > 0 ? (
-               <div className = "w-10/12 mx-auto flex flex-wrap justify-center gap-6 mt-6">
+               <div className = "flex flex-wrap justify-center gap-6 mt-6">
                   {workouts.map((workout: Workout) => (
                      <WorkoutCard
                         {...props}

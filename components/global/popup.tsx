@@ -56,9 +56,9 @@ export const PopUp = forwardRef(function PopUp(props: PopUpProps, ref) {
          }
          {
             open && (
-               <div className = {clsx("fixed w-full mx-auto inset-0 flex items-center justify-center align-center p-6 z-50", props.className)}>
+               <div className = {clsx("fixed w-full mx-auto inset-0 flex items-center justify-center align-center p-4 z-50", props.className)}>
                   <div className = "fixed inset-0 bg-gray-600 bg-opacity-50"></div>
-                  <div className = "relative bg-white rounded-lg shadow-lg p-16 w-full max-h-[90%] overflow-y-auto">
+                  <div className = "relative bg-white rounded-lg shadow-lg px-10 py-12 w-full max-h-[90%] overflow-y-auto">
                      <Button
                         className = "absolute top-3 right-3"
                         onClick = {(event) => {
