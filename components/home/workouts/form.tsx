@@ -67,7 +67,6 @@ function updateFilteredWorkouts(globalState: VitalityState, currentFiltered: Wor
    if (method !== "delete" && filterWorkout(globalState, returnedWorkout)) {
       // Updating or new workout passes current filters
       newFiltered.push(returnedWorkout);
-
    }
 
    return newFiltered.sort((a, b) => b.date.getTime() - a.date.getTime());

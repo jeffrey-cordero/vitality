@@ -23,7 +23,7 @@ export default function Layout({
    return (
       <div>
          <div className = "flex flex-col">
-            <div className = "flex-grow p-2">
+            <div className = "flex-grow">
                {children}
             </div>
          </div>

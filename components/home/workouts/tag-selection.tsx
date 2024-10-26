@@ -5,7 +5,7 @@ import { faGear, faXmark, faCloudArrowUp, faTrash, faTag } from "@fortawesome/fr
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/workouts/tags";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { useCallback, useContext, useMemo, useReducer } from "react";
+import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
 import { formReducer, handleResponse, VitalityChildProps, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
 import { PopUp } from "@/components/global/popup";
 import { searchForTitle } from "@/lib/workouts/shared";
@@ -73,7 +73,6 @@ function CreateWorkoutTag(props: CreateWorkoutTagProps) {
 
          // Dictionary of tags are essential to ignore deleted tags applied to existing workouts
          const newDictionary: { [key: string]: Tag } = Object.fromEntries(newOptions.map(tag => [tag.id, tag]));
-
 
          globalDispatch({
             type: "updateState",
@@ -158,8 +157,12 @@ function TagColorPicker(props: VitalityChildProps) {
    );
 };
 
-function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
-   const { tag, globalState, globalDispatch, localState, localDispatch } = props;
+interface EditWorkoutTagProps extends WorkoutTagProps {
+   onSave: () => void;
+}
+
+function EditWorkoutTag(props: EditWorkoutTagProps): JSX.Element {
+   const { tag, globalState, globalDispatch, localState, localDispatch, onSave } = props;
    const { updateNotification } = useContext(NotificationContext);
 
    const handleEditWorkoutTagSubmission = useCallback(async(method: "update" | "delete") => {
@@ -209,12 +212,8 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
             }
          });
 
-         // Display the success notification to the user
-         updateNotification({
-            status: response.status,
-            message: response.body.message,
-            timer: 1250
-         });
+         // Close the pop up form element and scroll into editing tag element
+         onSave();
       };
 
       if (response.status !== "Success") {
@@ -237,7 +236,7 @@ function EditWorkoutTag(props: WorkoutTagProps): JSX.Element {
          handleResponse(localDispatch, response, successMethod, updateNotification);
       }
 
-   }, [globalDispatch, globalState, localDispatch, localState.tagColor, localState.tagTitle, tag.id, tag.user_id, updateNotification]);
+   }, [globalDispatch, globalState, localDispatch, localState.tagColor, localState.tagTitle, tag.id, tag.user_id, updateNotification, onSave]);
 
    return (
       <div className = "flex flex-col justify-center align-center text-center gap-3 text-black">
@@ -298,6 +297,8 @@ export interface WorkoutTagProps extends VitalityChildProps {
 
 export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
    const { tag, selected, globalState, globalDispatch, localState, localDispatch } = props;
+   const editTagPopUpRef = useRef<{ close: () => void }>(null);
+   const tagRef = useRef<HTMLLIElement>(null);
 
    // Handle adding or removing a selected tag
    const handleSelectWorkoutTag = useCallback((adding: boolean) => {
@@ -337,28 +338,35 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
       });
    }, [localDispatch, localState, tag.color, tag.title]);
 
+   const handleEditTagSave = useCallback(() => {
+      editTagPopUpRef.current?.close();
+      tagRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+   }, []);
+
    return (
       <li
          className = {clsx("px-3 py-1 m-2 rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
          style = {{
             backgroundColor: tag.color
          }}
+         ref = {tagRef}
          key = {tag.id}
       >
          <div
-            className = "flex justify-center items-center gap-3 p-1"
+            className = "max-w-full mx-auto flex justify-center items-center gap-3 p-2"
             onClick = {() => {
                if (!(selected)) {
                   handleSelectWorkoutTag(true);
                }
             }}
          >
-            <div className = "cursor-pointer">
+            <div className = "cursor-pointer max-w-full px-2 mx-auto line-clamp-1 break-all text-center text-ellipsis">
                {tag.title}
             </div>
             {
                <PopUp
                   className = "max-w-2xl"
+                  ref = {editTagPopUpRef}
                   cover = {
                      <FontAwesomeIcon
                         icon = {faGear}
@@ -367,7 +375,9 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
                      />
                   }
                >
-                  <EditWorkoutTag {...props} />
+                  <EditWorkoutTag
+                     {...props}
+                     onSave = {handleEditTagSave} />
                </PopUp>
             }
             {

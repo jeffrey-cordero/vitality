@@ -44,7 +44,7 @@ export function filterWorkout(globalState: VitalityState, workout: Workout): boo
    const { dateFiltered, tagsFiltered } = globalState.workouts.data;
 
    const tagIds: Set<string> = new Set(
-      globalState.tags.data.selected.map((tag: Tag) => tag.id)
+      globalState.tags.data.filteredSelected.map((tag: Tag) => tag.id)
    );
 
    // Filter by date and/or applied tags, if applicable for either method
@@ -56,7 +56,7 @@ export function getFilteredTagsWorkouts(props: VitalityProps): Workout[] | null 
    const tagsFiltered: boolean = globalState.workouts.data.tagsFiltered;
 
    const tagIds: Set<string> = new Set(
-      globalState.tags.data.selected.map((tag: Tag) => tag.id)
+      globalState.tags.data.filterSelected.map((tag: Tag) => tag.id)
    );
 
    const filteredWorkouts: Workout[] = [...globalState.workouts.value].filter((workout: Workout) => {
@@ -198,7 +198,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
       // Resetting the date filter should fall back to tags filtered view, if applied
       const tagsFiltered: boolean = globalState.workouts.data.tagsFiltered;
       const tagIds: Set<string> = new Set(
-         globalState.tags.data.selected.map((tag: Tag) => tag.id)
+         globalState.tags.data.filterSelected.map((tag: Tag) => tag.id)
       );
 
       // All selected and filtered workouts remain the same, but additional filtered may be added as date filter is removed
@@ -250,15 +250,18 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          className = "max-w-xl"
          ref = {filterPopUpRef}
          cover = {
-            <Button
-               type = "button"
-               className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.5rem] text-sm"
-            >
-               <FontAwesomeIcon
-                  icon = {faCalendar}
-                  className = "text-xs" />
-               Filter by Date
-            </Button>
+            <div className = "flex-1">
+               <Button
+                  type = "button"
+                  className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.5rem] text-sm flex-1"
+               >
+                  <FontAwesomeIcon
+                     icon = {faCalendar}
+                     className = "text-xs" />
+                  Filter by Date
+               </Button>
+            </div>
+
          }
       >
          <div className = "flex flex-col justify-center align-center text-center gap-2">
@@ -424,16 +427,18 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          className = "max-w-xl"
          ref = {filterPopUpRef}
          cover = {
-            <Button
-               type = "button"
-               className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.5rem] text-sm"
-               onClick = {handleInitializeFilteredTags}
-            >
-               <FontAwesomeIcon
-                  icon = {faTag}
-                  className = "text-xs" />
-               Filter by Tags
-            </Button>
+            <div className = "flex-1">
+               <Button
+                  type = "button"
+                  className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.5rem] text-sm"
+                  onClick = {handleInitializeFilteredTags}
+               >
+                  <FontAwesomeIcon
+                     icon = {faTag}
+                     className = "text-xs" />
+                  Filter by Tags
+               </Button>
+            </div>
          }
       >
          <div className = "flex flex-col justify-center align-center text-center gap-2">
@@ -480,11 +485,9 @@ export default function WorkoutFiltering(props: VitalityProps): JSX.Element {
             input = {globalState.search}
             dispatch = {globalDispatch}
             autoFocus />
-         <div className = "w-full flex flex-row justify-between items-center gap-2">
-            <div className = "flex flex-row flex-wrap items-center justify-start gap-2 px-1">
-               <FilterByDate {...props} />
-               <FilterByTags {...props} />
-            </div>
+         <div className = "w-full mx-auto flex flex-row items-center justify-center gap-2">
+            <FilterByDate {...props} />
+            <FilterByTags {...props} />
          </div>
       </div>
    );

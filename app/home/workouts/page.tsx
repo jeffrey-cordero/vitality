@@ -219,51 +219,12 @@ export default function Page(): JSX.Element {
    }, [fetchWorkoutsData, globalState.workouts.data.fetched, globalState.tags, globalState.workouts]);
 
    return (
-      <main className = "w-full mx-auto my-6 flex min-h-screen flex-col items-center justify-start gap-4 text-center">
-         <div>
-            <h1 className = "text-4xl font-bold mt-8">Welcome Back, Champion!</h1>
-            <p className = "text-lg text-gray-700 mt-4 max-w-[90%] mx-auto">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
-         </div>
-         <div className = "flex justify-center w-full mx-auto">
-            <WorkoutForm
-               workout = {globalState.workout.value}
-               globalState = {globalState}
-               globalDispatch = {globalDispatch}
-               cover = {
-                  <Button
-                     type = "button"
-                     className = "bg-primary text-white w-full h-[2.6rem] p-4"
-                     icon = {faPlus}
-                     onClick = {() => {
-                        globalDispatch({
-                           type: "updateState",
-                           value: {
-                              id: "workout",
-                              input: {
-                                 ...globalState.workout,
-                                 value: {
-                                    id: "",
-                                    user_id: user?.id ?? "",
-                                    title: "",
-                                    date: new Date(),
-                                    image: "",
-                                    description: "",
-                                    tagIds: [],
-                                    exercises: []
-                                 }
-                              }
-                           }
-                        });
-                     }}
-                  >
-                     New Workout
-                  </Button>
-               }
-            />
-         </div>
+      <main className = "relative w-full lg:w-11/12 mx-auto my-8 flex min-h-screen flex-col items-center justify-start gap-4 text-center z-0">
          {
-            <div className = "w-10/12 mx-auto flex flex-col justify-center items-center">
-               <div className = "flex justify-start items-center text-left gap-2 my-2">
+            <div className = "w-full mx-auto flex flex-col justify-center items-center gap-2 px-3">
+               <div className = "relative">
+                  <h1 className = "text-4xl font-bold mt-8">Welcome Back, Champion!</h1>
+                  <p className = "text-lg text-gray-700 my-4 max-w-[90%] mx-auto">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
                   <WorkoutFiltering
                      globalState = {globalState}
                      globalDispatch = {globalDispatch} />
@@ -298,6 +259,43 @@ export default function Page(): JSX.Element {
                            globalDispatch = {globalDispatch} />
                      )
                   }
+               </div>
+               <div className = "flex justify-center w-full mx-auto mt-6">
+                  <WorkoutForm
+                     workout = {globalState.workout.value}
+                     globalState = {globalState}
+                     globalDispatch = {globalDispatch}
+                     cover = {
+                        <Button
+                           type = "button"
+                           className = "bg-primary text-white w-full h-[2.6rem] p-4"
+                           icon = {faPlus}
+                           onClick = {() => {
+                              globalDispatch({
+                                 type: "updateState",
+                                 value: {
+                                    id: "workout",
+                                    input: {
+                                       ...globalState.workout,
+                                       value: {
+                                          id: "",
+                                          user_id: user?.id ?? "",
+                                          title: "",
+                                          date: new Date(),
+                                          image: "",
+                                          description: "",
+                                          tagIds: [],
+                                          exercises: []
+                                       }
+                                    }
+                                 }
+                              });
+                           }}
+                        >
+                           New Workout
+                        </Button>
+                     }
+                  />
                </div>
                {
                   results.length > 0 && (

@@ -89,12 +89,12 @@ function SideBarLinks(): JSX.Element {
 
 export function SideBar(): JSX.Element {
    const [visibleSideBar, setVisibleSideBar] = useState<boolean>(() => {
-      const savedState = localStorage.getItem("visibleSideBar");
+      const savedState = window.localStorage.getItem("visibleSideBar");
       return savedState === "true";
    });
 
    useEffect(() => {
-      localStorage.setItem("visibleSideBar", visibleSideBar.toString());
+      window.localStorage.setItem("visibleSideBar", visibleSideBar.toString());
    }, [visibleSideBar]);
 
    return (
