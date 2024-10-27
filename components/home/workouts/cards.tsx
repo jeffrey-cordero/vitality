@@ -41,8 +41,8 @@ function WorkoutCard(props: WorkoutCardProps): JSX.Element {
                         )
                      }
                      <div className = "relative w-full h-full flex flex-col justify-start items-center overflow-hidden text-center pt-5">
-                        <h2 className = "text-primary font-extrabold text-4xl sm:text-3xl px-6 py-4 overflow-clip max-w-[90%] text-ellipsis whitespace-nowrap leading-none tracking-tight">{workout.title}</h2>
-                        <p className = "text-primary font-extrabold text-lg sm:text-sm">{getWorkoutDate(workout.date)}</p>
+                        <h2 className = "font-extrabold text-4xl sm:text-3xl px-6 py-4 overflow-clip max-w-[90%] text-ellipsis whitespace-nowrap leading-none tracking-tight">{workout.title}</h2>
+                        <p className = "font-extrabold text-lg sm:text-sm">{getWorkoutDate(workout.date)}</p>
                      </div>
                   </div>
                </div>

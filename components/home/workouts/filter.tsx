@@ -10,17 +10,17 @@ import { useCallback, useMemo, useRef } from "react";
 import { TagSelection } from "@/components/home/workouts/tag-selection";
 import { Tag } from "@/lib/workouts/tags";
 
-export function filterByTags(tagIds: Set<string>, workout: Workout): boolean {
+export function filterByTags(selectedTags: Set<string>, workout: Workout): boolean {
    // Ensure tags within the given workout cover entire provided set of tag id's
    let size: number = 0;
 
    for (const tagId of workout.tagIds) {
-      if (tagIds.has(tagId)) {
+      if (selectedTags.has(tagId)) {
          size++;
       }
    }
 
-   return size >= tagIds.size;
+   return size >= selectedTags.size;
 }
 
 export function filterByDate(globalState: VitalityState, workout: Workout): boolean {
@@ -40,30 +40,14 @@ export function filterByDate(globalState: VitalityState, workout: Workout): bool
 }
 
 
-export function filterWorkout(globalState: VitalityState, workout: Workout): boolean {
+export function filterWorkout(globalState: VitalityState, workout: Workout, selectedTags: Set<string>, source: "tags" | "date" | "update"): boolean {
+   // Filter by date and/or applied tags, if applicable for either method
    const { dateFiltered, tagsFiltered } = globalState.workouts.data;
 
-   const tagIds: Set<string> = new Set(
-      globalState.tags.data.filteredSelected.map((tag: Tag) => tag.id)
-   );
+   const passesDateFiltering: boolean = ((!(dateFiltered) && source !== "date")) || (filterByDate(globalState, workout));
+   const passesTagsFiltering: boolean = ((!(tagsFiltered) && source !== "tags")) || (filterByTags(selectedTags, workout));
 
-   // Filter by date and/or applied tags, if applicable for either method
-   return (!(dateFiltered) || filterByDate(globalState, workout)) && (!(tagsFiltered) || filterByTags(tagIds, workout));
-}
-
-export function getFilteredTagsWorkouts(props: VitalityProps): Workout[] | null {
-   const { globalState } = props;
-   const tagsFiltered: boolean = globalState.workouts.data.tagsFiltered;
-
-   const tagIds: Set<string> = new Set(
-      globalState.tags.data.filterSelected.map((tag: Tag) => tag.id)
-   );
-
-   const filteredWorkouts: Workout[] = [...globalState.workouts.value].filter((workout: Workout) => {
-      return !(tagsFiltered) || filterByTags(tagIds, workout);
-   });
-
-   return filteredWorkouts;
+   return passesDateFiltering && passesTagsFiltering;
 }
 
 export function getFilteredDateWorkouts(props: VitalityProps): Workout[] | null {
@@ -110,8 +94,13 @@ export function getFilteredDateWorkouts(props: VitalityProps): Workout[] | null 
          value: sendSuccessMessage<null>("Success", null)
       });
 
+      // Fetch cached selected filtered tags
+      const selectedTags: Set<string> = new Set(
+         globalState.tags.data.filteredSelected.map((tag: Tag) => tag.id)
+      );
+
       const filteredWorkouts: Workout[] = [...globalState.workouts.value].filter((workout: Workout) => {
-         return filterWorkout(globalState, workout);
+         return filterWorkout(globalState, workout, selectedTags, "date");
       });
 
       return filteredWorkouts;
@@ -169,7 +158,6 @@ function FilterByDate(props: VitalityProps): JSX.Element {
    }, [inputs, type]);
 
    const handleApplyFilterClick = useCallback(() => {
-      // Apply date filter
       const filteredWorkouts: Workout[] | null = getFilteredDateWorkouts(props);
 
       if (filteredWorkouts !== null) {
@@ -197,13 +185,13 @@ function FilterByDate(props: VitalityProps): JSX.Element {
    const handleReset = useCallback(() => {
       // Resetting the date filter should fall back to tags filtered view, if applied
       const tagsFiltered: boolean = globalState.workouts.data.tagsFiltered;
-      const tagIds: Set<string> = new Set(
-         globalState.tags.data.filterSelected.map((tag: Tag) => tag.id)
+      const selectedTags: Set<string> = new Set(
+         globalState.tags.data.filteredSelected.map((tag: Tag) => tag.id)
       );
 
       // All selected and filtered workouts remain the same, but additional filtered may be added as date filter is removed
       const newFiltered: Workout[] = [...globalState.workouts.value].filter((workout) => {
-         return !(tagsFiltered) || filterByTags(tagIds, workout);
+         return (!(tagsFiltered) || filterByTags(selectedTags, workout));
       });
 
       globalDispatch({
@@ -241,9 +229,9 @@ function FilterByDate(props: VitalityProps): JSX.Element {
             }
          }
       });
-   }, [globalDispatch, globalState.max, globalState.min, globalState.tags.data.selected,
-      globalState.type, globalState.workouts.data, globalState.workouts.value,
-      globalState.paging.data, globalState.paging.value]);
+   }, [globalDispatch, globalState.max, globalState.min, globalState.type, globalState.workouts.data,
+      globalState.workouts.value, globalState.paging.data, globalState.paging.value,
+      globalState.tags.data.filteredSelected]);
 
    return (
       <PopUp
@@ -356,28 +344,42 @@ function FilterByTags(props: VitalityProps): JSX.Element {
    }, [globalState.tags, globalDispatch]);
 
    const handleApplyFilterClick = useCallback(() => {
-      // Apply tag filter
-      const filteredWorkouts: Workout[] | null = getFilteredTagsWorkouts(props);
+      // Cache filtered tags selection
+      globalDispatch({
+         type: "updateState",
+         value: {
+            id: "tags",
+            input: {
+               ...globalState.tags,
+               data: {
+                  ...globalState.tags.data,
+                  filteredSelected: globalState.tags.data.selected
+               }
+            }
+         }
+      });
+
+      // Selected filtered tags from filter form
+      const selectedTags: Set<string> = new Set(
+         globalState.tags.data.selected.map((tag: Tag) => tag.id)
+      );
+
+      const filteredWorkouts: Workout[] = [...globalState.workouts.value].filter((workout: Workout) => {
+         return filterWorkout(globalState, workout, selectedTags, "tags");
+      });
 
       if (filteredWorkouts !== null) {
+         // Update filtered workouts state after applying tags filtering
          globalDispatch({
-            type: "updateStates",
+            type: "updateState",
             value: {
-               // Update filtered workouts state after applying tags filtering
-               workouts: {
+               id: "workouts",
+               input: {
                   ...globalState.workouts,
                   data: {
                      ...globalState.workouts.data,
                      filtered: filteredWorkouts,
                      tagsFiltered: true
-                  }
-               },
-               // Cache filtered tags selection
-               tags: {
-                  ...globalState.tags,
-                  data: {
-                     ...globalState.tags.data,
-                     filteredSelected: globalState.tags.data.selected
                   }
                }
             }
@@ -386,7 +388,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          filterPopUpRef.current?.close();
          document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "center" });
       }
-   }, [globalDispatch, globalState.tags, globalState.workouts, props]);
+   }, [globalState, globalDispatch]);
 
    const handleReset = useCallback(() => {
       // Resetting the tags filter should fall back to date filtered view, if applied
@@ -394,7 +396,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
 
       // All selected and filtered workouts remain the same, but additional filtered may be added as tag filter is removed
       const newFiltered: Workout[] = [...globalState.workouts.value].filter((workout) => {
-         return !(dateFiltered) || filterByDate(globalState, workout);
+         return (!(dateFiltered) || filterByDate(globalState, workout));
       });
 
       globalDispatch({

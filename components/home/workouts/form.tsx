@@ -61,10 +61,10 @@ function updateWorkouts(currentWorkouts: Workout[], returnedWorkout: Workout, me
 };
 
 function updateFilteredWorkouts(globalState: VitalityState, currentFiltered: Workout[],
-   returnedWorkout: Workout, method: "add" | "update" | "delete"): Workout[] {
+   returnedWorkout: Workout, method: "add" | "update" | "delete", selectedTags: Set<string>): Workout[] {
    const newFiltered = [...currentFiltered].filter(workout => workout.id !== returnedWorkout.id);
 
-   if (method !== "delete" && filterWorkout(globalState, returnedWorkout)) {
+   if (method !== "delete" && filterWorkout(globalState, returnedWorkout, selectedTags, "update")) {
       // Updating or new workout passes current filters
       newFiltered.push(returnedWorkout);
    }
@@ -117,8 +117,13 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
       const successMethod = () => {
          const returnedWorkout: Workout = response.body.data;
 
+         // Fetch cached selected filtered tags
+         const selectedTags: Set<string> = new Set(
+            globalState.tags.data.filteredSelected.map((tag: Tag) => tag.id)
+         );
+
          const newWorkouts: Workout[] = updateWorkouts(globalState.workouts.value, returnedWorkout, method);
-         const newFiltered: Workout[] = updateFilteredWorkouts(globalState, globalState.workouts.data.filtered, returnedWorkout, method);
+         const newFiltered: Workout[] = updateFilteredWorkouts(globalState, globalState.workouts.data.filtered, returnedWorkout, method, selectedTags);
 
          // Update editing workout and overall workouts global state
          globalDispatch({

@@ -45,6 +45,7 @@ const workouts: VitalityState = {
          dictionary: {},
          options: [],
          selected: [],
+         filterSelected: [],
          handlesChanges: true
       }
    },
@@ -245,7 +246,7 @@ export default function Page(): JSX.Element {
                      Cards
                   </Button>
                </div>
-               <div id = "workoutsView">
+               <div id = "workoutsView" className="w-full lg:w-10/12">
                   {
                      view === "table" ? (
                         <WorkoutTable

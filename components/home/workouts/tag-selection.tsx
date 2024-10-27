@@ -440,10 +440,10 @@ export function TagSelection(props: VitalityProps): JSX.Element {
          <div className = "w-full mx-auto flex flex-col flex-wrap justify-center items-center">
             <ul
                className = {clsx("flex flex-col sm:flex-row flex-wrap justify-center items-center", {
-                  "pb-3": globalState.tags.data.selected.length > 0
+                  "pb-3": globalState.tags.data.selected?.length > 0
                })}>
                {
-                  globalState.tags.data.selected.map((selected: Tag) => {
+                  globalState.tags.data.selected?.map((selected: Tag) => {
                      return (
                         selected !== undefined &&
                            <WorkoutTag
