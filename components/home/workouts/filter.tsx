@@ -178,7 +178,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          });
 
          filterPopUpRef.current?.close();
-         document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "center" });
+         document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }
    }, [props, globalState.workouts, globalDispatch]);
 
@@ -386,7 +386,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          });
 
          filterPopUpRef.current?.close();
-         document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "center" });
+         document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
    }, [globalState, globalDispatch]);
 
@@ -478,7 +478,7 @@ export default function WorkoutFiltering(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
 
    return (
-      <div className = "w-full flex flex-col justify-start gap-2">
+      <div className = "w-full flex flex-col justify-start gap-2 px-4 mx-auto">
          <Input
             id = "search"
             type = "text"
@@ -487,7 +487,7 @@ export default function WorkoutFiltering(props: VitalityProps): JSX.Element {
             input = {globalState.search}
             dispatch = {globalDispatch}
             autoFocus />
-         <div className = "w-full mx-auto flex flex-row items-center justify-center gap-2">
+         <div className = "w-full mx-auto flex flex-wrap items-center justify-center gap-2">
             <FilterByDate {...props} />
             <FilterByTags {...props} />
          </div>

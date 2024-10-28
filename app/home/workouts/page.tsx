@@ -13,6 +13,7 @@ import { useCallback, useContext, useEffect, useMemo, useReducer, useState } fro
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { searchForTitle } from "@/lib/workouts/shared";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import Loading from "@/components/global/loading";
 
 const workouts: VitalityState = {
    // Global filtering inputs
@@ -41,7 +42,7 @@ const workouts: VitalityState = {
       value: null,
       error: null,
       data: {
-         // [tag.id] -> tag
+         fetched: false,
          dictionary: {},
          options: [],
          selected: [],
@@ -84,54 +85,6 @@ const workouts: VitalityState = {
          page: 0,
          handlesChanges: true
       }
-   },
-   // Exercise form
-   name: {
-      value: "",
-      error: null,
-      data: {
-         id: "",
-         edit: false
-      }
-   },
-   weight: {
-      value: "",
-      error: null,
-      data: {}
-   },
-   repetitions: {
-      value: "",
-      error: null,
-      data: {}
-   },
-   hours: {
-      value: "",
-      error: null,
-      data: {}
-   },
-   minutes: {
-      value: "",
-      error: null,
-      data: {}
-   },
-   seconds: {
-      value: "",
-      error: null,
-      data: {}
-   },
-   text: {
-      value: "",
-      error: null,
-      data: {}
-   },
-   // Store editing exercise ID to control interning inputs
-   exerciseId: {
-      value: null,
-      error: null,
-      data: {
-         // Editing set ID to display potential inputs for
-         setId: ""
-      }
    }
 };
 
@@ -144,6 +97,9 @@ export default function Page(): JSX.Element {
    const search: string = useMemo(() => {
       return globalState.search.value.trim().toLowerCase();
    }, [globalState.search]);
+
+   // Check if user workouts have been fetched from the backend
+   const fetched: boolean = globalState.workouts.data.fetched;
 
    // Filtered based on selected tags or date intervals
    const filtered: Workout[] = globalState.workouts.data.filtered;
@@ -164,7 +120,7 @@ export default function Page(): JSX.Element {
    }, [results, low, high]);
 
 
-   const fetchWorkoutsData = useCallback(async() => {
+   const fetchWorkoutsData = useCallback(async () => {
       if (user !== undefined && globalState.workouts.data.fetched === false) {
          try {
             const [workoutsData, tagsData] = await Promise.all([
@@ -182,7 +138,8 @@ export default function Page(): JSX.Element {
                         options: tagsData,
                         selected: [],
                         filteredSelected: [],
-                        dictionary: Object.fromEntries(tagsData.map(tag => [tag.id, tag]))
+                        dictionary: Object.fromEntries(tagsData.map(tag => [tag.id, tag])),
+                        fetched: true
                      }
                   },
                   workout: {
@@ -220,94 +177,102 @@ export default function Page(): JSX.Element {
    }, [fetchWorkoutsData, globalState.workouts.data.fetched, globalState.tags, globalState.workouts]);
 
    return (
-      <main className = "relative w-full lg:w-11/12 mx-auto my-8 flex min-h-screen flex-col items-center justify-start gap-4 text-center z-0">
-         {
-            <div className = "w-full mx-auto flex flex-col justify-center items-center gap-2 px-3">
-               <div className = "relative">
-                  <h1 className = "text-4xl font-bold mt-8">Welcome Back, Champion!</h1>
-                  <p className = "text-lg text-gray-700 my-4 max-w-[90%] mx-auto">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
-                  <WorkoutFiltering
-                     globalState = {globalState}
-                     globalDispatch = {globalDispatch} />
-               </div>
-               <div className = "flex justify-start items-center text-left gap-2 mt-2">
-                  <Button
-                     onClick = {() => setView("table")}
-                     className = {clsx("transition duration-300 ease-in-out", {
-                        "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
-                     })}>
-                     Table
-                  </Button>
-                  <Button
-                     onClick = {() => setView("cards")}
-                     className = {clsx("transition duration-300 ease-in-out", {
-                        "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
-                     })}>
-                     Cards
-                  </Button>
-               </div>
-               <div id = "workoutsView" className="w-full lg:w-10/12">
-                  {
-                     view === "table" ? (
-                        <WorkoutTable
-                           workouts = {workoutsSection}
-                           globalState = {globalState}
-                           globalDispatch = {globalDispatch} />
-                     ) : (
-                        <WorkoutCards
-                           workouts = {workoutsSection}
-                           globalState = {globalState}
-                           globalDispatch = {globalDispatch} />
-                     )
-                  }
-               </div>
-               <div className = "flex justify-center w-full mx-auto mt-6">
-                  <WorkoutForm
-                     workout = {globalState.workout.value}
-                     globalState = {globalState}
-                     globalDispatch = {globalDispatch}
-                     cover = {
-                        <Button
-                           type = "button"
-                           className = "bg-primary text-white w-full h-[2.6rem] p-4"
-                           icon = {faPlus}
-                           onClick = {() => {
-                              globalDispatch({
-                                 type: "updateState",
-                                 value: {
-                                    id: "workout",
-                                    input: {
-                                       ...globalState.workout,
-                                       value: {
-                                          id: "",
-                                          user_id: user?.id ?? "",
-                                          title: "",
-                                          date: new Date(),
-                                          image: "",
-                                          description: "",
-                                          tagIds: [],
-                                          exercises: []
-                                       }
-                                    }
-                                 }
-                              });
-                           }}
-                        >
-                           New Workout
-                        </Button>
-                     }
-                  />
-               </div>
-               {
-                  results.length > 0 && (
-                     <Pagination
-                        workouts = {results}
-                        globalState = {globalState}
-                        globalDispatch = {globalDispatch} />
+      <main className="relative w-full lg:w-11/12 mx-auto my-8 min-h-screen flex flex-col justify-start items-center text-center">
+         <div className="relative">
+            <h1 className="text-4xl font-bold mt-8">Welcome Back, Champion!</h1>
+            <p className="text-lg text-gray-700 my-4 max-w-[90%] mx-auto">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
+            <WorkoutFiltering
+               globalState={globalState}
+               globalDispatch={globalDispatch} />
+         </div>
+         <div className="flex justify-start items-center text-left gap-2 mt-2">
+            <Button
+               onClick={() => setView("table")}
+               className={clsx("transition duration-300 ease-in-out", {
+                  "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
+               })}>
+               Table
+            </Button>
+            <Button
+               onClick={() => setView("cards")}
+               className={clsx("transition duration-300 ease-in-out", {
+                  "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
+               })}>
+               Cards
+            </Button>
+         </div>
+         <div id="workoutsView" className="w-11/12 min-h-max flex-grow flex flex-col justify-center items-center">
+            {
+               workoutsSection.length === 0 ? (
+                  <div className="w-full h-full mx-auto text-center flex justify-center items-start py-12">
+                     {
+                        fetched ? (
+                           <h1 className="font-bold text-xl">No available workouts</h1>
+                        ) : (
+                           <Loading />
+                        )}
+                  </div>
+               ) : (
+                  view === "table" ? (
+                     <WorkoutTable
+                        workouts={workoutsSection}
+                        globalState={globalState}
+                        globalDispatch={globalDispatch} />
+                  ) : (
+                     <WorkoutCards
+                        workouts={workoutsSection}
+                        globalState={globalState}
+                        globalDispatch={globalDispatch} />
                   )
+               )
+            }
+         </div>
+         <div className="flex justify-center w-full mx-auto mt-6">
+            <WorkoutForm
+               workout={globalState.workout.value}
+               globalState={globalState}
+               globalDispatch={globalDispatch}
+               cover={
+                  <Button
+                     type="button"
+                     className="bg-primary text-white w-full h-[2.6rem] p-4"
+                     icon={faPlus}
+                     onClick={() => {
+                        globalDispatch({
+                           type: "updateState",
+                           value: {
+                              id: "workout",
+                              input: {
+                                 ...globalState.workout,
+                                 value: {
+                                    id: "",
+                                    user_id: user?.id ?? "",
+                                    title: "",
+                                    date: new Date(),
+                                    image: "",
+                                    description: "",
+                                    tagIds: [],
+                                    exercises: []
+                                 }
+                              }
+                           }
+                        });
+                     }}
+                  >
+                     New Workout
+                  </Button>
                }
-            </div>
+            />
+         </div>
+         {
+            results.length > 0 && (
+               <Pagination
+                  workouts={results}
+                  globalState={globalState}
+                  globalDispatch={globalDispatch} />
+            )
          }
+
       </main >
    );
 }

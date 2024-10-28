@@ -67,7 +67,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
    }, [globalDispatch, globalState.paging]);
 
    return (
-      <div className = "mt-12 text-lg">
+      <div className = "mt-6 justify-self-end text-lg">
          <div className = "flex flex-row justify-center items-center mb-2">
             <FontAwesomeIcon
                icon = {faCircleChevronLeft}
