@@ -1,6 +1,7 @@
 import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 import Link from "next/link";
+import { faUsersViewfinder } from "@fortawesome/free-solid-svg-icons";
 
 interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
    children: React.ReactNode;
@@ -26,6 +27,7 @@ function PricingCard(props: PricingCardProps): JSX.Element {
             <div className = "my-6 flex flex-col justify-center gap-[14px] h-[12.5rem] font-medium">{props.children}</div>
             <Link href = "/signup">
                <Button
+                  icon = {faUsersViewfinder}
                   className = "block w-full rounded-md border border-primary bg-primary p-3 text-center text-white hover:scale-[1.05] transition duration-300 ease-in-out"
                >
                   {props.text}

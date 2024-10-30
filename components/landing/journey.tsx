@@ -3,6 +3,7 @@ import Image from "next/image";
 import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 import Ring from "@/components/landing/ring";
+import { faBullseye } from "@fortawesome/free-solid-svg-icons";
 
 export default function Journey(): JSX.Element {
    return (
@@ -66,7 +67,9 @@ export default function Journey(): JSX.Element {
                            Discover the power of tracking your fitness journey as you strive towards your goals. By monitoring your progress, you gain valuable insights, stay accountable, and fuel your motivation.
                         </p>
                         <Link href = "/signup">
-                           <Button className = "text-white text-md bg-primary whitespace-nowrap w-[8rem] h-[3rem] hover:scale-[1.05] transition duration-300 ease-in-out">
+                           <Button
+                              icon = {faBullseye}
+                              className = "text-white text-md bg-primary whitespace-nowrap w-[10rem] h-[2.6rem] hover:scale-[1.05] transition duration-300 ease-in-out">
                               Start Today
                            </Button>
                         </Link>

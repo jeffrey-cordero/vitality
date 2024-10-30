@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import Image from "next/image";
-import WorkoutForm from "./form";
 import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
 import { getWorkoutDate } from "@/lib/workouts/shared";
@@ -14,7 +13,7 @@ interface WorkoutCardProps extends WorkoutCardsProps {
 }
 
 function WorkoutCard(props: WorkoutCardProps): JSX.Element {
-   const { workout, globalState } = props;
+   const { workout, globalState, globalDispatch } = props;
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
          // Fetch tag using id
@@ -22,58 +21,70 @@ function WorkoutCard(props: WorkoutCardProps): JSX.Element {
 
          return (
             // Undefined in case of removal
-            tag !== undefined &&
-            <div
-               className={clsx("max-w-full px-3 py-1 m-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-md lg:text-sm font-bold text-white transition duration-300 ease-in-out")}
-               style={{
-                  backgroundColor: tag.color
-               }}
-               key={tag.id}
-            >
-               {tag.title}
-            </div>
+            tag !== undefined && (
+               <div
+                  className = {clsx("max-w-full px-3 py-1 m-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-sm font-bold text-white transition duration-300 ease-in-out")}
+                  style = {{
+                     backgroundColor: tag.color
+                  }}
+                  key = {tag.id}
+               >
+                  {tag.title}
+               </div>
+            )
+
          );
       });
    }, [workout, globalState.tags.data.dictionary]);
 
    return (
-      <WorkoutForm
-         {...props}
-         cover={
-            <div className="relative cursor-pointer flex flex-col justify-center items-center gap-2 w-[16rem] mx-auto rounded-2xl overflow-hidden shadow-xl bg-white hover:scale-105 transition duration-300 ease-in-out">
-               <div className="w-full h-[23rem] rounded-2xl rounded-b-none shadow-md">
-                  <div className="w-full h-full mx-auto">
-                     {
-                        workout.image ? (
-                           <Image
-                              quality={100}
-                              layout="fill"
-                              objectFit="cover"
-                              sizes="100vw"
-                              src={workout.image ?? ""}
-                              alt="workout-image"
-                              className="opacity-30"
-                           />
-                        ) : (
-                           <div className="absolute w-full h-full bg-white opacity-30 flex justify-center items-center">
-                              <FontAwesomeIcon
-                                 className="text-7xl text-primary"
-                                 icon={faImage} />
-                           </div>
-                        )
+      <div
+         id = {workout.id}
+         onClick = {() => {
+            globalDispatch({
+               type: "updateState",
+               value: {
+                  id: "workout",
+                  input: {
+                     ...globalState.workout,
+                     value: workout,
+                     data: {
+                        display: true
                      }
-                     <div className="relative w-full h-full flex flex-col justify-start items-center overflow-hidden text-center pt-5">
-                        <h2 className="font-bold text-2xl px-6 py-4 overflow-clip max-w-[90%] text-ellipsis whitespace-nowrap leading-none tracking-tight">{workout.title}</h2>
-                        <p className="font-bold text-sm">{getWorkoutDate(workout.date)}</p>
-                        <div className="flex flex-row flex-wrap justify-center items-center gap-2 p-2 overflow-y-scroll">
-                           {workoutTags}
-                        </div>
-                     </div>
+                  }
+               }
+            });
+         }}
+         className = "relative cursor-pointer flex flex-col justify-center items-center gap-2 w-full sm:w-[16rem] h-[26rem] sm:h-[22rem] mx-auto sm:m-2 rounded-2xl overflow-hidden shadow-lg bg-white hover:scale-105 transition duration-300 ease-in-out">
+         <div className = "w-full h-full mx-auto">
+            {
+               workout.image ? (
+                  <Image
+                     quality = {100}
+                     layout = "fill"
+                     objectFit = "cover"
+                     sizes = "100vw"
+                     src = {workout.image ?? ""}
+                     alt = "workout-image"
+                     className = "opacity-30"
+                  />
+               ) : (
+                  <div className = "absolute w-full h-full bg-white opacity-20 flex justify-center items-center">
+                     <FontAwesomeIcon
+                        className = "text-7xl text-primary"
+                        icon = {faImage} />
                   </div>
+               )
+            }
+            <div className = "relative w-full h-full flex flex-col justify-start items-center overflow-hidden text-center pt-5">
+               <h2 className = "font-bold text-2xl px-6 py-4 overflow-clip max-w-[90%] text-ellipsis whitespace-nowrap leading-none tracking-tight">{workout.title}</h2>
+               <p className = "font-bold text-sm">{getWorkoutDate(workout.date)}</p>
+               <div className = "w-full max-h-[15rem] flex flex-row flex-wrap justify-center items-center gap-2 p-2 overflow-auto scrollbar-hide cursor-all-scroll">
+                  {workoutTags}
                </div>
             </div>
-         }
-      />
+         </div>
+      </div>
    );
 };
 
@@ -85,13 +96,13 @@ export default function WorkoutCards(props: WorkoutCardsProps): JSX.Element {
    const { workouts } = props;
 
    return (
-      <div className="relative w-full mx-auto">
-         <div className="flex flex-wrap justify-center items-center gap-6 mt-6">
+      <div className = "relative w-full mx-auto">
+         <div className = "flex flex-row flex-wrap justify-center items-center gap-6 my-6">
             {workouts.map((workout: Workout) => (
                <WorkoutCard
                   {...props}
-                  workout={workout}
-                  key={workout.id} />
+                  workout = {workout}
+                  key = {workout.id} />
             ))}
          </div>
       </div>

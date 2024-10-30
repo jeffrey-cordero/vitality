@@ -8,9 +8,9 @@ import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { formReducer, handleResponse, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
 import { addWorkout, updateWorkout, Workout } from "@/lib/workouts/workouts";
 import { Tag } from "@/lib/workouts/tags";
-import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTrash, faPlus, faTrashCan, faSignature, faCalendar, faBook, faLink } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTrash, faTrashCan, faSignature, faCalendar, faBook, faLink, faArrowRotateBack, faSquareCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
+import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { filterWorkout } from "@/components/home/workouts/filter";
 import { PopUp } from "@/components/global/popup";
 
@@ -72,18 +72,18 @@ function updateFilteredWorkouts(globalState: VitalityState, currentFiltered: Wor
    return newFiltered.sort((a, b) => b.date.getTime() - a.date.getTime());
 };
 
-interface WorkoutFormProps extends VitalityProps {
-   workout: Workout;
-   cover: React.ReactNode | null;
-}
 
-export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
-   const { workout, cover, globalState, globalDispatch } = props;
+export default function WorkoutForm(props: VitalityProps): JSX.Element {
+   const { globalState, globalDispatch } = props;
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
 
    // Basic workout inputs like title, date, description, and image URL stored locally
    const [localState, localDispatch] = useReducer(formReducer, form);
+   const [displayPopUp, setDisplayPopUp] = useState(false);
+
+   // Fetch current editing workout
+   const workout: Workout = globalState.workout.value;
 
    // Empty ID implies new workout
    const isNewWorkout: boolean = workout.id?.trim().length === 0;
@@ -91,9 +91,14 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
    // Pop-up relating to workout deletion confirmation message
    const deletePopUpRef = useRef<{ close: () => void }>(null);
 
+   // Editing workout display container
+   const formPopUpRef = useRef<{ open: () => void }>(null);
+
    const defaultDate: string = useMemo(() => {
       return new Date().toISOString().split("T")[0];
    }, []);
+
+   const displayWorkoutForm: boolean = globalState.workout.data.display;
 
    const handleUpdateWorkout = async(method: "add" | "update" | "delete") => {
       const { selected, dictionary } = globalState.tags.data;
@@ -155,7 +160,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
       handleResponse(localDispatch, response, successMethod, updateNotification);
    };
 
-   const handleInitializeWorkoutState = () => {
+   const handleInitializeWorkoutState = useCallback(() => {
       // Update input states based on current workout or new workout
       globalDispatch({
          type: "initializeState",
@@ -204,7 +209,8 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
             }
          }
       });
-   };
+   }, [defaultDate, globalDispatch, globalState.tagSearch, globalState.tags, isNewWorkout, localState.date, localState.description,
+      localState.image, localState.title, workout.date, workout.description, workout.image, workout.tagIds, workout.title]);
 
    const handleReset = useCallback(() => {
       // Reset basic form inputs
@@ -229,12 +235,21 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
       });
    }, [globalDispatch, localDispatch, globalState.tags]);
 
+   useEffect(() => {
+      if (displayWorkoutForm && !(displayPopUp)) {
+         setDisplayPopUp(true);
+         handleInitializeWorkoutState();
+         formPopUpRef.current?.open();
+      }
+   }, [displayWorkoutForm, displayPopUp, handleInitializeWorkoutState]);
+
+
    return (
       <PopUp
          text = {isNewWorkout ? "New Workout" : "Edit Workout"}
          className = "max-w-3xl"
-         buttonClassName = "w-[9.5rem] h-[2.9rem] text-white text-md font-semibold bg-primary hover:scale-[1.05] transition duration-300 ease-in-out"
-         icon = {faPlus}
+         ref = {formPopUpRef}
+         display = {null}
          onClose = {() => {
             // Cleanup workout form component for future usage
             globalDispatch({
@@ -252,16 +267,20 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                         description: "",
                         tagIds: [],
                         exercises: []
+                     },
+                     data: {
+                        display: false
                      }
                   }
                }
             });
+
+            setDisplayPopUp(false);
          }}
          onClick = {handleInitializeWorkoutState}
-         cover = {cover}
       >
          <div className = "relative">
-            <div className = "flex flex-col justify-center align-center text-center gap-3">
+            <div className = "flex flex-col justify-center align-center text-center gap-2">
                <FontAwesomeIcon
                   icon = {faPersonRunning}
                   className = "text-6xl text-primary mt-1"
@@ -270,7 +289,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   {isNewWorkout ? "New" : "Edit"} Workout
                </h1>
             </div>
-            <div className = "relative mt-8 w-full flex flex-col justify-center align-center text-left gap-3">
+            <div className = "relative mt-8 w-full flex flex-col justify-center align-center text-left gap-2">
                <FontAwesomeIcon
                   icon = {faArrowRotateLeft}
                   onClick = {handleReset}
@@ -313,7 +332,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                      <PopUp
                         className = "max-w-xl"
                         ref = {deletePopUpRef}
-                        cover = {
+                        display = {
                            <Button
                               type = "button"
                               className = "w-full bg-red-500 text-white h-[2.6rem]"
@@ -323,17 +342,18 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                            </Button>
                         }
                      >
-                        <div className = "flex flex-col justify-center items-center gap-4">
+                        <div className = "flex flex-col justify-between items-center gap-4 p-2">
                            <FontAwesomeIcon
                               icon = {faTrashCan}
-                              className = "text-red-500 text-4xl" />
+                              className = "text-red-500 text-3xl" />
                            <p className = "font-bold">
-                              Are you sure you want to delete this workout
+                              Delete this workout?
                            </p>
-                           <div className = "flex flex-row justify-center items-center gap-4 flex-1">
+                           <div className = "flex flex-row flex-wrap justify-center items-center gap-2">
                               <Button
                                  type = "button"
-                                 className = "w-[10rem] bg-gray-100 text-black mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
+                                 icon = {faArrowRotateBack}
+                                 className = "w-[10rem] bg-gray-100 text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
                                  onClick = {() => {
                                     // Close the popup for deletion confirmation
                                     if (deletePopUpRef.current) {
@@ -345,7 +365,8 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                               </Button>
                               <Button
                                  type = "button"
-                                 className = "w-[10rem] bg-red-500 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
+                                 icon = {faSquareCheck}
+                                 className = "w-[10rem] bg-red-500 text-white px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
                                  onClick = {async() => handleUpdateWorkout("delete")}
                               >
                                  Yes, I&apos;m sure
@@ -362,7 +383,7 @@ export default function WorkoutForm(props: WorkoutFormProps): JSX.Element {
                   onClick = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
                >
                   {
-                     isNewWorkout ? "Create" : "Save"
+                     isNewWorkout ? "Create" : "Update"
                   }
                </Button>
                {

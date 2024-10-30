@@ -5,7 +5,7 @@ import Button from "@/components/global/button";
 import Input, { VitalityInputProps } from "@/components/global/input";
 import { useCallback, useState } from "react";
 import { PopUp } from "@/components/global/popup";
-import { faPaperclip, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faCameraRetro, faGlobe, faPaperclip, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const defaultImages = ["bike.png", "cardio.png", "default.png", "hike.png", "legs.png", "lift.png", "machine.png", "run.png", "swim.png", "weights.png"];
@@ -59,26 +59,24 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
    }, [dispatch, input]);
 
    return (
-      <div className = "flex flex-col gap-3">
-         <div className = "flex gap-8 font-bold text-lg">
-            <h3
-               onClick = {() => {
-                  setIsDefaultImage(true);
-               }}
-               className = {clsx("cursor-pointer", {
-                  "border-b-[3px] border-primary text-red": isDefaultImage
+      <div className = "flex flex-col">
+         <div className = "flex justify-start items-center text-left gap-4 mt-2 text-md">
+            <Button
+               icon = {faCameraRetro}
+               onClick = {() => setIsDefaultImage(true)}
+               className = {clsx("transition duration-300 ease-in-out", {
+                  "scale-105 border-b-4 border-b-primary rounded-none": isDefaultImage
                })}>
                Defaults
-            </h3>
-            <h3
-               onClick = {() => {
-                  setIsDefaultImage(false);
-               }}
-               className = {clsx("cursor-pointer", {
-                  "border-b-[3px] border-primary text-red": !(isDefaultImage)
+            </Button>
+            <Button
+               icon = {faGlobe}
+               onClick = {() => setIsDefaultImage(false)}
+               className = {clsx("transition duration-300 ease-in-out", {
+                  "scale-105  border-b-4 border-b-primary rounded-none": !(isDefaultImage)
                })}>
                URL
-            </h3>
+            </Button>
          </div>
          {
             isDefaultImage ?
@@ -95,7 +93,7 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
                               src = {source}
                               key = {source}
                               alt = "workout-image"
-                              className = {clsx("w-[20rem] h-[20rem] object-cover object-center shadow-inner rounded-xl cursor-pointer", {
+                              className = {clsx("w-[17rem] h-[17rem] object-cover object-center shadow-inner rounded-xl cursor-pointer", {
                                  "border-[4px] border-primary shadow-2xl scale-[1.05] transition duration-300 ease-in-out": input.value === source
                               })}
                               onClick = {() => handleDefaultImageSelection(source)}
@@ -106,7 +104,6 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
                </div>
                :
                <div
-                  className = "p-2"
                   onKeyDown = {(event: React.KeyboardEvent) => {
                      if (event.key === "Enter") {
                         handleImageURLSubmission();
@@ -137,7 +134,7 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
                                  });
                               }}
                               alt = "workout-image"
-                              className = {clsx("w-[20rem] h-[20rem] object-cover object-center rounded-xl cursor-pointer transition duration-300 ease-in-out")}
+                              className = {clsx("w-[12rem] h-[12rem] object-cover object-center rounded-xl cursor-pointer transition duration-300 ease-in-out")}
                            />
                         </div>
                      )
@@ -165,7 +162,7 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
                   <Button
                      type = "button"
                      onClick = {() => handleImageURLSubmission()}
-                     className = "w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] min-h-[2.8rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
+                     className = "w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] h-[2.6rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
                      icon = {faPaperclip}
                   >
                      Link
@@ -186,32 +183,35 @@ export default function ImageSelection(props: VitalityInputProps): JSX.Element {
          <ToolTip
             tooltipContent = {
                verifyURL(input.value) && isValidImage ?
-                  <Image
-                     width = {1000}
-                     height = {1000}
-                     quality = {100}
-                     src = {input.value}
-                     onError = {() => {
-                        dispatch({
-                           type: "updateState",
-                           value: {
-                              id: "image",
-                              input: {
-                                 ...input,
-                                 error: "Failed to fetch your desired image resource. Please ensure the link is valid.",
-                                 data: {
-                                    valid: false
+                  <div className = "w-full mx-auto">
+                     <Image
+                        quality = {100}
+                        layout = "fill"
+                        objectFit = "cover"
+                        sizes = "100vw"
+                        src = {input.value}
+                        onError = {() => {
+                           dispatch({
+                              type: "updateState",
+                              value: {
+                                 id: "image",
+                                 input: {
+                                    ...input,
+                                    error: "Failed to fetch your desired image resource. Please ensure the link is valid.",
+                                    data: {
+                                       valid: false
+                                    }
                                  }
                               }
-                           }
-                        });
-                     }}
-                     alt = "workout-image"
-                     className = {clsx("w-[13rem] h-[13rem] object-cover object-center rounded-2xl")}
-                  /> : null}
+                           });
+                        }}
+                        alt = "workout-image"
+                        className = {clsx("w-[17rem] h-[17rem] object-cover object-center rounded-2xl")}
+                     />
+                  </div> : null}
          >
             <PopUp
-               cover = {
+               display = {
                   <div>
                      <Button
                         className = {clsx("w-full text-black font-semibold border-[1.5px] h-[2.9rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500", {
@@ -221,13 +221,13 @@ export default function ImageSelection(props: VitalityInputProps): JSX.Element {
                         {selected ? "Edit Image" : "Add Image"}
                      </Button>
                      {input.error !== null &&
-                        <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
+                        <div className = "flex justify-center align-center text-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
                            <p className = "text-red-500 font-bold input-error"> {input.error} </p>
                         </div>
                      }
                   </div>
                }
-               className = "max-w-[80%]">
+               className = "max-w-full">
                <ImageSelectionForm {...props} />
             </PopUp>
          </ToolTip>

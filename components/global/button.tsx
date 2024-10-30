@@ -8,20 +8,22 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export default function Button(props: ButtonProps): JSX.Element {
+   const { children, className, icon } = props;
+
    return (
       <button
          {...props}
          className = {clsx(
             "flex gap-2 items-center justify-center min-h-[2rem] min-w-[4rem] focus:ring-slate-200 font-bold rounded-lg text-md outline-none hover:cursor-pointer",
-            props.className,
+            className,
          )}
       >
          {
-            props.icon && (
-               <FontAwesomeIcon icon = {props.icon} />
+            icon && (
+               <FontAwesomeIcon icon = {icon} />
             )
          }
-         {props.children}
+         {children}
       </button>
    );
 }

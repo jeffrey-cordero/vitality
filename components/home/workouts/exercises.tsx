@@ -2,9 +2,10 @@
 import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import TextArea from "@/components/global/textarea";
+import { useDoubleTap } from "use-double-tap";
 import { formReducer, handleResponse, VitalityChildProps, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
-import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCloudArrowUp, faDumbbell, faFeather, faPlus, faRotateLeft, faStopwatch, faTrash, faCaretRight, faCaretDown } from "@fortawesome/free-solid-svg-icons";
+import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCloudArrowUp, faDumbbell, faPenRuler, faPlus, faRotateLeft, faStopwatch, faTrash, faCaretRight, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useContext, useEffect, useReducer, useState } from "react";
 import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises } from "@/lib/workouts/exercises";
 import { NotificationContext } from "@/app/layout";
@@ -79,7 +80,7 @@ function NewExerciseInput(props: ExerciseProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
    const { workout, localState, localDispatch, saveExercises, onBlur } = props;
 
-   const handleCreateNewExercise = useCallback(async() => {
+   const handleCreateNewExercise = useCallback(async () => {
       const payload: Exercise = {
          id: "",
          workout_id: workout.id,
@@ -101,21 +102,31 @@ function NewExerciseInput(props: ExerciseProps): JSX.Element {
    }, [localDispatch, localState.name.value, saveExercises, updateNotification, workout.exercises, workout.id, onBlur]);
 
    return (
-      <div className = "w-full mb-2 mx-auto text-left" >
+      <div className="w-full flex flex-col justify-center align-center text-left gap-2">
          <Input
-            id = "name"
-            type = "text"
-            label = "Name"
-            icon = {faFeather}
-            input = {localState.name}
-            dispatch = {localDispatch}
+            id="name"
+            type="text"
+            label="Name"
+            icon={faPenRuler}
+            input={localState.name}
+            dispatch={localDispatch}
             autoFocus
             required />
          <Button
-            type = "button"
-            className = "w-full bg-green-600 text-white mt-2 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
-            icon = {faFeather}
-            onClick = {handleCreateNewExercise}
+            type="button"
+            className="w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
+            icon={faRotateLeft}
+            onClick={() => {
+               onBlur();
+            }}
+         >
+            Cancel
+         </Button>
+         <Button
+            type="button"
+            className="w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
+            icon={faPenRuler}
+            onClick={handleCreateNewExercise}
          >
             Add Exercise
          </Button>
@@ -173,10 +184,10 @@ function SetContainer(props: SetProps): JSX.Element {
          text: localState.text.value
       };
    }, [exercise.id, exercise.sets.length, localState.hours.value, localState.minutes.value,
-      localState.repetitions.value, localState.seconds.value, localState.text.value,
-      localState.weight.value, set]);
+   localState.repetitions.value, localState.seconds.value, localState.text.value,
+   localState.weight.value, set]);
 
-   const handleExerciseSetSubmission = useCallback(async(method: "update" | "delete") => {
+   const handleExerciseSetSubmission = useCallback(async (method: "update" | "delete") => {
       const newSet: ExerciseSet = constructNewExerciseSet();
       let response: VitalityResponse<Exercise>;
 
@@ -261,84 +272,84 @@ function SetContainer(props: SetProps): JSX.Element {
       // Display inputs
       setEditSet(true);
    }, [exercise.id, localDispatch, localState.exerciseId, localState.hours, localState.minutes, localState.repetitions,
-      localState.seconds, localState.text, localState.weight, set?.hours, set?.id, set?.minutes, set?.repetitions,
-      set?.seconds, set?.text, set?.weight]);
+   localState.seconds, localState.text, localState.weight, set?.hours, set?.id, set?.minutes, set?.repetitions,
+   set?.seconds, set?.text, set?.weight]);
 
    return (
       <div
-         style = {style}
-         ref = {setNodeRef}
+         style={style}
+         ref={setNodeRef}
       >
          {
             displayEditInputs ? (
-               <li className = "relative flex flex-col justify-start gap-2 w-full mx-auto pt-2 my-8 text-left">
+               <li className="relative flex flex-col justify-start gap-2 w-full mx-auto pt-2 my-8 text-left">
                   <FontAwesomeIcon
-                     icon = {faArrowRotateLeft}
-                     onClick = {reset}
-                     className = "absolute top-[-15px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                     icon={faArrowRotateLeft}
+                     onClick={reset}
+                     className="absolute top-[-15px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                   />
                   <Input
-                     id = "weight"
-                     type = "number"
-                     label = "Weight"
-                     min = "0"
-                     icon = {faDumbbell}
-                     input = {localState.weight}
-                     dispatch = {localDispatch}
+                     id="weight"
+                     type="number"
+                     label="Weight"
+                     min="0"
+                     icon={faDumbbell}
+                     input={localState.weight}
+                     dispatch={localDispatch}
                      autoFocus />
                   <Input
-                     id = "repetitions"
-                     type = "number"
-                     label = "Repetitions"
-                     min = "0"
-                     icon = {faArrowUp91}
-                     input = {localState.repetitions}
-                     dispatch = {localDispatch} />
-                  <div className = "flex flex-col sm:flex-row justify-between items-center gap-2">
-                     <div className = "w-full mx-auto">
+                     id="repetitions"
+                     type="number"
+                     label="Repetitions"
+                     min="0"
+                     icon={faArrowUp91}
+                     input={localState.repetitions}
+                     dispatch={localDispatch} />
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
+                     <div className="w-full mx-auto">
                         <Input
-                           id = "hours"
-                           type = "number"
-                           label = "Hours"
-                           min = "0"
-                           icon = {faStopwatch}
-                           input = {localState.hours}
-                           dispatch = {localDispatch} />
+                           id="hours"
+                           type="number"
+                           label="Hours"
+                           min="0"
+                           icon={faStopwatch}
+                           input={localState.hours}
+                           dispatch={localDispatch} />
                      </div>
-                     <div className = "w-full mx-auto">
+                     <div className="w-full mx-auto">
                         <Input
-                           id = "minutes"
-                           type = "number"
-                           label = "Minutes"
-                           min = "0"
-                           icon = {faStopwatch}
-                           input = {localState.minutes}
-                           dispatch = {localDispatch} />
+                           id="minutes"
+                           type="number"
+                           label="Minutes"
+                           min="0"
+                           icon={faStopwatch}
+                           input={localState.minutes}
+                           dispatch={localDispatch} />
                      </div>
-                     <div className = "w-full mx-auto">
+                     <div className="w-full mx-auto">
                         <Input
-                           id = "seconds"
-                           type = "number"
-                           label = "Seconds"
-                           min = "0"
-                           icon = {faStopwatch}
-                           input = {localState.seconds}
-                           dispatch = {localDispatch} />
+                           id="seconds"
+                           type="number"
+                           label="Seconds"
+                           min="0"
+                           icon={faStopwatch}
+                           input={localState.seconds}
+                           dispatch={localDispatch} />
                      </div>
                   </div>
                   <TextArea
-                     id = "text"
-                     type = "text"
-                     label = "Text"
-                     icon = {faAlignJustify}
-                     input = {localState.text}
-                     dispatch = {localDispatch}
+                     id="text"
+                     type="text"
+                     label="Text"
+                     icon={faAlignJustify}
+                     input={localState.text}
+                     dispatch={localDispatch}
                      required />
                   <Button
-                     type = "button"
-                     className = "w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
-                     icon = {faRotateLeft}
-                     onClick = {() => {
+                     type="button"
+                     className="w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
+                     icon={faRotateLeft}
+                     onClick={() => {
                         if (set === undefined) {
                            // Remove from DOM for new exercise set inputs
                            onBlur();
@@ -350,20 +361,20 @@ function SetContainer(props: SetProps): JSX.Element {
                      Cancel
                   </Button>
                   <Button
-                     type = "button"
-                     className = "w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
-                     icon = {faCloudArrowUp}
-                     onClick = {() => handleExerciseSetSubmission("update")}
+                     type="button"
+                     className="w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
+                     icon={faCloudArrowUp}
+                     onClick={() => handleExerciseSetSubmission("update")}
                   >
-                     {set !== undefined ? "Save" : "Create"}
+                     {set !== undefined ? "Update" : "Create"}
                   </Button>
                   {
                      set !== undefined && (
                         <Button
-                           type = "button"
-                           className = "w-full bg-red-600 text-white text-md px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
-                           icon = {faTrash}
-                           onClick = {() => handleExerciseSetSubmission("delete")}
+                           type="button"
+                           className="w-full bg-red-600 text-white text-md px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
+                           icon={faTrash}
+                           onClick={() => handleExerciseSetSubmission("delete")}
                         >
                            Delete
                         </Button>
@@ -373,33 +384,33 @@ function SetContainer(props: SetProps): JSX.Element {
                : (
                   set !== undefined && (
                      <li
-                        className = "flex flex-row justify-start items-start font-medium gap-8 w-full mx-auto pt-2 text-left text-md cursor-move"
-                        onDoubleClick = {handleInitializeEditSet}
+                        className="flex flex-row justify-start items-start font-medium gap-8 w-full mx-auto pt-2 text-left text-md cursor-move"
+                        onClick={handleInitializeEditSet}
                         {...attributes}
                         {...listeners}
                      >
-                        <div className = "flex flex-col gap-2 pl-6 cursor-pointer">
+                        <div className="flex flex-col gap-2 pl-6 cursor-pointer">
                            {set.weight !== undefined && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-bold">
+                              <div className="flex flex-row items-center justify-start gap-2 font-bold">
                                  <FontAwesomeIcon
-                                    className = "self-start pt-1 text-primary"
-                                    icon = {faDumbbell} />
+                                    className="self-start pt-1 text-primary"
+                                    icon={faDumbbell} />
                                  <p>{set.weight}</p>
                               </div>
                            )}
                            {set.repetitions !== undefined && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-bold">
+                              <div className="flex flex-row items-center justify-start gap-2 font-bold">
                                  <FontAwesomeIcon
-                                    className = "self-start pt-1 text-primary"
-                                    icon = {faArrowUp91} />
+                                    className="self-start pt-1 text-primary"
+                                    icon={faArrowUp91} />
                                  <p>{set.repetitions}</p>
                               </div>
                            )}
                            {(set.hours !== undefined || set.minutes !== undefined || set.seconds !== undefined) && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-bold">
+                              <div className="flex flex-row items-center justify-start gap-2 font-bold">
                                  <FontAwesomeIcon
-                                    className = "self-start pt-1 text-primary"
-                                    icon = {faStopwatch} />
+                                    className="self-start pt-1 text-primary"
+                                    icon={faStopwatch} />
                                  <p>
                                     {String(set.hours ?? 0).padStart(2, "0")}:
                                     {String(set.minutes ?? 0).padStart(2, "0")}:
@@ -408,11 +419,11 @@ function SetContainer(props: SetProps): JSX.Element {
                               </div>
                            )}
                            {set.text && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-bold text-base">
+                              <div className="flex flex-row items-center justify-start gap-2 font-bold text-base">
                                  <FontAwesomeIcon
-                                    className = "self-start pt-1 text-primary"
-                                    icon = {faAlignJustify} />
-                                 <p className = "line-clamp-3">{set.text}</p>
+                                    className="self-start pt-1 text-primary"
+                                    icon={faAlignJustify} />
+                                 <p className="line-clamp-3">{set.text}</p>
                               </div>
                            )}
                         </div>
@@ -476,7 +487,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       })
    );
 
-   const handleDragEnd = async(event) => {
+   const handleDragEnd = async (event) => {
       const { active, over } = event;
 
       if (active.id === editingExerciseSetId) {
@@ -526,7 +537,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       }
    };
 
-   const handleSaveExerciseName = useCallback(async() => {
+   const handleSaveExerciseName = useCallback(async () => {
       // Construct new exercise for update method
       const newName: string = localState.name.value.trim();
       const newExercise: Exercise = { ...exercise, name: newName };
@@ -543,7 +554,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       handleResponse(localDispatch, response, successMethod, updateNotification);
    }, [exercise, localDispatch, localState.name.value, saveExercises, updateNotification, workout.exercises, onBlur]);
 
-   const handleDeleteExercise = useCallback(async() => {
+   const handleDeleteExercise = useCallback(async () => {
       const newExercises: Exercise[] = [...workout.exercises].filter((e) => e.id !== exercise.id);
       const response: VitalityResponse<Exercise[]> = await updateExercises(workout.id, newExercises);
 
@@ -627,75 +638,78 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
       setAddSet(true);
    }, [exercise.id, localDispatch, localState.exerciseId, localState.hours, localState.minutes,
-      localState.repetitions, localState.seconds, localState.text, localState.weight]);
+   localState.repetitions, localState.seconds, localState.text, localState.weight]);
+
+   const bind = useDoubleTap(handleInitializeEditExerciseName);
 
    return (
       <li
-         className = "w-full mx-auto p-4 text-left focus:cursor-move"
-         style = {style}
-         ref = {setNodeRef}
+         className="w-full mx-auto p-4 text-left focus:cursor-move"
+         style={style}
+         ref={setNodeRef}
       >
          {
             displayEditName ? (
                <div>
                   <Input
-                     id = "name"
-                     type = "text"
-                     className = "mb-2"
-                     label = "Name"
-                     icon = {faFeather}
-                     input = {localState.name}
-                     dispatch = {localDispatch}
-                     onBlur = {() => setEditName(false)}
+                     id="name"
+                     type="text"
+                     className="mb-2"
+                     label="Name"
+                     icon={faPenRuler}
+                     input={localState.name}
+                     dispatch={localDispatch}
+                     onBlur={() => setEditName(false)}
                      autoFocus
                      required />
                   <Button
-                     type = "button"
-                     className = "w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
-                     icon = {faRotateLeft}
-                     onClick = {() => {
+                     type="button"
+                     className="w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
+                     icon={faRotateLeft}
+                     onClick={() => {
                         setEditName(false);
                      }}
                   >
                      Cancel
                   </Button>
                   <Button
-                     type = "button"
-                     className = "w-full bg-green-600 text-white text-md  mt-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
-                     icon = {faFeather}
-                     onClick = {handleSaveExerciseName}
+                     type="button"
+                     className="w-full bg-green-600 text-white text-md  mt-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
+                     icon={faPenRuler}
+                     onClick={handleSaveExerciseName}
                   >
-                     Save
+                     Update
                   </Button>
                   <Button
-                     type = "button"
-                     className = "w-full bg-red-600 text-white text-md mt-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
-                     icon = {faTrash}
-                     onClick = {handleDeleteExercise}
+                     type="button"
+                     className="w-full bg-red-600 text-white text-md mt-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
+                     icon={faTrash}
+                     onClick={handleDeleteExercise}
                   >
                      Delete
                   </Button>
                </div>
             ) : (
                <h1
-                  className = "text-xl mb-2 hover:cursor-move"
+                  className="text-xl mb-2 hover:cursor-move"
                >
+                  <span>
+                     <FontAwesomeIcon
+                        className="hover:cursor-pointer hover:text-primary pt-4"
+                        icon={isCollapsed ? faCaretRight : faCaretDown}
+                        {...attributes}
+                        {...listeners}
+                     />
+                  </span>
                   <span
-                     onClick = {(event) => {
+                     {...bind}
+                     className="pl-4 hover:cursor-pointer"
+                     onClick={(event) => {
                         event.stopPropagation();
                         event.preventDefault();
                         setIsCollapsed(!(isCollapsed));
                      }}
-                  >
-                     <FontAwesomeIcon
-                        className = "hover:cursor-pointer hover:text-primary pt-4"
-                        icon = {isCollapsed ? faCaretRight : faCaretDown} />
-                  </span>
-                  <span
-                     className = "pl-4 hover:cursor-pointer"
-                     onDoubleClick = {handleInitializeEditExerciseName}
-                     {...attributes}
-                     {...listeners}
+                     onDoubleClick={handleInitializeEditExerciseName}
                   >
                      {exercise.name}
                   </span>
@@ -706,42 +720,42 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
             !(isCollapsed) && (
                <div>
                   <DndContext
-                     sensors = {sensors}
-                     collisionDetection = {closestCenter}
-                     onDragEnd = {handleDragEnd}
+                     sensors={sensors}
+                     collisionDetection={closestCenter}
+                     onDragEnd={handleDragEnd}
                   >
                      <SortableContext
-                        items = {exercise.sets.map((set) => set.id)}
-                        strategy = {verticalListSortingStrategy}>
-                        <ul className = "list-disc text-black flex flex-col gap-8">
+                        items={exercise.sets.map((set) => set.id)}
+                        strategy={verticalListSortingStrategy}>
+                        <ul className="list-disc text-black flex flex-col gap-8">
                            {
                               exercise.sets.map((set: ExerciseSet) => {
                                  return (
                                     <SetContainer
                                        {...props}
-                                       set = {set}
-                                       reset = {() => handleReset(set.id)}
-                                       onBlur = {() => { }}
-                                       key = {set.id} />);
+                                       set={set}
+                                       reset={() => handleReset(set.id)}
+                                       onBlur={() => { }}
+                                       key={set.id} />);
                               })
                            }
                            {
                               addSet && (
                                  <SetContainer
                                     {...props}
-                                    set = {undefined}
-                                    reset = {() => handleReset("")}
-                                    onBlur = {() => setAddSet(false)} />
+                                    set={undefined}
+                                    reset={() => handleReset("")}
+                                    onBlur={() => setAddSet(false)} />
                               )
                            }
                         </ul>
                      </SortableContext>
                   </DndContext>
                   <Button
-                     type = "button"
-                     className = "z-50 w-full mx-auto ml-4 bg-white text-black text-md mt-6 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
-                     icon = {faPlus}
-                     onClick = {() => {
+                     type="button"
+                     className="z-50 w-full mx-auto ml-4 bg-white text-black text-md mt-6 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
+                     icon={faPlus}
+                     onClick={() => {
                         handleReset("");
                         setAddSet(true);
                      }}
@@ -797,7 +811,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
       setAddExercise(true);
    }, [localDispatch, localState.name]);
 
-   const handleSaveExercises = useCallback(async(updatingExercises: Exercise[]) => {
+   const handleSaveExercises = useCallback(async (updatingExercises: Exercise[]) => {
       // Update editing and overall workouts
       const newWorkout: Workout = { ...workout, exercises: updatingExercises };
       const newWorkouts: Workout[] = [...globalState.workouts.value].map((w) => w.id !== newWorkout.id ? w : newWorkout);
@@ -828,7 +842,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
       }
    }, [addExercise, globalDispatch, globalState.workout, globalState.workouts, workout]);
 
-   const handleDragEnd = async(event) => {
+   const handleDragEnd = async (event) => {
       const { active, over } = event;
 
       if (edit === true && id === active.id) {
@@ -870,40 +884,27 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
    };
 
    return (
-      <div className = "w-full mx-auto text-center font-bold flex flex-col justify-center items-center">
-         {
-            displayNewName &&
-            <NewExerciseInput
-               {...props}
-               localState = {localState}
-               localDispatch = {localDispatch}
-               exercise = {null}
-               saveExercises = {handleSaveExercises}
-               onBlur = {() => {
-                  setAddExercise(false);
-               }}
-            />
-         }
-         <hr className = "text-black w-full mb-2" />
+      <div className="w-full mx-auto text-center font-bold flex flex-col justify-center items-center">
+         <hr className="text-black w-full mb-2" />
          <DndContext
-            sensors = {sensors}
-            collisionDetection = {closestCenter}
-            onDragEnd = {handleDragEnd}
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
          >
             <SortableContext
-               items = {exercises.map((exercise) => exercise.id)}
-               strategy = {verticalListSortingStrategy}>
-               <ol className = "w-full mx-auto">
+               items={exercises.map((exercise) => exercise.id)}
+               strategy={verticalListSortingStrategy}>
+               <ol className="w-full mx-auto">
                   {
                      exercises.map((exercise: Exercise) => {
                         return (
                            <ExerciseContainer
                               {...props}
-                              localState = {localState}
-                              localDispatch = {localDispatch}
-                              saveExercises = {handleSaveExercises}
-                              exercise = {exercise}
-                              key = {exercise.id}
+                              localState={localState}
+                              localDispatch={localDispatch}
+                              saveExercises={handleSaveExercises}
+                              exercise={exercise}
+                              key={exercise.id}
                            />
                         );
                      })
@@ -911,14 +912,32 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                </ol>
             </SortableContext>
          </DndContext>
-         <Button
-            type = "button"
-            className = "w-full bg-white text-black px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] mt-2 focus:border-blue-500 focus:ring-blue-500"
-            icon = {faPlus}
-            onClick = {handleInitializeNewExerciseInput}
-         >
-            New Exercise
-         </Button>
+         <div className="w-full mx-auto my-2">
+            {
+               displayNewName ? (
+                  <NewExerciseInput
+                     {...props}
+                     localState={localState}
+                     localDispatch={localDispatch}
+                     exercise={null}
+                     saveExercises={handleSaveExercises}
+                     onBlur={() => {
+                        setAddExercise(false);
+                     }}
+                  />
+               ) : (
+                  <Button
+                     type="button"
+                     className="w-full bg-white text-black px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.9rem] focus:border-blue-500 focus:ring-blue-500"
+                     icon={faPlus}
+                     onClick={handleInitializeNewExerciseInput}
+                  >
+                     New Exercise
+                  </Button>
+               )
+            }
+         </div>
+
       </div>
    );
 }

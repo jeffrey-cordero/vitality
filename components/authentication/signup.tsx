@@ -4,7 +4,7 @@ import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateLeft, faIdCard, faDoorOpen, faFeather, faKey, faEnvelope, faPhone, faUserSecret, faCalendar } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faDoorOpen, faFeather, faKey, faEnvelope, faPhone, faUserSecret, faCalendar, faUserCheck } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
 import { VitalityState, formReducer, VitalityResponse, handleResponse } from "@/lib/global/state";
 import { login } from "@/lib/authentication/login";
@@ -101,7 +101,7 @@ function Form(): JSX.Element {
    };
 
    return (
-      <div className = "w-10/12 lg:w-1/2 mx-auto">
+      <div className = "w-10/12 lg:w-1/2 mx-auto mt-4">
          <form
             className = "relative w-full mx-auto flex flex-col justify-center align-center gap-3"
             onSubmit = {handleSubmit}>
@@ -178,8 +178,8 @@ function Form(): JSX.Element {
             <Button
                type = "submit"
                className = "bg-primary text-white h-[2.6rem]"
-               icon = {faIdCard}>
-               Submit
+               icon = {faUserCheck}>
+               Register
             </Button>
          </form>
          <p className = "mt-4">Already have an account? <Link
@@ -191,7 +191,7 @@ function Form(): JSX.Element {
 
 export default function SignUpForm(): JSX.Element {
    return (
-      <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
+      <div className = "w-full mx-auto mt-8 flex flex-col items-center justify-center text-center">
          <Heading
             title = "Sign Up"
             description = "Create an account to get started" />

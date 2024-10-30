@@ -45,7 +45,7 @@ const workoutsSchema = z.object({
    image: z
       .string()
       .refine((value) => urlRegex.test(value) || nextMediaRegex.test(value), {
-         message: "Invalid URL or media path"
+         message: "Invalid URL"
       })
       .or(z.literal("")),
    tags: z.array(z.string()).optional()

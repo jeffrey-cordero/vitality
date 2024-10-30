@@ -237,19 +237,16 @@ function FilterByDate(props: VitalityProps): JSX.Element {
       <PopUp
          className = "max-w-xl"
          ref = {filterPopUpRef}
-         cover = {
-            <div className = "flex-1">
-               <Button
-                  type = "button"
-                  className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.5rem] text-sm flex-1"
-               >
-                  <FontAwesomeIcon
-                     icon = {faCalendar}
-                     className = "text-xs" />
-                  Filter by Date
-               </Button>
-            </div>
-
+         display = {
+            <Button
+               type = "button"
+               className = "bg-gray-300 text-black font-semibold w-full h-[2.6rem] text-sm"
+            >
+               <FontAwesomeIcon
+                  icon = {faCalendar}
+                  className = "text-md" />
+               Filter by Date
+            </Button>
          }
       >
          <div className = "flex flex-col justify-center align-center text-center gap-2">
@@ -386,7 +383,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          });
 
          filterPopUpRef.current?.close();
-         document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+         document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }
    }, [globalState, globalDispatch]);
 
@@ -428,19 +425,17 @@ function FilterByTags(props: VitalityProps): JSX.Element {
       <PopUp
          className = "max-w-xl"
          ref = {filterPopUpRef}
-         cover = {
-            <div className = "flex-1">
-               <Button
-                  type = "button"
-                  className = "bg-gray-300 text-black font-medium w-[10rem] h-[2.5rem] text-sm"
-                  onClick = {handleInitializeFilteredTags}
-               >
-                  <FontAwesomeIcon
-                     icon = {faTag}
-                     className = "text-xs" />
-                  Filter by Tags
-               </Button>
-            </div>
+         display = {
+            <Button
+               type = "button"
+               className = "bg-gray-300 text-black font-semibold w-full h-[2.6rem] text-sm"
+               onClick = {handleInitializeFilteredTags}
+            >
+               <FontAwesomeIcon
+                  icon = {faTag}
+                  className = "text-md" />
+               Filter by Tags
+            </Button>
          }
       >
          <div className = "flex flex-col justify-center align-center text-center gap-2">
@@ -478,16 +473,18 @@ export default function WorkoutFiltering(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
 
    return (
-      <div className = "w-full flex flex-col justify-start gap-2 px-4 mx-auto">
-         <Input
-            id = "search"
-            type = "text"
-            label = "Search"
-            icon = {faMagnifyingGlass}
-            input = {globalState.search}
-            dispatch = {globalDispatch}
-            autoFocus />
-         <div className = "w-full mx-auto flex flex-wrap items-center justify-center gap-2">
+      <div className = "w-full mx-auto grid grid-rows-2 gap-4 px-4">
+         <div className = "row-span-1 col-span-full">
+            <Input
+               id = "search"
+               type = "text"
+               label = "Search"
+               icon = {faMagnifyingGlass}
+               input = {globalState.search}
+               dispatch = {globalDispatch}
+               autoFocus />
+         </div>
+         <div className = "w-full mx-auto grid grid-cols-2 gap-2">
             <FilterByDate {...props} />
             <FilterByTags {...props} />
          </div>

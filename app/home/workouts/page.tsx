@@ -12,8 +12,9 @@ import { fetchWorkoutTags } from "@/lib/workouts/tags";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { searchForTitle } from "@/lib/workouts/shared";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPhotoFilm, faPlus, faTable } from "@fortawesome/free-solid-svg-icons";
 import Loading from "@/components/global/loading";
+import Heading from "@/components/global/heading";
 
 const workouts: VitalityState = {
    // Global filtering inputs
@@ -63,7 +64,10 @@ const workouts: VitalityState = {
          exercises: []
       },
       error: null,
-      data: {}
+      data: {
+         // Interning edit/create form
+         display: false
+      }
    },
    // User workouts
    workouts: {
@@ -119,8 +123,7 @@ export default function Page(): JSX.Element {
       return results.slice(low, high + 1);
    }, [results, low, high]);
 
-
-   const fetchWorkoutsData = useCallback(async () => {
+   const fetchWorkoutsData = useCallback(async() => {
       if (user !== undefined && globalState.workouts.data.fetched === false) {
          try {
             const [workoutsData, tagsData] = await Promise.all([
@@ -177,37 +180,43 @@ export default function Page(): JSX.Element {
    }, [fetchWorkoutsData, globalState.workouts.data.fetched, globalState.tags, globalState.workouts]);
 
    return (
-      <main className="relative w-full lg:w-11/12 mx-auto my-8 min-h-screen flex flex-col justify-start items-center text-center">
-         <div className="relative">
-            <h1 className="text-4xl font-bold mt-8">Welcome Back, Champion!</h1>
-            <p className="text-lg text-gray-700 my-4 max-w-[90%] mx-auto">Ready to crush your goals? Create a new workout and let&apos;s make today count!</p>
+      <main className = "relative w-full lg:w-11/12 mx-auto my-10 min-h-screen flex flex-col justify-start items-center text-center">
+         <div className = "relative">
+            <Heading
+               title = "Workouts"
+               description = "Ready to crush your goals? Create a new workout and let&apos;s make today count!"
+            />
             <WorkoutFiltering
-               globalState={globalState}
-               globalDispatch={globalDispatch} />
+               globalState = {globalState}
+               globalDispatch = {globalDispatch} />
          </div>
-         <div className="flex justify-start items-center text-left gap-2 mt-2">
+         <div className = "flex justify-start items-center text-left gap-4 text-md">
             <Button
-               onClick={() => setView("table")}
-               className={clsx("transition duration-300 ease-in-out", {
+               icon = {faTable}
+               onClick = {() => setView("table")}
+               className = {clsx("transition duration-300 ease-in-out", {
                   "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
                })}>
                Table
             </Button>
             <Button
-               onClick={() => setView("cards")}
-               className={clsx("transition duration-300 ease-in-out", {
+               icon = {faPhotoFilm}
+               onClick = {() => setView("cards")}
+               className = {clsx("transition duration-300 ease-in-out", {
                   "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
                })}>
                Cards
             </Button>
          </div>
-         <div id="workoutsView" className="w-11/12 min-h-max flex-grow flex flex-col justify-center items-center">
+         <div
+            id = "workoutsView"
+            className = "w-11/12 min-h-max flex-grow flex flex-col justify-center items-center">
             {
                workoutsSection.length === 0 ? (
-                  <div className="w-full h-full mx-auto text-center flex justify-center items-start py-12">
+                  <div className = "w-full h-full mx-auto text-center flex justify-center items-start py-12">
                      {
                         fetched ? (
-                           <h1 className="font-bold text-xl">No available workouts</h1>
+                           <h1 className = "font-bold text-xl">No available workouts</h1>
                         ) : (
                            <Loading />
                         )}
@@ -215,61 +224,61 @@ export default function Page(): JSX.Element {
                ) : (
                   view === "table" ? (
                      <WorkoutTable
-                        workouts={workoutsSection}
-                        globalState={globalState}
-                        globalDispatch={globalDispatch} />
+                        workouts = {workoutsSection}
+                        globalState = {globalState}
+                        globalDispatch = {globalDispatch} />
                   ) : (
                      <WorkoutCards
-                        workouts={workoutsSection}
-                        globalState={globalState}
-                        globalDispatch={globalDispatch} />
+                        workouts = {workoutsSection}
+                        globalState = {globalState}
+                        globalDispatch = {globalDispatch} />
                   )
                )
             }
          </div>
-         <div className="flex justify-center w-full mx-auto mt-6">
+         <div className = "flex justify-center w-full mx-auto mb-6">
             <WorkoutForm
-               workout={globalState.workout.value}
-               globalState={globalState}
-               globalDispatch={globalDispatch}
-               cover={
-                  <Button
-                     type="button"
-                     className="bg-primary text-white w-full h-[2.6rem] p-4"
-                     icon={faPlus}
-                     onClick={() => {
-                        globalDispatch({
-                           type: "updateState",
-                           value: {
-                              id: "workout",
-                              input: {
-                                 ...globalState.workout,
-                                 value: {
-                                    id: "",
-                                    user_id: user?.id ?? "",
-                                    title: "",
-                                    date: new Date(),
-                                    image: "",
-                                    description: "",
-                                    tagIds: [],
-                                    exercises: []
-                                 }
-                              }
-                           }
-                        });
-                     }}
-                  >
-                     New Workout
-                  </Button>
-               }
+               globalState = {globalState}
+               globalDispatch = {globalDispatch}
             />
+            <Button
+               type = "button"
+               className = "bg-primary text-white w-[10rem] h-[2.6rem] p-4"
+               icon = {faPlus}
+               onClick = {() => {
+                  globalDispatch({
+                     type: "updateState",
+                     value: {
+                        id: "workout",
+                        input: {
+                           ...globalState.workout,
+                           value: {
+                              id: "",
+                              user_id: user?.id ?? "",
+                              title: "",
+                              date: new Date(),
+                              image: "",
+                              description: "",
+                              tagIds: [],
+                              exercises: []
+                           },
+                           data: {
+                              display: true
+                           }
+                        }
+                     }
+                  });
+               }}
+            >
+               New Workout
+            </Button>
          </div>
          {
             results.length > 0 && (
                <Pagination
-                  workouts={results}
-                  globalState={globalState}
-                  globalDispatch={globalDispatch} />
+                  workouts = {results}
+                  globalState = {globalState}
+                  globalDispatch = {globalDispatch} />
             )
          }
 

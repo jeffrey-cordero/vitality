@@ -57,7 +57,10 @@ export default function Layout({
          setUser(user);
          setFetched(true);
       } catch (error) {
-         console.error(error);
+         updateNotification({
+            status: "Failure",
+            message: error.message
+         });
          setUser(undefined);
       }
    };

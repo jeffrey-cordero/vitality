@@ -22,7 +22,7 @@ const credentials: VitalityState = {
    }
 };
 
-export default function Login(): JSX.Element {
+export default function LoginForm(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, credentials);
@@ -54,11 +54,11 @@ export default function Login(): JSX.Element {
    };
 
    return (
-      <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
+      <div className = "w-full mx-auto mt-8 flex flex-col items-center justify-center text-center">
          <Heading
             title = "Log In"
             description = "Enter valid credentials to enter" />
-         <div className = "w-10/12 lg:w-1/2 mx-auto">
+         <div className = "w-10/12 lg:w-1/2 mx-auto mt-4">
             <form
                className = "relative w-full flex flex-col justify-center align-center gap-3"
                onSubmit = {handleSubmit}>
@@ -92,7 +92,7 @@ export default function Login(): JSX.Element {
                   type = "submit"
                   className = "bg-primary text-white h-[2.6rem]"
                   icon = {faUnlockKeyhole}>
-               Submit
+                  Log In
                </Button>
             </form>
             <p className = "mt-4">Don&apos;t have an account? <Link
