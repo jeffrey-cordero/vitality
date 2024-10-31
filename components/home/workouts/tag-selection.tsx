@@ -7,7 +7,7 @@ import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/workouts/tags";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
 import { formReducer, handleResponse, VitalityChildProps, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
-import { PopUp } from "@/components/global/popup";
+import { Modal } from "@/components/global/modal";
 import { searchForTitle } from "@/lib/workouts/shared";
 import Loading from "@/components/global/loading";
 
@@ -298,7 +298,7 @@ export interface WorkoutTagProps extends VitalityChildProps {
 
 export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
    const { tag, selected, globalState, globalDispatch, localState, localDispatch } = props;
-   const editTagPopUpRef = useRef<{ close: () => void }>(null);
+   const editTagModalRef = useRef<{ close: () => void }>(null);
    const tagRef = useRef<HTMLLIElement>(null);
 
    // Handle adding or removing a selected tag
@@ -340,7 +340,7 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
    }, [localDispatch, localState, tag.color, tag.title]);
 
    const handleEditTagSave = useCallback(() => {
-      editTagPopUpRef.current?.close();
+      editTagModalRef.current?.close();
       tagRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
    }, []);
 
@@ -365,9 +365,8 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
                {tag.title}
             </div>
             {
-               <PopUp
-                  className = "max-w-2xl"
-                  ref = {editTagPopUpRef}
+               <Modal
+                  ref = {editTagModalRef}
                   display = {
                      <FontAwesomeIcon
                         icon = {faGear}
@@ -375,11 +374,12 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
                         className = "cursor-pointer text-xs hover:scale-125 transition duration-300 ease-in-out"
                      />
                   }
+                  className = "max-w-2xl"
                >
                   <EditWorkoutTag
                      {...props}
                      onSave = {handleEditTagSave} />
-               </PopUp>
+               </Modal>
             }
             {
                selected &&

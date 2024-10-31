@@ -1,7 +1,7 @@
 import Button from "@/components/global/button";
 import Input from "@/components/global/input";
 import Select from "@/components/global/select";
-import { PopUp } from "@/components/global/popup";
+import { Modal } from "@/components/global/modal";
 import { sendErrorMessage, sendSuccessMessage, VitalityInputState, VitalityProps, VitalityState } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
 import { faCalendar, faMagnifyingGlass, faArrowsUpDown, faArrowRight, faArrowLeft, faArrowRotateLeft, faTag } from "@fortawesome/free-solid-svg-icons";
@@ -142,7 +142,7 @@ function DateInput(props: DateInputProps) {
 
 function FilterByDate(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
-   const filterPopUpRef = useRef<{ close: () => void }>(null);
+   const filterModalRef = useRef<{ close: () => void }>(null);
    const type: string = globalState.type.value;
 
    const inputs: { [key: string]: VitalityInputState | undefined } = useMemo(() => {
@@ -177,7 +177,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
             }
          });
 
-         filterPopUpRef.current?.close();
+         filterModalRef.current?.close();
          document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }
    }, [props, globalState.workouts, globalDispatch]);
@@ -234,9 +234,8 @@ function FilterByDate(props: VitalityProps): JSX.Element {
       globalState.tags.data.filteredSelected]);
 
    return (
-      <PopUp
-         className = "max-w-xl"
-         ref = {filterPopUpRef}
+      <Modal
+         ref = {filterModalRef}
          display = {
             <Button
                type = "button"
@@ -248,6 +247,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                Filter by Date
             </Button>
          }
+         className = "max-w-xl"
       >
          <div className = "flex flex-col justify-center align-center text-center gap-2">
             <FontAwesomeIcon
@@ -315,13 +315,13 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                </Button>
             </div>
          </div>
-      </PopUp>
+      </Modal>
    );
 }
 
 function FilterByTags(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
-   const filterPopUpRef = useRef<{ close: () => void }>(null);
+   const filterModalRef = useRef<{ close: () => void }>(null);
 
    const handleInitializeFilteredTags = useCallback(() => {
       // Selected tags are applied from prior filter form selection
@@ -382,7 +382,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
             }
          });
 
-         filterPopUpRef.current?.close();
+         filterModalRef.current?.close();
          document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }
    }, [globalState, globalDispatch]);
@@ -422,9 +422,8 @@ function FilterByTags(props: VitalityProps): JSX.Element {
    }, [globalDispatch, globalState]);
 
    return (
-      <PopUp
-         className = "max-w-xl"
-         ref = {filterPopUpRef}
+      <Modal  
+         ref = {filterModalRef}
          display = {
             <Button
                type = "button"
@@ -437,6 +436,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                Filter by Tags
             </Button>
          }
+         className = "max-w-xl"
       >
          <div className = "flex flex-col justify-center align-center text-center gap-2">
             <FontAwesomeIcon
@@ -465,7 +465,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                </div>
             </div>
          </div>
-      </PopUp>
+      </Modal>
    );
 }
 

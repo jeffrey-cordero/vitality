@@ -38,10 +38,7 @@ function SideBarLinks(): JSX.Element {
    const pathname = usePathname();
    const { user, fetched } = useContext(AuthenticationContext);
    // Initialize links based on localStorage or pathname
-   const [links, setLinks] = useState<SideBarProps[]>(() => {
-      const savedLinkState = window.localStorage.getItem("links");
-      return savedLinkState === "home" || pathname.startsWith("/home") ? homeLinks : landingLinks;
-   });
+   const [links, setLinks] = useState<SideBarProps[]>(homeLinks);
 
    // Update links based on user state and store in localStorage on unmount
    useEffect(() => {
@@ -51,10 +48,6 @@ function SideBarLinks(): JSX.Element {
       if (fetched) {
          setLinks(newLinks);
       }
-
-      return () => {
-         window.localStorage.setItem("links", newLinks === homeLinks ? "home" : "landing");
-      };
    }, [user, fetched, links]);
 
    return (
@@ -88,14 +81,7 @@ function SideBarLinks(): JSX.Element {
 }
 
 export function SideBar(): JSX.Element {
-   const [visibleSideBar, setVisibleSideBar] = useState<boolean>(() => {
-      const savedState = window.localStorage.getItem("visibleSideBar");
-      return savedState === "true";
-   });
-
-   useEffect(() => {
-      window.localStorage.setItem("visibleSideBar", visibleSideBar.toString());
-   }, [visibleSideBar]);
+   const [visibleSideBar, setVisibleSideBar] = useState<boolean>(false);
 
    return (
       <div>

@@ -9,7 +9,7 @@ import { getWorkoutDate } from "@/lib/workouts/shared";
 import { Tag } from "@/lib/workouts/tags";
 import { useCallback, useContext, useMemo, useRef } from "react";
 import { NotificationContext } from "@/app/layout";
-import { PopUp } from "@/components/global/popup";
+import { Modal } from "@/components/global/modal";
 
 interface WorkoutListingProps extends VitalityProps {
    workout: Workout;
@@ -55,11 +55,11 @@ function WorkoutListing(props: WorkoutListingProps) {
             // Undefined in case of removal
             tag !== undefined &&
             <div
-               className = {clsx("max-w-full px-3 py-1 m-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-sm lg:text-xs font-bold text-white transition duration-300 ease-in-out")}
-               style = {{
+               className={clsx("max-w-full px-3 py-1 m-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-sm lg:text-xs font-bold text-white transition duration-300 ease-in-out")}
+               style={{
                   backgroundColor: tag.color
                }}
-               key = {tag.id}
+               key={tag.id}
             >
                {tag.title}
             </div>
@@ -69,55 +69,55 @@ function WorkoutListing(props: WorkoutListingProps) {
 
    return (
       <div
-         id = {workout.id}
-         className = "flex flex-col lg:flex-row justify-between items-center text-center w-full mx-auto bg-white lg:p-4 rounded-md lg:rounded-none">
-         <div className = "w-full lg:w-[1rem] flex justify-center items-center text-base uppercase p-3 whitespace-normal py-4 font-medium text-black">
+         id={workout.id}
+         className="flex flex-col lg:flex-row justify-between items-center text-center w-full mx-auto bg-white lg:p-4 rounded-md lg:rounded-none">
+         <div className="w-full lg:w-[1rem] flex justify-center items-center text-base uppercase p-3 whitespace-normal py-4 font-medium text-black">
             <input
-               id = {`workout-select-${workout.id}`}
-               type = "checkbox"
-               className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-               checked = {globalState.workouts.data.selected.has(workout)}
-               onChange = {() => handleWorkoutToggle()}
+               id={`workout-select-${workout.id}`}
+               type="checkbox"
+               className="cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+               checked={globalState.workouts.data.selected.has(workout)}
+               onChange={() => handleWorkoutToggle()}
             />
          </div>
-         <div className = "w-full max-w-[90%] lg:w-[10rem] text-xl lg:text-base font-bold lg:font-medium uppercase lg:p-6 whitespace-pre-wrap break-all py-4 text-black">
+         <div className="w-full max-w-[90%] lg:w-[10rem] text-xl lg:text-base font-bold lg:font-medium uppercase lg:p-6 whitespace-pre-wrap break-all py-4 text-black">
             {workout.title}
          </div>
-         <div className = "w-full lg:w-[10rem] text-lg lg:text-base font-bold lg:font-medium uppercase lg:p-6 whitespace-normal py-4 text-black">
+         <div className="w-full lg:w-[10rem] text-lg lg:text-base font-bold lg:font-medium uppercase lg:p-6 whitespace-normal py-4 text-black">
             {formattedDate}
          </div>
-         <div className = "w-full lg:w-[12rem] lg:max-h-[11rem] overflow-auto scrollbar-hide text-base lg:p-2 whitespace-normal py-4 font-medium text-black m:px-6">
-            <div className = "flex flex-row flex-wrap justify-center items-center gap-2 p-2 cursor-all-scroll">
+         <div className="w-full lg:w-[12rem] lg:max-h-[11rem] overflow-auto scrollbar-hide text-base lg:p-2 whitespace-normal py-4 font-medium text-black m:px-6">
+            <div className="flex flex-row flex-wrap justify-center items-center gap-2 p-2 cursor-all-scroll">
                {workoutTags}
             </div>
          </div>
          <div
-            className = {clsx("order-first lg:order-none w-full h-[22rem] lg:w-[12rem] lg:h-[12rem] max-w-full text-base uppercase lg:p-6 whitespace-normal lg:py-4 font-medium text-black border-b-primary border-b-[4px] lg:border-none", {
+            className={clsx("order-first lg:order-none w-full h-[22rem] lg:w-[12rem] lg:h-[12rem] max-w-full text-base uppercase lg:p-6 whitespace-normal lg:py-4 font-medium text-black border-b-primary border-b-[4px] lg:border-none", {
                "border-t-[4px] border-t-primary": index > 0
             })}>
             {
                workout.image ? (
                   <Image
-                     width = {1000}
-                     height = {1000}
-                     quality = {100}
-                     src = {workout.image}
-                     alt = "workout-image"
-                     className = {clsx("w-full h-full object-cover object-center rounded-sm lg:rounded-3xl cursor-pointer transition duration-300 ease-in-out")}
+                     width={1000}
+                     height={1000}
+                     quality={100}
+                     src={workout.image}
+                     alt="workout-image"
+                     className={clsx("w-full h-full object-cover object-center rounded-sm lg:rounded-3xl cursor-pointer transition duration-300 ease-in-out")}
                   />
                ) : (
-                  <div className = "w-full h-full lg:rounded-3xl flex justify-center items-center text-primary">
+                  <div className="w-full h-full lg:rounded-3xl flex justify-center items-center text-primary">
                      <FontAwesomeIcon
-                        className = "text-3xl"
-                        icon = {faImage} />
+                        className="text-3xl"
+                        icon={faImage} />
                   </div>
                )
             }
          </div>
-         <div className = "w-full lg:w-[3rem] text-base whitespace-normal lg:pr-6 py-4 font-medium text-black text-center">
-            <div className = "flex justify-center items-center gap-4">
+         <div className="w-full lg:w-[3rem] text-base whitespace-normal lg:pr-6 py-4 font-medium text-black text-center">
+            <div className="flex justify-center items-center gap-4">
                <div
-                  onClick = {() => {
+                  onClick={() => {
                      globalDispatch({
                         type: "updateState",
                         value: {
@@ -132,18 +132,18 @@ function WorkoutListing(props: WorkoutListingProps) {
                         }
                      });
                   }}
-                  className = "flex justify-center items-center">
-                  <div className = "hidden lg:block">
+                  className="flex justify-center items-center">
+                  <div className="hidden lg:block">
                      <FontAwesomeIcon
-                        icon = {faPencil}
-                        className = " text-primary cursor-pointer text-xl hover:scale-125 transition duration-300 ease-in-out"
+                        icon={faPencil}
+                        className=" text-primary cursor-pointer text-xl hover:scale-125 transition duration-300 ease-in-out"
                      />
                   </div>
-                  <div className = "block lg:hidden">
+                  <div className="block lg:hidden">
                      <Button
-                        type = "button"
-                        className = "block lg:hidden bg-primary text-white w-[10rem] mb-4 h-[2.6rem] p-4 text-sm"
-                        icon = {faPencil}
+                        type="button"
+                        className="block lg:hidden bg-primary text-white w-[10rem] mb-4 h-[2.6rem] p-4 text-sm"
+                        icon={faPencil}
                      >
                         Edit Workout
                      </Button>
@@ -163,7 +163,7 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
    const { workouts, globalState, globalDispatch } = props;
    const selected: Set<Workout> = globalState.workouts.data.selected;
-   const deletePopUpRef = useRef<{ close: () => void }>(null);
+   const deleteModalRef = useRef<{ close: () => void }>(null);
 
    // Visible workouts that have been selected
    const visibleSelectedWorkouts = useMemo(() => {
@@ -202,7 +202,7 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
       };
    }, [allVisibleSelected, handleUpdateSelectedWorkouts, workouts, selected, visibleSelectedWorkouts]);
 
-   const handleWorkoutDelete = useCallback(async() => {
+   const handleWorkoutDelete = useCallback(async () => {
       // Remove the current or visibleSelectedWorkouts set of workout's
       const size = visibleSelectedWorkouts.size;
 
@@ -248,90 +248,90 @@ export default function WorkoutTable(props: WorkoutTableProps): JSX.Element {
    }, [globalDispatch, selected, globalState, updateNotification, visibleSelectedWorkouts]);
 
    return (
-      <div className = "relative w-full mx-auto">
-         <div className = "my-6 overflow-hidden rounded-md border shadow-lg">
-            <div className = "hidden lg:flex justify-between items-center w-full mx-auto bg-white p-4">
-               <div className = "w-full lg:w-[1rem] flex justify-center items-center text-base uppercase p-3 whitespace-normal py-4 font-extrabold text-black">
+      <div className="relative w-full mx-auto">
+         <div className="my-6 overflow-hidden rounded-md border shadow-lg">
+            <div className="hidden lg:flex justify-between items-center w-full mx-auto bg-white p-4">
+               <div className="w-full lg:w-[1rem] flex justify-center items-center text-base uppercase p-3 whitespace-normal py-4 font-extrabold text-black">
                   <input
-                     id = "workout-select-all"
-                     type = "checkbox"
-                     checked = {allVisibleSelected}
-                     className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                     onChange = {() => handleWorkoutToggle()}
+                     id="workout-select-all"
+                     type="checkbox"
+                     checked={allVisibleSelected}
+                     className="cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                     onChange={() => handleWorkoutToggle()}
                   />
                </div>
-               <div className = "w-full lg:w-[10rem] text-base uppercase p-6 whitespace-normal py-4 font-extrabold text-black">
+               <div className="w-full lg:w-[10rem] text-base uppercase p-6 whitespace-normal py-4 font-extrabold text-black">
                   Title
                </div>
-               <div className = "w-full lg:w-[10rem] text-base uppercase p-6 whitespace-normal py-4 font-extrabold text-black">
+               <div className="w-full lg:w-[10rem] text-base uppercase p-6 whitespace-normal py-4 font-extrabold text-black">
                   Date
                </div>
-               <div className = "w-full lg:w-[12rem] text-base uppercase p-6 whitespace-normal py-4 font-extrabold text-black m:px-6">
+               <div className="w-full lg:w-[12rem] text-base uppercase p-6 whitespace-normal py-4 font-extrabold text-black m:px-6">
                   Tags
                </div>
-               <div className = "w-full lg:w-[12rem] text-base uppercase p-6 whitespace-normal py-4 font-extrabold text-black">
+               <div className="w-full lg:w-[12rem] text-base uppercase p-6 whitespace-normal py-4 font-extrabold text-black">
                   Image
                </div>
-               <div className = "w-full lg:w-[3rem] text-base uppercase p-6 whitespace-normal py-4 font-extrabold text-black">
+               <div className="w-full lg:w-[3rem] text-base uppercase p-6 whitespace-normal py-4 font-extrabold text-black">
                </div>
             </div>
-            <div className = "flex flex-col gap-4 lg:gap-0 w-full mx-auto bg-white">
+            <div className="flex flex-col gap-4 lg:gap-0 w-full mx-auto bg-white">
                {workouts.map((workout: Workout, index: number) => (
                   <WorkoutListing
-                     workout = {workout}
-                     index = {index}
-                     globalState = {globalState}
-                     globalDispatch = {globalDispatch}
-                     key = {workout.id} />
+                     workout={workout}
+                     index={index}
+                     globalState={globalState}
+                     globalDispatch={globalDispatch}
+                     key={workout.id} />
                ))}
             </div>
             {visibleSelectedWorkouts.size > 0 && (
-               <PopUp
-                  className = "max-w-xl"
-                  ref = {deletePopUpRef}
-                  display = {
-                     <div className = "w-full bg-white py-4">
+               <Modal
+                  ref={deleteModalRef}
+                  display={
+                     <div className="w-full bg-white py-4">
                         <FontAwesomeIcon
-                           className = "text-red-500 cursor-pointer text-xl hover:scale-125 transition duration-300 ease-in-out"
-                           icon = {faTrashCan}
+                           className="text-red-500 cursor-pointer text-xl hover:scale-125 transition duration-300 ease-in-out"
+                           icon={faTrashCan}
                         />
                      </div>
                   }
+                  className="max-w-xl"
                >
-                  <div className = "flex flex-col justify-between items-center gap-4 p-2">
+                  <div className="flex flex-col justify-between items-center gap-4 p-2">
                      <FontAwesomeIcon
-                        icon = {faTrashCan}
-                        className = "text-red-500 text-3xl" />
-                     <p className = "font-bold">
+                        icon={faTrashCan}
+                        className="text-red-500 text-3xl" />
+                     <p className="font-bold">
                         {
                            `Delete ${visibleSelectedWorkouts.size} workout${visibleSelectedWorkouts.size === 1 ? "" : "s"}?`
                         }
                      </p>
-                     <div className = "flex flex-row flex-wrap justify-center items-center gap-2">
+                     <div className="flex flex-row flex-wrap justify-center items-center gap-2">
                         <Button
-                           type = "button"
-                           icon = {faArrowRotateBack}
-                           className = "w-[10rem] bg-gray-100 text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
-                           onClick = {() => {
-                              // Close the popup for deletion confirmation
-                              if (deletePopUpRef.current) {
-                                 deletePopUpRef.current.close();
+                           type="button"
+                           icon={faArrowRotateBack}
+                           className="w-[10rem] bg-gray-100 text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
+                           onClick={() => {
+                              // Close the modal for deletion confirmation
+                              if (deleteModalRef.current) {
+                                 deleteModalRef.current.close();
                               }
                            }}
                         >
                            No, cancel
                         </Button>
                         <Button
-                           type = "button"
-                           icon = {faSquareCheck}
-                           className = "w-[10rem] bg-red-500 text-white px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
-                           onClick = {async() => handleWorkoutDelete()}
+                           type="button"
+                           icon={faSquareCheck}
+                           className="w-[10rem] bg-red-500 text-white px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
+                           onClick={async () => handleWorkoutDelete()}
                         >
                            Yes, I&apos;m sure
                         </Button>
                      </div>
                   </div>
-               </PopUp>
+               </Modal>
             )
             }
          </div>

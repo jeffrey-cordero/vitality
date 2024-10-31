@@ -3,6 +3,7 @@ import Input from "@/components/global/input";
 import TextArea from "@/components/global/textarea";
 import ImageSelection from "@/components/home/workouts/image-selection";
 import Exercises from "@/components/home/workouts/exercises";
+import { Modal } from "@/components/global/modal";
 import { TagSelection } from "@/components/home/workouts/tag-selection";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { formReducer, handleResponse, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
@@ -12,7 +13,6 @@ import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTra
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { filterWorkout } from "@/components/home/workouts/filter";
-import { PopUp } from "@/components/global/popup";
 
 const form: VitalityState = {
    // Basic inputs not covered by other global components
@@ -88,11 +88,11 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
    // Empty ID implies new workout
    const isNewWorkout: boolean = workout.id?.trim().length === 0;
 
-   // Pop-up relating to workout deletion confirmation message
-   const deletePopUpRef = useRef<{ close: () => void }>(null);
+   // Modal relating to workout deletion confirmation message
+   const deleteModalRef = useRef<{ close: () => void }>(null);
 
-   // Editing workout display container
-   const formPopUpRef = useRef<{ open: () => void }>(null);
+   // Workout modal container
+   const formModalRef = useRef<{ open: () => void }>(null);
 
    const defaultDate: string = useMemo(() => {
       return new Date().toISOString().split("T")[0];
@@ -239,17 +239,16 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
       if (displayWorkoutForm && !(displayPopUp)) {
          setDisplayPopUp(true);
          handleInitializeWorkoutState();
-         formPopUpRef.current?.open();
+         formModalRef.current?.open();
       }
    }, [displayWorkoutForm, displayPopUp, handleInitializeWorkoutState]);
 
 
    return (
-      <PopUp
-         text = {isNewWorkout ? "New Workout" : "Edit Workout"}
+      <Modal
+         display={null}
          className = "max-w-3xl"
-         ref = {formPopUpRef}
-         display = {null}
+         ref = {formModalRef}
          onClose = {() => {
             // Cleanup workout form component for future usage
             globalDispatch({
@@ -329,9 +328,9 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                   dispatch = {localDispatch} />
                {
                   !(isNewWorkout) && (
-                     <PopUp
+                     <Modal
                         className = "max-w-xl"
-                        ref = {deletePopUpRef}
+                        ref = {deleteModalRef}
                         display = {
                            <Button
                               type = "button"
@@ -355,9 +354,9 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                                  icon = {faArrowRotateBack}
                                  className = "w-[10rem] bg-gray-100 text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
                                  onClick = {() => {
-                                    // Close the popup for deletion confirmation
-                                    if (deletePopUpRef.current) {
-                                       deletePopUpRef.current.close();
+                                    // Close the modal for deletion confirmation
+                                    if (deleteModalRef.current) {
+                                       deleteModalRef.current.close();
                                     }
                                  }}
                               >
@@ -373,7 +372,7 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                               </Button>
                            </div>
                         </div>
-                     </PopUp>
+                     </Modal>
                   )
                }
                <Button
@@ -396,6 +395,6 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                }
             </div>
          </div>
-      </PopUp>
+      </Modal>
    );
 };

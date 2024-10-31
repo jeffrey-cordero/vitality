@@ -1,34 +1,113 @@
-"use client";
-import { useState } from "react";
+import clsx from "clsx";
+import Button from "@/components/global/button";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
-interface ModalProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
-   children?: React.ReactNode;
-   className?: string;
+interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
+   display: React.ReactNode;
+   children: React.ReactNode;
+   onClose?: () => void;
 }
 
-export default function Modal(props: ModalProps): JSX.Element {
-   const [visible, setVisible] = useState<boolean>(false);
+export const Modal = forwardRef(function Modal(props: ModalProps, ref) {
+   const { display, children, className, onClick, onClose } = props;
+   const [open, setOpen] = useState<boolean>(false);
+   const modalRef = useRef(null);
+
+   // Allow children components to handle opening/closing the model outside of click events
+   const handleOnClose = () => {
+      onClose?.call(null);
+      setOpen(false);
+   };
+
+   const handleOnOpen = () => {
+      setOpen(true);
+   };
+
+   useImperativeHandle(ref, () => ({
+      close: handleOnClose,
+      open: handleOnOpen
+   }));
+
+   // Close the modal when clicking outside of the area
+   useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+         if (modalRef.current && !(modalRef.current.contains(event.target as Node))) {
+            handleOnClose();
+         }
+      };
+
+      if (open) {
+         document.addEventListener("mousedown", handleClickOutside);
+      } else {
+         document.removeEventListener("mousedown", handleClickOutside);
+      }
+
+      return () => {
+         document.removeEventListener("mousedown", handleClickOutside);
+      };
+   }, [open]);
 
    return (
-      <div>
-         <button
-            className = "block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            type = "button"
-            onClick = {() => setVisible(!(visible))}
-         >
-            Toggle modal
-         </button>
-         {
-            visible && (
+      <div className="relative modal">
+         <div
+            onClick={(event) => {
+               // Ensure the onClick does that propagate to parent component
+               event.stopPropagation();
 
-               <div className = "overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-1/2 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                  <div className = "relative p-4 w-full max-w-2xl max-h-full">
-                     <div className = "relative bg-white rounded-lg shadow">
-                        {props.children}
+               if (open === false) {
+                  // Trigger defined onClick on display, if any
+                  onClick?.call(null, event);
+                  setOpen(true);
+               }
+            }}
+         >
+            { display }
+         </div>
+         {
+            open && (
+               <div className={clsx("fixed w-full mx-auto p-4 inset-0 flex items-center justify-center align-center z-50", className)}>
+                  <div className="fixed inset-0 bg-gray-600 bg-opacity-50"></div>
+                  <div
+                     ref={modalRef}
+                     className="relative bg-white rounded-lg shadow-lg px-6 md:px-10 py-8 w-full max-h-[90%] overflow-y-auto scrollbar-hide">
+                     <Button
+                        className="absolute top-3 right-3"
+                        onClick={(event) => {
+                           // Ensure the onClick does that propagate to parent display component
+                           event.stopPropagation();
+                           handleOnClose();
+                        }}
+                     >
+                        <FontAwesomeIcon
+                           icon={faXmark}
+                           className="text-2xl text-red-500"
+                        />
+                     </Button>
+                     <div
+                        tabIndex={0}
+                        className="modal"
+                        onKeyDown={(event) => {
+                           // Close the active modal in the DOM via the escape key
+                           const target = event.target as HTMLElement;
+
+                           if (event.key === "Escape"
+                              && target.tagName !== "INPUT"
+                              && target.tagName !== "TEXTAREA"
+                              && !(target.isContentEditable)
+                              && target.classList.contains("modal")) {
+                              event.stopPropagation();
+                              onClose();
+                           }
+                        }}
+                     >
+                        {children}
                      </div>
                   </div>
                </div>
-            )}
+            )
+         }
       </div>
    );
-}
+});

@@ -5,7 +5,7 @@ import TextArea from "@/components/global/textarea";
 import { useDoubleTap } from "use-double-tap";
 import { formReducer, handleResponse, VitalityChildProps, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
-import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCloudArrowUp, faDumbbell, faPenRuler, faPlus, faRotateLeft, faStopwatch, faTrash, faCaretRight, faCaretDown } from "@fortawesome/free-solid-svg-icons";
+import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCloudArrowUp, faDumbbell, faPenRuler, faPlus, faRotateLeft, faStopwatch, faTrash, faCaretRight, faCaretDown, faArrowsUpDownLeftRight, faCircle, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useContext, useEffect, useReducer, useState } from "react";
 import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises } from "@/lib/workouts/exercises";
 import { NotificationContext } from "@/app/layout";
@@ -102,7 +102,13 @@ function NewExerciseInput(props: ExerciseProps): JSX.Element {
    }, [localDispatch, localState.name.value, saveExercises, updateNotification, workout.exercises, workout.id, onBlur]);
 
    return (
-      <div className="w-full flex flex-col justify-center align-center text-left gap-2">
+      <div
+         onKeyDown={(event: React.KeyboardEvent) => {
+            if (event.key === "Enter") {
+               handleCreateNewExercise();
+            }
+         }}
+         className="w-full flex flex-col justify-center align-center text-left gap-2">
          <Input
             id="name"
             type="text"
@@ -166,9 +172,10 @@ function SetContainer(props: SetProps): JSX.Element {
 
    // Construct payload exercise set with valid numeric inputs
    const constructNewExerciseSet = useCallback(() => {
-      const parseNumber = (value) => {
-         const num = +value;
-         return isNaN(num) || num < 0 ? null : num;
+      const handleParseNumber = (value) => {
+         const isEmpty = typeof value === "string" && value.trim().length === 0;
+         const num = +(value);
+         return isEmpty || isNaN(num) || num < 0 ? null : num;
       };
 
       return {
@@ -176,11 +183,11 @@ function SetContainer(props: SetProps): JSX.Element {
          id: set !== undefined ? set.id : "",
          exercise_id: exercise.id,
          set_order: set !== undefined ? set.set_order : exercise.sets.length,
-         weight: parseNumber(localState.weight.value),
-         repetitions: parseNumber(localState.repetitions.value),
-         hours: parseNumber(localState.hours.value),
-         minutes: parseNumber(localState.minutes.value),
-         seconds: parseNumber(localState.seconds.value),
+         weight: handleParseNumber(localState.weight.value),
+         repetitions: handleParseNumber(localState.repetitions.value),
+         hours: handleParseNumber(localState.hours.value),
+         minutes: handleParseNumber(localState.minutes.value),
+         seconds: handleParseNumber(localState.seconds.value),
          text: localState.text.value
       };
    }, [exercise.id, exercise.sets.length, localState.hours.value, localState.minutes.value,
@@ -275,6 +282,8 @@ function SetContainer(props: SetProps): JSX.Element {
    localState.seconds, localState.text, localState.weight, set?.hours, set?.id, set?.minutes, set?.repetitions,
    set?.seconds, set?.text, set?.weight]);
 
+   const doubleTap = useDoubleTap(handleInitializeEditSet);
+
    return (
       <div
          style={style}
@@ -282,7 +291,13 @@ function SetContainer(props: SetProps): JSX.Element {
       >
          {
             displayEditInputs ? (
-               <li className="relative flex flex-col justify-start gap-2 w-full mx-auto pt-2 my-8 text-left">
+               <li
+                  onKeyDown={(event: React.KeyboardEvent) => {
+                     if (event.key === "Enter") {
+                        handleExerciseSetSubmission("update");
+                     }
+                  }}
+                  className="relative flex flex-col justify-start gap-2 w-full mx-auto pt-2 my-8 text-left">
                   <FontAwesomeIcon
                      icon={faArrowRotateLeft}
                      onClick={reset}
@@ -383,14 +398,19 @@ function SetContainer(props: SetProps): JSX.Element {
                </li >)
                : (
                   set !== undefined && (
-                     <li
-                        className="flex flex-row justify-start items-start font-medium gap-8 w-full mx-auto pt-2 text-left text-md cursor-move"
-                        onClick={handleInitializeEditSet}
-                        {...attributes}
-                        {...listeners}
-                     >
-                        <div className="flex flex-col gap-2 pl-6 cursor-pointer">
-                           {set.weight !== undefined && (
+                     <li className="flex flex-row justify-start items-start font-medium gap-2 pl-8 w-full mx-auto pt-2 text-left text-md cursor-move whitespace-pre-wrap break-all">
+                        <div
+                           className="cursor-move text-sm pt-1"
+                           {...attributes}
+                           {...listeners}
+                        >
+                           <FontAwesomeIcon icon={faCircleNotch} />
+                        </div>
+                        <div
+                           className="flex flex-col gap-2 pl-6 cursor-pointer"
+                           {...doubleTap}
+                        >
+                           {set.weight !== null && (
                               <div className="flex flex-row items-center justify-start gap-2 font-bold">
                                  <FontAwesomeIcon
                                     className="self-start pt-1 text-primary"
@@ -398,7 +418,7 @@ function SetContainer(props: SetProps): JSX.Element {
                                  <p>{set.weight}</p>
                               </div>
                            )}
-                           {set.repetitions !== undefined && (
+                           {set.repetitions !== null && (
                               <div className="flex flex-row items-center justify-start gap-2 font-bold">
                                  <FontAwesomeIcon
                                     className="self-start pt-1 text-primary"
@@ -406,7 +426,7 @@ function SetContainer(props: SetProps): JSX.Element {
                                  <p>{set.repetitions}</p>
                               </div>
                            )}
-                           {(set.hours !== undefined || set.minutes !== undefined || set.seconds !== undefined) && (
+                           {(set.hours !== null || set.minutes !== null || set.seconds !== null) && (
                               <div className="flex flex-row items-center justify-start gap-2 font-bold">
                                  <FontAwesomeIcon
                                     className="self-start pt-1 text-primary"
@@ -450,7 +470,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
    const collapsedId: string = `collapsed-${exercise.id}`;
    const [isCollapsed, setIsCollapsed] = useState(() => {
-      return !!localStorage.getItem(collapsedId);
+      return !!(localStorage.getItem(collapsedId));
    });
    const editingExerciseSetId: string = localState.exerciseId.data.setId;
    const displayEditName = editName && edit && id === exercise.id;
@@ -548,7 +568,6 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          const newExercises: Exercise[] = [...workout.exercises].map((e) => e.id !== exercise.id ? e : newExercise);
          setEditName(false);
          saveExercises(newExercises);
-         onBlur();
       };
 
       handleResponse(localDispatch, response, successMethod, updateNotification);
@@ -640,17 +659,23 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    }, [exercise.id, localDispatch, localState.exerciseId, localState.hours, localState.minutes,
    localState.repetitions, localState.seconds, localState.text, localState.weight]);
 
-   const bind = useDoubleTap(handleInitializeEditExerciseName);
+ 
+   const doubleTap = useDoubleTap(handleInitializeEditExerciseName);
 
    return (
       <li
-         className="w-full mx-auto p-4 text-left focus:cursor-move"
+         className="w-full mx-auto p-4 text-left"
          style={style}
          ref={setNodeRef}
       >
          {
             displayEditName ? (
-               <div>
+               <div
+                  onKeyDown={(event: React.KeyboardEvent) => {
+                     if (event.key === "Enter") {
+                        handleSaveExerciseName();
+                     }
+                  }}>
                   <Input
                      id="name"
                      type="text"
@@ -690,26 +715,23 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   </Button>
                </div>
             ) : (
-               <h1
-                  className="text-xl mb-2 hover:cursor-move"
-               >
+               <h1 className="cursor-default text-xl mb-2 flex justify-start items-center">
                   <span>
                      <FontAwesomeIcon
-                        className="hover:cursor-pointer hover:text-primary pt-4"
+                        className="cursor-all-scroll hover:text-primary text-2xl pt-1"
                         icon={isCollapsed ? faCaretRight : faCaretDown}
                         {...attributes}
                         {...listeners}
                      />
                   </span>
                   <span
-                     {...bind}
-                     className="pl-4 hover:cursor-pointer"
+                     className="cursor-pointer pl-6"
                      onClick={(event) => {
                         event.stopPropagation();
                         event.preventDefault();
                         setIsCollapsed(!(isCollapsed));
                      }}
-                     onDoubleClick={handleInitializeEditExerciseName}
+                     {...doubleTap}
                   >
                      {exercise.name}
                   </span>
