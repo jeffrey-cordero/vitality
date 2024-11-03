@@ -95,7 +95,9 @@ const workouts: VitalityState = {
 export default function Page(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const [globalState, globalDispatch] = useReducer(formReducer, workouts);
-   const [view, setView] = useState<"table" | "cards">("table");
+   const [view, setView] = useState<"table" | "cards">(() => {
+      return localStorage.getItem("view") === "table" ? "table" : "cards";
+   });
 
    // Convert search string to lower case for case-insensitive comparison
    const search: string = useMemo(() => {
@@ -177,10 +179,12 @@ export default function Page(): JSX.Element {
       if (!(globalState.workouts.data.fetched)) {
          fetchWorkoutsData();
       }
-   }, [fetchWorkoutsData, globalState.workouts.data.fetched, globalState.tags, globalState.workouts]);
+
+      localStorage.setItem("view", view);
+   }, [fetchWorkoutsData, globalState.workouts.data.fetched, globalState.tags, globalState.workouts, view]);
 
    return (
-      <main className = "relative w-full lg:w-11/12 mx-auto my-10 min-h-screen flex flex-col justify-start items-center text-center">
+      <main className = "relative w-full lg:w-11/12 mx-auto my-8 flex flex-col justify-start items-center text-center overscroll-y-none">
          <div className = "relative">
             <Heading
                title = "Workouts"
@@ -210,7 +214,7 @@ export default function Page(): JSX.Element {
          </div>
          <div
             id = "workoutsView"
-            className = "w-11/12 min-h-max flex-grow flex flex-col justify-center items-center">
+            className = "w-10/12 min-h-max flex-grow flex flex-col justify-center items-center">
             {
                workoutsSection.length === 0 ? (
                   <div className = "w-full h-full mx-auto text-center flex justify-center items-start py-12">
@@ -236,7 +240,7 @@ export default function Page(): JSX.Element {
                )
             }
          </div>
-         <div className = "flex justify-center w-full mx-auto mb-6">
+         <div className = "flex justify-center w-full mx-auto my-2">
             <WorkoutForm
                globalState = {globalState}
                globalDispatch = {globalDispatch}

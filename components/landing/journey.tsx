@@ -21,6 +21,7 @@ export default function Journey(): JSX.Element {
                            <div className = "pb-3 sm:pb-4">
                               <div className = "relative my-4">
                                  <Image
+                                    priority
                                     width = {2010}
                                     height = {1441}
                                     quality = {100}
@@ -31,6 +32,7 @@ export default function Journey(): JSX.Element {
                               </div>
                               <div className = "relative">
                                  <Image
+                                    priority
                                     width = {640}
                                     height = {960}
                                     quality = {100}
@@ -45,7 +47,7 @@ export default function Journey(): JSX.Element {
                         <div className = "w-full px-3 sm:px-4 xl:w-1/2">
                            <div className = "py-3 sm:py-4">
                               <Image
-                                 priority = {true}
+                                 priority
                                  width = {1920}
                                  height = {2880}
                                  quality = {100}

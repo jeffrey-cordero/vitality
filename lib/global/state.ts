@@ -153,6 +153,8 @@ export function handleResponse(
          type: "updateErrors",
          value: response
       });
+
+      document.getElementsByClassName("input-error").item(0)?.scrollIntoView({ behavior: "smooth", block: "center" });
    } else {
       // Display failure notification to the user
       updateNotification({

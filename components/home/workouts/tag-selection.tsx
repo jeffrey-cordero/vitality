@@ -144,7 +144,7 @@ function TagColorPicker(props: VitalityChildProps) {
                <div
                   style = {{ backgroundColor: color }}
                   className = {clsx("cursor-pointer w-full h-[3rem] border-[3px] rounded-sm p-3 text-white text-center", {
-                     "border-primary scale-[1.02] shadow-2xl": localState.tagColor.value === color,
+                     "border-primary shadow-2xl": localState.tagColor.value === color,
                      "border-white": localState.tagColor.value !== color
                   })}
                   onClick = {() => handleChangeColor(color)}
@@ -213,7 +213,7 @@ function EditWorkoutTag(props: EditWorkoutTagProps): JSX.Element {
             }
          });
 
-         // Close the pop up form element and scroll into editing tag element
+         // Close the modal form element and scroll into editing tag element
          onSave();
       };
 
@@ -244,9 +244,9 @@ function EditWorkoutTag(props: EditWorkoutTagProps): JSX.Element {
          <div className = "flex flex-col justify-center align-center text-center gap-3">
             <FontAwesomeIcon
                icon = {faGear}
-               className = "text-6xl text-primary mt-1"
+               className = "text-6xl text-primary mt-6"
             />
-            <h1 className = "text-3xl font-bold text-black mb-2">
+            <h1 className = "text-2xl font-bold text-black mb-2">
                Edit Workout Tag
             </h1>
          </div>
@@ -298,7 +298,7 @@ export interface WorkoutTagProps extends VitalityChildProps {
 
 export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
    const { tag, selected, globalState, globalDispatch, localState, localDispatch } = props;
-   const editTagModalRef = useRef<{ close: () => void }>(null);
+   const editTagModalRef = useRef<{ open: () => void, close: () => void }>(null);
    const tagRef = useRef<HTMLLIElement>(null);
 
    // Handle adding or removing a selected tag
@@ -346,7 +346,7 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
 
    return (
       <li
-         className = {clsx("px-3 py-1 m-2 rounded-full text-sm lg:text-xs font-bold text-white transition duration-300 ease-in-out")}
+         className = {clsx("p-[3px] m-2 rounded-full text-sm lg:text-xs font-bold text-white transition duration-300 ease-in-out")}
          style = {{
             backgroundColor: tag.color
          }}
@@ -473,7 +473,7 @@ export function TagSelection(props: VitalityProps): JSX.Element {
                   />
                </div>
                <ul
-                  className = {clsx("flex flex-col sm:flex-row flex-wrap justify-center items-center", {
+                  className = {clsx("flex flex-row flex-wrap justify-center items-center", {
                      "pt-3": results.length > 0 || search.trim().length > 0
                   })}>
                   {

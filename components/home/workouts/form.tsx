@@ -80,7 +80,7 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
 
    // Basic workout inputs like title, date, description, and image URL stored locally
    const [localState, localDispatch] = useReducer(formReducer, form);
-   const [displayPopUp, setDisplayPopUp] = useState(false);
+   const [displayModal, setDisplayModal] = useState(false);
 
    // Fetch current editing workout
    const workout: Workout = globalState.workout.value;
@@ -89,10 +89,10 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
    const isNewWorkout: boolean = workout.id?.trim().length === 0;
 
    // Modal relating to workout deletion confirmation message
-   const deleteModalRef = useRef<{ close: () => void }>(null);
+   const deleteModalRef = useRef<{ open: () => void, close: () => void }>(null);
 
    // Workout modal container
-   const formModalRef = useRef<{ open: () => void }>(null);
+   const formModalRef = useRef<{ open: () => void, close: () => void }>(null);
 
    const defaultDate: string = useMemo(() => {
       return new Date().toISOString().split("T")[0];
@@ -148,6 +148,11 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                }
             }
          });
+
+         // Close the form modal on deletion
+         if (method === "delete") {
+            formModalRef.current?.close();
+         }
 
          // Display update notification to the user
          updateNotification({
@@ -236,17 +241,17 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
    }, [globalDispatch, localDispatch, globalState.tags]);
 
    useEffect(() => {
-      if (displayWorkoutForm && !(displayPopUp)) {
-         setDisplayPopUp(true);
+      if (displayWorkoutForm && !(displayModal)) {
+         setDisplayModal(true);
          handleInitializeWorkoutState();
          formModalRef.current?.open();
       }
-   }, [displayWorkoutForm, displayPopUp, handleInitializeWorkoutState]);
+   }, [displayWorkoutForm, displayModal, handleInitializeWorkoutState]);
 
 
    return (
       <Modal
-         display={null}
+         display = {null}
          className = "max-w-3xl"
          ref = {formModalRef}
          onClose = {() => {
@@ -274,7 +279,7 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                }
             });
 
-            setDisplayPopUp(false);
+            setDisplayModal(false);
          }}
          onClick = {handleInitializeWorkoutState}
       >
@@ -282,7 +287,7 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
             <div className = "flex flex-col justify-center align-center text-center gap-2">
                <FontAwesomeIcon
                   icon = {faPersonRunning}
-                  className = "text-6xl text-primary mt-1"
+                  className = "text-6xl text-primary mt-6"
                />
                <h1 className = "text-3xl font-bold text-black mb-2">
                   {isNewWorkout ? "New" : "Edit"} Workout
@@ -334,7 +339,7 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                         display = {
                            <Button
                               type = "button"
-                              className = "w-full bg-red-500 text-white h-[2.6rem]"
+                              className = "w-full bg-red-500 text-white h-[2.4rem]"
                               icon = {faTrash}
                            >
                               Delete
@@ -352,7 +357,7 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                               <Button
                                  type = "button"
                                  icon = {faArrowRotateBack}
-                                 className = "w-[10rem] bg-gray-100 text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
+                                 className = "w-[10rem] bg-gray-100 text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
                                  onClick = {() => {
                                     // Close the modal for deletion confirmation
                                     if (deleteModalRef.current) {
@@ -365,7 +370,7 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                               <Button
                                  type = "button"
                                  icon = {faSquareCheck}
-                                 className = "w-[10rem] bg-red-500 text-white px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
+                                 className = "w-[10rem] bg-red-500 text-white px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
                                  onClick = {async() => handleUpdateWorkout("delete")}
                               >
                                  Yes, I&apos;m sure
@@ -377,7 +382,7 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                }
                <Button
                   type = "button"
-                  className = "bg-primary text-white h-[2.6rem]"
+                  className = "bg-primary text-white h-[2.4rem]"
                   icon = {props !== undefined ? faCloudArrowUp : faSquarePlus}
                   onClick = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
                >

@@ -7,15 +7,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NotificationContext } from "@/app/layout";
 
 export interface NotificationProps extends React.HTMLAttributes<any> {
-   children?: React.ReactNode;
-   timer?: number;
    status: "Initial" | "Success" | "Error" | "Failure";
    message: string;
+   children?: React.ReactNode;
+   timer?: number;
 }
 
 export default function Notification(props: NotificationProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
-   const icon = props.status === "Success" ? faCircleCheck : faTriangleExclamation;
+   const { status, message, children, timer } = props;
+   const icon = status === "Success" ? faCircleCheck : faTriangleExclamation;
    const notificationRef = useRef<HTMLDivElement>(null);
 
    const removeNotification = () => {
@@ -31,10 +32,10 @@ export default function Notification(props: NotificationProps): JSX.Element {
    };
 
    // If timer is provided, remove after the desired time limit
-   if (props.timer) {
+   if (timer !== undefined) {
       setTimeout(() => {
          removeNotification();
-      }, props.timer);
+      }, timer);
    }
 
    return (
@@ -48,22 +49,22 @@ export default function Notification(props: NotificationProps): JSX.Element {
                <div className = "text-left">
                   <div
                      className = {clsx("w-full border-stroke flex items-center rounded-lg border border-l-[8px] bg-white pl-4", {
-                        "border-l-green-600": props.status === "Success",
-                        "border-l-red-600": props.status !== "Success"
+                        "border-l-green-600": status === "Success",
+                        "border-l-red-600": status !== "Success"
                      })}>
                      <div className = "flex items-center justify-center rounded-full">
                         <FontAwesomeIcon
                            icon = {icon}
                            className = {clsx("text-3xl", {
-                              "text-green-600": props.status === "Success",
-                              "text-red-600": props.status !== "Success"
+                              "text-green-600": status === "Success",
+                              "text-red-600": status !== "Success"
                            })} />
                      </div>
                      <div className = "flex w-full items-center justify-between px-4 py-3">
                         <div>
                            <div className = "my-2 flex flex-col gap-2 font-bold">
-                              <p>{props.message}</p>
-                              {props.children}
+                              <p>{message}</p>
+                              {children}
                            </div>
                         </div>
                      </div>
@@ -77,7 +78,6 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      onClick = {() => {
                         removeNotification();
                      }} />
-
                </div>
             </div>
          }

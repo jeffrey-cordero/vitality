@@ -1,6 +1,6 @@
+import clsx from "clsx";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import clsx from "clsx";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
@@ -23,7 +23,7 @@ export default function Button(props: ButtonProps): JSX.Element {
                <FontAwesomeIcon icon = {icon} />
             )
          }
-         {children}
+         { children }
       </button>
    );
 }

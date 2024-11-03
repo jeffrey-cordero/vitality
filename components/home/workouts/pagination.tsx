@@ -32,6 +32,8 @@ export default function Pagination(props: PaginationProps): JSX.Element {
             }
          }
       });
+
+      document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "start" });
    }, [globalDispatch, globalState.paging]);
 
    if (page >= pages) {
@@ -64,6 +66,8 @@ export default function Pagination(props: PaginationProps): JSX.Element {
             }
          }
       });
+
+      document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "start" });
    }, [globalDispatch, globalState.paging]);
 
    return (

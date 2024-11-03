@@ -71,7 +71,7 @@ export default function Layout({
 
    useEffect(() => {
       handleAuthentication();
-   }, [])
+   }, []);
 
    return (
       <html

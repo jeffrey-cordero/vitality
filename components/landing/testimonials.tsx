@@ -25,6 +25,7 @@ function Testimonial(props: TestimonialProps): JSX.Element {
          <div>
             <div className = "flex flex-row flex-wrap gap-3 justify-center items-center w-full mx-auto p-5">
                <Image
+                  priority
                   width = {200}
                   height = {200}
                   quality = {100}

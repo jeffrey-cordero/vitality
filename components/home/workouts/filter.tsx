@@ -142,7 +142,7 @@ function DateInput(props: DateInputProps) {
 
 function FilterByDate(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
-   const filterModalRef = useRef<{ close: () => void }>(null);
+   const filterModalRef = useRef<{ open: () => void, close: () => void }>(null);
    const type: string = globalState.type.value;
 
    const inputs: { [key: string]: VitalityInputState | undefined } = useMemo(() => {
@@ -239,11 +239,11 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "bg-gray-300 text-black font-semibold w-full h-[2.6rem] text-sm"
+               className = "bg-gray-300 text-black font-semibold w-full h-[2.5rem] text-sm"
             >
                <FontAwesomeIcon
                   icon = {faCalendar}
-                  className = "text-md" />
+                  className = "text-sm" />
                Filter by Date
             </Button>
          }
@@ -252,7 +252,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          <div className = "flex flex-col justify-center align-center text-center gap-2">
             <FontAwesomeIcon
                icon = {faCalendar}
-               className = "text-3xl text-primary mt-1"
+               className = "text-3xl text-primary mt-6"
             />
             <h1 className = "text-2xl font-bold text-black mb-2">
                Filter by Date
@@ -307,7 +307,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                }
                <Button
                   type = "button"
-                  className = "bg-primary text-white font-bold w-full h-[2.6rem] text-sm mt-3"
+                  className = "bg-primary text-white font-bold w-full h-[2.5rem] text-sm mt-3"
                   icon = {faMagnifyingGlass}
                   onClick = {handleApplyFilterClick}
                >
@@ -321,7 +321,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
 
 function FilterByTags(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
-   const filterModalRef = useRef<{ close: () => void }>(null);
+   const filterModalRef = useRef<{ open: () => void, close: () => void }>(null);
 
    const handleInitializeFilteredTags = useCallback(() => {
       // Selected tags are applied from prior filter form selection
@@ -422,17 +422,17 @@ function FilterByTags(props: VitalityProps): JSX.Element {
    }, [globalDispatch, globalState]);
 
    return (
-      <Modal  
+      <Modal
          ref = {filterModalRef}
          display = {
             <Button
                type = "button"
-               className = "bg-gray-300 text-black font-semibold w-full h-[2.6rem] text-sm"
+               className = "bg-gray-300 text-black font-semibold w-full h-[2.5rem] text-sm"
                onClick = {handleInitializeFilteredTags}
             >
                <FontAwesomeIcon
                   icon = {faTag}
-                  className = "text-md" />
+                  className = "text-sm" />
                Filter by Tags
             </Button>
          }
@@ -441,7 +441,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          <div className = "flex flex-col justify-center align-center text-center gap-2">
             <FontAwesomeIcon
                icon = {faTag}
-               className = "text-3xl text-primary mt-1"
+               className = "text-3xl text-primary mt-6"
             />
             <h1 className = "text-2xl font-bold text-black mb-2">
                Filter by Tags
@@ -456,7 +456,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                   <TagSelection {...props} />
                   <Button
                      type = "button"
-                     className = "bg-primary text-white font-bold w-full h-[2.6rem] text-sm mt-3"
+                     className = "bg-primary text-white font-bold w-full h-[2.5rem] text-sm mt-3"
                      icon = {faMagnifyingGlass}
                      onClick = {handleApplyFilterClick}
                   >

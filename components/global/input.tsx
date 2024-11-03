@@ -26,10 +26,6 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
       if (inputRef.current && autoFocus) {
          inputRef.current.focus();
       }
-
-      if (inputRef.current && input.error) {
-         inputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
    }, [autoFocus, input.error]);
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +47,12 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
          });
       }
    }, [dispatch, input, id, onChange]);
+
+   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (inputRef.current && event.key === "Escape") {
+         inputRef.current.blur();
+      }
+   }, []);
 
    const handlePasswordIconClick = useCallback(() => {
       if (passwordButton.current !== null) {
@@ -94,8 +96,9 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             className = {clsx("peer p-4 block w-full rounded-lg text-sm font-semibold border-1 placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2",
                {
                   "border-gray-200 border-[1.5px]": input.error === null,
-                  "border-red-500 border-[1.5px] focus:border-red-500 focus:ring-red-500 ": input.error !== null
+                  "border-red-500 border-[1.5px] focus:border-red-500 focus:ring-red-500 error": input.error !== null
                }, className)}
+            onKeyDown = {(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event)}
             onChange = {(event: ChangeEvent<HTMLInputElement>) => handleInputChange(event)}
          />
          {(type === "password" || passwordButton.current !== null) &&
@@ -115,10 +118,10 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
                <Button
                   tabIndex = {-1}
                   type = "button"
-                  className = "absolute top-[5px] end-0 p-3.5 rounded-e-md">
+                  className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
                   <FontAwesomeIcon
                      icon = {input.data.valid ? faCircleCheck : faCircleXmark}
-                     className = {clsx("flex-shrink-0 size-3.5 password-icon", {
+                     className = {clsx("flex-shrink-0 size-3.5", {
                         "text-green-500": input.data.valid,
                         "text-red-500": !(input.data.valid)
                      })}
@@ -137,7 +140,6 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             {icon && <FontAwesomeIcon icon = {icon} />} {label}
          </label>
          {input.error !== null &&
-            // Display current errors, if any
             <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
                <p className = "text-red-500 font-bold input-error"> {input.error} </p>
             </div>

@@ -56,17 +56,17 @@ function WorkoutCard(props: WorkoutCardProps): JSX.Element {
             });
          }}
          className = "relative cursor-pointer flex flex-col justify-center items-center gap-2 w-full sm:w-[16rem] h-[26rem] sm:h-[22rem] mx-auto sm:m-2 rounded-2xl overflow-hidden shadow-lg bg-white hover:scale-105 transition duration-300 ease-in-out">
-         <div className = "w-full h-full mx-auto">
+         <div className = "relative w-full h-full mx-auto">
             {
                workout.image ? (
                   <Image
+                     fill
+                     priority
                      quality = {100}
-                     layout = "fill"
-                     objectFit = "cover"
-                     sizes = "100vw"
+                     sizes = "100%"
                      src = {workout.image ?? ""}
                      alt = "workout-image"
-                     className = "opacity-30"
+                     className = "opacity-30 object-center object-cover"
                   />
                ) : (
                   <div className = "absolute w-full h-full bg-white opacity-20 flex justify-center items-center">
