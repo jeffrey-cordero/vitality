@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
 import Input from "@/components/global/input";
-import { faGear, faXmark, faCloudArrowUp, faTrash, faTag } from "@fortawesome/free-solid-svg-icons";
+import { faGear, faXmark, faCloudArrowUp, faTrash, faTag, faArrowRotateLeft, faGears, faPlus, faTags } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/workouts/tags";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
@@ -10,6 +10,7 @@ import { formReducer, handleResponse, VitalityChildProps, VitalityProps, Vitalit
 import { Modal } from "@/components/global/modal";
 import { searchForTitle } from "@/lib/workouts/shared";
 import Loading from "@/components/global/loading";
+import Conformation from "@/components/global/confirmation";
 
 const form: VitalityState = {
    tagTitle: {
@@ -46,71 +47,32 @@ const colors = {
 };
 
 interface CreateWorkoutTagProps extends VitalityChildProps {
-   search: string;
-   user_id: string;
+   onSubmit: () => void;
 }
 
 function CreateWorkoutTag(props: CreateWorkoutTagProps) {
-   const { search, user_id, globalState, globalDispatch, localDispatch } = props;
-   const { updateNotification } = useContext(NotificationContext);
-
-   const handleNewWorkoutTagSubmission = useCallback(async() => {
-      // Default tags have gray color option
-      const tag: Tag = {
-         user_id: user_id,
-         id: "",
-         title: search,
-         color: "rgb(90, 90, 90)"
-      };
-
-      const response: VitalityResponse<Tag> = await addWorkoutTag(tag);
-
-      const successMethod = () => {
-         // Add the new tag to the overall user tag options
-         const newOption: Tag = response.body.data;
-
-         const newOptions: Tag[] = [...globalState.tags.data.options, newOption];
-         const newSelected: Tag[] = [...globalState.tags.data.selected, newOption];
-
-         // Dictionary of tags are essential to ignore deleted tags applied to existing workouts
-         const newDictionary: { [key: string]: Tag } = Object.fromEntries(newOptions.map(tag => [tag.id, tag]));
-
-         globalDispatch({
-            type: "updateState",
-            value: {
-               id: "tags",
-               input: {
-                  ...globalState.tags,
-                  data: {
-                     ...globalState.tags.data,
-                     options: newOptions,
-                     selected: newSelected,
-                     dictionary: newDictionary
-                  }
-               }
-            }
-         });
-      };
-
-      handleResponse(localDispatch, response, successMethod, updateNotification);
-   }, [globalDispatch, localDispatch, globalState.tags, search, user_id, updateNotification]);
+   const { localState, onSubmit } = props;
+   const search: string = localState.tagSearch.value;
 
    return (
       <div
          tabIndex = {0}
-         className = "cursor-pointer transition duration-300 ease-in-out hover:bg-gray-100 p-3 rounded-2xl"
+         className = {clsx("cursor-pointer text-sm font-bold focus:scale-[1.05] hover:scale-[1.05] transition duration-300 ease-in-out rounded-full mb-2 mt-4 focus:outline-blue-500")}
          onClick = {() => {
-            handleNewWorkoutTagSubmission();
+            onSubmit();
          }}
-         onKeyDown = {(event) => {
+         onKeyDown = {(event: React.KeyboardEvent) => {
             if (event.key === "Enter") {
-               handleNewWorkoutTagSubmission();
+               onSubmit();
             }
          }}
       >
-         <h1>Create <span
-            className = "inline-block px-3 py-1 rounded-full text-sm font-bold text-white"
-            style = {{ backgroundColor: "rgb(90, 90, 90)" }}>{search}</span></h1>
+         <div
+            className = "relative flex justify-center items-center gap-2 px-4 py-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-white"
+            style = {{ backgroundColor: "rgb(90, 90, 90)" }}>
+            <FontAwesomeIcon icon = {faTags} />
+            {search}
+         </div>
       </div>
    );
 }
@@ -143,11 +105,14 @@ function TagColorPicker(props: VitalityChildProps) {
             return (
                <div
                   style = {{ backgroundColor: color }}
-                  className = {clsx("cursor-pointer w-full h-[3rem] border-[3px] rounded-sm p-3 text-white text-center", {
+                  className = {clsx("flex justify-center items-center text-sm cursor-pointer w-full h-[2.6rem] border-[2px] rounded-sm p-3 text-white text-center", {
                      "border-primary shadow-2xl": localState.tagColor.value === color,
                      "border-white": localState.tagColor.value !== color
                   })}
-                  onClick = {() => handleChangeColor(color)}
+                  onClick = {(event) => {
+                     event.stopPropagation();
+                     handleChangeColor(color);
+                  }}
                   key = {name}
                >
                   {name}
@@ -217,7 +182,10 @@ function EditWorkoutTag(props: EditWorkoutTagProps): JSX.Element {
          onSave();
       };
 
-      if (response.status !== "Success") {
+      if (response.status !== "Error") {
+         // Handle success or failure responses
+         handleResponse(localDispatch, response, successMethod, updateNotification);
+      } else {
          // Handle error response uniquely by mapping response identifiers to local state identifiers
          localDispatch({
             type: "updateStates",
@@ -232,9 +200,6 @@ function EditWorkoutTag(props: EditWorkoutTagProps): JSX.Element {
                }
             }
          });
-      } else {
-         // Handle success or failure responses
-         handleResponse(localDispatch, response, successMethod, updateNotification);
       }
 
    }, [globalDispatch, globalState, localDispatch, localState.tagColor, localState.tagTitle, tag.id, tag.user_id, updateNotification, onSave]);
@@ -244,9 +209,9 @@ function EditWorkoutTag(props: EditWorkoutTagProps): JSX.Element {
          <div className = "flex flex-col justify-center align-center text-center gap-3">
             <FontAwesomeIcon
                icon = {faGear}
-               className = "text-6xl text-primary mt-6"
+               className = "text-4xl text-primary mt-6"
             />
-            <h1 className = "text-2xl font-bold text-black mb-2">
+            <h1 className = "text-2xl font-bold text-black mb-2 px-2">
                Edit Workout Tag
             </h1>
          </div>
@@ -259,7 +224,7 @@ function EditWorkoutTag(props: EditWorkoutTagProps): JSX.Element {
             dispatch = {localDispatch}
             autoFocus
             required />
-         <div className = "flex flex-col justify-center items-center gap-2">
+         <div className = "flex flex-col justify-center items-center gap-1">
             <TagColorPicker {...props} />
             {localState.tagColor.error !== null &&
                <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
@@ -267,20 +232,14 @@ function EditWorkoutTag(props: EditWorkoutTagProps): JSX.Element {
                </div>
             }
          </div>
-         <div>
+         <div className = "flex flex-col gap-2">
+            <Conformation
+               message = "Delete this tag?"
+               onConformation = {() => handleEditWorkoutTagSubmission("delete")}
+            />
             <Button
                type = "submit"
-               className = "bg-red-500 text-white w-full h-[2.9rem]"
-               icon = {faTrash}
-               onClick = {() => handleEditWorkoutTagSubmission("delete")}
-            >
-               Delete
-            </Button>
-         </div>
-         <div>
-            <Button
-               type = "submit"
-               className = "bg-primary text-white w-full  h-[2.9rem]"
+               className = "bg-primary text-white w-full  h-[2.4rem]"
                icon = {faCloudArrowUp}
                onClick = {() => handleEditWorkoutTagSubmission("update")}
             >
@@ -346,7 +305,7 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
 
    return (
       <li
-         className = {clsx("p-[3px] m-2 rounded-full text-sm lg:text-xs font-bold text-white transition duration-300 ease-in-out")}
+         className = {clsx("relative px-4 py-2 m-2 rounded-full text-sm font-bold text-white")}
          style = {{
             backgroundColor: tag.color
          }}
@@ -354,51 +313,63 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
          key = {tag.id}
       >
          <div
-            className = "max-w-full mx-auto flex justify-center items-center gap-3 p-2"
-            onClick = {() => {
+            className = "max-w-full mx-auto flex flex-row justify-center items-center"
+            onClick = {(event) => {
+               event.stopPropagation();
+
                if (!(selected)) {
                   handleSelectWorkoutTag(true);
                }
             }}
          >
-            <div className = "cursor-pointer max-w-full px-2 mx-auto line-clamp-1 break-all text-center text-ellipsis">
+            <div className = "cursor-pointer max-w-full pr-3 mx-auto line-clamp-1 break-all text-center text-ellipsis">
                {tag.title}
             </div>
-            {
-               <Modal
-                  ref = {editTagModalRef}
-                  display = {
+            <div className = "flex flex-row justify-center items-center gap-2 pr-2">
+               {
+                  <Modal
+                     ref = {editTagModalRef}
+                     display = {
+                        <FontAwesomeIcon
+                           icon = {faGears}
+                           onClick = {handleInitializeTagForm}
+                           className = "cursor-pointer text-md pt-1"
+                        />
+                     }
+                     className = "max-w-[90%] sm:max-w-xl max-h-[90%] mt-12"
+                  >
+                     <EditWorkoutTag
+                        {...props}
+                        onSave = {handleEditTagSave} />
+                  </Modal>
+               }
+               {
+                  selected && (
                      <FontAwesomeIcon
-                        icon = {faGear}
-                        onClick = {handleInitializeTagForm}
-                        className = "cursor-pointer text-xs hover:scale-125 transition duration-300 ease-in-out"
+                        onMouseDown = {() => handleSelectWorkoutTag(false)}
+                        icon = {faXmark}
+                        className = "cursor-pointer text-lg"
                      />
-                  }
-                  className = "max-w-2xl"
-               >
-                  <EditWorkoutTag
-                     {...props}
-                     onSave = {handleEditTagSave} />
-               </Modal>
-            }
-            {
-               selected &&
-               <FontAwesomeIcon
-                  onMouseDown = {() => handleSelectWorkoutTag(false)}
-                  icon = {faXmark}
-                  className = "cursor-pointer text-md transition duration-300 ease-in-out hover:scale-125 hover:text-red-500"
-               />
-            }
+                  )
+               }
+            </div>
+
          </div>
       </li>
    );
 };
 
-export function TagSelection(props: VitalityProps): JSX.Element {
-   const { globalState, globalDispatch } = props;
+interface TagSelectionProps extends VitalityProps {
+   onReset?: () => void;
+}
 
-   // Fetch user information from context
+export function TagSelection(props: TagSelectionProps): JSX.Element {
+   const { globalState, globalDispatch, onReset } = props;
+
+   // Fetch user and notification information from context
    const { user } = useContext(AuthenticationContext);
+
+   const { updateNotification } = useContext(NotificationContext);
 
    // Store overall and selected tags
    const { options, selected } = globalState.tags.data;
@@ -436,33 +407,101 @@ export function TagSelection(props: VitalityProps): JSX.Element {
       return titles;
    }, [options]);
 
+   const handleNewTagSubmission = useCallback(async() => {
+      // Default tags have gray color option
+      const tag: Tag = {
+         user_id: user?.id,
+         id: "",
+         title: localState.tagSearch.value.trim(),
+         color: "rgb(90, 90, 90)"
+      };
+
+      const response: VitalityResponse<Tag> = await addWorkoutTag(tag);
+
+      const successMethod = () => {
+         // Add the new tag to the overall user tag options
+         const newOption: Tag = response.body.data;
+
+         const newOptions: Tag[] = [...globalState.tags.data.options, newOption];
+         const newSelected: Tag[] = [...globalState.tags.data.selected, newOption];
+
+         // Dictionary of tags are essential to ignore deleted tags applied to existing workouts
+         const newDictionary: { [key: string]: Tag } = Object.fromEntries(newOptions.map(tag => [tag.id, tag]));
+
+         globalDispatch({
+            type: "updateState",
+            value: {
+               id: "tags",
+               input: {
+                  ...globalState.tags,
+                  data: {
+                     ...globalState.tags.data,
+                     options: newOptions,
+                     selected: newSelected,
+                     dictionary: newDictionary
+                  }
+               }
+            }
+         });
+      };
+
+      if (response.status !== "Error") {
+         // Handle success or failure responses
+         handleResponse(localDispatch, response, successMethod, updateNotification);
+      } else {
+         // Handle error response uniquely by mapping response identifiers to local state identifiers
+         localDispatch({
+            type: "updateStates",
+            value: {
+               tagSearch: {
+                  ...localState.tagSearch,
+                  error: response.body.errors["search"]?.[0] ?? null
+               }
+            }
+         });
+      }
+
+   }, [globalDispatch, localDispatch, localState.tagSearch, globalState.tags, user?.id, updateNotification]);
+
    const fetched: boolean = globalState.tags.data.fetched;
 
    return (
       <div>
          {fetched ? (
             <div className = "w-full mx-auto flex flex-col flex-wrap justify-center items-center">
-               <ul
-                  className = {clsx("flex flex-col sm:flex-row flex-wrap justify-center items-center", {
-                     "pb-3": globalState.tags.data.selected?.length > 0
-                  })}>
+               {
+                  globalState.tags.data.selected?.length > 0 && (
+                     <ul
+                        className = "flex flex-col sm:flex-row flex-wrap justify-center items-center pb-2">
+                        {
+                           globalState.tags.data.selected.map((selected: Tag) => {
+                              return (
+                                 selected !== undefined && (
+                                    <WorkoutTag
+                                       {...props}
+                                       localState = {localState}
+                                       localDispatch = {localDispatch}
+                                       tag = {selected}
+                                       selected = {true}
+                                       key = {selected.id}
+                                    />
+                                 )
+                              );
+                           })
+                        }
+                     </ul>
+                  )
+               }
+               <div className = "relative w-full mx-auto">
                   {
-                     globalState.tags.data.selected?.map((selected: Tag) => {
-                        return (
-                           selected !== undefined &&
-                           <WorkoutTag
-                              {...props}
-                              localState = {localState}
-                              localDispatch = {localDispatch}
-                              tag = {selected}
-                              selected = {true}
-                              key = {selected.id}
-                           />
-                        );
-                     })
+                     onReset && (
+                        <FontAwesomeIcon
+                           icon = {faArrowRotateLeft}
+                           onClick = {onReset}
+                           className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                        />
+                     )
                   }
-               </ul>
-               <div className = "w-full mx-auto">
                   <Input
                      id = "tagSearch"
                      type = "text"
@@ -470,33 +509,44 @@ export function TagSelection(props: VitalityProps): JSX.Element {
                      label = "Tags"
                      icon = {faTag}
                      dispatch = {localDispatch}
+                     onSubmit = {() => {
+                        if (!(tagsByTitle[search])) {
+                           handleNewTagSubmission();
+                        }
+                     }}
                   />
                </div>
-               <ul
-                  className = {clsx("flex flex-row flex-wrap justify-center items-center", {
-                     "pt-3": results.length > 0 || search.trim().length > 0
-                  })}>
-                  {
-                     results.length > 0 ? results.map((tag: Tag) => {
-                        return <WorkoutTag
-                           {...props}
-                           localState = {localState}
-                           localDispatch = {localDispatch}
-                           globalState = {globalState}
-                           globalDispatch = {globalDispatch}
-                           tag = {tag}
-                           selected = {false}
-                           key = {tag.id} />;
-                     }) : search.trim().length > 0 && user !== undefined && tagsByTitle[search] === undefined && (
-                        <CreateWorkoutTag
-                           {...props}
-                           localState = {localState}
-                           localDispatch = {localDispatch}
-                           search = {search}
-                           user_id = {user.id} />
-                     )
-                  }
-               </ul>
+               {
+                  results.length > 0 && (
+                     <ul className = "flex flex-row flex-wrap justify-center items-center pt-2">
+                        {
+                           results.map((tag: Tag) => {
+                              return (
+                                 <WorkoutTag
+                                    {...props}
+                                    localState = {localState}
+                                    localDispatch = {localDispatch}
+                                    globalState = {globalState}
+                                    globalDispatch = {globalDispatch}
+                                    tag = {tag}
+                                    selected = {false}
+                                    key = {tag.id} />
+                              );
+                           })
+                        }
+                     </ul>
+                  )
+               }
+               {
+                  (search.trim().length > 0 && user !== undefined && tagsByTitle[search] === undefined) && (
+                     <CreateWorkoutTag
+                        {...props}
+                        localState = {localState}
+                        localDispatch = {localDispatch}
+                        onSubmit = {() => handleNewTagSubmission()}
+                     />
+                  )
+               }
             </div>
          ) : (
             <div className = "w-full h-full justify-center items-center py-12">

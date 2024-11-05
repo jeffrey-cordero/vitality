@@ -12,7 +12,7 @@ export default function Journey(): JSX.Element {
             title = "Your Fitness Journey Starts Here"
             description = "Your ultimate companion for achieving optimal health and fitness"
          />
-         <div className = "overflow-hidden">
+         <div className = "overflow-hidden my-4">
             <div className = "container mx-auto">
                <div className = "flex flex-wrap items-center justify-center">
                   <div className = "w-full lg:w-6/12">

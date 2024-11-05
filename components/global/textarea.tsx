@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function TextArea(props: VitalityInputProps): JSX.Element {
    const { id, label, icon, onChange, placeholder, required, input, dispatch } = props;
-   const textArea = useRef<HTMLTextAreaElement | null>(null);
+   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
    const [visible, setVisible] = useState<boolean>(false);
 
    const handleTextAreaChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -31,8 +31,21 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
       handleTextAreaOverflow();
    }, [dispatch, input, id, onChange]);
 
+   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (textAreaRef.current && event.key === "Escape") {
+         textAreaRef.current.blur();
+
+         const modals: HTMLCollection = document.getElementsByClassName("modal");
+
+         if (modals.length > 0) {
+            // Focus the most inner modal, if any
+            (modals.item(modals.length - 1) as HTMLDivElement).focus();
+         }
+      }
+   }, []);
+
    const handleTextAreaOverflow = () => {
-      const textarea = textArea.current;
+      const textarea = textAreaRef.current;
 
       if (textarea) {
          textarea.style.height = "auto";
@@ -59,15 +72,16 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
                   "border-gray-200": input.error === null,
                   "border-red-500 ": input.error !== null
                })}
-            onChange = {handleTextAreaChange}
-            ref = {textArea}
+            onKeyDown = {(event: React.KeyboardEvent<HTMLTextAreaElement>) => handleKeyDown(event)}
+            onChange = {(event: ChangeEvent<HTMLTextAreaElement>) => handleTextAreaChange(event)}
+            ref = {textAreaRef}
          />
          <label
             htmlFor = {id}
             className = {clsx("absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-gray-500 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500", {
                "font-bold": required
             })}>
-            { icon && <FontAwesomeIcon icon = {icon} /> } { label }
+            {icon && <FontAwesomeIcon icon = {icon} />} {label}
          </label>
          {input.error !== null &&
             <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">

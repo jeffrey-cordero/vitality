@@ -29,26 +29,19 @@ export const Modal = forwardRef(function Modal(props: ModalProps, ref) {
       open: handleOnOpen
    }));
 
-   // Close the modal when clicking outside of the area
    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-         event.stopPropagation();
+      const modals = document.getElementsByClassName("modal");
 
-         if (modalRef.current && !(modalRef.current.contains(event.target as Node))) {
-            handleOnClose();
-         }
-      };
-
-      if (open) {
-         document.addEventListener("mousedown", handleClickOutside);
-      } else {
-         document.removeEventListener("mousedown", handleClickOutside);
+      if (modals.length > 0) {
+         document.body.parentElement.style.overflowY = "hidden";
       }
 
       return () => {
-         document.removeEventListener("mousedown", handleClickOutside);
+         if (modals.length === 0) {
+            document.body.parentElement.style.overflowY = "initial";
+         }
       };
-   }, [open, handleOnClose]);
+   }, []);
 
    return (
       <div className = "relative">
@@ -72,31 +65,29 @@ export const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                   <div className = "fixed inset-0 bg-gray-600 bg-opacity-50"></div>
                   <div
                      ref = {modalRef}
-                     className = "relative bg-white rounded-lg shadow-lg p-6 md:py-6 md:px-8 w-full max-h-[90%] overflow-y-auto scrollbar-hide">
-                     <div className = "absolute top-[10px] right-[10px] z-50 p-3.5 rounded-e-md">
-                        <FontAwesomeIcon
-                           icon = {faXmark}
-                           className = "cursor-pointer flex-shrink-0 size-4.5 text-2xl text-red-500 text-md font-extrabold"
-                           fill = "black"
-                           onClick = {(event) => {
-                              // Ensure the onClick does that propagate to parent display component
-                              event.stopPropagation();
-                              handleOnClose();
-                           }} />
-                     </div>
-                     <div
-                        tabIndex = {0}
-                        className = "modal"
-                        onKeyDown = {(event) => {
-                           // Close the active modal in the DOM through the escape key
-                           const target = event.target as HTMLElement;
+                     tabIndex = {0}
+                     onKeyDown = {(event) => {
+                        event.stopPropagation();
+                        // Close the active modal in the DOM through the escape key
+                        const target = event.target as HTMLElement;
 
-                           if (event.key === "Escape" && target.classList.contains("modal")) {
+                        if (event.key === "Escape" && target.classList.contains("modal")) {
+                           handleOnClose();
+                        }
+                     }}
+                     className = "relative bg-white rounded-lg shadow-lg p-6 md:py-6 md:px-8 w-full max-h-[90%] overflow-y-auto focus:outline-none modal scrollbar-hide">
+                     <div className = "absolute top-[2px] right-[5px] z-50 p-3.5 rounded-e-md">
+                        <FontAwesomeIcon
+                           onClick = {(event) => {
                               event.stopPropagation();
                               handleOnClose();
-                           }
-                        }}
-                     >
+                           }}
+                           icon = {faXmark}
+                           className = "cursor-pointer flex-shrink-0 size-4.5 text-2xl text-red-500 text-md font-extrabold modal-close"
+                           fill = "black"
+                        />
+                     </div>
+                     <div>
                         {children}
                      </div>
                   </div>

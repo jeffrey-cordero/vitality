@@ -10,11 +10,15 @@ export const authConfig = {
          const isOnHome = nextUrl.pathname.startsWith("/home");
 
          if (isOnHome) {
-            if (isLoggedIn) return true;
+            if (isLoggedIn) {
+               return true;
+            }
+
             return false;
          } else if (isLoggedIn) {
             return Response.redirect(new URL("/home", nextUrl));
          }
+
          return true;
       }
    },

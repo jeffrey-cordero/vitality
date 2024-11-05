@@ -6,7 +6,7 @@ import Footer from "@/components/global/footer";
 import Notification from "@/components/global/notification";
 import { sfPro, inter } from "@/app/fonts";
 import { SideBar } from "@/components/global/sidebar";
-import { createContext, SetStateAction, useEffect, useState } from "react";
+import { createContext, SetStateAction, useCallback, useEffect, useState } from "react";
 import { users as User } from "@prisma/client";
 import { getAuthentication } from "@/lib/authentication/user";
 import { NotificationProps } from "@/components/global/notification";
@@ -25,7 +25,7 @@ interface NotificationContextType {
 export const AuthenticationContext = createContext<AuthenticationContextType>({
    user: undefined,
    fetched: false,
-   updateUser: () => {}
+   updateUser: () => { }
 });
 
 export const NotificationContext = createContext<NotificationContextType>({
@@ -34,7 +34,7 @@ export const NotificationContext = createContext<NotificationContextType>({
       status: "Initial",
       message: ""
    },
-   updateNotification: () => {}
+   updateNotification: () => { }
 });
 
 export default function Layout({
@@ -51,27 +51,51 @@ export default function Layout({
       setUser(user);
    };
 
-   const handleAuthentication = async() => {
+   const handleAuthentication = useCallback(async() => {
       try {
          const user = await getAuthentication();
          setUser(user);
-         setFetched(true);
       } catch (error) {
          updateNotification({
             status: "Failure",
             message: error.message
          });
+
          setUser(undefined);
       }
-   };
+
+      setFetched(true);
+   }, []);
 
    const updateNotification = (notification: NotificationProps) => {
       setNotification(notification);
    };
 
    useEffect(() => {
-      handleAuthentication();
-   }, []);
+      if (!(fetched)) {
+         handleAuthentication();
+      }
+
+      const handleModalClickAway = (event: MouseEvent) => {
+         const modals = document.getElementsByClassName("modal");
+         const notifications = document.getElementsByClassName("notification");
+         const topMostModal = modals.length > 0 ? modals[modals.length - 1] as HTMLDivElement : null;
+
+         if (topMostModal && notifications.length === 0 && !(topMostModal.contains(event.target as HTMLElement))) {
+            (topMostModal.getElementsByClassName("modal-close")[0] as SVGElement).dispatchEvent(new MouseEvent("click", {
+               bubbles: true,
+               cancelable: true,
+               view: window
+            }));
+         }
+      };
+
+      document.body.addEventListener("mousedown", handleModalClickAway);
+
+      return () => {
+         document.body.removeEventListener("mousedown", handleModalClickAway);
+      };
+   }, [fetched, handleAuthentication]);
 
    return (
       <html
@@ -108,7 +132,7 @@ export default function Layout({
                      {children}
                   </div>
                   <div>
-                     { notification !== undefined && notification.status !== "Initial" && (
+                     {notification !== undefined && notification.status !== "Initial" && (
                         <Notification {...notification} />
                      )
                      }

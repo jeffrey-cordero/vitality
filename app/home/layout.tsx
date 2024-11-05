@@ -20,25 +20,9 @@ export default function Layout({
 }) {
    useValidateAuthenticatedURL();
 
-   const modals: HTMLCollection = document.getElementsByClassName("modal");
-
-   console.log(modals);
-  
-   if (modals.length > 0) {
-     document.body.classList.add("overflow-y-hidden");
-     document.body.parentElement.classList.add("overflow-y-hidden");
-   } else {
-     document.body.classList.remove("overflow-y-hidden");
-     document.body.parentElement.classList.remove("overflow-y-hidden");
-   }
-
    return (
-      <div>
-         <div className = "flex flex-col">
-            <div className = "flex-grow">
-               {children}
-            </div>
-         </div>
+      <div className = "w-full min-h-screen m-auto">
+         {children}
       </div>
    );
 }

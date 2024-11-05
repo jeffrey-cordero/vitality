@@ -1,6 +1,13 @@
 import { Workout } from "@/lib/workouts/workouts";
 import { Exercise } from "@/lib/workouts/exercises";
 
+const urlRegex = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg)|https?:\/\/[^/]+\/[^?#]+\?.*)$/i;
+const nextMediaRegex = /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
+
+export function verifyURL(url: string): boolean {
+   return urlRegex.test(url) || nextMediaRegex.test(url);
+}
+
 export function searchForTitle(array: any[], search: string): any[] {
    // Handle no input for array search
    if (search === "") {

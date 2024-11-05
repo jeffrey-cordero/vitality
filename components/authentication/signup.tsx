@@ -110,7 +110,7 @@ function Form(): JSX.Element {
                onClick = {() => dispatch({
                   type: "resetState", value: {}
                })}
-               className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+               className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
             <Input
                id = "username"

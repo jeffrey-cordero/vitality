@@ -63,7 +63,7 @@ export default function Testimonials(): JSX.Element {
    });
 
    return (
-      <div className = "w-full mx-auto">
+      <div className = "w-full mx-auto mt-4 mb-12">
          <Heading
             title = "Testimonials"
             description = "Discover the firsthand experiences of our valued users as they share insights into their fitness journey with our app"

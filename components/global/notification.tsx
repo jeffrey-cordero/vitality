@@ -75,7 +75,8 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      icon = {faXmark}
                      className = "cursor-pointer flex-shrink-0 size-4.5 text-[18px] text-red-500 text-md font-extrabold"
                      fill = "black"
-                     onClick = {() => {
+                     onClick = {(event) => {
+                        event.stopPropagation();
                         removeNotification();
                      }} />
                </div>

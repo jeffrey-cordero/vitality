@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useMemo, useRef } from "react";
 import { TagSelection } from "@/components/home/workouts/tag-selection";
 import { Tag } from "@/lib/workouts/tags";
+import Heading from "@/components/global/heading";
 
 export function filterByTags(selectedTags: Set<string>, workout: Workout): boolean {
    // Ensure tags within the given workout cover entire provided set of tag id's
@@ -239,7 +240,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "bg-gray-300 text-black font-semibold w-full h-[2.5rem] text-sm"
+               className = "bg-gray-300 text-black font-semibold w-full h-[2.4rem] text-sm"
             >
                <FontAwesomeIcon
                   icon = {faCalendar}
@@ -261,7 +262,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                <FontAwesomeIcon
                   icon = {faArrowRotateLeft}
                   onClick = {handleReset}
-                  className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                  className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
                <Select
                   id = "type"
@@ -307,7 +308,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                }
                <Button
                   type = "button"
-                  className = "bg-primary text-white font-bold w-full h-[2.5rem] text-sm mt-3"
+                  className = "bg-primary text-white font-bold w-full h-[2.4rem] text-sm mt-3"
                   icon = {faMagnifyingGlass}
                   onClick = {handleApplyFilterClick}
                >
@@ -427,7 +428,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "bg-gray-300 text-black font-semibold w-full h-[2.5rem] text-sm"
+               className = "bg-gray-300 text-black font-semibold w-full h-[2.4rem] text-sm"
                onClick = {handleInitializeFilteredTags}
             >
                <FontAwesomeIcon
@@ -446,17 +447,15 @@ function FilterByTags(props: VitalityProps): JSX.Element {
             <h1 className = "text-2xl font-bold text-black mb-2">
                Filter by Tags
             </h1>
-            <div className = "relative mt-8">
-               <FontAwesomeIcon
-                  icon = {faArrowRotateLeft}
-                  onClick = {handleReset}
-                  className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
-               />
+            <div className = "relative">
                <div className = "w-full mx-auto my-2">
-                  <TagSelection {...props} />
+                  <TagSelection
+                     {...props}
+                     onReset = {handleReset}
+                  />
                   <Button
                      type = "button"
-                     className = "bg-primary text-white font-bold w-full h-[2.5rem] text-sm mt-3"
+                     className = "bg-primary text-white font-bold w-full h-[2.4rem] text-sm mt-3"
                      icon = {faMagnifyingGlass}
                      onClick = {handleApplyFilterClick}
                   >
@@ -469,25 +468,32 @@ function FilterByTags(props: VitalityProps): JSX.Element {
    );
 }
 
-export default function WorkoutFiltering(props: VitalityProps): JSX.Element {
+export default function Filter(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
 
    return (
-      <div className = "w-full mx-auto grid grid-rows-2 gap-4 px-4">
-         <div className = "row-span-1 col-span-full">
-            <Input
-               id = "search"
-               type = "text"
-               label = "Search"
-               icon = {faMagnifyingGlass}
-               input = {globalState.search}
-               dispatch = {globalDispatch}
-               autoFocus />
-         </div>
-         <div className = "w-full mx-auto grid grid-cols-2 gap-2">
-            <FilterByDate {...props} />
-            <FilterByTags {...props} />
+      <div className = "relative">
+         <Heading
+            title = "Workouts"
+            description = "Ready to crush your goals? Create a new workout and let&apos;s make today count!"
+         />
+         <div className = "w-full mx-auto grid grid-rows-2 gap-4 px-4">
+            <div className = "row-span-1 col-span-full">
+               <Input
+                  id = "search"
+                  type = "text"
+                  label = "Search"
+                  icon = {faMagnifyingGlass}
+                  input = {globalState.search}
+                  dispatch = {globalDispatch}
+                  autoFocus />
+            </div>
+            <div className = "w-full mx-auto grid grid-cols-2 gap-2">
+               <FilterByDate {...props} />
+               <FilterByTags {...props} />
+            </div>
          </div>
       </div>
+
    );
 }

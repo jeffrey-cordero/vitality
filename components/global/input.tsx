@@ -14,10 +14,11 @@ export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
    dispatch: Dispatch<VitalityAction<any>>;
    icon?: IconProp;
    onBlur?: () => void;
+   onSubmit?: () => void;
 }
 
 export default function Input({ ...props }: VitalityInputProps): JSX.Element {
-   const { id, label, icon, placeholder, className, autoFocus, onChange, required, input, dispatch } = props;
+   const { id, label, icon, placeholder, className, autoFocus, onChange, onSubmit, required, input, dispatch } = props;
    const type = input.data.type ?? props.type;
    const inputRef = useRef<HTMLInputElement>(null);
    const passwordButton = useRef<SVGSVGElement | null>(null);
@@ -51,8 +52,17 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
    const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
       if (inputRef.current && event.key === "Escape") {
          inputRef.current.blur();
+
+         const modals: HTMLCollection = document.getElementsByClassName("modal");
+
+         if (modals.length > 0) {
+            // Focus the most inner modal, if any
+            (modals.item(modals.length - 1) as HTMLDivElement).focus();
+         }
+      } else if (event.key === "Enter") {
+         onSubmit?.call(null);
       }
-   }, []);
+   }, [onSubmit]);
 
    const handlePasswordIconClick = useCallback(() => {
       if (passwordButton.current !== null) {
@@ -140,7 +150,7 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             {icon && <FontAwesomeIcon icon = {icon} />} {label}
          </label>
          {input.error !== null &&
-            <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
+            <div className = "flex justify-center align-center text-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
                <p className = "text-red-500 font-bold input-error"> {input.error} </p>
             </div>
          }

@@ -164,7 +164,7 @@ export async function updateExercise(
             return sendSuccessMessage("Successfully updated exercise name", null);
          }
       } else {
-         const containsNoInputs = (set: ExerciseSet) => {
+         const isEmptyExerciseSet = (set: ExerciseSet) => {
             return (
                set.weight === null &&
           set.repetitions === null &&
@@ -185,10 +185,10 @@ export async function updateExercise(
                   null,
                   fields.error.flatten().fieldErrors,
                );
-            } else if (containsNoInputs(set)) {
+            } else if (isEmptyExerciseSet(set)) {
                return sendErrorMessage(
                   "Error",
-                  "Every exercise set must contain at least 1 valid input.",
+                  "Set must be non-empty.",
                   null,
                   null,
                );

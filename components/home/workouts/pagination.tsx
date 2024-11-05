@@ -15,6 +15,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
    const { globalState, globalDispatch, workouts } = props;
 
    // Hold total table/cards pages and current page index
+   const fetched: boolean = globalState.workouts.data.fetched;
    const pages: number = Math.ceil(workouts.length / globalState.paging.value);
    const page: number = globalState.paging.data.page;
 
@@ -22,7 +23,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
       globalDispatch({
          type: "updateState",
          value: {
-            id : "paging",
+            id: "paging",
             input: {
                ...globalState.paging,
                data: {
@@ -36,7 +37,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
       document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "start" });
    }, [globalDispatch, globalState.paging]);
 
-   if (page >= pages) {
+   if (fetched && page >= pages) {
       // Ensure current page index is within range, especially when deleting workouts
       handlePageClick(Math.max(0, pages - 1));
    }
@@ -71,41 +72,43 @@ export default function Pagination(props: PaginationProps): JSX.Element {
    }, [globalDispatch, globalState.paging]);
 
    return (
-      <div className = "mt-6 justify-self-end text-lg">
-         <div className = "flex flex-row justify-center items-center mb-2">
-            <FontAwesomeIcon
-               icon = {faCircleChevronLeft}
-               className = "cursor-pointer text-primary text-xl mr-2"
-               onClick = {handleLeftClick} />
-            {Array.from({ length: pages }, (_, index) => (
-               <Button
-                  key = {index}
-                  onClick = {() => handlePageClick(index)}
-                  className = {clsx("rounded-lg px-2 py-1", {
-                     "font-bold text-primary border-2 border-primary bg-blue-100": index === page
-                  })}
-               >
-                  {index + 1}
-               </Button>
-            ))}
-            <FontAwesomeIcon
-               icon = {faCircleChevronRight}
-               className = "cursor-pointer text-primary text-xl ml-2"
-               onClick = {handleRightClick} />
+      workouts.length > 0 && (
+         <div className = "mt-6 justify-self-end text-lg">
+            <div className = "flex flex-row justify-center items-center mb-2">
+               <FontAwesomeIcon
+                  icon = {faCircleChevronLeft}
+                  className = "cursor-pointer text-primary text-xl mr-2"
+                  onClick = {handleLeftClick} />
+               {Array.from({ length: pages }, (_, index) => (
+                  <Button
+                     key = {index}
+                     onClick = {() => handlePageClick(index)}
+                     className = {clsx("rounded-lg px-2 py-1", {
+                        "font-bold text-primary border-2 border-primary bg-blue-100": index === page
+                     })}
+                  >
+                     {index + 1}
+                  </Button>
+               ))}
+               <FontAwesomeIcon
+                  icon = {faCircleChevronRight}
+                  className = "cursor-pointer text-primary text-xl ml-2"
+                  onClick = {handleRightClick} />
+            </div>
+            <div>
+               <Select
+                  id = "paging"
+                  type = "select"
+                  label = "Entries"
+                  icon = {faTabletScreenButton}
+                  input = {globalState.paging}
+                  values = {[5, 10, 25, 50, 100, 500, 1000]}
+                  dispatch = {globalDispatch}
+                  className = "min-w-[10rem] max-h-[5rem] mt-4"
+                  onChange = {(event) => handleEntriesOnChange(event)}
+               />
+            </div>
          </div>
-         <div>
-            <Select
-               id = "paging"
-               type = "select"
-               label = "Entries"
-               icon = {faTabletScreenButton}
-               input = {globalState.paging}
-               values = {[5, 10, 25, 50, 100, 500, 1000]}
-               dispatch = {globalDispatch}
-               className = "min-w-[10rem] max-h-[5rem] mt-4"
-               onChange = {(event) => handleEntriesOnChange(event)}
-            />
-         </div>
-      </div>
+      )
    );
 }

@@ -140,7 +140,7 @@ export async function addWorkout(
       });
 
       return sendSuccessMessage(
-         "Successfully added new workout",
+         "Added new workout",
          formatWorkout(newWorkout)
       );
    } catch (error) {
@@ -245,7 +245,7 @@ export async function updateWorkout(
          });
 
          return sendSuccessMessage(
-            "Successfully updated workout",
+            "Updated workout",
             formatWorkout(updatedWorkout)
          );
       }
@@ -274,7 +274,7 @@ export async function removeWorkouts(
       });
 
       return sendSuccessMessage(
-         `Successfully deleted ${response.count} workout${
+         `Deleted ${response.count} workout${
             response.count === 1 ? "" : "s"
          }`,
          response.count

@@ -2,28 +2,25 @@ import Image from "next/image";
 import clsx from "clsx";
 import Button from "@/components/global/button";
 import Input, { VitalityInputProps } from "@/components/global/input";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal } from "@/components/global/modal";
 import { faCameraRetro, faGlobe, faPaperclip, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { verifyURL } from "@/lib/workouts/shared";
 
 const defaultImages = ["bike.png", "cardio.png", "default.png", "hike.png", "legs.png", "lift.png", "machine.png", "run.png", "swim.png", "weights.png"];
-const urlRegex = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg))$/i;
-const nextMediaRegex = /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
 
-function verifyURL(url: string): boolean {
-   // URL may be relative to WWW or NextJS Static Media
-   return urlRegex.test(url) || nextMediaRegex.test(url);
+interface ImageSelectionFormProps extends VitalityInputProps {
+   isValidResource: boolean;
+   isValidURL: boolean;
 }
 
-function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
-   const { input, dispatch } = props;
+function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
+   const { isValidURL, isValidResource, input, dispatch } = props;
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(true);
-   const isValidImage = input.data.valid;
+
 
    const handleImageURLSubmission = useCallback(() => {
-      const isValidURL = verifyURL(input.value);
-
       dispatch({
          type: "updateState",
          value: {
@@ -32,12 +29,13 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
                ...input,
                error: isValidURL ? null : "Invalid image URL",
                data: {
+                  ...input.data,
                   valid: isValidURL
                }
             }
          }
       });
-   }, [dispatch, input]);
+   }, [dispatch, input, isValidURL]);
 
    const handleDefaultImageSelection = useCallback((source: string) => {
       // All default images are valid images
@@ -50,6 +48,7 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
                value: source,
                error: null,
                data: {
+                  ...input.data,
                   valid: true
                }
             }
@@ -65,10 +64,13 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
 
    return (
       <div className = "flex flex-col">
-         <div className = "flex justify-start items-center text-left gap-4 mt-2 mb-4 text-md">
+         <div className = "flex justify-start items-center text-left gap-4 mt-2 mb-4 text-sm">
             <Button
                icon = {faCameraRetro}
-               onClick = {() => setIsDefaultImage(true)}
+               onClick = {(event: React.MouseEvent) => {
+                  event.stopPropagation();
+                  setIsDefaultImage(true);
+               }}
                className = {clsx("transition duration-300 ease-in-out", {
                   "scale-105 border-b-4 border-b-primary rounded-none": isDefaultImage
                })}>
@@ -76,7 +78,10 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
             </Button>
             <Button
                icon = {faGlobe}
-               onClick = {() => setIsDefaultImage(false)}
+               onClick = {(event: React.MouseEvent) => {
+                  event.stopPropagation();
+                  setIsDefaultImage(false);
+               }}
                className = {clsx("transition duration-300 ease-in-out", {
                   "scale-105  border-b-4 border-b-primary rounded-none": !(isDefaultImage)
                })}>
@@ -114,7 +119,10 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
                                  className = {clsx("object-cover object-center shadow-inner rounded-xl cursor-pointer", {
                                     "border-[4px] border-primary shadow-2xl scale-[1.05] transition duration-300 ease-in-out": input.value === source
                                  })}
-                                 onClick = {() => handleDefaultImageSelection(source)}
+                                 onClick = {(event: React.MouseEvent) => {
+                                    event.stopPropagation();
+                                    handleDefaultImageSelection(source);
+                                 }}
                               />
                            </div>
 
@@ -132,7 +140,7 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
                   className = "relative w-full h-full mx-auto"
                >
                   {
-                     isValidImage && (
+                     isValidResource && isValidURL && (
                         <div className = "flex justify-center items-center my-6">
                            <div className = "relative w-[12rem] h-[12rem]">
                               <Image
@@ -151,6 +159,7 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
                                              ...input,
                                              error: "Failed to fetch your desired image resource. Please ensure the link is valid.",
                                              data: {
+                                                ...input.data,
                                                 valid: false
                                              }
                                           }
@@ -177,7 +186,8 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
                                  value: event.target.value,
                                  error: null,
                                  data: {
-                                    valid: false
+                                    ...input.data,
+                                    valid: undefined
                                  }
                               }
                            }
@@ -186,8 +196,11 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
                   />
                   <Button
                      type = "button"
-                     onClick = {() => handleImageURLSubmission()}
-                     className = "w-full bg-primary text-white mt-2 font-semibold border-gray-200 border-[1.5px] h-[2.5rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500"
+                     onClick = {(event: React.MouseEvent) => {
+                        event.stopPropagation();
+                        handleImageURLSubmission();
+                     }}
+                     className = "w-full bg-primary text-white mt-2 font-semibold  h-[2.4rem] placeholder:text-transparent"
                      icon = {faPaperclip}
                   >
                      Link
@@ -200,8 +213,11 @@ function ImageSelectionForm(props: VitalityInputProps): JSX.Element {
 
 export default function ImageSelection(props: VitalityInputProps): JSX.Element {
    const { input } = props;
-   const isValidImage: boolean = input.data.valid;
-   const selected = input.value !== "";
+   const isValidResource: boolean = input.data.valid !== false;
+   const isValidURL: boolean = useMemo(() => {
+      return verifyURL(input.value);
+   }, [input.value]);
+   const addedImage: boolean = isValidResource && isValidURL;
 
    return (
       <div>
@@ -210,10 +226,10 @@ export default function ImageSelection(props: VitalityInputProps): JSX.Element {
                <div>
                   <Button
                      className = {clsx("w-full text-black font-semibold border-[1.5px] px-4 py-2 h-[2.4rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500", {
-                        "border-[1.5px] border-red-500": !(isValidImage) && selected
+                        "border-[1.5px] border-red-500": !(isValidResource)
                      })}>
-                     <FontAwesomeIcon icon = {selected ? faPenToSquare : faPaperclip} />
-                     {selected ? "Edit Image" : "Add Image"}
+                     <FontAwesomeIcon icon = {addedImage ? faPenToSquare : faPaperclip} />
+                     {addedImage ? "Edit Image" : "Add Image"}
                   </Button>
                   {input.error !== null &&
                      <div className = "flex justify-center align-center text-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
@@ -223,7 +239,11 @@ export default function ImageSelection(props: VitalityInputProps): JSX.Element {
                </div>
             }
             className = "max-w-[90%] sm:max-w-xl max-h-[90%] mt-12">
-            <ImageSelectionForm {...props} />
+            <ImageSelectionForm
+               {...props}
+               isValidResource = {isValidResource}
+               isValidURL = {isValidURL}
+            />
          </Modal>
       </div>
    );

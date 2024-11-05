@@ -11,8 +11,8 @@ interface CardProps {
 
 function Card(props: CardProps): JSX.Element {
    return (
-      <div className = "flex justify-center w-[21rem] h-[26rem] max-w-[90%] text-center rounded-2xl border border-gray-200 bg-white shadow-md">
-         <div className = "flex flex-col text-center justify-center items-center gap-8 px-8 text-black">
+      <div className = "flex justify-center w-[20rem] h-[25rem] max-w-[90%] text-center rounded-2xl border border-gray-200 bg-white shadow-md">
+         <div className = "w-full mx-auto flex flex-col text-center justify-center items-center gap-8 px-6 text-black">
             <div>
                <FontAwesomeIcon
                   icon = {props.icon}
@@ -34,7 +34,7 @@ export default function Highlights(): JSX.Element {
             title = "Optimized Fitness Tracking"
             description = "We've developed a cutting-edge fitness tracker that empowers users to effortlessly monitor their progress, set goals, and achieve optimal fitness levels"
          />
-         <div className = "w-full mx-auto flex flex-row flex-wrap justify-center align-center gap-16">
+         <div className = "relative w-full mx-auto flex flex-row flex-wrap justify-center align-center gap-8">
             <Card
                icon = {faPaintbrush}
                title = "Modern Design"

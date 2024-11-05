@@ -1,20 +1,16 @@
 "use client";
-import WorkoutFiltering from "@/components/home/workouts/filter";
-import WorkoutForm from "@/components/home/workouts/form";
-import WorkoutTable from "@/components/home/workouts/table";
-import WorkoutCards from "@/components/home/workouts/cards";
+import Filter from "@/components/home/workouts/filter";
+import View from "@/components/home/workouts/view";
+import Form from "@/components/home/workouts/form";
 import Button from "@/components/global/button";
 import Pagination from "@/components/home/workouts/pagination";
-import clsx from "clsx";
 import { AuthenticationContext } from "@/app/layout";
 import { fetchWorkouts, Workout } from "@/lib/workouts/workouts";
 import { fetchWorkoutTags } from "@/lib/workouts/tags";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { searchForTitle } from "@/lib/workouts/shared";
-import { faPhotoFilm, faPlus, faTable } from "@fortawesome/free-solid-svg-icons";
-import Loading from "@/components/global/loading";
-import Heading from "@/components/global/heading";
+import { faPersonRunning } from "@fortawesome/free-solid-svg-icons";
 
 const workouts: VitalityState = {
    // Global filtering inputs
@@ -95,17 +91,12 @@ const workouts: VitalityState = {
 export default function Page(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const [globalState, globalDispatch] = useReducer(formReducer, workouts);
-   const [view, setView] = useState<"table" | "cards">(() => {
-      return localStorage.getItem("view") === "table" ? "table" : "cards";
-   });
+   const [view, setView] = useState<"table" | "cards" | "">("");
 
    // Convert search string to lower case for case-insensitive comparison
    const search: string = useMemo(() => {
       return globalState.search.value.trim().toLowerCase();
    }, [globalState.search]);
-
-   // Check if user workouts have been fetched from the backend
-   const fetched: boolean = globalState.workouts.data.fetched;
 
    // Filtered based on selected tags or date intervals
    const filtered: Workout[] = globalState.workouts.data.filtered;
@@ -177,78 +168,30 @@ export default function Page(): JSX.Element {
 
    useEffect(() => {
       if (!(globalState.workouts.data.fetched)) {
+         setView(window.localStorage.getItem("view") === "table" ? "table" : "cards");
          fetchWorkoutsData();
       }
-
-      localStorage.setItem("view", view);
    }, [fetchWorkoutsData, globalState.workouts.data.fetched, globalState.tags, globalState.workouts, view]);
 
    return (
-      <main className = "relative w-full lg:w-11/12 mx-auto my-8 flex flex-col justify-start items-center text-center overscroll-y-none">
-         <div className = "relative">
-            <Heading
-               title = "Workouts"
-               description = "Ready to crush your goals? Create a new workout and let&apos;s make today count!"
-            />
-            <WorkoutFiltering
+      <main className = "relative w-full lg:w-11/12  mx-auto mt-8 flex flex-col justify-start items-center text-center overscroll-y-none">
+         <Filter
+            globalState = {globalState}
+            globalDispatch = {globalDispatch} />
+         <View
+            view = {view}
+            setView = {setView}
+            workouts = {workoutsSection}
+            globalState = {globalState}
+            globalDispatch = {globalDispatch} />
+         <div className = "flex justify-center w-full mx-auto my-4">
+            <Form
                globalState = {globalState}
                globalDispatch = {globalDispatch} />
-         </div>
-         <div className = "flex justify-start items-center text-left gap-4 text-md">
-            <Button
-               icon = {faTable}
-               onClick = {() => setView("table")}
-               className = {clsx("transition duration-300 ease-in-out", {
-                  "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
-               })}>
-               Table
-            </Button>
-            <Button
-               icon = {faPhotoFilm}
-               onClick = {() => setView("cards")}
-               className = {clsx("transition duration-300 ease-in-out", {
-                  "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
-               })}>
-               Cards
-            </Button>
-         </div>
-         <div
-            id = "workoutsView"
-            className = "w-10/12 min-h-max flex-grow flex flex-col justify-center items-center">
-            {
-               workoutsSection.length === 0 ? (
-                  <div className = "w-full h-full mx-auto text-center flex justify-center items-start py-12">
-                     {
-                        fetched ? (
-                           <h1 className = "font-bold text-xl">No available workouts</h1>
-                        ) : (
-                           <Loading />
-                        )}
-                  </div>
-               ) : (
-                  view === "table" ? (
-                     <WorkoutTable
-                        workouts = {workoutsSection}
-                        globalState = {globalState}
-                        globalDispatch = {globalDispatch} />
-                  ) : (
-                     <WorkoutCards
-                        workouts = {workoutsSection}
-                        globalState = {globalState}
-                        globalDispatch = {globalDispatch} />
-                  )
-               )
-            }
-         </div>
-         <div className = "flex justify-center w-full mx-auto my-2">
-            <WorkoutForm
-               globalState = {globalState}
-               globalDispatch = {globalDispatch}
-            />
             <Button
                type = "button"
-               className = "bg-primary text-white w-[10rem] h-[2.6rem] p-4"
-               icon = {faPlus}
+               className = "bg-primary text-white w-[10rem] h-[2.6rem] px-4 py-6"
+               icon = {faPersonRunning}
                onClick = {() => {
                   globalDispatch({
                      type: "updateState",
@@ -277,15 +220,10 @@ export default function Page(): JSX.Element {
                New Workout
             </Button>
          </div>
-         {
-            results.length > 0 && (
-               <Pagination
-                  workouts = {results}
-                  globalState = {globalState}
-                  globalDispatch = {globalDispatch} />
-            )
-         }
-
+         <Pagination
+            workouts = {results}
+            globalState = {globalState}
+            globalDispatch = {globalDispatch} />
       </main >
    );
 }

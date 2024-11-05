@@ -7,12 +7,14 @@ import { Modal } from "@/components/global/modal";
 import { TagSelection } from "@/components/home/workouts/tag-selection";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { formReducer, handleResponse, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
-import { addWorkout, updateWorkout, Workout } from "@/lib/workouts/workouts";
+import { addWorkout, removeWorkouts, updateWorkout, Workout } from "@/lib/workouts/workouts";
 import { Tag } from "@/lib/workouts/tags";
 import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faTrash, faTrashCan, faSignature, faCalendar, faBook, faLink, faArrowRotateBack, faSquareCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { filterWorkout } from "@/components/home/workouts/filter";
+import Conformation from "@/components/global/confirmation";
+import { verifyURL } from "@/lib/workouts/shared";
 
 const form: VitalityState = {
    // Basic inputs not covered by other global components
@@ -36,11 +38,10 @@ const form: VitalityState = {
       error: null,
       data: {
          handlesChanges: true,
-         valid: false
+         valid: undefined
       }
    }
 };
-
 
 function updateWorkouts(currentWorkouts: Workout[], returnedWorkout: Workout, method: "add" | "update" | "delete"): Workout[] {
    let newWorkouts: Workout[] = [];
@@ -73,7 +74,7 @@ function updateFilteredWorkouts(globalState: VitalityState, currentFiltered: Wor
 };
 
 
-export default function WorkoutForm(props: VitalityProps): JSX.Element {
+export default function Form(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
@@ -87,9 +88,6 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
 
    // Empty ID implies new workout
    const isNewWorkout: boolean = workout.id?.trim().length === 0;
-
-   // Modal relating to workout deletion confirmation message
-   const deleteModalRef = useRef<{ open: () => void, close: () => void }>(null);
 
    // Workout modal container
    const formModalRef = useRef<{ open: () => void, close: () => void }>(null);
@@ -115,12 +113,13 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
       };
 
       // Request to either add or update the workout instance
-      const response: VitalityResponse<Workout> = isNewWorkout
+      const response: VitalityResponse<Workout | number> = isNewWorkout
          ? await addWorkout(payload)
-         : await updateWorkout(payload);
+         : method === "update" ? await updateWorkout(payload) : await removeWorkouts([payload]);
+
 
       const successMethod = () => {
-         const returnedWorkout: Workout = response.body.data;
+         const returnedWorkout: Workout | null = method === "delete" ? payload : response.body.data as Workout;
 
          // Fetch cached selected filtered tags
          const selectedTags: Set<string> = new Set(
@@ -152,14 +151,13 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
          // Close the form modal on deletion
          if (method === "delete") {
             formModalRef.current?.close();
-         }
 
-         // Display update notification to the user
-         updateNotification({
-            status: response.status,
-            message: response.body.message,
-            timer: 1250
-         });
+            updateNotification({
+               status: "Success",
+               message: "Deleted workout",
+               timer: 1000
+            });
+         }
       };
 
       handleResponse(localDispatch, response, successMethod, updateNotification);
@@ -203,7 +201,8 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                value: workout.image,
                error: null,
                data: {
-                  valid: true,
+                  handlesChanges: true,
+                  valid: verifyURL(workout.image) ? true : workout.image !== "" ? false : undefined,
                   error: false
                }
             },
@@ -247,7 +246,6 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
          formModalRef.current?.open();
       }
    }, [displayWorkoutForm, displayModal, handleInitializeWorkoutState]);
-
 
    return (
       <Modal
@@ -297,7 +295,7 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                <FontAwesomeIcon
                   icon = {faArrowRotateLeft}
                   onClick = {handleReset}
-                  className = "absolute top-[-25px] right-[15px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                  className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
                <Input
                   id = "title"
@@ -306,6 +304,7 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                   icon = {faSignature}
                   input = {localState.title}
                   dispatch = {localDispatch}
+                  onSubmit = {() => handleUpdateWorkout("update")}
                   autoFocus
                   required />
                <Input
@@ -315,15 +314,9 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                   icon = {faCalendar}
                   input = {localState.date}
                   dispatch = {localDispatch}
+                  onSubmit = {() => handleUpdateWorkout("update")}
                   required />
                <TagSelection {...props} />
-               <TextArea
-                  id = "description"
-                  type = "text"
-                  label = "Description"
-                  icon = {faBook}
-                  input = {localState.description}
-                  dispatch = {localDispatch} />
                <ImageSelection
                   id = "image"
                   type = "text"
@@ -331,55 +324,14 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                   icon = {faLink}
                   input = {localState.image}
                   dispatch = {localDispatch} />
-               {
-                  !(isNewWorkout) && (
-                     <Modal
-                        className = "max-w-xl"
-                        ref = {deleteModalRef}
-                        display = {
-                           <Button
-                              type = "button"
-                              className = "w-full bg-red-500 text-white h-[2.4rem]"
-                              icon = {faTrash}
-                           >
-                              Delete
-                           </Button>
-                        }
-                     >
-                        <div className = "flex flex-col justify-between items-center gap-4 p-2">
-                           <FontAwesomeIcon
-                              icon = {faTrashCan}
-                              className = "text-red-500 text-3xl" />
-                           <p className = "font-bold">
-                              Delete this workout?
-                           </p>
-                           <div className = "flex flex-row flex-wrap justify-center items-center gap-2">
-                              <Button
-                                 type = "button"
-                                 icon = {faArrowRotateBack}
-                                 className = "w-[10rem] bg-gray-100 text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 hover:scale-105 transition duration-300 ease-in-out"
-                                 onClick = {() => {
-                                    // Close the modal for deletion confirmation
-                                    if (deleteModalRef.current) {
-                                       deleteModalRef.current.close();
-                                    }
-                                 }}
-                              >
-                                 No, cancel
-                              </Button>
-                              <Button
-                                 type = "button"
-                                 icon = {faSquareCheck}
-                                 className = "w-[10rem] bg-red-500 text-white px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-red-300 focus:ring-red-300 hover:scale-105 transition duration-300 ease-in-out"
-                                 onClick = {async() => handleUpdateWorkout("delete")}
-                              >
-                                 Yes, I&apos;m sure
-                              </Button>
-                           </div>
-                        </div>
-                     </Modal>
-                  )
-               }
+               <TextArea
+                  id = "description"
+                  type = "text"
+                  label = "Description"
+                  icon = {faBook}
+                  input = {localState.description}
+                  onSubmit = {() => handleUpdateWorkout("update")}
+                  dispatch = {localDispatch} />
                <Button
                   type = "button"
                   className = "bg-primary text-white h-[2.4rem]"
@@ -390,6 +342,14 @@ export default function WorkoutForm(props: VitalityProps): JSX.Element {
                      isNewWorkout ? "Create" : "Update"
                   }
                </Button>
+               {
+                  !(isNewWorkout) && (
+                     <Conformation
+                        message = "Delete this workout?"
+                        onConformation = {() => handleUpdateWorkout("delete")}
+                     />
+                  )
+               }
                {
                   !(isNewWorkout) && (
                      <Exercises
