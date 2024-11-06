@@ -2,7 +2,6 @@
 import Filter from "@/components/home/workouts/filter";
 import View from "@/components/home/workouts/view";
 import Form from "@/components/home/workouts/form";
-import Button from "@/components/global/button";
 import Pagination from "@/components/home/workouts/pagination";
 import { AuthenticationContext } from "@/app/layout";
 import { fetchWorkouts, Workout } from "@/lib/workouts/workouts";
@@ -10,7 +9,6 @@ import { fetchWorkoutTags } from "@/lib/workouts/tags";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { searchForTitle } from "@/lib/workouts/shared";
-import { faPersonRunning } from "@fortawesome/free-solid-svg-icons";
 
 const workouts: VitalityState = {
    // Global filtering inputs
@@ -82,7 +80,13 @@ const workouts: VitalityState = {
       value: 10,
       error: null,
       data: {
-         page: 0,
+         handlesChanges: true
+      }
+   },
+   page: {
+      value: 0,
+      error: null,
+      data: {
          handlesChanges: true
       }
    }
@@ -107,7 +111,7 @@ export default function Page(): JSX.Element {
    }, [filtered, search]);
 
    const pages: number = globalState.paging.value;
-   const page: number = globalState.paging.data.page;
+   const page: number = globalState.page.value;
 
    const low: number = page * pages;
    const high = low + pages - 1;
@@ -184,42 +188,9 @@ export default function Page(): JSX.Element {
             workouts = {workoutsSection}
             globalState = {globalState}
             globalDispatch = {globalDispatch} />
-         <div className = "flex justify-center w-full mx-auto my-4">
-            <Form
-               globalState = {globalState}
-               globalDispatch = {globalDispatch} />
-            <Button
-               type = "button"
-               className = "bg-primary text-white w-[10rem] h-[2.6rem] px-4 py-6"
-               icon = {faPersonRunning}
-               onClick = {() => {
-                  globalDispatch({
-                     type: "updateState",
-                     value: {
-                        id: "workout",
-                        input: {
-                           ...globalState.workout,
-                           value: {
-                              id: "",
-                              user_id: user?.id ?? "",
-                              title: "",
-                              date: new Date(),
-                              image: "",
-                              description: "",
-                              tagIds: [],
-                              exercises: []
-                           },
-                           data: {
-                              display: true
-                           }
-                        }
-                     }
-                  });
-               }}
-            >
-               New Workout
-            </Button>
-         </div>
+         <Form
+            globalState = {globalState}
+            globalDispatch = {globalDispatch} />
          <Pagination
             workouts = {results}
             globalState = {globalState}

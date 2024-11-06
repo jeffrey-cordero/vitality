@@ -221,18 +221,14 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                value: ""
             },
             // Reset to first page view
-            paging: {
-               data: {
-                  ...globalState.paging.data,
-                  page: 0
-               },
-               value: globalState.paging.value
+            page: {
+               ...globalState.page,
+               value: 0
             }
          }
       });
    }, [globalDispatch, globalState.max, globalState.min, globalState.type, globalState.workouts.data,
-      globalState.workouts.value, globalState.paging.data, globalState.paging.value,
-      globalState.tags.data.filteredSelected]);
+      globalState.workouts.value, globalState.page, globalState.tags.data.filteredSelected]);
 
    return (
       <Modal

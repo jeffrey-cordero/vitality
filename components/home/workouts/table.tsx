@@ -2,7 +2,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import Button from "@/components/global/button";
 import { VitalityProps, VitalityResponse } from "@/lib/global/state";
-import { faArrowRotateBack, faImage, faPencil, faSquareCheck, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faImage, faPencil } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { removeWorkouts, Workout } from "@/lib/workouts/workouts";
 import { getWorkoutDate } from "@/lib/workouts/shared";
@@ -226,6 +226,10 @@ export default function Table(props: TableProps): JSX.Element {
          const newSelected = new Set(selected);
          visibleSelectedWorkouts.forEach(workout => newSelected.delete(workout));
 
+         // Account for a page in workouts view being removed
+         const pages: number = Math.ceil(newWorkouts.length / globalState.paging.value);
+         const page: number = globalState.page.value;
+
          globalDispatch({
             type: "updateStates",
             value: {
@@ -238,6 +242,10 @@ export default function Table(props: TableProps): JSX.Element {
                      // Clear selected workouts
                      selected: newSelected
                   }
+               },
+               page: {
+                  ...globalState.page,
+                  value: page >= pages ? Math.max(0, page - 1) : page
                }
             }
          });

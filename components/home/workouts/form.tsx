@@ -129,6 +129,10 @@ export default function Form(props: VitalityProps): JSX.Element {
          const newWorkouts: Workout[] = updateWorkouts(globalState.workouts.value, returnedWorkout, method);
          const newFiltered: Workout[] = updateFilteredWorkouts(globalState, globalState.workouts.data.filtered, returnedWorkout, method, selectedTags);
 
+         // Account for a page in workouts view being removed
+         const pages: number = Math.ceil(newWorkouts.length / globalState.paging.value);
+         const page: number = globalState.page.value;
+
          // Update editing workout and overall workouts global state
          globalDispatch({
             type: "updateStates",
@@ -144,6 +148,10 @@ export default function Form(props: VitalityProps): JSX.Element {
                      ...globalState.workouts.data,
                      filtered: newFiltered
                   }
+               },
+               page: {
+                  ...globalState.page,
+                  value: page >= pages ? Math.max(0, page - 1) : page
                }
             }
          });
@@ -248,118 +256,151 @@ export default function Form(props: VitalityProps): JSX.Element {
    }, [displayWorkoutForm, displayModal, handleInitializeWorkoutState]);
 
    return (
-      <Modal
-         display = {null}
-         className = "max-w-3xl"
-         ref = {formModalRef}
-         onClose = {() => {
-            // Cleanup workout form component for future usage
-            globalDispatch({
-               type: "updateState",
-               value: {
-                  id: "workout",
-                  input: {
-                     ...globalState.workout,
-                     value: {
-                        id: "",
-                        user_id: user.id,
-                        title: "",
-                        date: "",
-                        image: "",
-                        description: "",
-                        tagIds: [],
-                        exercises: []
-                     },
-                     data: {
-                        display: false
+      <div className = "flex justify-center w-full mx-auto my-4">
+         <Modal
+            display = {null}
+            className = "max-w-3xl"
+            ref = {formModalRef}
+            onClose = {() => {
+               // Cleanup workout form component for future usage
+               globalDispatch({
+                  type: "updateState",
+                  value: {
+                     id: "workout",
+                     input: {
+                        ...globalState.workout,
+                        value: {
+                           id: "",
+                           user_id: user.id,
+                           title: "",
+                           date: "",
+                           image: "",
+                           description: "",
+                           tagIds: [],
+                           exercises: []
+                        },
+                        data: {
+                           display: false
+                        }
                      }
                   }
-               }
-            });
+               });
 
-            setDisplayModal(false);
-         }}
-         onClick = {handleInitializeWorkoutState}
-      >
-         <div className = "relative">
-            <div className = "flex flex-col justify-center align-center text-center gap-2">
-               <FontAwesomeIcon
-                  icon = {faPersonRunning}
-                  className = "text-6xl text-primary mt-6"
-               />
-               <h1 className = "text-3xl font-bold text-black mb-2">
-                  {isNewWorkout ? "New" : "Edit"} Workout
-               </h1>
-            </div>
-            <div className = "relative mt-8 w-full flex flex-col justify-center align-center text-left gap-2">
-               <FontAwesomeIcon
-                  icon = {faArrowRotateLeft}
-                  onClick = {handleReset}
-                  className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
-               />
-               <Input
-                  id = "title"
-                  type = "text"
-                  label = "Title"
-                  icon = {faSignature}
-                  input = {localState.title}
-                  dispatch = {localDispatch}
-                  onSubmit = {() => handleUpdateWorkout("update")}
-                  autoFocus
-                  required />
-               <Input
-                  id = "date"
-                  type = "date"
-                  label = "Title"
-                  icon = {faCalendar}
-                  input = {localState.date}
-                  dispatch = {localDispatch}
-                  onSubmit = {() => handleUpdateWorkout("update")}
-                  required />
-               <TagSelection {...props} />
-               <ImageSelection
-                  id = "image"
-                  type = "text"
-                  label = "URL"
-                  icon = {faLink}
-                  input = {localState.image}
-                  dispatch = {localDispatch} />
-               <TextArea
-                  id = "description"
-                  type = "text"
-                  label = "Description"
-                  icon = {faBook}
-                  input = {localState.description}
-                  onSubmit = {() => handleUpdateWorkout("update")}
-                  dispatch = {localDispatch} />
-               <Button
-                  type = "button"
-                  className = "bg-primary text-white h-[2.4rem]"
-                  icon = {props !== undefined ? faCloudArrowUp : faSquarePlus}
-                  onClick = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
-               >
+               setDisplayModal(false);
+            }}
+            onClick = {handleInitializeWorkoutState}
+         >
+            <div className = "relative">
+               <div className = "flex flex-col justify-center align-center text-center gap-2">
+                  <FontAwesomeIcon
+                     icon = {faPersonRunning}
+                     className = "text-6xl text-primary mt-6"
+                  />
+                  <h1 className = "text-3xl font-bold text-black mb-2">
+                     {isNewWorkout ? "New" : "Edit"} Workout
+                  </h1>
+               </div>
+               <div className = "relative mt-8 w-full flex flex-col justify-center align-center text-left gap-2">
+                  <FontAwesomeIcon
+                     icon = {faArrowRotateLeft}
+                     onClick = {handleReset}
+                     className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                  />
+                  <Input
+                     id = "title"
+                     type = "text"
+                     label = "Title"
+                     icon = {faSignature}
+                     input = {localState.title}
+                     dispatch = {localDispatch}
+                     onSubmit = {() => handleUpdateWorkout("update")}
+                     autoFocus
+                     required />
+                  <Input
+                     id = "date"
+                     type = "date"
+                     label = "Title"
+                     icon = {faCalendar}
+                     input = {localState.date}
+                     dispatch = {localDispatch}
+                     onSubmit = {() => handleUpdateWorkout("update")}
+                     required />
+                  <TagSelection {...props} />
+                  <ImageSelection
+                     id = "image"
+                     type = "text"
+                     label = "URL"
+                     icon = {faLink}
+                     input = {localState.image}
+                     dispatch = {localDispatch} />
+                  <TextArea
+                     id = "description"
+                     type = "text"
+                     label = "Description"
+                     icon = {faBook}
+                     input = {localState.description}
+                     onSubmit = {() => handleUpdateWorkout("update")}
+                     dispatch = {localDispatch} />
+                  <Button
+                     type = "button"
+                     className = "bg-primary text-white h-[2.4rem]"
+                     icon = {props !== undefined ? faCloudArrowUp : faSquarePlus}
+                     onClick = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
+                  >
+                     {
+                        isNewWorkout ? "Create" : "Update"
+                     }
+                  </Button>
                   {
-                     isNewWorkout ? "Create" : "Update"
+                     !(isNewWorkout) && (
+                        <Conformation
+                           message = "Delete this workout?"
+                           onConformation = {() => handleUpdateWorkout("delete")}
+                        />
+                     )
                   }
-               </Button>
-               {
-                  !(isNewWorkout) && (
-                     <Conformation
-                        message = "Delete this workout?"
-                        onConformation = {() => handleUpdateWorkout("delete")}
-                     />
-                  )
-               }
-               {
-                  !(isNewWorkout) && (
-                     <Exercises
-                        workout = {workout}
-                        globalState = {globalState}
-                        globalDispatch = {globalDispatch} />
-                  )
-               }
+                  {
+                     !(isNewWorkout) && (
+                        <Exercises
+                           workout = {workout}
+                           globalState = {globalState}
+                           globalDispatch = {globalDispatch} />
+                     )
+                  }
+               </div>
             </div>
-         </div>
-      </Modal>
+         </Modal>
+         <Button
+            type = "button"
+            className = "bg-primary text-white w-[10rem] h-[2.6rem] px-4 py-6"
+            icon = {faPersonRunning}
+            onClick = {() => {
+               globalDispatch({
+                  type: "updateState",
+                  value: {
+                     id: "workout",
+                     input: {
+                        ...globalState.workout,
+                        value: {
+                           id: "",
+                           user_id: user?.id ?? "",
+                           title: "",
+                           date: new Date(),
+                           image: "",
+                           description: "",
+                           tagIds: [],
+                           exercises: []
+                        },
+                        data: {
+                           display: true
+                        }
+                     }
+                  }
+               });
+            }}
+         >
+            New Workout
+         </Button>
+      </div>
    );
 };

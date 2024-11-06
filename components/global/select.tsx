@@ -9,7 +9,7 @@ export interface SelectProps extends VitalityInputProps {
 }
 
 export default function Select(props: SelectProps): JSX.Element {
-   const { id, label, values, icon, placeholder, className, onChange, input, dispatch } = props;
+   const { id, label, value, values, icon, placeholder, className, onChange, input, dispatch } = props;
 
    const handleSelectChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
       if (input.data.handlesChanges !== undefined) {
@@ -36,7 +36,7 @@ export default function Select(props: SelectProps): JSX.Element {
          <select
             id = {id}
             placeholder = {placeholder ?? ""}
-            value = {input.value}
+            value = {value ?? input.value}
             className = {clsx("peer p-4 block w-full rounded-lg text-sm font-semibold border-1 placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2 border-gray-200", className)}
             onChange = {handleSelectChange}
          >
