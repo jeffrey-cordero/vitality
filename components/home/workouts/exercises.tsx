@@ -4,8 +4,7 @@ import Button from "@/components/global/button";
 import TextArea from "@/components/global/textarea";
 import { formReducer, handleResponse, VitalityChildProps, VitalityProps, VitalityResponse, VitalityState } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
-import { Modal } from "@/components/global/modal";
-import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCloudArrowUp, faDumbbell, faPenRuler, faPlus, faRotateLeft, faStopwatch, faTrash, faCaretRight, faCaretDown, faCircleNotch, faPersonRunning, faTrashCan, faArrowRotateBack, faSquareCheck } from "@fortawesome/free-solid-svg-icons";
+import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCloudArrowUp, faDumbbell, faPenRuler, faPlus, faRotateLeft, faStopwatch, faCaretRight, faCaretDown, faCircleNotch, faPersonRunning } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
 import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises } from "@/lib/workouts/exercises";
 import { NotificationContext } from "@/app/layout";
@@ -442,7 +441,7 @@ function SetContainer(props: SetProps): JSX.Element {
                                  <FontAwesomeIcon
                                     className = "self-start pt-1 text-primary"
                                     icon = {faAlignJustify} />
-                                 <p>{set.text}</p>
+                                 <p>{set.text.trim()}</p>
                               </div>
                            )}
                         </div>
@@ -717,7 +716,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      />
                   </span>
                   <span
-                     className = "cursor-pointer pl-6"
+                     className = "cursor-pointer pl-4"
                      {...doubleTap}
                   >
                      {exercise.name}
@@ -762,7 +761,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   </DndContext>
                   {
                      (
-                        <div className = "w-full mx-auto mt-4 px-4 sm:px-8">
+                        <div className = "w-full mx-auto mt-2 px-4 sm:px-8">
                            <Button
                               type = "button"
                               className = "w-full bg-white text-black text-md px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500"
@@ -772,7 +771,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                                  setAddSet(true);
                               }}
                            >
-                              New Set
+                              New Entry
                            </Button>
                         </div>
                      )
@@ -946,10 +945,10 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                      }}
                   />
                ) : (
-                  <div className = "w-full px-2 sm:px-8 mx-auto">
+                  <div className = "w-full mx-auto">
                      <Button
                         type = "button"
-                        className = "w-full bg-white text-black px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500"
+                        className = "w-full bg-white text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500"
                         icon = {faPlus}
                         onClick = {handleInitializeNewExerciseInput}
                      >

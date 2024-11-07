@@ -110,14 +110,14 @@ export default function Page(): JSX.Element {
       return searchForTitle(filtered, search);
    }, [filtered, search]);
 
-   const pages: number = globalState.paging.value;
+   const paging: number = globalState.paging.value;
    const page: number = globalState.page.value;
 
-   const low: number = page * pages;
-   const high = low + pages - 1;
+   const low: number = page * paging;
+   const high = low + paging;
 
    const workoutsSection: Workout[] = useMemo(() => {
-      return results.slice(low, high + 1);
+      return results.slice(low, high);
    }, [results, low, high]);
 
    const fetchWorkoutsData = useCallback(async() => {
@@ -178,7 +178,7 @@ export default function Page(): JSX.Element {
    }, [fetchWorkoutsData, globalState.workouts.data.fetched, globalState.tags, globalState.workouts, view]);
 
    return (
-      <main className = "relative w-full lg:w-11/12  mx-auto mt-8 flex flex-col justify-start items-center text-center overscroll-y-none">
+      <main className = "relative w-full lg:w-11/12 mx-auto mt-8 flex flex-col justify-start items-center text-center overscroll-y-none">
          <Filter
             globalState = {globalState}
             globalDispatch = {globalDispatch} />
@@ -195,6 +195,6 @@ export default function Page(): JSX.Element {
             workouts = {results}
             globalState = {globalState}
             globalDispatch = {globalDispatch} />
-      </main >
+      </main>
    );
 }
