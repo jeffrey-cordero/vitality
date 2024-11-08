@@ -57,7 +57,7 @@ const registrationSchema = z.object({
 });
 
 export async function signup(
-   registration: Registration
+   registration: Registration,
 ): Promise<VitalityResponse<null>> {
    if (registration?.phone?.trim().length === 0) {
       delete registration.phone;
@@ -70,7 +70,7 @@ export async function signup(
          "Error",
          "Invalid user registration fields",
          null,
-         fields.error.flatten().fieldErrors
+         fields.error.flatten().fieldErrors,
       );
    } else if (!(registration.password === registration.confirmPassword)) {
       return sendErrorMessage("Error", "Invalid user registration fields", null, {
@@ -123,12 +123,9 @@ export async function signup(
             phone: ["Phone number already taken"]
          });
       } else {
-         return sendErrorMessage(
-            "Failure",
-            error.meta?.message,
-            null,
-            { system: error.meta?.message }
-         );
+         return sendErrorMessage("Failure", error.meta?.message, null, {
+            system: error.meta?.message
+         });
       }
    }
 }

@@ -3,7 +3,10 @@ import prisma from "@/lib/database/client";
 import { users as User } from "@prisma/client";
 import { auth } from "@/auth";
 
-export async function getUserByUsername(username: string, authentication: boolean): Promise<User | null> {
+export async function getUserByUsername(
+   username: string,
+   authentication: boolean,
+): Promise<User | null> {
    try {
       const user = await prisma.users.findFirst({
          where: {
@@ -11,8 +14,8 @@ export async function getUserByUsername(username: string, authentication: boolea
          }
       });
 
-      if (user !== null && !(authentication)) {
-         // Remove password from the user object outside of authentication purposes
+      if (user !== null && !authentication) {
+      // Remove password from the user object outside of authentication purposes
          user.password = "";
       }
 
@@ -32,7 +35,7 @@ export async function getUserByEmail(email: string): Promise<User | undefined> {
       });
 
       if (user !== null) {
-         // Remove password from the user object
+      // Remove password from the user object
          user.password = "";
       }
 

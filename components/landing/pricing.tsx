@@ -4,11 +4,11 @@ import Link from "next/link";
 import { faUsersViewfinder } from "@fortawesome/free-solid-svg-icons";
 
 interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
-   children: React.ReactNode;
-   price: string;
-   type: string;
-   subscription: string;
-   text: string;
+  children: React.ReactNode;
+  price: string;
+  type: string;
+  subscription: string;
+  text: string;
 }
 
 function PricingCard(props: PricingCardProps): JSX.Element {
@@ -21,29 +21,27 @@ function PricingCard(props: PricingCardProps): JSX.Element {
             <h2 className = "w-11/12 mx-auto text-4xl font-bold text-dark pb-6 border-b-[2px] border-b-slate-400">
                {props.price}
                <span className = "text-base font-medium text-body-color">
-                  / {props.subscription}
+            / {props.subscription}
                </span>
             </h2>
-            <div className = "my-6 flex flex-col justify-center gap-[14px] h-[12.5rem] font-medium">{props.children}</div>
+            <div className = "my-6 flex flex-col justify-center gap-[14px] h-[12.5rem] font-medium">
+               {props.children}
+            </div>
             <Link href = "/signup">
                <Button
                   icon = {faUsersViewfinder}
-                  className = "block w-full rounded-md border border-primary bg-primary p-3 text-center text-white hover:scale-[1.05] transition duration-300 ease-in-out"
-               >
+                  className = "block w-full rounded-md border border-primary bg-primary p-3 text-center text-white hover:scale-[1.05] transition duration-300 ease-in-out">
                   {props.text}
                </Button>
             </Link>
-
          </div>
       </div>
    );
-};
+}
 
 function List({ children }: { children: React.ReactNode }): JSX.Element {
-   return (
-      <p className = "text-base text-body-color">{children}</p>
-   );
-};
+   return <p className = "text-base text-body-color">{children}</p>;
+}
 
 export default function Pricing(): JSX.Element {
    return (
@@ -58,8 +56,7 @@ export default function Pricing(): JSX.Element {
                   type = "Regular"
                   price = "$0"
                   subscription = "year"
-                  text = "Choose Regular"
-               >
+                  text = "Choose Regular">
                   <List>Access to basic features</List>
                   <List>Track your workouts</List>
                   <List>Set fitness goals</List>
@@ -70,8 +67,7 @@ export default function Pricing(): JSX.Element {
                   type = "Member"
                   price = "$99"
                   subscription = "year"
-                  text = "Choose Member"
-               >
+                  text = "Choose Member">
                   <List>All Regular features</List>
                   <List>Advanced workout tracking</List>
                   <List>Customized fitness plans</List>
@@ -82,8 +78,7 @@ export default function Pricing(): JSX.Element {
                   type = "Veteran"
                   price = "$199"
                   subscription = "year"
-                  text = "Choose Veteran"
-               >
+                  text = "Choose Veteran">
                   <List>All Member features</List>
                   <List>Exclusive workouts and challenges</List>
                   <List>Personalized coaching sessions</List>
@@ -94,5 +89,4 @@ export default function Pricing(): JSX.Element {
          </div>
       </div>
    );
-};
-
+}

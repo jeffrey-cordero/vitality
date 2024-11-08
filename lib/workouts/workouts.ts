@@ -90,7 +90,7 @@ export async function fetchWorkouts(userId: string): Promise<Workout[]> {
 }
 
 export async function addWorkout(
-   workout: Workout
+   workout: Workout,
 ): Promise<VitalityResponse<Workout>> {
    try {
       // Validate the feedback form first
@@ -102,7 +102,7 @@ export async function addWorkout(
             "Error",
             "Invalid workout tag fields",
             workout,
-            fields.error.flatten().fieldErrors
+            fields.error.flatten().fieldErrors,
          );
       }
 
@@ -139,10 +139,7 @@ export async function addWorkout(
          }
       });
 
-      return sendSuccessMessage(
-         "Added new workout",
-         formatWorkout(newWorkout)
-      );
+      return sendSuccessMessage("Added new workout", formatWorkout(newWorkout));
    } catch (error) {
       console.error(error);
 
@@ -153,7 +150,7 @@ export async function addWorkout(
 }
 
 export async function updateWorkout(
-   workout: Workout
+   workout: Workout,
 ): Promise<VitalityResponse<Workout>> {
    try {
       const fields = workoutsSchema.safeParse(workout);
@@ -163,7 +160,7 @@ export async function updateWorkout(
             "Error",
             "Invalid workout fields",
             workout,
-            fields.error.flatten().fieldErrors
+            fields.error.flatten().fieldErrors,
          );
       } else {
       // Fetch existing tags first for data integrity
@@ -198,10 +195,10 @@ export async function updateWorkout(
          const newTagIdsSet: Set<string> = new Set(workout.tagIds);
 
          const tagsToRemove: string[] = existingTagIdsArray.filter(
-            (id) => !newTagIdsSet.has(id)
+            (id) => !newTagIdsSet.has(id),
          );
          const tagsToAdd: string[] = newTagIdsArray.filter(
-            (id) => !existingTagIdsSet.has(id)
+            (id) => !existingTagIdsSet.has(id),
          );
 
          // Update the workout with set operation
@@ -246,7 +243,7 @@ export async function updateWorkout(
 
          return sendSuccessMessage(
             "Updated workout",
-            formatWorkout(updatedWorkout)
+            formatWorkout(updatedWorkout),
          );
       }
    } catch (error) {
@@ -260,7 +257,7 @@ export async function updateWorkout(
 
 // Handle removing single or multiple workouts in a given list
 export async function removeWorkouts(
-   workouts: Workout[]
+   workouts: Workout[],
 ): Promise<VitalityResponse<number>> {
    try {
       const ids: string[] = workouts.map((workout: Workout) => workout.id);
@@ -274,10 +271,8 @@ export async function removeWorkouts(
       });
 
       return sendSuccessMessage(
-         `Deleted ${response.count} workout${
-            response.count === 1 ? "" : "s"
-         }`,
-         response.count
+         `Deleted ${response.count} workout${response.count === 1 ? "" : "s"}`,
+         response.count,
       );
    } catch (error) {
       console.error(error);

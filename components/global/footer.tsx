@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGithub, faYoutube, faXTwitter, faMeta } from "@fortawesome/free-brands-svg-icons";
+import {
+   faGithub,
+   faYoutube,
+   faXTwitter,
+   faMeta
+} from "@fortawesome/free-brands-svg-icons";
 
 export default function Footer(): JSX.Element {
    const year = new Date().getFullYear();
@@ -13,22 +18,30 @@ export default function Footer(): JSX.Element {
                      <li>
                         <Link
                            className = "hover:text-slate-500"
-                           href = "http://localhost:3000/#">About</Link>
+                           href = "http://localhost:3000/#">
+                  About
+                        </Link>
                      </li>
                      <li>
                         <Link
                            className = "hover:text-slate-500"
-                           href = "http://localhost:3000/#">Privacy</Link>
+                           href = "http://localhost:3000/#">
+                  Privacy
+                        </Link>
                      </li>
                      <li>
                         <Link
                            className = "hover:text-slate-500"
-                           href = "http://localhost:3000/#">Policy</Link>
+                           href = "http://localhost:3000/#">
+                  Policy
+                        </Link>
                      </li>
                      <li>
                         <Link
                            className = "hover:text-slate-500"
-                           href = "http://localhost:3000/#">Contact</Link>
+                           href = "http://localhost:3000/#">
+                  Contact
+                        </Link>
                      </li>
                   </ul>
                </div>
@@ -41,7 +54,8 @@ export default function Footer(): JSX.Element {
                            className = "text-black hover:text-slate-500">
                            <FontAwesomeIcon
                               icon = {faGithub}
-                              className = "text-2xl" />
+                              className = "text-2xl"
+                           />
                         </Link>
                      </li>
                      <li>
@@ -51,7 +65,8 @@ export default function Footer(): JSX.Element {
                            className = "text-black hover:text-slate-500">
                            <FontAwesomeIcon
                               icon = {faXTwitter}
-                              className = "text-2xl" />
+                              className = "text-2xl"
+                           />
                         </Link>
                      </li>
                      <li>
@@ -61,7 +76,8 @@ export default function Footer(): JSX.Element {
                            className = "text-black hover:text-slate-500">
                            <FontAwesomeIcon
                               icon = {faMeta}
-                              className = "text-2xl" />
+                              className = "text-2xl"
+                           />
                         </Link>
                      </li>
                      <li>
@@ -71,14 +87,17 @@ export default function Footer(): JSX.Element {
                            className = "text-black hover:text-slate-500">
                            <FontAwesomeIcon
                               icon = {faYoutube}
-                              className = "text-2xl" />
+                              className = "text-2xl"
+                           />
                         </Link>
                      </li>
                   </ul>
                </div>
             </div>
             <div className = "text-center m-4">
-               <span className = "text-sm text-black sm:text-center font-bold">© {year} <Link href = "http://localhost:3000">Vitality™</Link>. All Rights Reserved.
+               <span className = "text-sm text-black sm:text-center font-bold">
+            © {year} <Link href = "http://localhost:3000">Vitality™</Link>. All
+            Rights Reserved.
                </span>
             </div>
          </div>

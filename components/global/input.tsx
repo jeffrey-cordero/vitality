@@ -30,7 +30,7 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
    }, [autoFocus, input.error]);
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-      if (input.data.handlesChanges !== undefined) {
+      if (input.handlesOnChange) {
          // Call the user-defined event handler (complex state)
          onChange?.call(null, event);
       } else {
@@ -120,7 +120,8 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
                   icon = {type == "password" ? faEye : faEyeSlash}
                   className = "flex-shrink-0 size-3.5 password-icon"
                   ref = {passwordButton}
-                  onClick = {handlePasswordIconClick} />
+                  onClick = {handlePasswordIconClick}
+               />
             </Button>
          }
          {

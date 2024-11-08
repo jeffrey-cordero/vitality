@@ -4,9 +4,19 @@ import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 import Input from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateLeft, faBook, faEnvelope, faFeather } from "@fortawesome/free-solid-svg-icons";
+import {
+   faArrowRotateLeft,
+   faBook,
+   faEnvelope,
+   faFeather
+} from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { VitalityState, formReducer, VitalityResponse, handleResponse } from "@/lib/global/state";
+import {
+   VitalityState,
+   formReducer,
+   VitalityResponse,
+   handleResponse
+} from "@/lib/global/state";
 import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
 import { NotificationContext } from "@/app/layout";
 
@@ -62,13 +72,15 @@ function Form(): JSX.Element {
       <div className = "w-full mx-auto">
          <form
             className = "relative w-1/2 mx-auto flex flex-col justify-center align-center gap-3"
-            onSubmit = {handleSubmit}
-         >
+            onSubmit = {handleSubmit}>
             <FontAwesomeIcon
                icon = {faArrowRotateLeft}
-               onClick = {() => dispatch({
-                  type: "resetState", value: {}
-               })}
+               onClick = {() =>
+                  dispatch({
+                     type: "resetState",
+                     value: {}
+                  })
+               }
                className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
             <Input
@@ -79,7 +91,8 @@ function Form(): JSX.Element {
                input = {state.name}
                dispatch = {dispatch}
                autoFocus
-               required />
+               required
+            />
             <Input
                id = "email"
                type = "text"
@@ -87,7 +100,8 @@ function Form(): JSX.Element {
                icon = {faEnvelope}
                input = {state.email}
                dispatch = {dispatch}
-               required />
+               required
+            />
             <TextArea
                id = "message"
                type = "text"
@@ -95,11 +109,12 @@ function Form(): JSX.Element {
                icon = {faBook}
                input = {state.message}
                dispatch = {dispatch}
-               required />
+               required
+            />
             <Button
                type = "submit"
                className = "bg-primary text-white h-[2.6rem]">
-               Submit
+          Submit
             </Button>
          </form>
       </div>

@@ -15,7 +15,7 @@ describe("User can be created and conflicts arise when attempting login with inv
 
    beforeAll(async() => {
       await prisma.$connect();
-   });;
+   });
 
    afterAll(async() => {
       await prisma.$disconnect();
@@ -45,17 +45,29 @@ describe("User can be created and conflicts arise when attempting login with inv
       const user = await getUserByUsername(payload.username.trim(), false);
       expect(user).not.toBe(null);
 
-      const missingUser = await getUserByUsername(payload.username.trim() + "a", false);
+      const missingUser = await getUserByUsername(
+         payload.username.trim() + "a",
+         false,
+      );
       expect(missingUser).toBe(null);
 
-      const validCredentials = await bcrypt.compare(payload.password, user?.password);
+      const validCredentials = await bcrypt.compare(
+         payload.password,
+         user?.password,
+      );
       expect(validCredentials).toBe(true);
 
       // Ensure invalid passwords turn out to be invalid credentials
-      let invalidCredentials = await bcrypt.compare("0Password123$$A", user?.password);
+      let invalidCredentials = await bcrypt.compare(
+         "0Password123$$A",
+         user?.password,
+      );
       expect(invalidCredentials).toBe(false);
 
-      invalidCredentials = await bcrypt.compare("1Password123$$AA", user?.password);
+      invalidCredentials = await bcrypt.compare(
+         "1Password123$$AA",
+         user?.password,
+      );
       expect(invalidCredentials).toBe(false);
    });
 });

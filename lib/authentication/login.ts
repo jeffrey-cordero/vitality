@@ -1,14 +1,20 @@
 "use server";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
-import { VitalityResponse, sendSuccessMessage, sendErrorMessage } from "@/lib/global/state";
+import {
+   VitalityResponse,
+   sendSuccessMessage,
+   sendErrorMessage
+} from "@/lib/global/state";
 
 export type Credentials = {
-   username: string;
-   password: string;
-}
+  username: string;
+  password: string;
+};
 
-export async function login(credentials: Credentials): Promise<VitalityResponse<null>> {
+export async function login(
+   credentials: Credentials,
+): Promise<VitalityResponse<null>> {
    try {
       const userCredentials = new FormData();
       userCredentials.append("username", credentials.username.trim());
@@ -22,9 +28,17 @@ export async function login(credentials: Credentials): Promise<VitalityResponse<
          switch (error.type) {
             case "CallbackRouteError":
             case "CredentialsSignin":
-               return sendErrorMessage("Error", "Invalid credentials", null, { username : ["Invalid credentials"], password: ["Invalid credentials"] });
+               return sendErrorMessage("Error", "Invalid credentials", null, {
+                  username: ["Invalid credentials"],
+                  password: ["Invalid credentials"]
+               });
             default:
-               return sendErrorMessage("Failure", "Internal Server Authentication Error. Please try again later.", null, {});
+               return sendErrorMessage(
+                  "Failure",
+                  "Internal Server Authentication Error. Please try again later.",
+                  null,
+                  {},
+               );
          }
       }
 

@@ -6,13 +6,29 @@ import { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname } from "next/navigation";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faUtensils, faBrain, faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears, faDumbbell, faBarsStaggered } from "@fortawesome/free-solid-svg-icons";
+import {
+   faAnglesRight,
+   faPlaneArrival,
+   faUserPlus,
+   faDoorOpen,
+   faHouse,
+   faUtensils,
+   faBrain,
+   faHeartCircleBolt,
+   faBullseye,
+   faShuffle,
+   faPeopleGroup,
+   faHandshakeAngle,
+   faGears,
+   faDumbbell,
+   faBarsStaggered
+} from "@fortawesome/free-solid-svg-icons";
 import { AuthenticationContext } from "@/app/layout";
 
 interface SideBarProps {
-   name: string;
-   href: string;
-   icon: IconDefinition;
+  name: string;
+  href: string;
+  icon: IconDefinition;
 }
 
 const landingLinks: SideBarProps[] = [
@@ -61,16 +77,13 @@ function SideBarLinks(): JSX.Element {
                      "flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-black bg-gray-50 text-sm font-medium hover:text-primary z-40",
                      {
                         "bg-sky-100 text-primary": pathname === link.href
-                     }
+                     },
                   )}>
-                  <div
-                     className = "w-[30px] pl-[10px]"
-                  >
+                  <div className = "w-[30px] pl-[10px]">
                      <FontAwesomeIcon
                         icon = {link.icon}
                         className = "text-2xl"
                      />
-
                   </div>
                   <p className = "whitespace-nowrap">{link.name}</p>
                </Link>
@@ -85,15 +98,14 @@ export function SideBar(): JSX.Element {
 
    return (
       <div>
-         <div
-            className = "absolute top-0 left-0 z-30">
+         <div className = "absolute top-0 left-0 z-30">
             <div className = "relative top-0 left-0 transform translate-x-[15px] translate-y-[25px] z-30">
                <FontAwesomeIcon
                   id = "sideBarButton"
                   icon = {visibleSideBar ? faAnglesRight : faBarsStaggered}
                   className = "text-3xl text-black font-extrabold hover:cursor-pointer"
                   onClick = {() => {
-                     setVisibleSideBar(!(visibleSideBar));
+                     setVisibleSideBar(!visibleSideBar);
                   }}
                />
             </div>
@@ -101,21 +113,20 @@ export function SideBar(): JSX.Element {
          <div className = "absolute z-20">
             <div
                id = "sideBarLinks"
-               className = {clsx("relative m-0 top-[10px] w-[4.5rem] hover:w-64 focus:w-64 transition-all duration-1000 ease-in-out", {
-                  "left-[-5rem]": !(visibleSideBar),
-                  "left-[10px]": visibleSideBar
-               })}>
+               className = {clsx(
+                  "relative m-0 top-[10px] w-[4.5rem] hover:w-64 focus:w-64 transition-all duration-1000 ease-in-out",
+                  {
+                     "left-[-5rem]": !visibleSideBar,
+                     "left-[10px]": visibleSideBar
+                  },
+               )}>
                <div
                   className = "flex h-auto mt-20 flex-col px-3 py-4 bg-gray-50 shadow-md rounded-2xl overflow-hidden"
                   onMouseEnter = {() => {
                      setVisibleSideBar(true);
-                  }}
-
-               >
+                  }}>
                   <div className = "flex flex-col space-x-2 space-y-2 justify-center text-center">
-                     <div
-                        className = "flex flex-col w-full h-full items-center justify-between text-center"
-                     >
+                     <div className = "flex flex-col w-full h-full items-center justify-between text-center">
                         <SideBarLinks />
                      </div>
                   </div>

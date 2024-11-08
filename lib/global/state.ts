@@ -6,19 +6,20 @@ export interface VitalityInputState {
   value: any;
   error: string | null;
   data: { [key: string]: any };
+  handlesOnChange?: boolean;
 }
 
 export type VitalityState = { [key: string]: VitalityInputState };
 export type VitalityUpdateState = { id: string; input: VitalityInputState };
 
 export interface VitalityProps {
-   globalState: VitalityState;
-   globalDispatch: Dispatch<VitalityAction<any>>;
+  globalState: VitalityState;
+  globalDispatch: Dispatch<VitalityAction<any>>;
 }
 
 export interface VitalityChildProps extends VitalityProps {
-   localState: VitalityState;
-   localDispatch: Dispatch<VitalityAction<any>>;
+  localState: VitalityState;
+  localDispatch: Dispatch<VitalityAction<any>>;
 }
 
 export interface VitalityResponse<T> {
@@ -54,7 +55,7 @@ export interface VitalityAction<T> {
 
 export function formReducer(
    state: VitalityState,
-   action: VitalityAction<any>
+   action: VitalityAction<any>,
 ): VitalityState {
    return produce(state, (draft) => {
       switch (action.type) {
@@ -108,7 +109,7 @@ export function formReducer(
 
 export function sendSuccessMessage<T>(
    message: string,
-   data: T
+   data: T,
 ): VitalityResponse<T> {
    return {
       status: "Success",
@@ -120,7 +121,7 @@ export function sendErrorMessage<T>(
    status: "Error" | "Failure",
    message: string,
    data: T,
-   errors: { [key: string]: string[] }
+   errors: { [key: string]: string[] },
 ): VitalityResponse<T> {
    return {
       status: status,
@@ -136,7 +137,7 @@ export function handleResponse(
    dispatch: Dispatch<VitalityAction<any>>,
    response: VitalityResponse<any>,
    successMethod: () => void,
-   updateNotification: (_notification: NotificationProps) => void
+   updateNotification: (_notification: NotificationProps) => void,
 ): void {
    if (response.status === "Success") {
       // Remove any existing notifications
@@ -147,14 +148,20 @@ export function handleResponse(
 
       // Call the success method appropriately
       successMethod.call(null);
-   } else if (response.status === "Error" && Object.keys(response.body.errors).length > 0) {
+   } else if (
+      response.status === "Error" &&
+    Object.keys(response.body.errors).length > 0
+   ) {
       // Update state to display all errors relative to the response
       dispatch({
          type: "updateErrors",
          value: response
       });
 
-      document.getElementsByClassName("input-error").item(0)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      document
+         .getElementsByClassName("input-error")
+         .item(0)
+         ?.scrollIntoView({ behavior: "smooth", block: "center" });
    } else {
       // Display failure notification to the user
       updateNotification({

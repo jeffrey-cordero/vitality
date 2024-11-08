@@ -4,9 +4,24 @@ import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateLeft, faDoorOpen, faFeather, faKey, faEnvelope, faPhone, faUserSecret, faCalendar, faUserCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+   faArrowRotateLeft,
+   faDoorOpen,
+   faFeather,
+   faKey,
+   faEnvelope,
+   faPhone,
+   faUserSecret,
+   faCalendar,
+   faUserCheck
+} from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import { VitalityState, formReducer, VitalityResponse, handleResponse } from "@/lib/global/state";
+import {
+   VitalityState,
+   formReducer,
+   VitalityResponse,
+   handleResponse
+} from "@/lib/global/state";
 import { login } from "@/lib/authentication/login";
 import { signup, Registration } from "@/lib/authentication/signup";
 import { NotificationContext } from "@/app/layout";
@@ -41,7 +56,8 @@ const registration: VitalityState = {
       value: "",
       error: null,
       data: {}
-   }, phone: {
+   },
+   phone: {
       value: "",
       error: null,
       data: {}
@@ -85,9 +101,8 @@ function Form(): JSX.Element {
                            });
 
                            window.location.reload();
-                        }}
-                     >
-                        Log In
+                        }}>
+                Log In
                      </Button>
                   </Link>
                )
@@ -107,9 +122,12 @@ function Form(): JSX.Element {
             onSubmit = {handleSubmit}>
             <FontAwesomeIcon
                icon = {faArrowRotateLeft}
-               onClick = {() => dispatch({
-                  type: "resetState", value: {}
-               })}
+               onClick = {() =>
+                  dispatch({
+                     type: "resetState",
+                     value: {}
+                  })
+               }
                className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
             />
             <Input
@@ -121,7 +139,8 @@ function Form(): JSX.Element {
                input = {state.username}
                dispatch = {dispatch}
                autoFocus
-               required />
+               required
+            />
             <Input
                id = "password"
                type = "password"
@@ -130,7 +149,8 @@ function Form(): JSX.Element {
                icon = {faKey}
                input = {state.password}
                dispatch = {dispatch}
-               required />
+               required
+            />
             <Input
                id = "confirmPassword"
                type = "password"
@@ -139,7 +159,8 @@ function Form(): JSX.Element {
                icon = {faKey}
                input = {state.confirmPassword}
                dispatch = {dispatch}
-               required />
+               required
+            />
             <Input
                id = "name"
                type = "text"
@@ -148,7 +169,8 @@ function Form(): JSX.Element {
                icon = {faFeather}
                input = {state.name}
                dispatch = {dispatch}
-               required />
+               required
+            />
             <Input
                id = "birthday"
                type = "date"
@@ -157,7 +179,8 @@ function Form(): JSX.Element {
                icon = {faCalendar}
                input = {state.birthday}
                dispatch = {dispatch}
-               required />
+               required
+            />
             <Input
                id = "email"
                type = "email"
@@ -166,7 +189,8 @@ function Form(): JSX.Element {
                icon = {faEnvelope}
                input = {state.email}
                dispatch = {dispatch}
-               required />
+               required
+            />
             <Input
                id = "phone"
                type = "tel"
@@ -174,17 +198,23 @@ function Form(): JSX.Element {
                autoComplete = "tel"
                icon = {faPhone}
                input = {state.phone}
-               dispatch = {dispatch} />
+               dispatch = {dispatch}
+            />
             <Button
                type = "submit"
                className = "bg-primary text-white h-[2.6rem]"
                icon = {faUserCheck}>
-               Register
+          Register
             </Button>
          </form>
-         <p className = "mt-4">Already have an account? <Link
-            href = "/login"
-            className = "text-primary font-bold">Log In</Link></p>
+         <p className = "mt-4">
+        Already have an account?{" "}
+            <Link
+               href = "/login"
+               className = "text-primary font-bold">
+          Log In
+            </Link>
+         </p>
       </div>
    );
 }
@@ -194,7 +224,8 @@ export default function SignUpForm(): JSX.Element {
       <div className = "w-full mx-auto mt-8 flex flex-col items-center justify-center text-center">
          <Heading
             title = "Sign Up"
-            description = "Create an account to get started" />
+            description = "Create an account to get started"
+         />
          <Form />
       </div>
    );

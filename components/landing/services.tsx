@@ -2,22 +2,35 @@ import cx from "classnames";
 import Heading from "@/components/global/heading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faPersonRunning, faUtensils, faBullseye, faWeightScale, faBottleWater, faBrain } from "@fortawesome/free-solid-svg-icons";
+import {
+   faPersonRunning,
+   faUtensils,
+   faBullseye,
+   faWeightScale,
+   faBottleWater,
+   faBrain
+} from "@fortawesome/free-solid-svg-icons";
 
 interface ServiceProps {
-   icon: IconProp;
-   title: string;
-   background: string;
-   color: string;
-   divider: string;
+  icon: IconProp;
+  title: string;
+  background: string;
+  color: string;
+  divider: string;
 }
 
 function Service(props: ServiceProps): JSX.Element {
    return (
-      <div className = {cx(props.background, props.color, "flex flex-col align-center justify-center gap-1 w-[11rem] max-w-[90%] md:max-w-none h-[11rem] text-center rounded-2xl border border-gray-200 shadow-md p-4 mx-auto")}>
+      <div
+         className = {cx(
+            props.background,
+            props.color,
+            "flex flex-col align-center justify-center gap-1 w-[11rem] max-w-[90%] md:max-w-none h-[11rem] text-center rounded-2xl border border-gray-200 shadow-md p-4 mx-auto",
+         )}>
          <FontAwesomeIcon
             icon = {props.icon}
-            className = {cx(props.color, "text-4xl")} />
+            className = {cx(props.color, "text-4xl")}
+         />
          <div className = {cx(props.divider, "w-1/2 mx-auto my-1")} />
          <h1 className = "font-semibold text-2xl">{props.title}</h1>
       </div>

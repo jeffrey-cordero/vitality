@@ -3,8 +3,8 @@ import clsx from "clsx";
 import { useState } from "react";
 
 interface CarouselProps {
-   items: JSX.Element[];
-   columns: number;
+  items: JSX.Element[];
+  columns: number;
 }
 
 export default function Carousel(props: CarouselProps): JSX.Element {
@@ -12,11 +12,14 @@ export default function Carousel(props: CarouselProps): JSX.Element {
    const columnWidth = props.columns * 100;
 
    const nextSlide = () => {
-      setCurrentIndex((currentIndex + (100 / columnWidth)) % props.items.length);
+      setCurrentIndex((currentIndex + 100 / columnWidth) % props.items.length);
    };
 
    const prevSlide = () => {
-      setCurrentIndex((currentIndex - (100 / columnWidth) + props.items.length) % props.items.length);
+      setCurrentIndex(
+         (currentIndex - 100 / columnWidth + props.items.length) %
+        props.items.length,
+      );
    };
 
    return (
@@ -25,17 +28,18 @@ export default function Carousel(props: CarouselProps): JSX.Element {
             className = "carousel-inner flex transition-[opacity,transform] ease-in-out duration-500"
             style = {{
                transform: `translateX(-${currentIndex * columnWidth}%)`
-            }}
-         >
+            }}>
             {props.items.map((slide, index) => (
                <div
                   key = {index}
-                  className = {clsx("flex justify-center items-center p-2 md:p-4 flex-shrink-0 rounded-2xl", {
-                     "opacity-100": index === currentIndex,
-                     "opacity-30": index !== currentIndex
-                  })}
-                  style = {{ width: `${columnWidth}%` }}
-               >
+                  className = {clsx(
+                     "flex justify-center items-center p-2 md:p-4 flex-shrink-0 rounded-2xl",
+                     {
+                        "opacity-100": index === currentIndex,
+                        "opacity-30": index !== currentIndex
+                     },
+                  )}
+                  style = {{ width: `${columnWidth}%` }}>
                   {slide}
                </div>
             ))}
@@ -57,7 +61,8 @@ export default function Carousel(props: CarouselProps): JSX.Element {
                         strokeLinecap = "round"
                         strokeLinejoin = "round"
                         strokeWidth = "2"
-                        d = "M5 1 1 5l4 4" />
+                        d = "M5 1 1 5l4 4"
+                     />
                   </svg>
                   <span className = "sr-only">Previous</span>
                </span>
@@ -79,7 +84,8 @@ export default function Carousel(props: CarouselProps): JSX.Element {
                         strokeLinecap = "round"
                         strokeLinejoin = "round"
                         strokeWidth = "2"
-                        d = "m1 9 4-4-4-4" />
+                        d = "m1 9 4-4-4-4"
+                     />
                   </svg>
                   <span className = "sr-only">Next</span>
                </span>

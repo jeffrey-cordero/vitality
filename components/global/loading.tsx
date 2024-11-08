@@ -1,4 +1,3 @@
-
 export default function Loading(): JSX.Element {
    return (
       <div className = "relative w-full mx-auto flex justify-center">

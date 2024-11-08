@@ -1,6 +1,6 @@
 interface HeadingProps {
-   title: string;
-   description?: string;
+  title: string;
+  description?: string;
 }
 
 export default function Heading(props: HeadingProps): JSX.Element {
@@ -17,14 +17,11 @@ export default function Heading(props: HeadingProps): JSX.Element {
                      </h1>
                   </div>
                   <div className = "mt-5 max-w-3xl">
-                     <p className = "text-md md:text-lg text-gray-500">
-                        {description}
-                     </p>
+                     <p className = "text-md md:text-lg text-gray-500">{description}</p>
                   </div>
                </div>
             </div>
          </div>
-
       </div>
    );
 }

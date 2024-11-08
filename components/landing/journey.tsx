@@ -42,7 +42,6 @@ export default function Journey(): JSX.Element {
                                  />
                               </div>
                            </div>
-
                         </div>
                         <div className = "w-full px-3 sm:px-4 xl:w-1/2">
                            <div className = "py-3 sm:py-4">
@@ -63,16 +62,19 @@ export default function Journey(): JSX.Element {
                      <div className = "flex flex-col items-center justify-center text-center">
                         <Ring />
                         <span className = "block mb-6 mx-6 w-11/12 sm:w-4/5 text-2xl md:text-3xl font-bold text-primary">
-                           Level Up Your Fitness
+                  Level Up Your Fitness
                         </span>
                         <p className = "w-10/12 sm:w-2/3 mx-auto mb-8 font-medium text-sm md:text-md text-slate-500">
-                           Discover the power of tracking your fitness journey as you strive towards your goals. By monitoring your progress, you gain valuable insights, stay accountable, and fuel your motivation.
+                  Discover the power of tracking your fitness journey as you
+                  strive towards your goals. By monitoring your progress, you
+                  gain valuable insights, stay accountable, and fuel your
+                  motivation.
                         </p>
                         <Link href = "/signup">
                            <Button
                               icon = {faBullseye}
                               className = "text-white text-md bg-primary whitespace-nowrap w-[10rem] h-[2.6rem] hover:scale-[1.05] transition duration-300 ease-in-out">
-                              Start Today
+                    Start Today
                            </Button>
                         </Link>
                      </div>

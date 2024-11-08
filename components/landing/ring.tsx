@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 interface CounterProps {
-   value: number;
-   className: string;
-   start: number;
-   duration: number;
+  value: number;
+  className: string;
+  start: number;
+  duration: number;
 }
 
 function Counter(props: CounterProps): JSX.Element {
@@ -41,9 +41,7 @@ export default function Ring(): JSX.Element {
       <div className = "relative h-full w-full my-[4rem]">
          <motion.svg
             className = "absolute inset-0 m-auto w-[80px] md:w-[100px] h-[80px] md:h-[100px]"
-            viewBox = "0 0 100 100"
-
-         >
+            viewBox = "0 0 100 100">
             <motion.circle
                initial = {{ pathLength: 0 }}
                animate = {{ pathLength: 1 }}

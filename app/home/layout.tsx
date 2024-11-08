@@ -7,22 +7,14 @@ function useValidateAuthenticatedURL() {
    const pathname = usePathname();
 
    useEffect(() => {
-      if (!(pathname.startsWith("/home"))) {
+      if (!pathname.startsWith("/home")) {
          window.location.reload();
       }
    });
 }
 
-export default function Layout({
-   children
-}: {
-   children: React.ReactNode;
-}) {
+export default function Layout({ children }: { children: React.ReactNode }) {
    useValidateAuthenticatedURL();
 
-   return (
-      <div className = "w-full min-h-screen m-auto">
-         {children}
-      </div>
-   );
+   return <div className = "w-full min-h-screen m-auto">{children}</div>;
 }

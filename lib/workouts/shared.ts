@@ -1,8 +1,10 @@
 import { Workout } from "@/lib/workouts/workouts";
 import { Exercise } from "@/lib/workouts/exercises";
 
-const urlRegex = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg)|https?:\/\/[^/]+\/[^?#]+\?.*)$/i;
-const nextMediaRegex = /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
+const urlRegex =
+  /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg)|https?:\/\/[^/]+\/[^?#]+\?.*)$/i;
+const nextMediaRegex =
+  /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
 
 export function verifyURL(url: string): boolean {
    return urlRegex.test(url) || nextMediaRegex.test(url);
@@ -15,7 +17,7 @@ export function searchForTitle(array: any[], search: string): any[] {
    }
 
    // Partial match search (case-insensitive - assumes search is lowercase)
-   return array.filter(t => t.title.toLowerCase().includes(search));
+   return array.filter((t) => t.title.toLowerCase().includes(search));
 }
 
 export function getWorkoutDate(date: Date): string {
@@ -32,10 +34,12 @@ export function formatWorkout(workout): Workout {
       date: workout.date,
       description: workout.description ?? "",
       image: workout.image ?? "",
-      tagIds: workout.workout_applied_tags?.map(
-         (applied_tag: any) => applied_tag.workout_tags.id
+      tagIds:
+      workout.workout_applied_tags?.map(
+         (applied_tag: any) => applied_tag.workout_tags.id,
       ) ?? [],
-      exercises: workout.exercises?.map((exercise) => formatExercise(exercise)) ?? []
+      exercises:
+      workout.exercises?.map((exercise) => formatExercise(exercise)) ?? []
    };
 }
 

@@ -18,13 +18,13 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
                const { username, password } = parsedCredentials.data;
                const user = await getUserByUsername(username, true);
 
-               if (!(user)) {
+               if (!user) {
                   return undefined;
                }
 
                const validCredentials = await bcrypt.compare(
                   password,
-                  user.password
+                  user.password,
                );
 
                if (validCredentials) {

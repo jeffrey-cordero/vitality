@@ -13,7 +13,7 @@ describe("User can be created and conflicts arise when attempting registration w
 
    beforeAll(async() => {
       await prisma.$connect();
-   });;
+   });
 
    afterAll(async() => {
       await prisma.$disconnect();
@@ -76,7 +76,6 @@ describe("User can be created and conflicts arise when attempting registration w
 
       expect(missing).toBe(null);
    });
-
 
    test("Valid registration fields and unique field conflicts", async() => {
       payload = {

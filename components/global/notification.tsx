@@ -2,15 +2,19 @@
 import React, { useRef } from "react";
 import clsx from "clsx";
 import { useContext } from "react";
-import { faCircleCheck, faTriangleExclamation, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+   faCircleCheck,
+   faTriangleExclamation,
+   faXmark
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NotificationContext } from "@/app/layout";
 
 export interface NotificationProps extends React.HTMLAttributes<any> {
-   status: "Initial" | "Success" | "Error" | "Failure";
-   message: string;
-   children?: React.ReactNode;
-   timer?: number;
+  status: "Initial" | "Success" | "Error" | "Failure";
+  message: string;
+  children?: React.ReactNode;
+  timer?: number;
 }
 
 export default function Notification(props: NotificationProps): JSX.Element {
@@ -44,21 +48,24 @@ export default function Notification(props: NotificationProps): JSX.Element {
             <div
                className = "fixed w-[30rem] max-w-[90%] min-h-[4.5rem] top-0 left-1/2 transform -translate-x-1/2 max-w-4/5 mx-auto mt-4 opacity-0 notification animate-fadeIn z-50"
                {...props}
-               ref = {notificationRef}
-            >
+               ref = {notificationRef}>
                <div className = "text-left">
                   <div
-                     className = {clsx("w-full border-stroke flex items-center rounded-lg border border-l-[8px] bg-white pl-4", {
-                        "border-l-green-600": status === "Success",
-                        "border-l-red-600": status !== "Success"
-                     })}>
+                     className = {clsx(
+                        "w-full border-stroke flex items-center rounded-lg border border-l-[8px] bg-white pl-4",
+                        {
+                           "border-l-green-600": status === "Success",
+                           "border-l-red-600": status !== "Success"
+                        },
+                     )}>
                      <div className = "flex items-center justify-center rounded-full">
                         <FontAwesomeIcon
                            icon = {icon}
                            className = {clsx("text-3xl", {
                               "text-green-600": status === "Success",
                               "text-red-600": status !== "Success"
-                           })} />
+                           })}
+                        />
                      </div>
                      <div className = "flex w-full items-center justify-between px-4 py-3">
                         <div>
@@ -78,7 +85,8 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      onClick = {(event) => {
                         event.stopPropagation();
                         removeNotification();
-                     }} />
+                     }}
+                  />
                </div>
             </div>
          }

@@ -97,19 +97,16 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
             search: ["Workout tag already exists"]
          });
       } else {
-         return sendErrorMessage(
-            "Failure",
-            error.meta?.message,
-            tag,
-            { system: error.meta?.message }
-         );
+         return sendErrorMessage("Failure", error.meta?.message, tag, {
+            system: error.meta?.message
+         });
       }
    }
 }
 
 export async function updateWorkoutTag(
    tag: Tag,
-   method: "update" | "delete"
+   method: "update" | "delete",
 ): Promise<VitalityResponse<Tag>> {
    const fields = workoutTagSchema.safeParse(tag);
 
@@ -121,7 +118,7 @@ export async function updateWorkoutTag(
          "Error",
          "Invalid workout tag fields",
          tag,
-         fields.error.flatten().fieldErrors
+         fields.error.flatten().fieldErrors,
       );
    }
 
@@ -146,14 +143,14 @@ export async function updateWorkoutTag(
 
             return sendSuccessMessage(
                "Successfully deleted workout tag",
-               deletedTag
+               deletedTag,
             );
          default:
             return sendErrorMessage(
                "Failure",
                "Invalid Workout Tag Update Method",
                tag,
-               {}
+               {},
             );
       }
    } catch (error) {
@@ -172,15 +169,12 @@ export async function updateWorkoutTag(
             tag,
             {
                title: ["Workout tag title already exists"]
-            }
+            },
          );
       } else {
-         return sendErrorMessage(
-            "Failure",
-            error.meta?.message,
-            tag,
-            { system: error.meta?.message }
-         );
+         return sendErrorMessage("Failure", error.meta?.message, tag, {
+            system: error.meta?.message
+         });
       }
    }
 }

@@ -1,12 +1,16 @@
 import Heading from "@/components/global/heading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faPaintbrush, faCode, faChartColumn } from "@fortawesome/free-solid-svg-icons";
+import {
+   faPaintbrush,
+   faCode,
+   faChartColumn
+} from "@fortawesome/free-solid-svg-icons";
 
 interface CardProps {
-   icon: IconProp;
-   title: string;
-   description: string;
+  icon: IconProp;
+  title: string;
+  description: string;
 }
 
 function Card(props: CardProps): JSX.Element {
@@ -16,11 +20,16 @@ function Card(props: CardProps): JSX.Element {
             <div>
                <FontAwesomeIcon
                   icon = {props.icon}
-                  className = "text-4xl text-primary" />
-               <h1 className = "font-bold text-2xl md:text-3xl text-primary mt-8">{props.title}</h1>
+                  className = "text-4xl text-primary"
+               />
+               <h1 className = "font-bold text-2xl md:text-3xl text-primary mt-8">
+                  {props.title}
+               </h1>
             </div>
             <div>
-               <p className = "text-sm md:text-md font-medium text-slate-500">{props.description}</p>
+               <p className = "text-sm md:text-md font-medium text-slate-500">
+                  {props.description}
+               </p>
             </div>
          </div>
       </div>

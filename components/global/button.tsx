@@ -16,14 +16,9 @@ export default function Button(props: ButtonProps): JSX.Element {
          className = {clsx(
             "flex gap-2 items-center justify-center min-h-[2rem] min-w-[4rem] focus:ring-slate-200 font-bold rounded-lg text-md outline-none hover:cursor-pointer",
             className,
-         )}
-      >
-         {
-            icon && (
-               <FontAwesomeIcon icon = {icon} />
-            )
-         }
-         { children }
+         )}>
+         {icon && <FontAwesomeIcon icon = {icon} />}
+         {children}
       </button>
    );
 }

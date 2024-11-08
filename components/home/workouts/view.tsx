@@ -5,14 +5,18 @@ import Cards from "@/components/home/workouts/cards";
 import Loading from "@/components/global/loading";
 import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/workouts/workouts";
-import { faPersonRunning, faPhotoFilm, faTable } from "@fortawesome/free-solid-svg-icons";
-import { Dispatch, useState } from "react";
+import {
+   faPersonRunning,
+   faPhotoFilm,
+   faTable
+} from "@fortawesome/free-solid-svg-icons";
+import { Dispatch } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface ViewProps extends VitalityProps {
-   view: "table" | "cards" | "";
-   setView: Dispatch<"table" | "cards" | "">;
-   workouts: Workout[];
+  view: "table" | "cards" | "";
+  setView: Dispatch<"table" | "cards" | "">;
+  workouts: Workout[];
 }
 
 export default function View(props: ViewProps): JSX.Element {
@@ -29,9 +33,10 @@ export default function View(props: ViewProps): JSX.Element {
                   window.localStorage.setItem("view", "table");
                }}
                className = {clsx("transition duration-300 ease-in-out", {
-                  "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
+                  "scale-105 border-b-4 border-b-primary rounded-none":
+              view === "table"
                })}>
-               Table
+          Table
             </Button>
             <Button
                icon = {faPhotoFilm}
@@ -40,45 +45,45 @@ export default function View(props: ViewProps): JSX.Element {
                   window.localStorage.setItem("view", "cards");
                }}
                className = {clsx("transition duration-300 ease-in-out", {
-                  "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
+                  "scale-105  border-b-4 border-b-primary rounded-none":
+              view === "cards"
                })}>
-               Cards
+          Cards
             </Button>
          </div>
          <div
             id = "workoutsView"
             className = "w-11/12 lg:w-10/12 flex-grow flex flex-col justify-start items-center">
-            {
-               workouts.length === 0 ? (
-                  <div className = "w-full h-full mx-auto text-center flex justify-center items-start pt-12 pb-4">
-                     {
-                        fetched ? (
-                           <div className = "flex flex-col gap-2">
-                              <FontAwesomeIcon
-                                 icon = {faPersonRunning}
-                                 className = "text-primary text-5xl" />
-                              <h1 className = "font-bold text-lg">No available workouts</h1>
-                           </div>
-                        ) : (
-                           <Loading />
-                        )}
-                  </div>
-               ) : (
-                  view === "table" ? (
-                     <Table
-                        workouts = {workouts}
-                        globalState = {globalState}
-                        globalDispatch = {globalDispatch} />
-                  ) : (view === "cards") && (
-                     <Cards
-                        workouts = {workouts}
-                        globalState = {globalState}
-                        globalDispatch = {globalDispatch} />
-                  )
+            {workouts.length === 0 ? (
+               <div className = "w-full h-full mx-auto text-center flex justify-center items-start pt-12 pb-4">
+                  {fetched ? (
+                     <div className = "flex flex-col gap-2">
+                        <FontAwesomeIcon
+                           icon = {faPersonRunning}
+                           className = "text-primary text-5xl"
+                        />
+                        <h1 className = "font-bold text-lg">No available workouts</h1>
+                     </div>
+                  ) : (
+                     <Loading />
+                  )}
+               </div>
+            ) : view === "table" ? (
+               <Table
+                  workouts = {workouts}
+                  globalState = {globalState}
+                  globalDispatch = {globalDispatch}
+               />
+            ) : (
+               view === "cards" && (
+                  <Cards
+                     workouts = {workouts}
+                     globalState = {globalState}
+                     globalDispatch = {globalDispatch}
+                  />
                )
-            }
+            )}
          </div>
-
       </div>
    );
 }

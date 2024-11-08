@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { removeWorkouts, Workout } from "@/lib/workouts/workouts";
 import { getWorkoutDate } from "@/lib/workouts/shared";
 import { Tag } from "@/lib/workouts/tags";
-import { useCallback, useContext, useMemo, useRef } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { NotificationContext } from "@/app/layout";
 import Conformation from "@/components/global/confirmation";
 
@@ -59,8 +59,7 @@ function Row(props: RowProps) {
                style = {{
                   backgroundColor: tag.color
                }}
-               key = {tag.id}
-            >
+               key = {tag.id}>
                {tag.title}
             </div>
          );
@@ -114,7 +113,8 @@ function Row(props: RowProps) {
                   <div className = "w-[15rem] h-[15rem] lg:w-[8rem] lg:h-[8rem] flex justify-center items-center rounded-full overflow-hidden text-primary">
                      <FontAwesomeIcon
                         className = "text-4xl"
-                        icon = {faImage} />
+                        icon = {faImage}
+                     />
                   </div>
                )
             }
@@ -148,8 +148,7 @@ function Row(props: RowProps) {
                      <Button
                         type = "button"
                         className = "block lg:hidden bg-primary text-white w-[10rem] mt-2 mb-6 h-[2.4rem] p-4 text-sm"
-                        icon = {faPencil}
-                     >
+                        icon = {faPencil}>
                         Edit Workout
                      </Button>
                   </div>
@@ -304,7 +303,8 @@ export default function Table(props: TableProps): JSX.Element {
                      index = {index}
                      globalState = {globalState}
                      globalDispatch = {globalDispatch}
-                     key = {workout.id} />
+                     key = {workout.id}
+                  />
                ))}
             </div>
             {visibleSelectedWorkouts.size > 0 && (

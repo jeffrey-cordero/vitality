@@ -20,7 +20,7 @@ const feedbackSchema = z.object({
 });
 
 export async function sendFeedback(
-   feedback: Feedback
+   feedback: Feedback,
 ): Promise<VitalityResponse<null>> {
    // Validate the feedback form first
    const fields = feedbackSchema.safeParse(feedback);
@@ -30,7 +30,7 @@ export async function sendFeedback(
          "Error",
          "Message.",
          null,
-         fields.error.flatten().fieldErrors
+         fields.error.flatten().fieldErrors,
       );
    }
 
@@ -48,7 +48,7 @@ export async function sendFeedback(
          "Failure",
          "Internal Server Error. Please try again later.",
          null,
-         { system: error.meta?.message }
+         { system: error.meta?.message },
       );
    }
 }
