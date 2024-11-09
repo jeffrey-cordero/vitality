@@ -10,7 +10,8 @@ interface CounterProps {
 }
 
 function Counter(props: CounterProps): JSX.Element {
-   const [count, setCount] = useState<number>(props.start);
+   const { value, className, start, duration } = props;
+   const [count, setCount] = useState<number>(start);
    const easeOutQuad = (t: number, b: number, c: number, d: number) => {
       t = t > d ? d : t / d;
       return Math.round(-c * t * (t - 2) + b);
@@ -21,19 +22,22 @@ function Counter(props: CounterProps): JSX.Element {
       const animateCount = (timestamp: number) => {
          if (!startTime) startTime = timestamp;
          const timePassed = timestamp - startTime;
-         const progress = timePassed / props.duration;
-         const currentCount = easeOutQuad(progress, 0, props.value, 1);
-         if (currentCount >= props.value) {
-            setCount(props.value);
+         const progress = timePassed / duration;
+         const currentCount = easeOutQuad(progress, 0, value, 1);
+         if (currentCount >= value) {
+            setCount(value);
             return;
          }
          setCount(currentCount);
          requestAnimationFrame(animateCount);
       };
       requestAnimationFrame(animateCount);
-   }, [props.value, props.duration]);
+   }, [
+      value,
+      duration
+   ]);
 
-   return <p className = {props.className}>{Intl.NumberFormat().format(count)}</p>;
+   return <p className = {className}>{Intl.NumberFormat().format(count)}</p>;
 }
 
 export default function Ring(): JSX.Element {

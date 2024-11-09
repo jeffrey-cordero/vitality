@@ -6,7 +6,7 @@ import {
    sendSuccessMessage,
    sendErrorMessage
 } from "@/lib/global/state";
-import { formatWorkout } from "./shared";
+import { formatWorkout } from "@/lib/workouts/shared";
 
 export type ExerciseSet = {
   id: string;

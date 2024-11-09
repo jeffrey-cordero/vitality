@@ -15,7 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface ViewProps extends VitalityProps {
   view: "table" | "cards" | "";
-  setView: Dispatch<"table" | "cards" | "">;
+  setView: Dispatch<"table" | "cards">;
   workouts: Workout[];
 }
 
@@ -33,10 +33,9 @@ export default function View(props: ViewProps): JSX.Element {
                   window.localStorage.setItem("view", "table");
                }}
                className = {clsx("transition duration-300 ease-in-out", {
-                  "scale-105 border-b-4 border-b-primary rounded-none":
-              view === "table"
+                  "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
                })}>
-          Table
+               Table
             </Button>
             <Button
                icon = {faPhotoFilm}
@@ -45,10 +44,9 @@ export default function View(props: ViewProps): JSX.Element {
                   window.localStorage.setItem("view", "cards");
                }}
                className = {clsx("transition duration-300 ease-in-out", {
-                  "scale-105  border-b-4 border-b-primary rounded-none":
-              view === "cards"
+                  "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
                })}>
-          Cards
+               Cards
             </Button>
          </div>
          <div

@@ -16,12 +16,11 @@ function Card(props: CardProps): JSX.Element {
    const { workout, globalState, globalDispatch } = props;
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
-      // Fetch tag using id
-         const tag: Tag = globalState.tags.data.dictionary[tagId];
+         // Fetch workout tag, which may be missing in up-to-date dictionary due to a removal
+         const tag: Tag | undefined = globalState.tags.data.dictionary[tagId];
 
          return (
-         // Undefined in case of removal
-            tag !== undefined && (
+            tag && (
                <div
                   className = {clsx(
                      "max-w-full px-4 py-2 m-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-xs font-bold text-white",
@@ -35,7 +34,10 @@ function Card(props: CardProps): JSX.Element {
             )
          );
       });
-   }, [workout, globalState.tags.data.dictionary]);
+   }, [
+      workout,
+      globalState.tags.data.dictionary
+   ]);
 
    return (
       <div
@@ -63,7 +65,7 @@ function Card(props: CardProps): JSX.Element {
                   priority
                   quality = {100}
                   sizes = "100%"
-                  src = {workout.image ?? ""}
+                  src = {workout.image}
                   alt = "workout-image"
                   className = "opacity-30 object-center object-cover"
                />

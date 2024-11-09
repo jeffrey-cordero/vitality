@@ -7,6 +7,8 @@
     "jsx-quotes": ["error", "prefer-double"],
     "semi": ["error", "always"],
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "no-mixed-spaces-and-tabs": ["error"],
+    "no-multiple-empty-lines": ["error", { "max": 1 }],
     "no-var": "error",
     "prefer-const": "error",
     "arrow-spacing": "error",

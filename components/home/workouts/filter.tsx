@@ -192,7 +192,10 @@ function FilterByDate(props: VitalityProps): JSX.Element {
           "Is on or after": globalState.minDate,
           "Is on or before": globalState.maxDate
        };
-    }, [globalState.minDate, globalState.maxDate]);
+    }, [
+       globalState.minDate,
+       globalState.maxDate
+    ]);
 
    const input: VitalityInputState | undefined = useMemo(() => {
       return inputs[type];
@@ -223,7 +226,11 @@ function FilterByDate(props: VitalityProps): JSX.Element {
             .getElementById("workoutsView")
             ?.scrollIntoView({ behavior: "smooth", block: "start" });
       }
-   }, [props, globalState.workouts, globalDispatch]);
+   }, [
+      props,
+      globalState.workouts,
+      globalDispatch
+   ]);
 
    const handleReset = useCallback(() => {
       // Resetting the date filter should fall back to tags filtered view, if applied
@@ -386,7 +393,10 @@ function FilterByTags(props: VitalityProps): JSX.Element {
             }
          }
       });
-   }, [globalState.tags, globalDispatch]);
+   }, [
+      globalState.tags,
+      globalDispatch
+   ]);
 
    const handleApplyFilterClick = useCallback(() => {
       // Cache filtered tags selection
@@ -437,7 +447,10 @@ function FilterByTags(props: VitalityProps): JSX.Element {
             .getElementById("workoutsView")
             ?.scrollIntoView({ behavior: "smooth", block: "start" });
       }
-   }, [globalState, globalDispatch]);
+   }, [
+      globalState,
+      globalDispatch
+   ]);
 
    const handleReset = useCallback(() => {
       // Resetting the tags filter should fall back to date filtered view, if applied
@@ -450,8 +463,6 @@ function FilterByTags(props: VitalityProps): JSX.Element {
             return !appliedDateFiltering || filterByDate(globalState, workout);
          },
       );
-
-
 
       globalDispatch({
          type: "updateStates",
@@ -475,7 +486,10 @@ function FilterByTags(props: VitalityProps): JSX.Element {
             }
          }
       });
-   }, [globalDispatch, globalState]);
+   }, [
+      globalDispatch,
+      globalState
+   ]);
 
    return (
       <Modal

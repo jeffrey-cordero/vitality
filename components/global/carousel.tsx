@@ -8,17 +8,18 @@ interface CarouselProps {
 }
 
 export default function Carousel(props: CarouselProps): JSX.Element {
+   const { columns, items } = props;
    const [currentIndex, setCurrentIndex] = useState(1);
-   const columnWidth = props.columns * 100;
+   const columnWidth = columns * 100;
 
    const nextSlide = () => {
-      setCurrentIndex((currentIndex + 100 / columnWidth) % props.items.length);
+      setCurrentIndex((currentIndex + 100 / columnWidth) % items.length);
    };
 
    const prevSlide = () => {
       setCurrentIndex(
-         (currentIndex - 100 / columnWidth + props.items.length) %
-        props.items.length,
+         (currentIndex - 100 / columnWidth + items.length) %
+        items.length,
       );
    };
 
@@ -29,7 +30,7 @@ export default function Carousel(props: CarouselProps): JSX.Element {
             style = {{
                transform: `translateX(-${currentIndex * columnWidth}%)`
             }}>
-            {props.items.map((slide, index) => (
+            {items.map((slide, index) => (
                <div
                   key = {index}
                   className = {clsx(

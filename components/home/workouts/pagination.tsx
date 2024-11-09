@@ -13,17 +13,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ChangeEvent, useCallback } from "react";
 
 interface PaginationProps extends VitalityProps {
-  workouts: Workout[];
+   workouts: Workout[];
 }
 
 export default function Pagination(props: PaginationProps): JSX.Element {
-   const { globalState, globalDispatch, workouts } = props;
+   const { workouts, globalState, globalDispatch } = props;
 
-   // Hold total table/cards pages and current page index
+   // Total workout pages and index
    const pages: number = Math.ceil(workouts.length / globalState.paging.value);
    const page: number = globalState.page.value;
 
-   const array: number[] = Array.from(
+   const pagination: number[] = Array.from(
       { length: pages },
       (_, index) => index + 1,
    );
@@ -42,9 +42,10 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                }
             }
          });
-      },
-      [globalDispatch, globalState.page],
-   );
+      }, [
+         globalDispatch,
+         globalState.page
+      ]);
 
    const handleLeftClick = () => {
       handlePageClick(Math.max(0, page - 1));
@@ -56,7 +57,6 @@ export default function Pagination(props: PaginationProps): JSX.Element {
 
    const handleEntriesOnChange = useCallback(
       (event: ChangeEvent<HTMLSelectElement>) => {
-      // When total visible entries are changed, ensure to reset page index to first page
          globalDispatch({
             type: "updateStates",
             value: {
@@ -66,50 +66,57 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                },
                page: {
                   ...globalState.page,
+                  // When visible entries per page are changed, reset page index
                   value: 0
                }
             }
          });
 
-         document
-            .getElementById("workoutsView")
-            ?.scrollIntoView({ behavior: "smooth", block: "start" });
-      },
-      [globalDispatch, globalState.paging, globalState.page],
-   );
+         document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "start" });
+         window.localStorage.setItem("paging", event.target.value);
+      }, [
+         globalDispatch,
+         globalState.paging,
+         globalState.page
+      ]);
 
    return (
       workouts.length > 0 && (
          <div className = "max-w-sm mt-6 justify-self-end text-lg">
-            <div className = "relative flex flex-row justify-center items-center mb-2">
+            <div className = "max-w-xs relative flex flex-row justify-center items-center mx-4">
                <FontAwesomeIcon
                   icon = {faCircleChevronLeft}
-                  className = "cursor-pointer text-primary text-xl mr-2"
+                  className = "cursor-pointer text-primary text-xl"
                   onClick = {handleLeftClick}
                />
                {low > 0 && (
-                  <div className = "flex flex-row justify-center items-center">
+                  <div className = "flex flex-row justify-center items-center gap-4 ml-4">
                      <Button
                         key = "min"
                         onClick = {() => handlePageClick(0)}>
-                1
+                        1
                      </Button>
                      <Button key = "low">...</Button>
                   </div>
                )}
-               {array.slice(low, high).map((index) => (
-                  <Button
-                     key = {index}
-                     onClick = {() => handlePageClick(index - 1)}
-                     className = {clsx("rounded-lg px-2 py-1", {
-                        "font-bold text-primary border-2 border-primary bg-blue-100":
-                  index === page + 1
-                     })}>
-                     {index}
-                  </Button>
-               ))}
+               {pagination.slice(low, high).map((index) => {
+                  const isSelected: boolean = index === page + 1;
+
+                  return (
+                     <Button
+                        key = {index}
+                        onClick = {() => handlePageClick(index - 1)}
+                        className = {clsx("rounded-lg w-[3rem] h-[2.2rem]", {
+                           "font-bold text-primary border-2 border-primary bg-blue-100": isSelected,
+                           "ml-3": isSelected && index === 1,
+                           "mr-3": isSelected && index === pages
+                        })}>
+                        {index}
+                     </Button>
+                  );
+               })}
                {high < pages && (
-                  <div className = "flex flex-row justify-center items-center">
+                  <div className = "flex flex-row justify-center items-center gap-4 mr-4">
                      <Button key = "higher">...</Button>
                      <Button
                         key = "min"
@@ -120,7 +127,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                )}
                <FontAwesomeIcon
                   icon = {faCircleChevronRight}
-                  className = "cursor-pointer text-primary text-xl ml-2"
+                  className = "cursor-pointer text-primary text-xl"
                   onClick = {handleRightClick}
                />
             </div>
@@ -132,12 +139,10 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   icon = {faFileLines}
                   input = {globalState.page}
                   value = {page + 1}
-                  values = {array}
+                  values = {pagination}
                   dispatch = {globalDispatch}
                   className = "min-w-[10rem] max-h-[5rem] mt-4"
-                  onChange = {(event) => {
-                     handlePageClick(event.target.value - 1);
-                  }}
+                  onChange = {(event) => handlePageClick(event.target.value - 1)}
                />
             </div>
             <div className = "relative">

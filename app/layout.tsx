@@ -110,7 +110,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       return () => {
          document.body.removeEventListener("mousedown", handleModalClickAway);
       };
-   }, [fetched, handleAuthentication]);
+   }, [
+      fetched,
+      handleAuthentication
+   ]);
 
    return (
       <html

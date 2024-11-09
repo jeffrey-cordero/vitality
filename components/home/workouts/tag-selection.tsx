@@ -111,9 +111,10 @@ function TagColorPicker(props: VitalityChildProps) {
                }
             }
          });
-      },
-      [localDispatch, localState],
-   );
+      }, [
+         localDispatch,
+         localState
+      ]);
 
    return (
       <>
@@ -349,9 +350,11 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
                }
             }
          });
-      },
-      [globalDispatch, globalState.tags, tag],
-   );
+      }, [
+         globalDispatch,
+         globalState.tags,
+         tag
+      ]);
 
    const handleInitializeTagForm = useCallback(() => {
       // Update edit tag information globalState
@@ -370,7 +373,12 @@ export function WorkoutTag(props: WorkoutTagProps): JSX.Element {
             }
          }
       });
-   }, [localDispatch, localState, tag.color, tag.title]);
+   }, [
+      localDispatch,
+      localState,
+      tag.color,
+      tag.title
+   ]);
 
    const handleEditTagSave = useCallback(() => {
       editTagModalRef.current?.close();
@@ -460,12 +468,18 @@ export function TagSelection(props: TagSelectionProps): JSX.Element {
 
    const searchOptions = useMemo(() => {
       return options.filter((tag: Tag) => !selectedOptions.has(tag));
-   }, [options, selectedOptions]);
+   }, [
+      options,
+      selectedOptions
+   ]);
 
    // Search results
    const results: Tag[] = useMemo(() => {
       return searchForTitle(searchOptions, search);
-   }, [searchOptions, search]);
+   }, [
+      searchOptions,
+      search
+   ]);
 
    // Tags by title to show that current search pattern exists or can be used as a new tag title
    const tagsByTitle: { [title: string]: Tag } = useMemo(() => {

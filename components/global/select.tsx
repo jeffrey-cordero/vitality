@@ -41,9 +41,12 @@ export default function Select(props: SelectProps): JSX.Element {
                }
             });
          }
-      },
-      [dispatch, input, id, onChange],
-   );
+      }, [
+         dispatch,
+         input,
+         id,
+         onChange
+      ]);
 
    return (
       <div className = "relative">

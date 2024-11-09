@@ -3,6 +3,7 @@ import Input from "@/components/global/input";
 import TextArea from "@/components/global/textarea";
 import ImageSelection from "@/components/home/workouts/image-selection";
 import Exercises from "@/components/home/workouts/exercises";
+import Conformation from "@/components/global/confirmation";
 import { Modal } from "@/components/global/modal";
 import { TagSelection } from "@/components/home/workouts/tag-selection";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
@@ -41,7 +42,6 @@ import {
    useState
 } from "react";
 import { filterWorkout } from "@/components/home/workouts/filter";
-import Conformation from "@/components/global/confirmation";
 import { verifyURL } from "@/lib/workouts/shared";
 
 const form: VitalityState = {
@@ -329,7 +329,11 @@ export default function Form(props: VitalityProps): JSX.Element {
             }
          }
       });
-   }, [globalDispatch, localDispatch, globalState.tags]);
+   }, [
+      globalDispatch,
+      localDispatch,
+      globalState.tags
+   ]);
 
    useEffect(() => {
       if (displayWorkoutForm && !displayModal) {
@@ -337,7 +341,11 @@ export default function Form(props: VitalityProps): JSX.Element {
          handleInitializeWorkoutState();
          formModalRef.current?.open();
       }
-   }, [displayWorkoutForm, displayModal, handleInitializeWorkoutState]);
+   }, [
+      displayWorkoutForm,
+      displayModal,
+      handleInitializeWorkoutState
+   ]);
 
    return (
       <div className = "flex justify-center w-full mx-auto my-4">

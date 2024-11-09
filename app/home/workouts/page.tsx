@@ -94,7 +94,7 @@ const workouts: VitalityState = {
 export default function Page(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const [globalState, globalDispatch] = useReducer(formReducer, workouts);
-   const [view, setView] = useState<"table" | "cards" | "">("");
+   const [view, setView] = useState<"table" | "cards">("table");
 
    // Lower case search string value for case-insensitive comparison
    const search: string = useMemo(() => {
@@ -107,7 +107,10 @@ export default function Page(): JSX.Element {
       const filtered: Workout[] = globalState.workouts.data.filtered;
 
       return searchForTitle(filtered, search);
-   }, [globalState.workouts.data.filtered, search]);
+   }, [
+      globalState.workouts.data.filtered,
+      search
+   ]);
 
    // Pagination calculations for current page interval
    const paging: number = globalState.paging.value;
@@ -118,17 +121,21 @@ export default function Page(): JSX.Element {
       const high = low + paging;
 
       return results.slice(low, high);
-   }, [results, paging, page]);
+   }, [
+      results,
+      paging,
+      page
+   ]);
 
    const fetchWorkoutsData = useCallback(async() => {
       try {
-      // Fetch user workouts and workout tags
+         // Fetch user workouts and workout tags
          const [workoutsData, tagsData] = await Promise.all([
             fetchWorkouts(user.id),
             fetchWorkoutTags(user.id)
          ]);
 
-         // Update global state to maintain tags, workouts, and user ID
+         // Update global state to maintain up-to-date tags, workouts, and paging
          globalDispatch({
             type: "initializeState",
             value: {
@@ -162,22 +169,33 @@ export default function Page(): JSX.Element {
                      ...globalState.workout.value,
                      user_id: user.id
                   }
+               },
+               paging: {
+                  ...globalState.paging,
+                  value: Number.parseInt(window.localStorage.getItem("paging") ?? "10")
                }
             }
          });
       } catch (error) {
          console.error(error);
       }
-   }, [globalState.tags, globalState.workout, globalState.workouts, user]);
+   }, [
+      globalState.tags,
+      globalState.workouts,
+      globalState.workout,
+      globalState.paging,
+      user
+   ]);
 
    useEffect(() => {
-      if (!globalState.workouts.data.fetched) {
+      if (user && !globalState.workouts.data.fetched) {
          setView(
-            window.localStorage.getItem("view") === "table" ? "table" : "cards",
+            window.localStorage.getItem("view") === "cards" ? "cards" : "table",
          );
          fetchWorkoutsData();
       }
    }, [
+      user,
       fetchWorkoutsData,
       globalState.workouts.data.fetched,
       globalState.tags,
@@ -186,7 +204,7 @@ export default function Page(): JSX.Element {
    ]);
 
    return (
-      <main className = "relative w-full lg:w-11/12 mx-auto mt-8 flex flex-col justify-start items-center text-center overscroll-y-none">
+      <main className = "relative w-full lg:w-11/12 mx-auto mt-8 flex flex-col justify-start items-center text-center">
          <Filter
             globalState = {globalState}
             globalDispatch = {globalDispatch}

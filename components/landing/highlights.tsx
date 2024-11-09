@@ -14,21 +14,23 @@ interface CardProps {
 }
 
 function Card(props: CardProps): JSX.Element {
+   const { icon, title, description } = props;
+
    return (
       <div className = "flex justify-center w-[20rem] h-[25rem] max-w-[90%] text-center rounded-2xl border border-gray-200 bg-white shadow-md">
          <div className = "w-full mx-auto flex flex-col text-center justify-center items-center gap-8 px-6 text-black">
             <div>
                <FontAwesomeIcon
-                  icon = {props.icon}
+                  icon = {icon}
                   className = "text-4xl text-primary"
                />
                <h1 className = "font-bold text-2xl md:text-3xl text-primary mt-8">
-                  {props.title}
+                  {title}
                </h1>
             </div>
             <div>
                <p className = "text-sm md:text-md font-medium text-slate-500">
-                  {props.description}
+                  {description}
                </p>
             </div>
          </div>

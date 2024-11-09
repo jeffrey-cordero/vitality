@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import Image from "next/image";
 import Button from "@/components/global/button";
+import Conformation from "@/components/global/confirmation";
 import { VitalityProps, VitalityResponse } from "@/lib/global/state";
 import { faImage, faPencil } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,7 +10,6 @@ import { getWorkoutDate } from "@/lib/workouts/shared";
 import { Tag } from "@/lib/workouts/tags";
 import { useCallback, useContext, useMemo } from "react";
 import { NotificationContext } from "@/app/layout";
-import Conformation from "@/components/global/confirmation";
 
 interface RowProps extends VitalityProps {
    workout: Workout;
@@ -19,10 +19,13 @@ interface RowProps extends VitalityProps {
 function Row(props: RowProps) {
    const { workout, globalState, globalDispatch } = props;
    const selected: Set<Workout> = globalState.workouts.data.selected;
-   const formattedDate = useMemo(() => getWorkoutDate(new Date(workout.date)), [workout.date]);
+
+   const formattedDate = useMemo(() => {
+      return getWorkoutDate(new Date(workout.date));
+   }, [workout.date]);
 
    const handleWorkoutToggle = useCallback(() => {
-      // Either add or remove from selected
+      // Add or remove desired workout from set of selected workouts
       const newSelected: Set<Workout> = new Set(selected);
 
       if (newSelected.has(workout)) {
@@ -44,7 +47,12 @@ function Row(props: RowProps) {
             }
          }
       });
-   }, [globalDispatch, selected, globalState.workouts, workout]);
+   }, [
+      globalDispatch,
+      selected,
+      globalState.workouts,
+      workout
+   ]);
 
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
@@ -53,18 +61,22 @@ function Row(props: RowProps) {
 
          return (
             // Undefined in case of removal
-            tag !== undefined &&
-            <div
-               className = {clsx("max-w-full px-4 py-2 m-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-xs font-bold text-white")}
-               style = {{
-                  backgroundColor: tag.color
-               }}
-               key = {tag.id}>
-               {tag.title}
-            </div>
+            tag !== undefined && (
+               <div
+                  className = {clsx("max-w-full px-4 py-2 m-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-xs font-bold text-white")}
+                  style = {{
+                     backgroundColor: tag.color
+                  }}
+                  key = {tag.id}>
+                  {tag.title}
+               </div>
+            )
          );
       });
-   }, [workout, globalState.tags.data.dictionary]);
+   }, [
+      workout,
+      globalState.tags.data.dictionary
+   ]);
 
    return (
       <div
@@ -108,7 +120,6 @@ function Row(props: RowProps) {
                         className = {clsx("w-full h-full mx-auto object-cover object-center rounded-full overflow-hidden shadow-sm")}
                      />
                   </div>
-
                ) : (
                   <div className = "w-[15rem] h-[15rem] lg:w-[8rem] lg:h-[8rem] flex justify-center items-center rounded-full overflow-hidden text-primary">
                      <FontAwesomeIcon
@@ -168,49 +179,62 @@ export default function Table(props: TableProps): JSX.Element {
    const { workouts, globalState, globalDispatch } = props;
    const selected: Set<Workout> = globalState.workouts.data.selected;
 
-   // Visible workouts that have been selected
+   // Filtered workouts that have been selected
    const visibleSelectedWorkouts = useMemo(() => {
       return new Set<Workout>(workouts.filter(workout => selected.has(workout)));
-   }, [workouts, selected]);
+   }, [
+      workouts,
+      selected
+   ]);
 
-   // Check if all visible workouts are selected
-   const allVisibleSelected: boolean = workouts.length > 0 && workouts.every(workout => selected.has(workout));
+   // Determines if all visible workouts are selected
+   const allVisibleSelected: boolean = workouts.length > 0
+      && workouts.every(workout => selected.has(workout));
 
    // Function to update selected workouts in the globalState
-   const handleUpdateSelectedWorkouts = useCallback((newSelected: Set<Workout>) => {
-      globalDispatch({
-         type: "updateState",
-         value: {
-            id: "workouts",
-            input: {
-               ...globalState.workouts,
-               data: {
-                  ...globalState.workouts.data,
-                  selected: newSelected
+   const handleUpdateSelectedWorkouts = useCallback(
+      (newSelected: Set<Workout>) => {
+         globalDispatch({
+            type: "updateState",
+            value: {
+               id: "workouts",
+               input: {
+                  ...globalState.workouts,
+                  data: {
+                     ...globalState.workouts.data,
+                     selected: newSelected
+                  }
                }
             }
-         }
-      });
-   }, [globalDispatch, globalState.workouts]);
+         });
+      }, [
+         globalDispatch,
+         globalState.workouts
+      ]);
 
    const handleWorkoutToggle = useMemo(() => {
       return () => {
          if (allVisibleSelected) {
             // Remove all visibly selected workouts
-            handleUpdateSelectedWorkouts(new Set([...Array.from(selected)].filter(workout => !visibleSelectedWorkouts.has(workout))));
+            handleUpdateSelectedWorkouts(new Set([...Array.from(selected)]
+               .filter(workout => !visibleSelectedWorkouts.has(workout))));
          } else {
             // Select all visible workouts
             handleUpdateSelectedWorkouts(new Set([...Array.from(selected), ...workouts]));
          }
       };
-   }, [allVisibleSelected, handleUpdateSelectedWorkouts, workouts, selected, visibleSelectedWorkouts]);
+   }, [
+      allVisibleSelected,
+      handleUpdateSelectedWorkouts,
+      workouts,
+      selected,
+      visibleSelectedWorkouts
+   ]);
 
    const handleWorkoutDelete = useCallback(async() => {
-      // Remove the current or visibleSelectedWorkouts set of workout's
-      const size = visibleSelectedWorkouts.size;
-
-      // Remove the singular workout or only the visible workouts in the current view
-      const response: VitalityResponse<number> = await removeWorkouts(Array.from(visibleSelectedWorkouts));
+      const size: number = visibleSelectedWorkouts.size;
+      const response: VitalityResponse<number> = 
+         await removeWorkouts(Array.from(visibleSelectedWorkouts));
 
       if (response.body.data === size) {
          // Remove single or multiple workouts from overall, filtered, and selected workouts
@@ -225,7 +249,7 @@ export default function Table(props: TableProps): JSX.Element {
          const newSelected = new Set(selected);
          visibleSelectedWorkouts.forEach(workout => newSelected.delete(workout));
 
-         // Account for a page in workouts view being removed
+         // Account for a page being removed in pagination view
          const pages: number = Math.ceil(newWorkouts.length / globalState.paging.value);
          const page: number = globalState.page.value;
 
@@ -238,7 +262,6 @@ export default function Table(props: TableProps): JSX.Element {
                   data: {
                      ...globalState.workouts.data,
                      filtered: newFiltered,
-                     // Clear selected workouts
                      selected: newSelected
                   }
                },
@@ -250,14 +273,18 @@ export default function Table(props: TableProps): JSX.Element {
          });
       }
 
-      // Display the success or failure notification to the user
       updateNotification({
          status: response.status,
          message: response.body.message,
          timer: 1000
       });
-
-   }, [globalDispatch, selected, globalState, updateNotification, visibleSelectedWorkouts]);
+   }, [
+      globalDispatch,
+      selected,
+      globalState,
+      updateNotification,
+      visibleSelectedWorkouts
+   ]);
 
    return (
       <div className = "relative w-full mx-auto">

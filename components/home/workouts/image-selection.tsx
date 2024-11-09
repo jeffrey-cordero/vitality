@@ -50,7 +50,11 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
             }
          }
       });
-   }, [dispatch, input, isValidURL]);
+   }, [
+      dispatch,
+      input,
+      isValidURL
+   ]);
 
    const handleDefaultImageSelection = useCallback(
       (source: string) => {
@@ -70,9 +74,10 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                }
             }
          });
-      },
-      [dispatch, input],
-   );
+      }, [
+         dispatch,
+         input
+      ]);
 
    useEffect(() => {
       if (isDefaultImage) {

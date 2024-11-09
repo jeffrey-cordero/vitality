@@ -64,7 +64,11 @@ function SideBarLinks(): JSX.Element {
       if (fetched) {
          setLinks(newLinks);
       }
-   }, [user, fetched, links]);
+   }, [
+      user,
+      fetched,
+      links
+   ]);
 
    return (
       <>

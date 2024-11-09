@@ -20,19 +20,20 @@ interface ServiceProps {
 }
 
 function Service(props: ServiceProps): JSX.Element {
+   const { icon, title, background, color, divider } = props;
    return (
       <div
          className = {cx(
-            props.background,
-            props.color,
+            background,
+            color,
             "flex flex-col align-center justify-center gap-1 w-[11rem] max-w-[90%] md:max-w-none h-[11rem] text-center rounded-2xl border border-gray-200 shadow-md p-4 mx-auto",
          )}>
          <FontAwesomeIcon
-            icon = {props.icon}
-            className = {cx(props.color, "text-4xl")}
+            icon = {icon}
+            className = {cx(color, "text-4xl")}
          />
-         <div className = {cx(props.divider, "w-1/2 mx-auto my-1")} />
-         <h1 className = "font-semibold text-2xl">{props.title}</h1>
+         <div className = {cx(divider, "w-1/2 mx-auto my-1")} />
+         <h1 className = "font-semibold text-2xl">{title}</h1>
       </div>
    );
 }

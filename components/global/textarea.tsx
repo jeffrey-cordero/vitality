@@ -31,9 +31,12 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
          }
 
          handleTextAreaOverflow();
-      },
-      [dispatch, input, id, onChange],
-   );
+      }, [
+         dispatch,
+         input,
+         id,
+         onChange
+      ]);
 
    const handleKeyDown = useCallback(
       (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -47,9 +50,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
                (modals.item(modals.length - 1) as HTMLDivElement).focus();
             }
          }
-      },
-      [],
-   );
+      }, []);
 
    const handleTextAreaOverflow = () => {
       const textarea = textAreaRef.current;

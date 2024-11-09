@@ -12,26 +12,28 @@ interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 function PricingCard(props: PricingCardProps): JSX.Element {
+   const { children, price, type, text, subscription } = props;
+
    return (
       <div className = "flex justify-center w-[23rem] h-[34rem] max-w-[90%] text-center rounded-2xl border border-gray-200 bg-white shadow-md px-4">
          <div className = "relative flex flex-col justify-center align-center">
             <span className = "mb-3 block text-3xl font-extrabold text-primary">
-               {props.type}
+               {type}
             </span>
             <h2 className = "w-11/12 mx-auto text-4xl font-bold text-dark pb-6 border-b-[2px] border-b-slate-400">
-               {props.price}
+               {price}
                <span className = "text-base font-medium text-body-color">
-            / {props.subscription}
+            / {subscription}
                </span>
             </h2>
             <div className = "my-6 flex flex-col justify-center gap-[14px] h-[12.5rem] font-medium">
-               {props.children}
+               {children}
             </div>
             <Link href = "/signup">
                <Button
                   icon = {faUsersViewfinder}
                   className = "block w-full rounded-md border border-primary bg-primary p-3 text-center text-white hover:scale-[1.05] transition duration-300 ease-in-out">
-                  {props.text}
+                  {text}
                </Button>
             </Link>
          </div>

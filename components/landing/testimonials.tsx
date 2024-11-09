@@ -16,6 +16,8 @@ interface TestimonialProps {
 const people: TestimonialProps[] = testimonialData;
 
 function Testimonial(props: TestimonialProps): JSX.Element {
+   const { testimonial, name, stars, image } = props;
+
    return (
       <div className = "flex flex-col box-border gap-1 justify-center align-center w-full min-h-[25rem] max-h-full mx-auto">
          <FontAwesomeIcon
@@ -23,7 +25,7 @@ function Testimonial(props: TestimonialProps): JSX.Element {
             className = "text-4xl text-primary"
          />
          <p className = "font-semibold text-md w-3/4 mx-auto my-4">
-            {props.testimonial}
+            {testimonial}
          </p>
          <div>
             <div className = "flex flex-row flex-wrap gap-3 justify-center items-center w-full mx-auto p-5">
@@ -33,12 +35,12 @@ function Testimonial(props: TestimonialProps): JSX.Element {
                   height = {200}
                   quality = {100}
                   className = "rounded-full w-[4.5rem] h-[4.5rem] object-cover object-center shadow-inner"
-                  src = {props.image}
+                  src = {image}
                   alt = "Rounded avatar"
                />
                <div>
-                  <p className = "font-semibold text-md">{props.name}</p>
-                  {props.stars.map((rating, index) => {
+                  <p className = "font-semibold text-md">{name}</p>
+                  {stars.map((rating, index) => {
                      return (
                         <FontAwesomeIcon
                            key = {index}

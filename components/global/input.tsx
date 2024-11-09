@@ -17,9 +17,9 @@ export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
    onSubmit?: () => void;
 }
 
-export default function Input({ ...props }: VitalityInputProps): JSX.Element {
-   const { id, label, icon, placeholder, className, autoFocus, onChange, onSubmit, required, input, dispatch } = props;
-   const type = input.data.type ?? props.type;
+export default function Input(props: VitalityInputProps): JSX.Element {
+   const { id, label, type, icon, placeholder, className, min, autoFocus, autoComplete, onChange, onSubmit, required, input, dispatch } = props;
+   const inputType = input.data.type ?? type;
    const inputRef = useRef<HTMLInputElement>(null);
    const passwordButton = useRef<SVGSVGElement | null>(null);
 
@@ -27,7 +27,10 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
       if (inputRef.current && autoFocus) {
          inputRef.current.focus();
       }
-   }, [autoFocus, input.error]);
+   }, [
+      autoFocus,
+      input.error
+   ]);
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
       if (input.handlesOnChange) {
@@ -47,7 +50,12 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             }
          });
       }
-   }, [dispatch, input, id, onChange]);
+   }, [
+      dispatch,
+      input,
+      id,
+      onChange
+   ]);
 
    const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
       if (inputRef.current && event.key === "Escape") {
@@ -68,11 +76,10 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
       if (passwordButton.current !== null) {
          inputRef.current?.focus();
 
-         if (type === "password") {
+         if (inputType === "password") {
             passwordButton.current.classList.add("text-primary");
          } else {
             passwordButton.current.classList.remove("text-primary");
-
          }
 
          dispatch({
@@ -83,24 +90,27 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
                   ...input,
                   data: {
                      ...input.data,
-                     type: type === "password" ? "text" : "password"
+                     type: inputType === "password" ? "text" : "password"
                   }
                }
             }
          });
-
-
       }
-   }, [dispatch, input, id, type]);
+   }, [
+      dispatch,
+      input,
+      id,
+      inputType
+   ]);
 
    return (
       <div className = "relative">
          <input
             id = {id}
-            type = {type}
+            type = {inputType}
             value = {input.value}
-            autoComplete = {props.autoComplete ?? undefined}
-            min = {props.min ?? undefined}
+            autoComplete = {autoComplete ?? undefined}
+            min = {min ?? undefined}
             ref = {inputRef}
             placeholder = {placeholder ?? ""}
             className = {clsx("peer p-4 block w-full rounded-lg text-sm font-semibold border-1 placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2",
@@ -111,13 +121,13 @@ export default function Input({ ...props }: VitalityInputProps): JSX.Element {
             onKeyDown = {(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event)}
             onChange = {(event: ChangeEvent<HTMLInputElement>) => handleInputChange(event)}
          />
-         {(type === "password" || passwordButton.current !== null) &&
+         {(inputType === "password" || passwordButton.current !== null) &&
             <Button
                tabIndex = {-1}
                type = "button"
                className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
                <FontAwesomeIcon
-                  icon = {type == "password" ? faEye : faEyeSlash}
+                  icon = {inputType == "password" ? faEye : faEyeSlash}
                   className = "flex-shrink-0 size-3.5 password-icon"
                   ref = {passwordButton}
                   onClick = {handlePasswordIconClick}
