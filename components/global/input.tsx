@@ -1,54 +1,168 @@
 import clsx from "clsx";
-import { ChangeEvent, useRef } from "react";
-import { faEye } from "@fortawesome/free-solid-svg-icons";
+import Button from "@/components/global/button";
+import { ChangeEvent, Dispatch, useCallback, useEffect, useRef } from "react";
+import { faEye, faEyeSlash, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { InputProps, FormItems, updateFormState } from "@/lib/global/form";
+import { VitalityAction, VitalityInputState } from "@/lib/global/state";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
-export default function Input({ updater, ...props }: InputProps): JSX.Element {
-   const eyeButton = useRef<SVGSVGElement | null>(null);
+export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
+   type: string;
+   id: string;
+   label: string;
+   input: VitalityInputState;
+   dispatch: Dispatch<VitalityAction<any>>;
+   icon?: IconProp;
+   onBlur?: () => void;
+   onSubmit?: () => void;
+}
+
+export default function Input(props: VitalityInputProps): JSX.Element {
+   const { id, label, type, icon, placeholder, className, min, autoFocus, autoComplete, onChange, onSubmit, required, input, dispatch } = props;
+   const inputType = input.data.type ?? type;
+   const inputRef = useRef<HTMLInputElement>(null);
+   const passwordButton = useRef<SVGSVGElement | null>(null);
+
+   useEffect(() => {
+      if (inputRef.current && autoFocus) {
+         inputRef.current.focus();
+      }
+   }, [
+      autoFocus,
+      input.error
+   ]);
+
+   const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+      if (input.handlesOnChange) {
+         // Call the user-defined event handler (complex state)
+         onChange?.call(null, event);
+      } else {
+         // Simple state
+         dispatch({
+            type: "updateState",
+            value: {
+               id: id,
+               input: {
+                  ...input,
+                  value: event.target.value,
+                  error: null
+               }
+            }
+         });
+      }
+   }, [
+      dispatch,
+      input,
+      id,
+      onChange
+   ]);
+
+   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (inputRef.current && event.key === "Escape") {
+         inputRef.current.blur();
+
+         const modals: HTMLCollection = document.getElementsByClassName("modal");
+
+         if (modals.length > 0) {
+            // Focus the most inner modal, if any
+            (modals.item(modals.length - 1) as HTMLDivElement).focus();
+         }
+      } else if (event.key === "Enter") {
+         onSubmit?.call(null);
+      }
+   }, [onSubmit]);
+
+   const handlePasswordIconClick = useCallback(() => {
+      if (passwordButton.current !== null) {
+         inputRef.current?.focus();
+
+         if (inputType === "password") {
+            passwordButton.current.classList.add("text-primary");
+         } else {
+            passwordButton.current.classList.remove("text-primary");
+         }
+
+         dispatch({
+            type: "updateState",
+            value: {
+               id: id,
+               input: {
+                  ...input,
+                  data: {
+                     ...input.data,
+                     type: inputType === "password" ? "text" : "password"
+                  }
+               }
+            }
+         });
+      }
+   }, [
+      dispatch,
+      input,
+      id,
+      inputType
+   ]);
 
    return (
       <div className = "relative">
          <input
-            type = {props.input.type}
-            id = {props.input.id}
-            value = {props.input.value}
+            id = {id}
+            type = {inputType}
+            value = {input.value}
+            autoComplete = {autoComplete ?? undefined}
+            min = {min ?? undefined}
+            ref = {inputRef}
+            placeholder = {placeholder ?? ""}
             className = {clsx("peer p-4 block w-full rounded-lg text-sm font-semibold border-1 placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2",
                {
-                  "border-gray-200": props.input.error === null,
-                  "border-red-500": props.input.error !== null
-               })}
-            onChange = {(event: ChangeEvent<HTMLInputElement>) => {
-               updateFormState(event, updater);
-            }}
+                  "border-gray-200 border-[1.5px]": input.error === null,
+                  "border-red-500 border-[1.5px] focus:border-red-500 focus:ring-red-500 error": input.error !== null
+               }, className)}
+            onKeyDown = {(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event)}
+            onChange = {(event: ChangeEvent<HTMLInputElement>) => handleInputChange(event)}
          />
-         {props.input.isPassword &&
-            <button type = "button" className = "absolute top-0 end-0 p-3.5 rounded-e-md">
+         {(inputType === "password" || passwordButton.current !== null) &&
+            <Button
+               tabIndex = {-1}
+               type = "button"
+               className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
                <FontAwesomeIcon
-                  icon = {faEye}
+                  icon = {inputType == "password" ? faEye : faEyeSlash}
                   className = "flex-shrink-0 size-3.5 password-icon"
-                  ref = {eyeButton}
-                  onClick = {() => {
-                     if (eyeButton.current !== null) {
-                        eyeButton.current.style.color = props.input.type === "password" ? "blue" : "black";
-
-                        updater((inputs: FormItems) => {
-                           inputs[props.input.id].type = props.input.type === "password" ? "text" : "password";
-                        });
-                     }
-                  }} />
-            </button>
+                  ref = {passwordButton}
+                  onClick = {handlePasswordIconClick}
+               />
+            </Button>
+         }
+         {
+            input.data.valid !== undefined && (
+               <Button
+                  tabIndex = {-1}
+                  type = "button"
+                  className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
+                  <FontAwesomeIcon
+                     icon = {input.data.valid ? faCircleCheck : faCircleXmark}
+                     className = {clsx("flex-shrink-0 size-3.5", {
+                        "text-green-500": input.data.valid,
+                        "text-red-500": !(input.data.valid)
+                     })}
+                  />
+               </Button>
+            )
          }
          <label
-            htmlFor = {props.input.id}
-            className = {clsx("absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-gray-500 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500", {
-               "font-bold": props.input.label.includes("*")
-            })}>
-            {props.input.label}
+            htmlFor = {id}
+            className = {clsx(
+               "absolute top-0 start-0 p-4 h-full text-sm text-black truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-gray-500 peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-black peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500",
+               {
+                  "font-bold": required
+               }
+            )}>
+            {icon && <FontAwesomeIcon icon = {icon} />} {label}
          </label>
-         {props.input.error !== null &&
-            <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-               <p className = "text-red-500 input-error"> {props.input.error} </p>
+         {input.error !== null &&
+            <div className = "flex justify-center align-center text-center max-w-[90%] mx-auto gap-2 mt-2 opacity-0 animate-fadeIn">
+               <p className = "text-red-500 font-bold input-error"> {input.error} </p>
             </div>
          }
       </div>

@@ -13,7 +13,7 @@ describe("User can be created and conflicts arise when attempting registration w
 
    beforeAll(async() => {
       await prisma.$connect();
-   });;
+   });
 
    afterAll(async() => {
       await prisma.$disconnect();
@@ -31,7 +31,7 @@ describe("User can be created and conflicts arise when attempting registration w
 
       expected = {
          state: "Error",
-         response: { message: "Invalid user registration fields" },
+         body: { message: "Invalid user registration fields" },
          errors: { birthday: ["Required"], email: ["Required"] }
       };
 
@@ -59,7 +59,7 @@ describe("User can be created and conflicts arise when attempting registration w
 
       expected = {
          state: "Error",
-         response: { message: "Invalid user registration fields" },
+         body: { message: "Invalid user registration fields" },
          errors: {
             password: ["Passwords do not match"],
             confirmPassword: ["Passwords do not match"]
@@ -77,7 +77,6 @@ describe("User can be created and conflicts arise when attempting registration w
       expect(missing).toBe(null);
    });
 
-
    test("Valid registration fields and unique field conflicts", async() => {
       payload = {
          name: "John Doe",
@@ -91,7 +90,7 @@ describe("User can be created and conflicts arise when attempting registration w
 
       expected = {
          state: "Success",
-         response: { message: "Successfully registered", data: undefined },
+         body: { message: "Successfully registered", data: undefined },
          errors: {}
       };
 
@@ -126,7 +125,7 @@ describe("User can be created and conflicts arise when attempting registration w
 
       expected = {
          state: "Error",
-         response: { message: "Internal database conflicts" },
+         body: { message: "Internal database conflicts" },
          errors: {
             username: ["Username already taken"]
          }
@@ -147,7 +146,7 @@ describe("User can be created and conflicts arise when attempting registration w
 
       expected = {
          state: "Error",
-         response: { message: "Internal database conflicts" },
+         body: { message: "Internal database conflicts" },
          errors: {
             email: ["Email already taken"]
          }
@@ -168,7 +167,7 @@ describe("User can be created and conflicts arise when attempting registration w
 
       expected = {
          state: "Error",
-         response: { message: "Internal database conflicts" },
+         body: { message: "Internal database conflicts" },
          errors: {
             phone: ["Phone number already taken"]
          }

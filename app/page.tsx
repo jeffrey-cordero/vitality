@@ -6,14 +6,12 @@ import Testimonials from "@/components/landing/testimonials";
 
 export default function Page() {
    return (
-      <>
-         <main className = "w-full flex min-h-screen flex-col items-center justify-start mx-2 md:px-4 text-center overflow-hidden">
-            <Journey />
-            <Highlights />
-            <Services />
-            <Pricing />
-            <Testimonials />
-         </main>
-      </>
+      <main className = "w-full min-h-screen flex flex-col items-center justify-start md:px-4 text-center overflow-hidden my-10 gap-4">
+         <Journey />
+         <Highlights />
+         <Services />
+         <Pricing />
+         <Testimonials />
+      </main>
    );
 }

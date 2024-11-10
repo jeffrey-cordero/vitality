@@ -1,11 +1,14 @@
 {
-  "extends": "next/core-web-vitals",
+  "extends": ["next/core-web-vitals"],
+  "plugins": ["react"],
   "rules": {
-    "indent": ["error", 3],
+    "indent": ["error", 3, { "SwitchCase": 1 }],
     "quotes": ["error", "double"],
     "jsx-quotes": ["error", "prefer-double"],
     "semi": ["error", "always"],
-    "no-unused-vars": "warn",
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "no-mixed-spaces-and-tabs": ["error"],
+    "no-multiple-empty-lines": ["error", { "max": 1 }],
     "no-var": "error",
     "prefer-const": "error",
     "arrow-spacing": "error",
@@ -19,6 +22,14 @@
     "spaced-comment": ["error", "always"],
     "space-before-function-paren": ["error", "never"],
     "object-curly-spacing": ["error", "always"],
-    "eqeqeq": "error"
+    "react/jsx-uses-react": "error",
+    "react/jsx-uses-vars": "error",
+    "react/jsx-first-prop-new-line": [1, "multiline"],
+    "react/jsx-max-props-per-line": ["error", { "maximum": 1 }],
+    "react/jsx-indent-props": [2, 3],
+    "react/jsx-closing-bracket-location": [
+      "error",
+      { "nonEmpty": "after-props" }
+    ]
   }
 }

@@ -1,29 +1,20 @@
 "use client";
-
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
-function useValidateHomeURL(): void {
+function useValidateAuthenticatedURL() {
+   // Ensure logged in user URL's start are in form "/home/..."
    const pathname = usePathname();
 
-   if (!(pathname.startsWith("/home"))) {
-      window.location.reload();
-   }
+   useEffect(() => {
+      if (!pathname.startsWith("/home")) {
+         window.location.reload();
+      }
+   });
 }
 
-export default function Layout({
-   children
-}: {
-   children: React.ReactNode;
-}) {
-   useValidateHomeURL();
+export default function Layout({ children }: { children: React.ReactNode }) {
+   useValidateAuthenticatedURL();
 
-   return (
-      <>
-         <div className = "flex flex-col mt-6">
-            <div className = "flex-grow md:overflow-y-auto p-4">
-               {children}
-            </div>
-         </div>
-      </>
-   );
+   return <div className = "w-full min-h-screen m-auto">{children}</div>;
 }

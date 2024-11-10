@@ -1,142 +1,232 @@
 "use client";
 import Heading from "@/components/global/heading";
 import Input from "@/components/global/input";
-import Notification from "@/components/global/notification";
 import Button from "@/components/global/button";
 import Link from "next/link";
-import { FormEvent } from "react";
-import { useImmer } from "use-immer";
-import { FormItems, handleFormErrors, SubmissionStatus } from "@/lib/global/form";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+   faArrowRotateLeft,
+   faDoorOpen,
+   faFeather,
+   faKey,
+   faEnvelope,
+   faPhone,
+   faUserSecret,
+   faCalendar,
+   faUserCheck
+} from "@fortawesome/free-solid-svg-icons";
+import { FormEvent, useContext, useReducer } from "react";
+import {
+   VitalityState,
+   formReducer,
+   VitalityResponse,
+   handleResponse
+} from "@/lib/global/state";
 import { login } from "@/lib/authentication/login";
 import { signup, Registration } from "@/lib/authentication/signup";
+import { NotificationContext } from "@/app/layout";
+
+const registration: VitalityState = {
+   username: {
+      value: "",
+      error: null,
+      data: {}
+   },
+   password: {
+      value: "",
+      error: null,
+      data: {}
+   },
+   confirmPassword: {
+      value: "",
+      error: null,
+      data: {}
+   },
+   name: {
+      value: "",
+      error: null,
+      data: {}
+   },
+   birthday: {
+      value: "",
+      error: null,
+      data: {}
+   },
+   email: {
+      value: "",
+      error: null,
+      data: {}
+   },
+   phone: {
+      value: "",
+      error: null,
+      data: {}
+   }
+};
 
 function Form(): JSX.Element {
-   const [status, setStatus] = useImmer<SubmissionStatus>({ state: "Initial", response: {}, errors: {} });
-   const [registration, setRegistration] = useImmer<FormItems>(
-      {
-         username: {
-            label: "Username *",
-            type: "text",
-            id: "username",
-            value: "",
-            error: null
-         }, password: {
-            label: "Password *",
-            type: "password",
-            isPassword: true,
-            id: "password",
-            value: "",
-            error: null
-         }, confirmPassword: {
-            label: "Confirm Password *",
-            type: "password",
-            isPassword: true,
-            id: "confirmPassword",
-            value: "",
-            error: null
-         }, name: {
-            label: "Name *",
-            type: "text",
-            id: "name",
-            value: "",
-            error: null
-         }, birthday: {
-            label: "Birthday *",
-            type: "date",
-            id: "birthday",
-            value: "",
-            error: null
-         },
-         email: {
-            label: "Email *",
-            type: "email",
-            id: "email",
-            value: "",
-            error: null
-         }, phone: {
-            label: "Phone",
-            type: "tel",
-            id: "phone",
-            value: "",
-            error: null
-         }
-      });
+   const { updateNotification } = useContext(NotificationContext);
+   const [state, dispatch] = useReducer(formReducer, registration);
 
    const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();
 
       try {
-         const payload: Registration = {
-            name: registration.name.value,
-            birthday: new Date(registration.birthday.value),
-            username: registration.username.value,
-            password: registration.password.value,
-            confirmPassword: registration.confirmPassword.value,
-            email: registration.email.value,
-            phone: registration.phone.value
+         const registration: Registration = {
+            name: state.name.value.trim(),
+            username: state.username.value.trim(),
+            password: state.password.value.trim(),
+            confirmPassword: state.confirmPassword.value.trim(),
+            email: state.email.value.trim(),
+            birthday: new Date(state.birthday.value),
+            phone: state.phone.value.trim()
+         };
+         const response: VitalityResponse<null> = await signup(registration);
+
+         const successMethod = () => {
+            // Display login notification
+            updateNotification({
+               status: response.status,
+               message: response.body.message,
+               children: (
+                  <Link href = "/home">
+                     <Button
+                        type = "button"
+                        className = "bg-green-600 text-white p-4 text-sm h-[2rem]"
+                        icon = {faDoorOpen}
+                        onClick = {async() => {
+                           await login({
+                              username: state.username.value,
+                              password: state.password.value
+                           });
+
+                           window.location.reload();
+                        }}>
+                Log In
+                     </Button>
+                  </Link>
+               )
+            });
          };
 
-         if (payload.phone === "") {
-            delete payload.phone;
-         }
-
-         // Update current status of form to show potential success notification
-         const response = await signup(payload);
-         setStatus(response);
-         handleFormErrors(response, registration, setRegistration);
+         handleResponse(dispatch, response, successMethod, updateNotification);
       } catch (error) {
-         console.error("Error updating status:", error);
+         console.error(error);
       }
    };
 
    return (
-      <div className = "w-10/12 lg:w-1/2 mx-auto">
-         <form className = "w-full mx-auto flex flex-col justify-center align-center gap-3" onSubmit = {handleSubmit}>
-            <Input input = {registration.username} updater = {setRegistration} />
-            <Input input = {registration.password} updater = {setRegistration} />
-            <Input input = {registration.confirmPassword} updater = {setRegistration} />
-            <Input input = {registration.name} updater = {setRegistration} />
-            <Input input = {registration.birthday} updater = {setRegistration} />
-            <Input input = {registration.email} updater = {setRegistration} />
-            <Input input = {registration.phone} updater = {setRegistration} />
-            <Button type = "submit" className = "bg-primary text-white h-[2.6rem]">
-               Submit
+      <div className = "w-10/12 lg:w-1/2 mx-auto mt-4">
+         <form
+            className = "relative w-full mx-auto flex flex-col justify-center align-center gap-3"
+            onSubmit = {handleSubmit}>
+            <FontAwesomeIcon
+               icon = {faArrowRotateLeft}
+               onClick = {() =>
+                  dispatch({
+                     type: "resetState",
+                     value: {}
+                  })
+               }
+               className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+            />
+            <Input
+               id = "username"
+               type = "text"
+               label = "Username"
+               autoComplete = "username"
+               icon = {faUserSecret}
+               input = {state.username}
+               dispatch = {dispatch}
+               autoFocus
+               required
+            />
+            <Input
+               id = "password"
+               type = "password"
+               label = "Password"
+               autoComplete = "new-password"
+               icon = {faKey}
+               input = {state.password}
+               dispatch = {dispatch}
+               required
+            />
+            <Input
+               id = "confirmPassword"
+               type = "password"
+               label = "Confirm Password"
+               autoComplete = "new-password"
+               icon = {faKey}
+               input = {state.confirmPassword}
+               dispatch = {dispatch}
+               required
+            />
+            <Input
+               id = "name"
+               type = "text"
+               label = "Name"
+               autoComplete = "name"
+               icon = {faFeather}
+               input = {state.name}
+               dispatch = {dispatch}
+               required
+            />
+            <Input
+               id = "birthday"
+               type = "date"
+               label = "Birthday"
+               autoComplete = "bday"
+               icon = {faCalendar}
+               input = {state.birthday}
+               dispatch = {dispatch}
+               required
+            />
+            <Input
+               id = "email"
+               type = "email"
+               label = "Email"
+               autoComplete = "email"
+               icon = {faEnvelope}
+               input = {state.email}
+               dispatch = {dispatch}
+               required
+            />
+            <Input
+               id = "phone"
+               type = "tel"
+               label = "Phone"
+               autoComplete = "tel"
+               icon = {faPhone}
+               input = {state.phone}
+               dispatch = {dispatch}
+            />
+            <Button
+               type = "submit"
+               className = "bg-primary text-white h-[2.6rem]"
+               icon = {faUserCheck}>
+          Register
             </Button>
          </form>
-         <p className = "mt-4">Already have an account? <Link href = "/login" className = "text-primary font-bold underline">Log In</Link></p>
-         {
-            (status.state === "Success" || status.state === "Failure") && (
-               <Notification status = {status}>
-                  {(status.state === "Success") &&
-                     <Link href = "/home">
-                        <Button
-                           type = "button"
-                           className = "bg-green-600 text-white p-4 text-sm h-[2rem]"
-                           onClick = {async() => {
-                              await login({
-                                 username: registration.username.value,
-                                 password: registration.password.value
-                              });
-                           }}
-                        >
-                           Log In
-                        </Button>
-                     </Link>
-                  }
-               </Notification>
-            )
-         }
+         <p className = "mt-4">
+        Already have an account?{" "}
+            <Link
+               href = "/login"
+               className = "text-primary font-bold">
+          Log In
+            </Link>
+         </p>
       </div>
    );
 }
 
 export default function SignUpForm(): JSX.Element {
    return (
-      <>
-         <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
-            <Heading title = "Sign Up" description = "Create an account to get started" />
-            <Form />
-         </div>
-      </>
+      <div className = "w-full mx-auto mt-8 flex flex-col items-center justify-center text-center">
+         <Heading
+            title = "Sign Up"
+            description = "Create an account to get started"
+         />
+         <Form />
+      </div>
    );
 }

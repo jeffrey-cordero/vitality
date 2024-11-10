@@ -1,4 +1,4 @@
-### Please check if the PR fulfills these requirement
+### Please check if the PR fulfills these requirements
 
 <!-- Make sure to review each item in the checklist and check it off once you have completed it, if applicable. -->
 

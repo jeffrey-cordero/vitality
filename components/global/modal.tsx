@@ -1,35 +1,108 @@
-"use client";
-import { useState } from "react";
+import clsx from "clsx";
+import {
+   forwardRef,
+   useCallback,
+   useEffect,
+   useImperativeHandle,
+   useRef,
+   useState
+} from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
-interface ModalProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
-   children?: React.ReactNode;
-   className?: string;
+interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
+  display: React.ReactNode;
+  children: React.ReactNode;
+  onClose?: () => void;
 }
 
-export default function Modal(props: ModalProps): JSX.Element {
-   const [visible, setVisible] = useState<boolean>(false);
+export const Modal = forwardRef(function Modal(props: ModalProps, ref) {
+   const { display, children, className, onClick, onClose } = props;
+   const [open, setOpen] = useState<boolean>(false);
+   const modalRef = useRef(null);
+
+   // Allow children components to handle opening/closing the model outside of click events
+   const handleOnClose = useCallback(() => {
+      onClose?.call(null);
+      setOpen(false);
+   }, [onClose]);
+
+   const handleOnOpen = () => {
+      setOpen(true);
+   };
+
+   useImperativeHandle(ref, () => ({
+      close: handleOnClose,
+      open: handleOnOpen
+   }));
+
+   useEffect(() => {
+      const modals = document.getElementsByClassName("modal");
+
+      if (modals.length > 0) {
+         document.body.parentElement.style.overflowY = "hidden";
+      }
+
+      return () => {
+         if (modals.length === 0) {
+            document.body.parentElement.style.overflowY = "initial";
+         }
+      };
+   }, []);
 
    return (
-      <>
-         <button
-            className = "block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            type = "button"
-            onClick = {() => setVisible(!(visible))}
-         >
-            Toggle modal
-         </button>
-         {
-            visible && (
+      <div className = "relative">
+         <div
+            onClick = {(event) => {
+               // Ensure the onClick does that propagate to parent component
+               event.stopPropagation();
 
-               <div className = "overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-1/2 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                  <div className = "relative p-4 w-full max-w-2xl max-h-full">
-                     <div className = "relative bg-white rounded-lg shadow">
-                        {props.children}
-                     </div>
+               if (open === false) {
+                  // Trigger defined onClick on display, if any
+                  onClick?.call(null, event);
+                  setOpen(true);
+               }
+            }}>
+            {display}
+         </div>
+         {open && (
+            <div
+               className = {clsx(
+                  "fixed w-full mx-auto p-4 inset-0 flex items-center justify-center align-center z-50",
+                  className,
+               )}>
+               <div className = "fixed inset-0 bg-gray-600 bg-opacity-50"></div>
+               <div
+                  ref = {modalRef}
+                  tabIndex = {0}
+                  onKeyDown = {(event) => {
+                     event.stopPropagation();
+                     // Close the active modal in the DOM through the escape key
+                     const target = event.target as HTMLElement;
+
+                     if (
+                        event.key === "Escape" &&
+                target.classList.contains("modal")
+                     ) {
+                        handleOnClose();
+                     }
+                  }}
+                  className = "relative bg-white rounded-lg shadow-lg p-6 md:py-6 md:px-8 w-full max-h-[90%] overflow-y-auto focus:outline-none modal scrollbar-hide">
+                  <div className = "absolute top-[2px] right-[5px] z-50 p-3.5 rounded-e-md">
+                     <FontAwesomeIcon
+                        onClick = {(event) => {
+                           event.stopPropagation();
+                           handleOnClose();
+                        }}
+                        icon = {faXmark}
+                        className = "cursor-pointer flex-shrink-0 size-4.5 text-2xl text-red-500 text-md font-extrabold modal-close"
+                        fill = "black"
+                     />
                   </div>
+                  <div>{children}</div>
                </div>
-            )}
-      </>
-
+            </div>
+         )}
+      </div>
    );
-}
+});

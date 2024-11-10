@@ -38,7 +38,7 @@ jobs:
         run: npm install
 
       - name: Run Unit tests
-        run: npx jest tests/unit/* --collect-coverage
+        run: npm run unit
 
   Integration:
     runs-on: ubuntu-22.04

@@ -3,14 +3,15 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 interface CounterProps {
-   value: number;
-   className: string;
-   start: number;
-   duration: number;
+  value: number;
+  className: string;
+  start: number;
+  duration: number;
 }
 
 function Counter(props: CounterProps): JSX.Element {
-   const [count, setCount] = useState<number>(props.start);
+   const { value, className, start, duration } = props;
+   const [count, setCount] = useState<number>(start);
    const easeOutQuad = (t: number, b: number, c: number, d: number) => {
       t = t > d ? d : t / d;
       return Math.round(-c * t * (t - 2) + b);
@@ -21,29 +22,30 @@ function Counter(props: CounterProps): JSX.Element {
       const animateCount = (timestamp: number) => {
          if (!startTime) startTime = timestamp;
          const timePassed = timestamp - startTime;
-         const progress = timePassed / props.duration;
-         const currentCount = easeOutQuad(progress, 0, props.value, 1);
-         if (currentCount >= props.value) {
-            setCount(props.value);
+         const progress = timePassed / duration;
+         const currentCount = easeOutQuad(progress, 0, value, 1);
+         if (currentCount >= value) {
+            setCount(value);
             return;
          }
          setCount(currentCount);
          requestAnimationFrame(animateCount);
       };
       requestAnimationFrame(animateCount);
-   }, [props.value, props.duration]);
+   }, [
+      value,
+      duration
+   ]);
 
-   return <p className = {props.className}>{Intl.NumberFormat().format(count)}</p>;
+   return <p className = {className}>{Intl.NumberFormat().format(count)}</p>;
 }
 
 export default function Ring(): JSX.Element {
    return (
       <div className = "relative h-full w-full my-[4rem]">
          <motion.svg
-            className = "absolute inset-0 m-auto w-[90px] md:w-[120px] h-[90px] md:h-[120px]"
-            viewBox = "0 0 100 100"
-
-         >
+            className = "absolute inset-0 m-auto w-[80px] md:w-[100px] h-[80px] md:h-[100px]"
+            viewBox = "0 0 100 100">
             <motion.circle
                initial = {{ pathLength: 0 }}
                animate = {{ pathLength: 1 }}
@@ -65,7 +67,7 @@ export default function Ring(): JSX.Element {
             value = {100}
             start = {0}
             duration = {3500}
-            className = "relative inset-0 mx-auto flex items-center justify-center font-display text-3xl sm:text-4xl text-green-500"
+            className = "relative inset-0 mx-auto flex items-center justify-center font-display text-2xl sm:text-3xl text-green-500"
          />
       </div>
    );

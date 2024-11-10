@@ -12,33 +12,41 @@ const config: Config = {
             "13": "repeat(13, minmax(0, 1fr))"
          },
          colors: {
-            primary: "#2947A9"
-         }
-      },
-      keyframes: {
-         slideIn: {
-            from: {
-               opacity: "0",
-               transform: "translateY(-30px)"
+            primary: "#2563EB"
+         },
+         keyframes: {
+            slideIn: {
+               from: {
+                  opacity: "0",
+                  transform: "translateY(-30px)"
+               },
+               to: {
+                  opacity: "1",
+                  transform: "translateY(0)"
+               }
             },
-            to: {
-               opacity: "1",
-               transform: "translateY(0)"
+            fadeIn: {
+               from: {
+                  opacity: "0"
+               },
+               to: {
+                  opacity: "1"
+               }
+            },
+            fadeOut: {
+               from: {
+                  opacity: "1"
+               },
+               to: {
+                  opacity: "0"
+               }
             }
          },
-
-         fadeIn: {
-            from: {
-               opacity: "0"
-            },
-            to: {
-               opacity: "1"
-            }
+         animation: {
+            slideIn: "slideIn 1s ease-in-out",
+            fadeIn: "fadeIn 700ms ease-in-out forwards",
+            fadeOut: "fadeOut 700ms ease-in-out forwards"
          }
-      },
-      animation: {
-         slideIn: "slideIn 1s ease-in-out 300ms",
-         fadeIn: "fadeIn 1s ease-in-out 300ms forwards"
       }
    },
    plugins: [require("@tailwindcss/forms")]

@@ -7,6 +7,4 @@ jest.mock("@prisma/client", () => ({
    }
 }));
 
-test("Test that user feedback can be stored", async() => {
-
-});
+test("Test that user feedback can be stored", async() => {});
