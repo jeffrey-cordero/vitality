@@ -17,7 +17,7 @@ import {
    VitalityResponse,
    handleResponse
 } from "@/lib/global/state";
-import { Feedback, sendFeedback } from "@/lib/feedback/feedback";
+import { Feedback, sendFeedback } from "@/lib/home/feedback/feedback";
 import { NotificationContext } from "@/app/layout";
 
 const feedback: VitalityState = {

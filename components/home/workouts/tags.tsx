@@ -13,7 +13,7 @@ import {
    faTags
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { addWorkoutTag, updateWorkoutTag, Tag } from "@/lib/workouts/tags";
+import { addWorkoutTag, updateWorkoutTag, Tag } from "@/lib/home/workouts/tags";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
 import {
@@ -25,7 +25,7 @@ import {
    VitalityState
 } from "@/lib/global/state";
 import { Modal } from "@/components/global/modal";
-import { searchForTitle } from "@/lib/workouts/shared";
+import { searchForTitle } from "@/lib/home/workouts/shared";
 
 const form: VitalityState = {
    tagTitle: {
@@ -70,20 +70,20 @@ function CreateTagContainer(props: CreateTagContainerProps) {
 
    return (
       <div
-         tabIndex={0}
-         className={clsx(
+         tabIndex = {0}
+         className = {clsx(
             "cursor-pointer text-sm font-bold focus:scale-[1.05] hover:scale-[1.05] transition duration-300 ease-in-out rounded-full mb-2 mt-4 focus:outline-blue-500",
          )}
-         onClick={onSubmit}
-         onKeyDown={(event: React.KeyboardEvent) => {
+         onClick = {onSubmit}
+         onKeyDown = {(event: React.KeyboardEvent) => {
             if (event.key === "Enter") {
                onSubmit();
             }
          }}>
          <div
-            className="relative flex justify-center items-center gap-2 px-4 py-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-white"
-            style={{ backgroundColor: "rgb(90, 90, 90)" }}>
-            <FontAwesomeIcon icon={faTags} />
+            className = "relative flex justify-center items-center gap-2 px-4 py-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-white"
+            style = {{ backgroundColor: "rgb(90, 90, 90)" }}>
+            <FontAwesomeIcon icon = {faTags} />
             {search}
          </div>
       </div>
@@ -94,10 +94,10 @@ function TagColorInput(props: VitalityChildProps) {
    const { localState, localDispatch } = props;
 
    const names = useMemo(() => {
-      return Object.keys(colors)
+      return Object.keys(colors);
    }, []);
 
-   const handleChangeColor = useCallback(
+   const handleColorChange = useCallback(
       (color: string) => {
          localDispatch({
             type: "updateState",
@@ -111,19 +111,19 @@ function TagColorInput(props: VitalityChildProps) {
             }
          });
       }, [
-      localDispatch,
-      localState
-   ]);
+         localDispatch,
+         localState
+      ]);
 
    return (
-      <div className="relative w-full mx-auto">
+      <div className = "relative w-full mx-auto">
          {names.map((name: string) => {
             const color = colors[name];
 
             return (
                <div
-                  style={{ backgroundColor: color }}
-                  className={clsx(
+                  style = {{ backgroundColor: color }}
+                  className = {clsx(
                      "flex justify-center items-center text-sm cursor-pointer w-full h-[2.6rem] border-[2px] rounded-sm p-3 text-white text-center",
                      {
                         "border-primary border-[4px] shadow-2xl":
@@ -131,11 +131,11 @@ function TagColorInput(props: VitalityChildProps) {
                         "border-white": localState.tagColor.value !== color
                      },
                   )}
-                  onClick={(event) => {
+                  onClick = {(event) => {
                      event.stopPropagation();
-                     handleChangeColor(color);
+                     handleColorChange(color);
                   }}
-                  key={name}>
+                  key = {name}>
                   {name}
                </div>
             );
@@ -159,8 +159,8 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
    } = props;
    const { updateNotification } = useContext(NotificationContext);
 
-   const handleEditWorkoutTagSubmission = useCallback(
-      async (method: "update" | "delete") => {
+   const handleTagUpdates = useCallback(
+      async(method: "update" | "delete") => {
          const payload: Tag = {
             user_id: tag.user_id,
             id: tag.id,
@@ -262,47 +262,48 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
    );
 
    return (
-      <div className="flex flex-col justify-center align-center text-center gap-3 text-black">
-         <div className="flex flex-col justify-center align-center text-center gap-3">
+      <div className = "flex flex-col justify-center align-center text-center gap-3 text-black">
+         <div className = "flex flex-col justify-center align-center text-center gap-3">
             <FontAwesomeIcon
-               icon={faGear}
-               className="text-4xl text-primary mt-6"
+               icon = {faGear}
+               className = "text-4xl text-primary mt-6"
             />
-            <h1 className="text-2xl font-bold text-black mb-2 px-2">
+            <h1 className = "text-2xl font-bold text-black mb-2 px-2">
                Edit Tag
             </h1>
          </div>
          <Input
-            id="tagTitle"
-            type="text"
-            label="Title"
-            icon={faTag}
-            input={localState.tagTitle}
-            dispatch={localDispatch}
+            id = "tagTitle"
+            type = "text"
+            label = "Title"
+            icon = {faTag}
+            input = {localState.tagTitle}
+            dispatch = {localDispatch}
+            onSubmit={() => handleTagUpdates("update")}
             autoFocus
             required
          />
-         <div className="flex flex-col justify-center items-center gap-1">
+         <div className = "flex flex-col justify-center items-center gap-1">
             <TagColorInput {...props} />
             {localState.tagColor.error !== null && (
-               <div className="flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                  <p className="text-red-500 font-bold input-error">
+               <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
+                  <p className = "text-red-500 font-bold input-error">
                      {" "}
                      {localState.tagColor.error}{" "}
                   </p>
                </div>
             )}
          </div>
-         <div className="flex flex-col gap-2">
+         <div className = "flex flex-col gap-2">
             <Conformation
-               message="Delete this tag?"
-               onConformation={() => handleEditWorkoutTagSubmission("delete")}
+               message = "Delete this tag?"
+               onConformation = {() => handleTagUpdates("delete")}
             />
             <Button
-               type="submit"
-               className="bg-primary text-white w-full  h-[2.4rem]"
-               icon={faCloudArrowUp}
-               onClick={() => handleEditWorkoutTagSubmission("update")}>
+               type = "submit"
+               className = "bg-primary text-white w-full  h-[2.4rem]"
+               icon = {faCloudArrowUp}
+               onClick = {() => handleTagUpdates("update")}>
                Save
             </Button>
          </div>
@@ -328,7 +329,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
    const editTagModalRef = useRef<{ open: () => void; close: () => void }>(null);
 
    // Handle adding or removing a selected tag
-   const handleSelectWorkoutTag = useCallback(
+   const handleTagSelect = useCallback(
       (adding: boolean) => {
          globalDispatch({
             type: "updateState",
@@ -338,7 +339,6 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                   ...globalState.tags,
                   data: {
                      ...globalState.tags.data,
-                     // Add to selected options, if applicable, or remove
                      selected: adding
                         ? [...globalState.tags.data.selected, tag]
                         : [...globalState.tags.data.selected].filter(
@@ -349,12 +349,12 @@ function TagContainer(props: TagContainerProps): JSX.Element {
             }
          });
       }, [
-      globalDispatch,
-      globalState.tags,
-      tag
-   ]);
+         globalDispatch,
+         globalState.tags,
+         tag
+      ]);
 
-   const handleInitializeTagForm = useCallback(() => {
+   const handleTagEdits = useCallback(() => {
       // Update edit tag information globalState
       localDispatch({
          type: "updateStates",
@@ -378,56 +378,56 @@ function TagContainer(props: TagContainerProps): JSX.Element {
       tag.title
    ]);
 
-   const handleEditTagSave = useCallback(() => {
+   const handleTagSave = useCallback(() => {
       editTagModalRef.current?.close();
       tagRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
    }, []);
 
    return (
       <li
-         className={clsx(
+         className = {clsx(
             "relative px-4 py-2 m-2 rounded-full text-sm font-bold text-white",
          )}
-         style={{
+         style = {{
             backgroundColor: tag.color
          }}
-         ref={tagRef}
-         key={tag.id}>
-         <div className="max-w-full mx-auto flex flex-row justify-center items-center">
+         ref = {tagRef}
+         key = {tag.id}>
+         <div className = "max-w-full mx-auto flex flex-row justify-center items-center">
             <div
-               onClick={(event) => {
+               onClick = {(event) => {
                   event.stopPropagation();
 
                   if (!selected) {
-                     handleSelectWorkoutTag(true);
+                     handleTagSelect(true);
                   }
                }}
-               className="cursor-pointer max-w-full pr-3 mx-auto line-clamp-1 break-all text-center text-ellipsis">
+               className = "cursor-pointer max-w-full pr-3 mx-auto line-clamp-1 break-all text-center text-ellipsis">
                {tag.title}
             </div>
-            <div className="flex flex-row justify-center items-center gap-2 pr-2">
+            <div className = "flex flex-row justify-center items-center gap-2 pr-2">
                {
                   <Modal
-                     ref={editTagModalRef}
-                     display={
+                     ref = {editTagModalRef}
+                     display = {
                         <FontAwesomeIcon
-                           icon={faGears}
-                           onClick={handleInitializeTagForm}
-                           className="cursor-pointer text-md pt-1"
+                           icon = {faGears}
+                           onClick = {handleTagEdits}
+                           className = "cursor-pointer text-md pt-1"
                         />
                      }
-                     className="max-w-[90%] sm:max-w-xl max-h-[90%] mt-12">
+                     className = "max-w-[90%] sm:max-w-xl max-h-[90%] mt-12">
                      <EditTagContainer
                         {...props}
-                        onSave={handleEditTagSave}
+                        onSave = {handleTagSave}
                      />
                   </Modal>
                }
                {selected && (
                   <FontAwesomeIcon
-                     onMouseDown={() => handleSelectWorkoutTag(false)}
-                     icon={faXmark}
-                     className="cursor-pointer text-lg"
+                     onMouseDown = {() => handleTagSelect(false)}
+                     icon = {faXmark}
+                     className = "cursor-pointer text-lg"
                   />
                )}
             </div>
@@ -441,18 +441,17 @@ interface TagsProps extends VitalityProps {
 }
 
 export function Tags(props: TagsProps): JSX.Element {
+   const { user } = useContext(AuthenticationContext);
+   const { updateNotification } = useContext(NotificationContext);
    const { globalState, globalDispatch, onReset } = props;
 
-   // Fetch user and notification information from context
-   const { user } = useContext(AuthenticationContext);
-
-   const { updateNotification } = useContext(NotificationContext);
-
-   // Store overall and selected tags
+   // Fetch overall and selected tags lists
    const { options, selected } = globalState.tags.data;
 
    // Local state for tag-related inputs
    const [localState, localDispatch] = useReducer(formReducer, form);
+
+   const fetched: boolean = globalState.tags.data.fetched;
 
    // Convert search string to lower case for case-insensitive comparison
    const search: string = useMemo(() => {
@@ -472,14 +471,14 @@ export function Tags(props: TagsProps): JSX.Element {
    ]);
 
    // Search results
-   const results: Tag[] = useMemo(() => {
+   const searchResults: Tag[] = useMemo(() => {
       return searchForTitle(searchOptions, search);
    }, [
       searchOptions,
       search
    ]);
 
-   // Tags by title to show that current search pattern exists or can be used as a new tag title
+   // Tags by title to determine if search pattern exists or may be used for a new tag
    const tagsByTitle: { [title: string]: Tag } = useMemo(() => {
       const titles = {};
 
@@ -490,7 +489,7 @@ export function Tags(props: TagsProps): JSX.Element {
       return titles;
    }, [options]);
 
-   const handleNewTagSubmission = useCallback(async () => {
+   const handleTagCreation = useCallback(async() => {
       // Default tags have gray color option
       const tag: Tag = {
          user_id: user?.id,
@@ -545,7 +544,7 @@ export function Tags(props: TagsProps): JSX.Element {
             value: {
                tagSearch: {
                   ...localState.tagSearch,
-                  error: response.body.errors["search"]?.[0] ?? null
+                  error: response.body.errors["title"]?.[0] ?? null
                }
             }
          });
@@ -559,85 +558,81 @@ export function Tags(props: TagsProps): JSX.Element {
       updateNotification
    ]);
 
-   const fetched: boolean = globalState.tags.data.fetched;
-
    return (
       <div>
          {fetched ? (
-            <div className="w-full mx-auto flex flex-col flex-wrap justify-center items-center">
+            <div className = "w-full mx-auto flex flex-col flex-wrap justify-center items-center">
                {globalState.tags.data.selected?.length > 0 && (
-                  <ul className="flex flex-col sm:flex-row flex-wrap justify-center items-center pb-2">
+                  <ul className = "flex flex-col sm:flex-row flex-wrap justify-center items-center pb-2">
                      {globalState.tags.data.selected.map((selected: Tag) => {
                         return (
                            selected !== undefined && (
                               <TagContainer
                                  {...props}
-                                 localState={localState}
-                                 localDispatch={localDispatch}
-                                 tag={selected}
-                                 selected={true}
-                                 key={selected.id}
+                                 localState = {localState}
+                                 localDispatch = {localDispatch}
+                                 tag = {selected}
+                                 selected = {true}
+                                 key = {selected.id}
                               />
                            )
                         );
                      })}
                   </ul>
                )}
-               <div className="relative w-full mx-auto">
+               <div className = "relative w-full mx-auto">
                   {onReset && (
-                     <div className="relative mt-4">
+                     <div className = "relative mt-4">
                         <FontAwesomeIcon
-                           icon={faArrowRotateLeft}
-                           onClick={onReset}
-                           className="absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                           icon = {faArrowRotateLeft}
+                           onClick = {onReset}
+                           className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                         />
                      </div>
                   )}
                   <Input
-                     id="tagSearch"
-                     type="text"
-                     input={localState.tagSearch}
-                     label="Tags"
-                     icon={faTag}
-                     dispatch={localDispatch}
-                     onSubmit={() => {
+                     id = "tagSearch"
+                     type = "text"
+                     input = {localState.tagSearch}
+                     label = "Tags"
+                     icon = {faTag}
+                     dispatch = {localDispatch}
+                     onSubmit = {() => {
                         if (!tagsByTitle[search]) {
-                           handleNewTagSubmission();
+                           handleTagCreation();
                         }
                      }}
                   />
                </div>
-               {results.length > 0 && (
-                  <ul className="flex flex-row flex-wrap justify-center items-center pt-2">
-                     {results.map((tag: Tag) => {
+               {searchResults.length > 0 && (
+                  <ul className = "flex flex-row flex-wrap justify-center items-center pt-2">
+                     {searchResults.map((tag: Tag) => {
                         return (
                            <TagContainer
                               {...props}
-                              localState={localState}
-                              localDispatch={localDispatch}
-                              globalState={globalState}
-                              globalDispatch={globalDispatch}
-                              tag={tag}
-                              selected={false}
-                              key={tag.id}
+                              localState = {localState}
+                              localDispatch = {localDispatch}
+                              globalState = {globalState}
+                              globalDispatch = {globalDispatch}
+                              tag = {tag}
+                              selected = {false}
+                              key = {tag.id}
                            />
                         );
                      })}
                   </ul>
                )}
-               {search.trim().length > 0 &&
-                  user !== undefined &&
-                  tagsByTitle[search] === undefined && (
-                     <CreateTagContainer
-                        {...props}
-                        localState={localState}
-                        localDispatch={localDispatch}
-                        onSubmit={() => handleNewTagSubmission()}
-                     />
-                  )}
+               {search.trim().length > 0 && user !== undefined && tagsByTitle[search] === undefined && (
+                  <CreateTagContainer
+                     {...props}
+                     localState = {localState}
+                     localDispatch = {localDispatch}
+                     onSubmit = {() => handleTagCreation()}
+                  />
+               )}
             </div>
          ) : (
-            <div className="w-full h-full justify-center items-center py-12">
+            <div className = "w-full h-full justify-center items-center py-12">
                <Loading />
             </div>
          )}

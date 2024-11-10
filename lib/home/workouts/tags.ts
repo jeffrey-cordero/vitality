@@ -1,5 +1,5 @@
 "use server";
-import prisma from "@/lib/database/client";
+import prisma from "@/lib/prisma/client";
 import { z } from "zod";
 import {
    VitalityResponse,
@@ -53,9 +53,9 @@ export async function fetchWorkoutTags(userId: string): Promise<Tag[]> {
       return result;
    } catch (error) {
       console.error(error);
-
-      return [];
    }
+
+   return [];
 }
 
 export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
@@ -65,10 +65,10 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
       // Return the field errors
       const errors = fields.error.flatten();
 
-      // Only error should be tag title being too long or short
+      // Only error should be proposed tag title not being a valid length
       if (errors.fieldErrors.title) {
          return sendErrorMessage("Error", "Invalid workout tag fields", tag, {
-            search: errors.fieldErrors.title ?? [""]
+            title: errors.fieldErrors.title ?? [""]
          });
       }
    }
@@ -88,11 +88,11 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
 
       if (
          error.code === "P2002" &&
-      error.meta?.modelName === "workout_tags" &&
-      error.meta?.target?.includes("user_id") &&
-      error.meta?.target?.includes("title")
+         error.meta?.modelName === "workout_tags" &&
+         error.meta?.target?.includes("user_id") &&
+         error.meta?.target?.includes("title")
       ) {
-      // Workout tags must be unique
+         // Workout tags must be unique
          return sendErrorMessage("Error", "Workout tag already exists", tag, {
             search: ["Workout tag already exists"]
          });
@@ -141,10 +141,7 @@ export async function updateWorkoutTag(
                }
             });
 
-            return sendSuccessMessage(
-               "Successfully deleted workout tag",
-               deletedTag,
-            );
+            return sendSuccessMessage("Successfully deleted workout tag", deletedTag);
          default:
             return sendErrorMessage(
                "Failure",
@@ -158,11 +155,11 @@ export async function updateWorkoutTag(
 
       if (
          error.code === "P2002" &&
-      error.meta?.modelName === "workout_tags" &&
-      error.meta?.target?.includes("user_id") &&
-      error.meta?.target?.includes("title")
+         error.meta?.modelName === "workout_tags" &&
+         error.meta?.target?.includes("user_id") &&
+         error.meta?.target?.includes("title")
       ) {
-      // Workout tags must be unique by their title
+            // Workout tags must be unique by their title
          return sendErrorMessage(
             "Error",
             "Workout tag title already exists",

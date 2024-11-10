@@ -1,12 +1,12 @@
 import clsx from "clsx";
 import Image from "next/image";
 import { VitalityProps } from "@/lib/global/state";
-import { Workout } from "@/lib/workouts/workouts";
-import { getWorkoutDate } from "@/lib/workouts/shared";
+import { Workout } from "@/lib/home/workouts/workouts";
+import { getWorkoutDate } from "@/lib/home/workouts/shared";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 import { useMemo } from "react";
-import { Tag } from "@/lib/workouts/tags";
+import { Tag } from "@/lib/home/workouts/tags";
 
 interface CardProps extends CardsProps {
   workout: Workout;

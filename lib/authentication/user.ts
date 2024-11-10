@@ -1,5 +1,5 @@
 "use server";
-import prisma from "@/lib/database/client";
+import prisma from "@/lib/prisma/client";
 import { users as User } from "@prisma/client";
 import { auth } from "@/auth";
 
@@ -15,7 +15,7 @@ export async function getUserByUsername(
       });
 
       if (user !== null && !authentication) {
-      // Remove password from the user object outside of authentication purposes
+         // Remove password from the user object outside of authentication purposes
          user.password = "";
       }
 
@@ -35,7 +35,7 @@ export async function getUserByEmail(email: string): Promise<User | undefined> {
       });
 
       if (user !== null) {
-      // Remove password from the user object
+         // Remove password from the user object
          user.password = "";
       }
 

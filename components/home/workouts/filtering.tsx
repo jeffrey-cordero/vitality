@@ -10,7 +10,7 @@ import {
    VitalityProps,
    VitalityState
 } from "@/lib/global/state";
-import { Workout } from "@/lib/workouts/workouts";
+import { Workout } from "@/lib/home/workouts/workouts";
 import {
    faCalendar,
    faMagnifyingGlass,
@@ -23,7 +23,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useMemo, useRef } from "react";
 import { Tags } from "@/components/home/workouts/tags";
-import { Tag } from "@/lib/workouts/tags";
+import { Tag } from "@/lib/home/workouts/tags";
 
 export function filterByTags(
    selectedTags: Set<string>,

@@ -4,7 +4,7 @@ import Table from "@/components/home/workouts/table";
 import Cards from "@/components/home/workouts/cards";
 import Loading from "@/components/global/loading";
 import { VitalityProps } from "@/lib/global/state";
-import { Workout } from "@/lib/workouts/workouts";
+import { Workout } from "@/lib/home/workouts/workouts";
 import {
    faPersonRunning,
    faPhotoFilm,

@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { mockDeep } from "jest-mock-extended";
 import { expect } from "@jest/globals";
-import { addWorkout } from "@/lib/workouts/workouts";
+import { addWorkout } from "@/lib/home/workouts/workouts";
 
 jest.mock("@prisma/client", () => ({
    PrismaClient: function() {

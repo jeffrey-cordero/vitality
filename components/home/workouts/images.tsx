@@ -8,12 +8,13 @@ import {
    faCameraRetro,
    faGlobe,
    faPaperclip,
-   faPenToSquare
+   faPenToSquare,
+   faTrashCan
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { verifyImageURL } from "@/lib/workouts/shared";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
 
-const defaultImages = [
+const images = [
    "bike.png",
    "cardio.png",
    "default.png",
@@ -26,16 +27,16 @@ const defaultImages = [
    "weights.png"
 ];
 
-interface ImageSelectionFormProps extends VitalityInputProps {
-  isValidResource: boolean;
-  isValidURL: boolean;
+interface ImagesFormProps extends VitalityInputProps {
+   isValidResource: boolean;
+   isValidURL: boolean;
 }
 
-function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
+function ImagesForm(props: ImagesFormProps): JSX.Element {
    const { isValidURL, isValidResource, input, dispatch } = props;
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(true);
 
-   const handleImageURLSubmission = useCallback(() => {
+   const handleImageURLUpdates = useCallback(() => {
       dispatch({
          type: "updateState",
          value: {
@@ -58,7 +59,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
 
    const handleDefaultImageSelection = useCallback(
       (source: string) => {
-      // All default images are valid images
+         // All default images are valid image URL's
          dispatch({
             type: "updateState",
             value: {
@@ -79,6 +80,46 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
          input
       ]);
 
+   const handleImageResourceError = useCallback(() => {
+      dispatch({
+         type: "updateState",
+         value: {
+            id: "image",
+            input: {
+               ...input,
+               error: "Failed to fetch your desired image resource. Please ensure the link is valid.",
+               data: {
+                  ...input.data,
+                  valid: false
+               }
+            }
+         }
+      });
+   }, [
+      dispatch,
+      input
+   ]);
+
+   const handleImageURLReset = useCallback(() => {
+      dispatch({
+         type: "updateState",
+         value: {
+            id: "image",
+            input: {
+               ...input,
+               error: null,
+               value: "",
+               data: {
+                  valid: undefined
+               }
+            }
+         }
+      });
+   }, [
+      dispatch,
+      input
+   ]);
+
    useEffect(() => {
       if (isDefaultImage) {
          document.getElementById(input.value)
@@ -97,9 +138,9 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                }}
                className = {clsx("transition duration-300 ease-in-out", {
                   "scale-105 border-b-4 border-b-primary rounded-none":
-              isDefaultImage
+                     isDefaultImage
                })}>
-          Defaults
+               Defaults
             </Button>
             <Button
                icon = {faGlobe}
@@ -109,17 +150,18 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                }}
                className = {clsx("transition duration-300 ease-in-out", {
                   "scale-105  border-b-4 border-b-primary rounded-none":
-              !isDefaultImage
+                     !isDefaultImage
                })}>
-          URL
+               URL
             </Button>
          </div>
          {isDefaultImage ? (
             <div
                tabIndex = {0}
-               className = "flex flex-wrap gap-6 justify-center items-center px-2 py-4">
-               {defaultImages.map((image) => {
-                  const source = `/workouts/${image}`;
+               className = "relative flex flex-wrap gap-6 justify-center items-center px-2 py-4">
+               {images.map((image) => {
+                  const source: string = `/workouts/${image}`;
+                  const isSelected: boolean = input.value === source;
 
                   return (
                      <div
@@ -141,16 +183,11 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                            key = {source}
                            alt = "workout-image"
                            className = {clsx(
-                              "object-cover object-center shadow-inner rounded-xl cursor-pointer",
-                              {
-                                 "border-[4px] border-primary shadow-2xl scale-[1.05] transition duration-300 ease-in-out":
-                        input.value === source
-                              },
+                              "object-cover object-center shadow-inner rounded-xl cursor-pointer", {
+                                 "border-primary border-[4px] shadow-2xl scale-[1.05] transition duration-300 ease-in-out": isSelected
+                              }
                            )}
-                           onClick = {(event: React.MouseEvent) => {
-                              event.stopPropagation();
-                              handleDefaultImageSelection(source);
-                           }}
+                           onClick = {() => !isSelected ? handleDefaultImageSelection(source) : handleImageURLReset()}
                         />
                      </div>
                   );
@@ -160,7 +197,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
             <div
                onKeyDown = {(event: React.KeyboardEvent) => {
                   if (event.key === "Enter") {
-                     handleImageURLSubmission();
+                     handleImageURLUpdates();
                   }
                }}
                className = "relative w-full h-full mx-auto">
@@ -173,24 +210,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                            quality = {100}
                            sizes = "100%"
                            src = {input.value}
-                           onError = {() => {
-                              // Resource removed, moved temporarily, etc.
-                              dispatch({
-                                 type: "updateState",
-                                 value: {
-                                    id: "image",
-                                    input: {
-                                       ...input,
-                                       error:
-                            "Failed to fetch your desired image resource. Please ensure the link is valid.",
-                                       data: {
-                                          ...input.data,
-                                          valid: false
-                                       }
-                                    }
-                                 }
-                              });
-                           }}
+                           onError = {handleImageResourceError}
                            alt = "workout-image"
                            className = {clsx(
                               "object-cover object-center rounded-xl cursor-default border-[4px] border-primary shadow-md scale-[1.05] transition duration-300 ease-in-out",
@@ -222,13 +242,17 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
                />
                <Button
                   type = "button"
-                  onClick = {(event: React.MouseEvent) => {
-                     event.stopPropagation();
-                     handleImageURLSubmission();
-                  }}
-                  className = "w-full bg-primary text-white mt-2 font-semibold  h-[2.4rem] placeholder:text-transparent"
+                  onClick = {handleImageURLReset}
+                  className = "w-full px-4 py-2 mt-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
+                  icon = {faTrashCan}>
+                  Remove Image
+               </Button>
+               <Button
+                  type = "button"
+                  onClick = {handleImageURLUpdates}
+                  className = "w-full bg-primary text-white mt-2 font-semibold h-[2.4rem] placeholder:text-transparent"
                   icon = {faPaperclip}>
-            Link
+                  Add Image
                </Button>
             </div>
          )}
@@ -236,9 +260,14 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
    );
 }
 
-export default function ImageSelection(props: VitalityInputProps): JSX.Element {
+export default function Images(props: VitalityInputProps): JSX.Element {
    const { input } = props;
-   const isValidResource: boolean = input.data.valid !== false;
+   const isValidResource: boolean = useMemo(() => {
+      return input.data.valid !== false && input.value.trim().length !== 0;
+   }, [
+      input.data.valid,
+      input.value
+   ]);
    const isValidURL: boolean = useMemo(() => {
       return verifyImageURL(input.value);
    }, [input.value]);
@@ -253,7 +282,7 @@ export default function ImageSelection(props: VitalityInputProps): JSX.Element {
                      className = {clsx(
                         "w-full text-black font-semibold border-[1.5px] px-4 py-2 h-[2.4rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500",
                         {
-                           "border-[1.5px] border-red-500": !isValidResource
+                           "border-[1.5px] border-red-500": input.error
                         },
                      )}>
                      <FontAwesomeIcon
@@ -272,7 +301,7 @@ export default function ImageSelection(props: VitalityInputProps): JSX.Element {
                </div>
             }
             className = "max-w-[90%] sm:max-w-xl max-h-[90%] mt-12">
-            <ImageSelectionForm
+            <ImagesForm
                {...props}
                isValidResource = {isValidResource}
                isValidURL = {isValidURL}

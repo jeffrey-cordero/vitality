@@ -11,7 +11,7 @@ import {
    VitalityResponse,
    VitalityState
 } from "@/lib/global/state";
-import { Workout } from "@/lib/workouts/workouts";
+import { Workout } from "@/lib/home/workouts/workouts";
 import {
    faAlignJustify,
    faArrowRotateLeft,
@@ -40,7 +40,7 @@ import {
    Exercise,
    ExerciseSet,
    updateExercises
-} from "@/lib/workouts/exercises";
+} from "@/lib/home/workouts/exercises";
 import { NotificationContext } from "@/app/layout";
 import { useDoubleTap } from "use-double-tap";
 import {
@@ -162,7 +162,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          />
          <Button
             type = "button"
-            className = "w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
+            className = "w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
             icon = {faRotateLeft}
             onClick = {() => {
                onBlur();
@@ -171,7 +171,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          </Button>
          <Button
             type = "button"
-            className = "w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500"
+            className = "w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
             icon = {faPenRuler}
             onClick = {handleCreateNewExercise}>
             Add Exercise
@@ -240,7 +240,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
          hours: parseNumber(localState.hours.value),
          minutes: parseNumber(localState.minutes.value),
          seconds: parseNumber(localState.seconds.value),
-         text: localState.text.value
+         text: localState.text.value.trim()
       };
    }, [
       set,
@@ -461,7 +461,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                />
                <Button
                   type = "button"
-                  className = "w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
+                  className = "w-full px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
                   icon = {faRotateLeft}
                   onClick = {() => {
                      if (set === undefined) {
@@ -475,7 +475,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                </Button>
                <Button
                   type = "button"
-                  className = "w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500"
+                  className = "w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
                   icon = {faCloudArrowUp}
                   onClick = {() => handleExerciseSetUpdates("update")}>
                   {set !== undefined ? "Update" : "Create"}
@@ -536,7 +536,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                               className = "self-start pt-1 text-primary"
                               icon = {faAlignJustify}
                            />
-                           <p className = "whitespace-pre">{set.text.trim()}</p>
+                           <p>{set.text}</p>
                         </div>
                      )}
                   </div>
@@ -832,7 +832,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                />
                <Button
                   type = "button"
-                  className = "w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
+                  className = "w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
                   icon = {faRotateLeft}
                   onClick = {() => {
                      setEditName(false);
@@ -841,7 +841,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                </Button>
                <Button
                   type = "button"
-                  className = "w-full bg-green-600 text-white text-md my-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500"
+                  className = "w-full bg-green-600 text-white text-md my-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
                   icon = {faPenRuler}
                   onClick = {handleExerciseNameUpdates}>
                   Update
@@ -902,10 +902,10 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   </SortableContext>
                </DndContext>
                {
-                  <div className = "w-full mx-auto mt-2 px-4 sm:px-8">
+                  <div className = "w-full mx-auto px-4 sm:px-8">
                      <Button
                         type = "button"
-                        className = "w-full bg-white text-black text-md px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500"
+                        className = "w-full bg-white text-black text-md px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
                         icon = {faPersonRunning}
                         onClick = {() => {
                            handleReset("");
@@ -1106,7 +1106,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                <div className = "w-full mx-auto">
                   <Button
                      type = "button"
-                     className = "w-full bg-white text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.5rem] focus:border-blue-500 focus:ring-blue-500"
+                     className = "w-full bg-white text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
                      icon = {faPlus}
                      onClick = {handleInitializeNewExerciseInput}>
                       New Exercise

@@ -2,7 +2,7 @@ import clsx from "clsx";
 import Button from "@/components/global/button";
 import Select from "@/components/global/select";
 import { VitalityProps } from "@/lib/global/state";
-import { Workout } from "@/lib/workouts/workouts";
+import { Workout } from "@/lib/home/workouts/workouts";
 import {
    faCircleChevronLeft,
    faCircleChevronRight,

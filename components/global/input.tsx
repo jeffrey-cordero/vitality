@@ -161,7 +161,7 @@ export default function Input(props: VitalityInputProps): JSX.Element {
             {icon && <FontAwesomeIcon icon = {icon} />} {label}
          </label>
          {input.error !== null &&
-            <div className = "flex justify-center align-center text-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
+            <div className = "flex justify-center align-center text-center max-w-[90%] mx-auto gap-2 mt-2 opacity-0 animate-fadeIn">
                <p className = "text-red-500 font-bold input-error"> {input.error} </p>
             </div>
          }

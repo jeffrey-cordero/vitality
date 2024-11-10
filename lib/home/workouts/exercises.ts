@@ -1,12 +1,13 @@
 "use server";
-import prisma from "@/lib/database/client";
+import prisma from "@/lib/prisma/client";
 import { z } from "zod";
 import {
    VitalityResponse,
    sendSuccessMessage,
    sendErrorMessage
 } from "@/lib/global/state";
-import { formatWorkout } from "@/lib/workouts/shared";
+import { formatWorkout } from "@/lib/home/workouts/shared";
+import { uuidSchema } from "@/lib/global/zod";
 
 export type ExerciseSet = {
   id: string;
@@ -23,55 +24,55 @@ export type ExerciseSet = {
 const MAX_INTEGER = 2147483647;
 
 const setSchema = z.object({
-   id: z.string(),
-   exercise_id: z.string(),
+   id: uuidSchema,
+   exercise_id: uuidSchema,
    hours: z
       .number()
       .min(0, {
-         message: "Hours must be non-negative."
+         message: "Hours must be non-negative"
       })
       .max(MAX_INTEGER, {
-         message: "Hours exceeds the maximum limit for a number."
+         message: "Value exceeds the maximum limit for a number"
       })
       .optional()
       .nullable(),
    minutes: z
       .number()
       .min(0, {
-         message: "Minutes must be non-negative."
+         message: "Minutes must be non-negative"
       })
       .max(60, {
-         message: "Minutes cannot exceed 60."
+         message: "Minutes cannot exceed 60"
       })
       .optional()
       .nullable(),
    seconds: z
       .number()
       .min(0, {
-         message: "Seconds must be non-negative."
+         message: "Seconds must be non-negative"
       })
       .max(60, {
-         message: "Seconds cannot exceed 60."
+         message: "Seconds cannot exceed 60"
       })
       .optional()
       .nullable(),
    weight: z
       .number()
       .min(0, {
-         message: "Weight must be non-negative."
+         message: "Weight must be non-negative"
       })
       .max(MAX_INTEGER, {
-         message: "Weight exceeds the maximum limit for a number."
+         message: "Value exceeds the maximum limit for a number"
       })
       .optional()
       .nullable(),
    repetitions: z
       .number()
       .min(0, {
-         message: "Repetitions must be non-negative."
+         message: "Repetitions must be non-negative"
       })
       .max(MAX_INTEGER, {
-         message: "Repetitions exceeds the maximum limit for a number."
+         message: "Value exceeds the maximum limit for a number"
       })
       .optional()
       .nullable(),
@@ -87,8 +88,8 @@ export type Exercise = {
 };
 
 const exerciseSchema = z.object({
-   id: z.string(),
-   workout_id: z.string(),
+   id: uuidSchema,
+   workout_id: uuidSchema,
    name: z
       .string()
       .trim()
@@ -139,7 +140,7 @@ export async function updateExercise(
 ): Promise<VitalityResponse<Exercise>> {
    try {
       if (method === "name") {
-      // Update exercise name
+         // Update exercise name
          const name = exercise.name.trim();
 
          if (name.length === 0) {
@@ -161,17 +162,20 @@ export async function updateExercise(
                }
             });
 
-            return sendSuccessMessage("Successfully updated exercise name", null);
+            return sendSuccessMessage("Successfully updated exercise name", {
+               ...exercise,
+               name: name
+            });
          }
       } else {
-         const isEmptyExerciseSet = (set: ExerciseSet) => {
+         const isEmptySet = (set: ExerciseSet) => {
             return (
                set.weight === null &&
-          set.repetitions === null &&
-          set.hours === null &&
-          set.minutes === null &&
-          set.seconds === null &&
-          set.text?.trim() === ""
+               set.repetitions === null &&
+               set.hours === null &&
+               set.minutes === null &&
+               set.seconds === null &&
+               set.text?.trim() === ""
             );
          };
 
@@ -185,7 +189,7 @@ export async function updateExercise(
                   null,
                   fields.error.flatten().fieldErrors,
                );
-            } else if (isEmptyExerciseSet(set)) {
+            } else if (isEmptySet(set)) {
                return sendErrorMessage(
                   "Error",
                   "Set must be non-empty.",
@@ -195,7 +199,7 @@ export async function updateExercise(
             }
          }
 
-         // Update exercise sets
+         // Update exercise sets while referring to current exercise entry
          const existingExercise = await prisma.exercises.findUnique({
             where: {
                id: exercise.id
@@ -209,16 +213,14 @@ export async function updateExercise(
             }
          });
 
-         const existingExerciseSetIdsArray: string[] =
-        existingExercise?.sets.map((set) => set.id) || [];
-         const newExerciseSetIdsArray: string[] = exercise.sets.map(
+         const existingExerciseSets: string[] = existingExercise?.sets.map((set) => set.id) || [];
+         const newExerciseSets: Set<string> = new Set(exercise.sets.map(
             (set) => set.id,
-         );
-         const newExerciseSetIdsSet: Set<string> = new Set(newExerciseSetIdsArray);
+         ));
 
          // Determine IDs to remove
-         const exerciseSetsToRemove: string[] = existingExerciseSetIdsArray.filter(
-            (id) => !newExerciseSetIdsSet.has(id),
+         const exerciseSetsToRemove: string[] = existingExerciseSets.filter(
+            (id) => !newExerciseSets.has(id),
          );
 
          // Determine sets to create or update
@@ -230,11 +232,6 @@ export async function updateExercise(
                ...exercise.sets[i],
                set_order: i
             };
-
-            // Remove the exercise ID for the Prisma ORM transaction
-            if (exerciseSet.exercise_id !== undefined) {
-               delete exerciseSet.exercise_id;
-            }
 
             if (exerciseSet.id === undefined || exerciseSet.id.trim() === "") {
                exerciseSetsToCreate.push({
@@ -251,7 +248,10 @@ export async function updateExercise(
                   where: {
                      id: exerciseSet.id
                   },
-                  data: exerciseSet
+                  data: {
+                     ...exerciseSet,
+                     exercise_id: undefined
+                  }
                });
             }
          }
@@ -281,7 +281,7 @@ export async function updateExercise(
          });
 
          return sendSuccessMessage(
-            "Missing implementation for update exercise sets",
+            "Successfully updated exercise sets",
             newExercise,
          );
       }
@@ -331,27 +331,24 @@ export async function updateExercises(
       });
 
       // Extract exercise IDs
-      const existingExerciseIdsArray: string[] =
-      existingWorkout?.exercises.map((exercise) => exercise.id) ?? [];
-      const newExerciseIdsArray: string[] = exercises.map(
+      const existingExercisesIds: string[] = existingWorkout?.exercises.map((exercise) => exercise.id) ?? [];
+      const newExercisesIds: Set<string> = new Set(exercises.map(
          (exercise) => exercise.id,
-      );
-      const newExerciseIdsSet: Set<string> = new Set(newExerciseIdsArray);
+      ));
 
       // Determine exercise's to remove and update ordering accordingly
-      const exerciseIdsToRemove: string[] = existingExerciseIdsArray.filter(
-         (id: string) => !newExerciseIdsSet.has(id),
+      const exerciseIdsToRemove: string[] = existingExercisesIds.filter(
+         (id: string) => !newExercisesIds.has(id),
       );
 
       const workout = await prisma.workouts.update({
          where: { id: workoutId },
          data: {
             exercises: {
-               // Update existing ordering for reorder or deletion methods
                deleteMany: {
                   id: { in: exerciseIdsToRemove }
                },
-               updateMany: newExerciseIdsArray.map((id: string, index: number) => ({
+               updateMany: Array.from(newExercisesIds).map((id: string, index: number) => ({
                   where: {
                      id: id
                   },

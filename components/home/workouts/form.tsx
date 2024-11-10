@@ -1,7 +1,7 @@
 import Button from "@/components/global/button";
 import Input from "@/components/global/input";
 import TextArea from "@/components/global/textarea";
-import ImageSelection from "@/components/home/workouts/image-selection";
+import Images from "@/components/home/workouts/images";
 import Exercises from "@/components/home/workouts/exercises";
 import Conformation from "@/components/global/confirmation";
 import { Modal } from "@/components/global/modal";
@@ -19,8 +19,8 @@ import {
    removeWorkouts,
    updateWorkout,
    Workout
-} from "@/lib/workouts/workouts";
-import { Tag } from "@/lib/workouts/tags";
+} from "@/lib/home/workouts/workouts";
+import { Tag } from "@/lib/home/workouts/tags";
 import {
    faArrowRotateLeft,
    faPersonRunning,
@@ -42,7 +42,7 @@ import {
    useState
 } from "react";
 import { filterWorkout } from "@/components/home/workouts/filtering";
-import { verifyImageURL } from "@/lib/workouts/shared";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
 
 const form: VitalityState = {
    title: {
@@ -440,7 +440,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                   <Tags
                      {...props}
                   />
-                  <ImageSelection
+                  <Images
                      id = "image"
                      type = "text"
                      label = "URL"

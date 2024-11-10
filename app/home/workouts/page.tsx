@@ -4,8 +4,8 @@ import View from "@/components/home/workouts/view";
 import Form from "@/components/home/workouts/form";
 import Pagination from "@/components/home/workouts/pagination";
 import { AuthenticationContext } from "@/app/layout";
-import { fetchWorkouts, Workout } from "@/lib/workouts/workouts";
-import { fetchWorkoutTags } from "@/lib/workouts/tags";
+import { fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
+import { fetchWorkoutTags } from "@/lib/home/workouts/tags";
 import {
    useCallback,
    useContext,
@@ -15,7 +15,7 @@ import {
    useState
 } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
-import { searchForTitle } from "@/lib/workouts/shared";
+import { searchForTitle } from "@/lib/home/workouts/shared";
 
 const workouts: VitalityState = {
    search: {

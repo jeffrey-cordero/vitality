@@ -5,9 +5,9 @@ import Conformation from "@/components/global/confirmation";
 import { VitalityProps, VitalityResponse } from "@/lib/global/state";
 import { faImage, faPencil } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { removeWorkouts, Workout } from "@/lib/workouts/workouts";
-import { getWorkoutDate } from "@/lib/workouts/shared";
-import { Tag } from "@/lib/workouts/tags";
+import { removeWorkouts, Workout } from "@/lib/home/workouts/workouts";
+import { getWorkoutDate } from "@/lib/home/workouts/shared";
+import { Tag } from "@/lib/home/workouts/tags";
 import { useCallback, useContext, useMemo } from "react";
 import { NotificationContext } from "@/app/layout";
 
@@ -117,7 +117,7 @@ function Row(props: RowProps) {
                         sizes = "100%"
                         src = {workout.image}
                         alt = "workout-image"
-                        className = {clsx("w-full h-full mx-auto object-cover object-center rounded-full overflow-hidden shadow-sm")}
+                        className = {clsx("w-full h-full mx-auto object-cover object-center rounded-full overflow-hidden shadow-lg")}
                      />
                   </div>
                ) : (

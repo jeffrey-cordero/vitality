@@ -1,23 +1,21 @@
-import { Workout } from "@/lib/workouts/workouts";
-import { Exercise } from "@/lib/workouts/exercises";
+import { Workout } from "@/lib/home/workouts/workouts";
 
 const urlRegex =
   /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg)|https?:\/\/[^/]+\/[^?#]+\?.*)$/i;
-const nextMediaRegex =
+const defaultImageRegex =
   /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
 
 export function verifyImageURL(url: string): boolean {
-   return urlRegex.test(url) || nextMediaRegex.test(url);
+   return url.trim().length === 0 || urlRegex.test(url) || defaultImageRegex.test(url);
 }
 
 export function searchForTitle(array: any[], search: string): any[] {
-   // Handle no input for array search
    if (search === "") {
       return array;
    }
 
-   // Partial match search (case-insensitive - assumes search is lowercase)
-   return array.filter((t) => t.title.toLowerCase().includes(search));
+   // Partial match search (case-insensitive)
+   return array.filter((t) => t.title.toLowerCase().includes(search.toLowerCase()));
 }
 
 export function getWorkoutDate(date: Date): string {
@@ -25,8 +23,8 @@ export function getWorkoutDate(date: Date): string {
    return date.toISOString().slice(0, 10);
 }
 
-export function formatWorkout(workout): Workout {
-   // Turn combined tag and exercise data into a uniform Workout typed
+export function formatWorkout(workout: any): Workout {
+   // Uniform workout object containing all potential properties, tags, and exercises
    return {
       id: workout.id,
       user_id: workout.user_id,
@@ -38,17 +36,14 @@ export function formatWorkout(workout): Workout {
       workout.workout_applied_tags?.map(
          (applied_tag: any) => applied_tag.workout_tags.id,
       ) ?? [],
-      exercises:
-      workout.exercises?.map((exercise) => formatExercise(exercise)) ?? []
-   };
-}
-
-export function formatExercise(exercise): Exercise {
-   return {
-      id: exercise.id,
-      workout_id: exercise.workout_id,
-      exercise_order: exercise.exercise_order,
-      name: exercise.name,
-      sets: exercise.sets ?? []
+      exercises: workout.exercises?.map((exercise: any) => {
+         return {
+            id: exercise.id,
+            workout_id: exercise.workout_id,
+            exercise_order: exercise.exercise_order,
+            name: exercise.name,
+            sets: exercise.sets ?? []
+         };
+      }) ?? []
    };
 }

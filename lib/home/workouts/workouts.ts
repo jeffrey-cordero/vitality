@@ -1,13 +1,13 @@
 "use server";
-import prisma from "@/lib/database/client";
+import prisma from "@/lib/prisma/client";
 import { z } from "zod";
 import {
    VitalityResponse,
    sendSuccessMessage,
    sendErrorMessage
 } from "@/lib/global/state";
-import { formatWorkout } from "@/lib/workouts/shared";
-import { Exercise } from "@/lib/workouts/exercises";
+import { formatWorkout } from "@/lib/home/workouts/shared";
+import { Exercise } from "@/lib/home/workouts/exercises";
 import { uuidSchema } from "@/lib/global/zod";
 
 export type Workout = {
@@ -97,7 +97,6 @@ export async function addWorkout(
       const fields = workoutsSchema.safeParse(workout);
 
       if (!fields.success) {
-      // Return the field errors
          return sendErrorMessage(
             "Error",
             "Invalid workout tag fields",
@@ -105,7 +104,8 @@ export async function addWorkout(
             fields.error.flatten().fieldErrors,
          );
       }
-
+      
+      // Create new workout with basic properties and an additional nested create operation for applied workout tags
       const newWorkout = await prisma.workouts.create({
          data: {
             user_id: workout.user_id,
@@ -113,7 +113,6 @@ export async function addWorkout(
             date: workout.date,
             image: workout.image,
             description: workout.description,
-            // Nested create operation to add entries to the workout_applied_tags table, if any
             workout_applied_tags: {
                create: workout.tagIds.map((tagId: string) => {
                   return {
@@ -163,7 +162,7 @@ export async function updateWorkout(
             fields.error.flatten().fieldErrors,
          );
       } else {
-      // Fetch existing tags first for data integrity
+         // Fetch existing tags first for data integrity
          const existingWorkout = await prisma.workouts.findUnique({
             where: {
                id: workout.id
@@ -186,22 +185,18 @@ export async function updateWorkout(
          });
 
          // Extract existing tag IDs
-         const existingTagIdsArray: string[] =
-        existingWorkout?.workout_applied_tags.map((tag) => tag.tag_id) || [];
-         const existingTagIdsSet: Set<string> = new Set(existingTagIdsArray);
+         const existingAppliedTags: Set<string> = new Set(existingWorkout?.workout_applied_tags.map((tag) => tag.tag_id) || []);
 
          // Determine tags to connect and disconnect
-         const newTagIdsArray: string[] = workout.tagIds;
-         const newTagIdsSet: Set<string> = new Set(workout.tagIds);
+         const newAppliedTags: Set<string> = new Set(workout.tagIds);
 
-         const tagsToRemove: string[] = existingTagIdsArray.filter(
-            (id) => !newTagIdsSet.has(id),
+         const tagsToRemove: string[] = Array.from(existingAppliedTags).filter(
+            (id) => !newAppliedTags.has(id),
          );
-         const tagsToAdd: string[] = newTagIdsArray.filter(
-            (id) => !existingTagIdsSet.has(id),
+         const tagsToAdd: string[] = Array.from(newAppliedTags).filter(
+            (id) => !existingAppliedTags.has(id),
          );
 
-         // Update the workout with set operation
          const updatedWorkout = await prisma.workouts.update({
             where: { id: workout.id },
             data: {
@@ -209,13 +204,12 @@ export async function updateWorkout(
                description: workout.description,
                date: workout.date,
                image: workout.image,
-               // Update tags
                workout_applied_tags: {
-                  // Disconnect existing tags
+                  // Disconnect existing applied tags
                   deleteMany: {
                      tag_id: { in: tagsToRemove }
                   },
-                  // Add new tag entries using tagsToAdd id's
+                  // Create new applied tags
                   createMany: {
                      data: tagsToAdd.map((tagId: string) => ({
                         tag_id: tagId
@@ -242,7 +236,7 @@ export async function updateWorkout(
          });
 
          return sendSuccessMessage(
-            "Updated workout",
+            "Successfully updated workout",
             formatWorkout(updatedWorkout),
          );
       }
@@ -255,7 +249,6 @@ export async function updateWorkout(
    }
 }
 
-// Handle removing single or multiple workouts in a given list
 export async function removeWorkouts(
    workouts: Workout[],
 ): Promise<VitalityResponse<number>> {
