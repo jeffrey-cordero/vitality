@@ -6,7 +6,7 @@ const urlRegex =
 const nextMediaRegex =
   /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
 
-export function verifyURL(url: string): boolean {
+export function verifyImageURL(url: string): boolean {
    return urlRegex.test(url) || nextMediaRegex.test(url);
 }
 

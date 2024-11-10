@@ -72,7 +72,8 @@ export default function Pagination(props: PaginationProps): JSX.Element {
             }
          });
 
-         document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "start" });
+         document.getElementById("workoutsView")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" });
          window.localStorage.setItem("paging", event.target.value);
       }, [
          globalDispatch,
@@ -108,8 +109,8 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                         onClick = {() => handlePageClick(index - 1)}
                         className = {clsx("rounded-lg w-[3rem] h-[2.2rem]", {
                            "font-bold text-primary border-2 border-primary bg-blue-100": isSelected,
-                           "ml-3": isSelected && index === 1,
-                           "mr-3": isSelected && index === pages
+                           "ml-2": isSelected && index === 1,
+                           "mr-2": isSelected && index === pages
                         })}>
                         {index}
                      </Button>

@@ -129,7 +129,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          // Add the new exercise to editing workout array of exercises
          const newExercises: Exercise[] = [
             ...workout.exercises,
-            response.body.data
+            response.body.data as Exercise
          ];
          saveExercises(newExercises);
          onBlur();
@@ -700,12 +700,12 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       );
 
       const successMethod = () => {
-      // Update the overall workout exercises with new exercises from backend response
-         saveExercises(response.body.data);
+         // Update the overall workout exercises with new exercises from backend response
+         saveExercises(response.body.data as Exercise[]);
       };
 
       if (window.localStorage.getItem(collapsedId)) {
-      // Remove from localStorage as the exercise no longer exists
+         // Remove from localStorage as the exercise no longer exists
          window.localStorage.removeItem(collapsedId);
       }
 

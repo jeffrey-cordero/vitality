@@ -1,5 +1,5 @@
 "use client";
-import Filter from "@/components/home/workouts/filter";
+import Filtering from "@/components/home/workouts/filtering";
 import View from "@/components/home/workouts/view";
 import Form from "@/components/home/workouts/form";
 import Pagination from "@/components/home/workouts/pagination";
@@ -44,7 +44,7 @@ const workouts: VitalityState = {
       data: {
          options: [],
          selected: [],
-         filterSelected: [],
+         filtered: [],
          dictionary: {},
          fetched: false
       },
@@ -145,7 +145,7 @@ export default function Page(): JSX.Element {
                      ...globalState.tags.data,
                      options: tagsData,
                      selected: [],
-                     selectedFromFiltered: [],
+                     filtered: [],
                      dictionary: Object.fromEntries(
                         tagsData.map((tag) => [tag.id, tag]),
                      ),
@@ -205,7 +205,7 @@ export default function Page(): JSX.Element {
 
    return (
       <main className = "relative w-full lg:w-11/12 mx-auto mt-8 flex flex-col justify-start items-center text-center">
-         <Filter
+         <Filtering
             globalState = {globalState}
             globalDispatch = {globalDispatch}
          />

@@ -233,10 +233,10 @@ export default function Table(props: TableProps): JSX.Element {
 
    const handleWorkoutDelete = useCallback(async() => {
       const size: number = visibleSelectedWorkouts.size;
-      const response: VitalityResponse<number> = 
+      const response: VitalityResponse<number> =
          await removeWorkouts(Array.from(visibleSelectedWorkouts));
 
-      if (response.body.data === size) {
+      if (response.body.data as number === size) {
          // Remove single or multiple workouts from overall, filtered, and selected workouts
          const newWorkouts = [...globalState.workouts.value].filter((w: Workout) => {
             return !(visibleSelectedWorkouts.has(w));

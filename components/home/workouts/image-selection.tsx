@@ -11,7 +11,7 @@ import {
    faPenToSquare
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { verifyURL } from "@/lib/workouts/shared";
+import { verifyImageURL } from "@/lib/workouts/shared";
 
 const defaultImages = [
    "bike.png",
@@ -81,8 +81,7 @@ function ImageSelectionForm(props: ImageSelectionFormProps): JSX.Element {
 
    useEffect(() => {
       if (isDefaultImage) {
-         document
-            .getElementById(input.value)
+         document.getElementById(input.value)
             ?.scrollIntoView({ behavior: "smooth", block: "center" });
       }
    });
@@ -241,7 +240,7 @@ export default function ImageSelection(props: VitalityInputProps): JSX.Element {
    const { input } = props;
    const isValidResource: boolean = input.data.valid !== false;
    const isValidURL: boolean = useMemo(() => {
-      return verifyURL(input.value);
+      return verifyImageURL(input.value);
    }, [input.value]);
    const addedImage: boolean = isValidResource && isValidURL;
 

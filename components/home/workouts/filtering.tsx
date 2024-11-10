@@ -22,14 +22,14 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useMemo, useRef } from "react";
-import { TagSelection } from "@/components/home/workouts/tag-selection";
+import { Tags } from "@/components/home/workouts/tags";
 import { Tag } from "@/lib/workouts/tags";
 
 export function filterByTags(
    selectedTags: Set<string>,
    workout: Workout,
 ): boolean {
-   // Ensure tags within the given workout cover entire provided set of tag id's
+   // Ensure tags within the given workout cover entire set of filtered tags
    let size: number = 0;
 
    for (const tagId of workout.tagIds) {
@@ -54,9 +54,10 @@ export function filterByDate(
       case "Is on or after":
          return isNaN(minDate.getTime()) || workout.date >= minDate;
       case "Is on or before":
-         return workout.date <= maxDate;
+         return isNaN(maxDate.getTime()) || workout.date <= maxDate;
       default:
-         return workout.date >= minDate && workout.date <= maxDate;
+         return isNaN(minDate.getTime()) && isNaN(maxDate.getTime())
+            || workout.date >= minDate && workout.date <= maxDate;
    }
 }
 
@@ -68,88 +69,20 @@ export function filterWorkout(
 ): boolean {
    // Filter by date and/or applied tags, if applicable for either method
    const { appliedDateFiltering, appliedTagsFiltering } =
-    globalState.workouts.data;
+      globalState.workouts.data;
 
    const passesDateFiltering: boolean =
-    (!appliedDateFiltering && source !== "date") ||
-    filterByDate(globalState, workout);
+      (!appliedDateFiltering && source !== "date") ||
+      filterByDate(globalState, workout);
    const passesTagsFiltering: boolean =
-    (!appliedTagsFiltering && source !== "tags") ||
-    filterByTags(selectedTags, workout);
+      (!appliedTagsFiltering && source !== "tags") ||
+      filterByTags(selectedTags, workout);
 
    return passesDateFiltering && passesTagsFiltering;
 }
 
-export function getFilteredDateWorkouts(
-   props: VitalityProps,
-): Workout[] | null {
-   const { globalState, globalDispatch } = props;
-
-   // Handle invalid inputs
-   const errors = {};
-
-   const dateFilter: string = globalState.dateFilter.value;
-   const minDate: Date = new Date(globalState.minDate.value);
-   const maxDate: Date = new Date(globalState.maxDate.value);
-   const isRange: boolean = dateFilter === "Is between";
-
-   const validateDate = (date: Date, key: string) => {
-      if (isNaN(date.getTime())) {
-         errors[key] = ["Date must be non-empty"];
-      }
-   };
-
-   // For range method, both date inputs are validated
-   if (isRange || dateFilter === "Is on or after") {
-      validateDate(minDate, "min");
-   }
-
-   if (isRange || dateFilter === "Is on or before") {
-      validateDate(maxDate, "max");
-   }
-
-   // Invalid range errors
-   if (isRange && !Object.keys(errors).length && minDate > maxDate) {
-      errors["min"] = errors["max"] = ["Date range must be valid"];
-   }
-
-   if (Object.keys(errors).length > 0) {
-      // Display all errors
-      globalDispatch({
-         type: "updateErrors",
-         value: sendErrorMessage<null>(
-            "Error",
-            "Invalid Date filter(s)",
-            null,
-            errors,
-         )
-      });
-   } else {
-      // Remove all errors, if any, and apply filter all available workouts
-      globalDispatch({
-         type: "updateErrors",
-         value: sendSuccessMessage<null>("Success", null)
-      });
-
-      // Fetch cached selected filtered tags
-      const selectedTags: Set<string> = new Set(
-         globalState.tags.data.selectedFromFiltered.map((tag: Tag) => tag.id),
-      );
-
-      const filteredWorkouts: Workout[] = [...globalState.workouts.value].filter(
-         (workout: Workout) => {
-            return filterWorkout(globalState, workout, selectedTags, "date");
-         },
-      );
-
-      return filteredWorkouts;
-   }
-
-   return null;
-}
-
 interface DateInputProps extends VitalityProps {
-  input: VitalityInputState;
+   input: VitalityInputState;
 }
 
 function DateInput(props: DateInputProps) {
@@ -167,7 +100,7 @@ function DateInput(props: DateInputProps) {
          </div>
          <div className = "w-full mx-auto">
             <Input
-               id = {isMinDate ? "min" : "max"}
+               id = {isMinDate ? "minDate" : "maxDate"}
                type = "date"
                label = "Title"
                icon = {faCalendar}
@@ -183,29 +116,82 @@ function DateInput(props: DateInputProps) {
 function FilterByDate(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
    const filterModalRef = useRef<{ open: () => void; close: () => void }>(null);
-   const type: string = globalState.dateFilter.value;
+   const dateFilterType: string = globalState.dateFilter.value;
 
-   const inputs: { [key: string]: VitalityInputState | undefined } =
-    useMemo(() => {
-       return {
-          "Is between": undefined,
-          "Is on or after": globalState.minDate,
-          "Is on or before": globalState.maxDate
-       };
-    }, [
-       globalState.minDate,
-       globalState.maxDate
-    ]);
+   const inputs = useMemo(() => {
+      return {
+         "Is between": undefined,
+         "Is on or after": globalState.minDate,
+         "Is on or before": globalState.maxDate
+      };
+   }, [
+      globalState.minDate,
+      globalState.maxDate
+   ]);
 
    const input: VitalityInputState | undefined = useMemo(() => {
-      return inputs[type];
-   }, [inputs, type]);
+      return inputs[dateFilterType];
+   }, [inputs, dateFilterType]);
 
    const handleApplyFilterClick = useCallback(() => {
-      const filteredWorkouts: Workout[] | null = getFilteredDateWorkouts(props);
+      // Handle invalid inputs
+      const errors = {};
 
-      if (filteredWorkouts !== null) {
-      // Update filtered state for global state
+      const dateFilter: string = globalState.dateFilter.value;
+      const minDate: Date = new Date(globalState.minDate.value);
+      const maxDate: Date = new Date(globalState.maxDate.value);
+      const isRange: boolean = dateFilter === "Is between";
+
+      const validateDate = (date: Date, key: string) => {
+         if (isNaN(date.getTime())) {
+            errors[key] = ["Date must be non-empty"];
+         }
+      };
+
+      // For range filtering, ensure both inputs are validated
+      if (isRange || dateFilter === "Is on or after") {
+         validateDate(minDate, "minDate");
+      }
+
+      if (isRange || dateFilter === "Is on or before") {
+         validateDate(maxDate, "maxDate");
+      }
+
+      // Invalid range errors
+      if (isRange && !Object.keys(errors).length && minDate > maxDate) {
+         errors["minDate"] = errors["maxDate"] = ["Date range must be valid"];
+      }
+
+      if (Object.keys(errors).length > 0) {
+         // Display all errors
+         globalDispatch({
+            type: "updateErrors",
+            value: sendErrorMessage(
+               "Error",
+               "Invalid Date filter(s)",
+               null,
+               errors,
+            )
+         });
+      } else {
+         // Remove all errors, if any, and apply filter all available workouts
+         globalDispatch({
+            type: "updateErrors",
+            value: sendSuccessMessage("Success", null)
+         });
+
+         // Fetch cached selected filtered tags
+         const filteredTags: Set<string> = new Set(
+            globalState.tags.data.filtered.map((tag: Tag) => tag.id),
+         );
+
+         const filteredWorkouts: Workout[] = [...globalState.workouts.value].filter(
+            (workout: Workout) => {
+               return filterWorkout(globalState, workout, filteredTags, "date");
+            },
+         );
+
+         // Update filtered state for global state
          globalDispatch({
             type: "updateState",
             value: {
@@ -222,28 +208,25 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          });
 
          filterModalRef.current?.close();
-         document
-            .getElementById("workoutsView")
+         document.getElementById("workoutsView")
             ?.scrollIntoView({ behavior: "smooth", block: "start" });
       }
    }, [
-      props,
-      globalState.workouts,
+      globalState,
       globalDispatch
    ]);
 
    const handleReset = useCallback(() => {
-      // Resetting the date filter should fall back to tags filtered view, if applied
+      // Resetting the date filter should fall back to only tag filtering, if applied
       const appliedTagsFiltering: boolean =
-      globalState.workouts.data.appliedTagsFiltering;
-      const selectedTags: Set<string> = new Set(
-         globalState.tags.data.selectedFromFiltered.map((tag: Tag) => tag.id),
+         globalState.workouts.data.appliedTagsFiltering;
+      const filteredTags: Set<string> = new Set(
+         globalState.tags.data.filtered.map((tag: Tag) => tag.id),
       );
 
-      // All selected and filtered workouts remain the same, but additional filtered may be added as date filter is removed
       const newFiltered: Workout[] = [...globalState.workouts.value].filter(
          (workout) => {
-            return !appliedTagsFiltering || filterByTags(selectedTags, workout);
+            return !appliedTagsFiltering || filterByTags(filteredTags, workout);
          },
       );
 
@@ -262,19 +245,22 @@ function FilterByDate(props: VitalityProps): JSX.Element {
             // Reset date filtering inputs
             dateFilter: {
                ...globalState.dateFilter,
+               error: null,
                value: "Is on or after"
             },
             minDate: {
                ...globalState.minDate,
+               error: null,
                value: ""
             },
             maxDate: {
                ...globalState.maxDate,
+               error: null,
                value: ""
             },
-            // Reset to first page view
             page: {
                ...globalState.page,
+               error: null,
                value: 0
             }
          }
@@ -287,7 +273,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
       globalState.workouts.data,
       globalState.workouts.value,
       globalState.page,
-      globalState.tags.data.selectedFromFiltered
+      globalState.tags.data.filtered
    ]);
 
    return (
@@ -301,7 +287,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                   icon = {faCalendar}
                   className = "text-sm"
                />
-          Filter by Date
+               Filter by Date
             </Button>
          }
          className = "max-w-xl">
@@ -318,7 +304,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                   className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
                <Select
-                  id = "type"
+                  id = "dateFilter"
                   type = "select"
                   values = {["Is on or after", "Is on or before", "Is between"]}
                   input = {globalState.dateFilter}
@@ -327,7 +313,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                   dispatch = {globalDispatch}
                />
                {input !== undefined ? (
-               // Min or max
+                  // Min or max
                   <div>
                      <DateInput
                         {...props}
@@ -335,10 +321,9 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                      />
                   </div>
                ) : (
-               // Range (Min and Max Date Input's)
                   <div className = "my-2">
                      <Input
-                        id = "min"
+                        id = "minDate"
                         type = "date"
                         label = "Min"
                         icon = {faCalendar}
@@ -351,7 +336,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                         className = "text-lg text-primary my-2"
                      />
                      <Input
-                        id = "max"
+                        id = "maxDate"
                         type = "date"
                         label = "Max"
                         icon = {faCalendar}
@@ -366,7 +351,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                   className = "bg-primary text-white font-bold w-full h-[2.4rem] text-sm mt-3"
                   icon = {faMagnifyingGlass}
                   onClick = {handleApplyFilterClick}>
-            Apply
+                  Apply
                </Button>
             </div>
          </div>
@@ -379,7 +364,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
    const filterModalRef = useRef<{ open: () => void; close: () => void }>(null);
 
    const handleInitializeFilteredTags = useCallback(() => {
-      // Selected tags are applied from prior filter form selection
+      // Selected tags are fetched from prior tag filter form batch
       globalDispatch({
          type: "updateState",
          value: {
@@ -388,7 +373,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                ...globalState.tags,
                data: {
                   ...globalState.tags.data,
-                  selected: globalState.tags.data.selectedFromFiltered
+                  selected: globalState.tags.data.filtered
                }
             }
          }
@@ -408,54 +393,51 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                ...globalState.tags,
                data: {
                   ...globalState.tags.data,
-                  selectedFromFiltered: globalState.tags.data.selected
+                  filtered: globalState.tags.data.selected
                }
             }
          }
       });
 
-      // Selected filtered tags from filter form
-      const selectedTags: Set<string> = new Set(
+      // Selected tags represents current tag filtering form value
+      const filteredTags: Set<string> = new Set(
          globalState.tags.data.selected.map((tag: Tag) => tag.id),
       );
 
       const filteredWorkouts: Workout[] = [...globalState.workouts.value].filter(
          (workout: Workout) => {
-            return filterWorkout(globalState, workout, selectedTags, "tags");
+            return filterWorkout(globalState, workout, filteredTags, "tags");
          },
       );
 
-      if (filteredWorkouts !== null) {
       // Update filtered workouts state after applying tags filtering
-         globalDispatch({
-            type: "updateState",
-            value: {
-               id: "workouts",
-               input: {
-                  ...globalState.workouts,
-                  data: {
-                     ...globalState.workouts.data,
-                     filtered: filteredWorkouts,
-                     appliedTagsFiltering: true
-                  }
+      globalDispatch({
+         type: "updateState",
+         value: {
+            id: "workouts",
+            input: {
+               ...globalState.workouts,
+               data: {
+                  ...globalState.workouts.data,
+                  filtered: filteredWorkouts,
+                  appliedTagsFiltering: true
                }
             }
-         });
+         }
+      });
 
-         filterModalRef.current?.close();
-         document
-            .getElementById("workoutsView")
-            ?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      filterModalRef.current?.close();
+      document.getElementById("workoutsView")
+         ?.scrollIntoView({ behavior: "smooth", block: "start" });
    }, [
       globalState,
       globalDispatch
    ]);
 
    const handleReset = useCallback(() => {
-      // Resetting the tags filter should fall back to date filtered view, if applied
+      // Resetting the tags filter should fall back to date filtering, if applied
       const appliedDateFiltering: boolean =
-      globalState.workouts.data.appliedDateFiltering;
+         globalState.workouts.data.appliedDateFiltering;
 
       // All selected and filtered workouts remain the same, but additional filtered may be added as tag filter is removed
       const newFiltered: Workout[] = [...globalState.workouts.value].filter(
@@ -475,12 +457,11 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                },
                value: globalState.workouts.value
             },
-            // Selected and filtered selected should reset to empty lists
             tags: {
                data: {
                   ...globalState.tags.data,
                   selected: [],
-                  selectedFromFiltered: []
+                  filtered: []
                },
                value: globalState.tags.value
             }
@@ -503,7 +484,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                   icon = {faTag}
                   className = "text-sm"
                />
-          Filter by Tags
+               Filter by Tags
             </Button>
          }
          className = "max-w-xl">
@@ -515,7 +496,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
             <h1 className = "text-2xl font-bold text-black mb-2">Filter by Tags</h1>
             <div className = "relative">
                <div className = "w-full mx-auto my-2">
-                  <TagSelection
+                  <Tags
                      {...props}
                      onReset = {handleReset}
                   />
@@ -524,7 +505,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                      className = "bg-primary text-white font-bold w-full h-[2.4rem] text-sm mt-3"
                      icon = {faMagnifyingGlass}
                      onClick = {handleApplyFilterClick}>
-              Apply
+                     Apply
                   </Button>
                </div>
             </div>
@@ -533,7 +514,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
    );
 }
 
-export default function Filter(props: VitalityProps): JSX.Element {
+export default function Filtering(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
 
    return (
