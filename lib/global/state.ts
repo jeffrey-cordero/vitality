@@ -1,6 +1,6 @@
-import { NotificationProps } from "@/components/global/notification";
 import { produce } from "immer";
 import { Dispatch } from "react";
+import { NotificationProps } from "@/components/global/notification";
 
 export interface VitalityInputState {
   value: any;

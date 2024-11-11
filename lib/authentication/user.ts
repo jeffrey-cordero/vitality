@@ -15,7 +15,7 @@ export async function getUserByUsername(
       });
 
       if (user !== null && !authentication) {
-         // Remove password from the user object outside of authentication purposes
+         // Remove password for non-authentication purposes
          user.password = "";
       }
 
@@ -26,7 +26,7 @@ export async function getUserByUsername(
    }
 }
 
-export async function getUserByEmail(email: string): Promise<User | undefined> {
+export async function getUserByEmail(email: string, authentication: boolean): Promise<User | undefined> {
    try {
       const user = await prisma.users.findFirst({
          where: {
@@ -34,8 +34,8 @@ export async function getUserByEmail(email: string): Promise<User | undefined> {
          }
       });
 
-      if (user !== null) {
-         // Remove password from the user object
+      if (user !== null && !authentication) {
+         // Remove password for non-authentication purposes
          user.password = "";
       }
 
@@ -46,7 +46,7 @@ export async function getUserByEmail(email: string): Promise<User | undefined> {
    }
 }
 
-export async function getAuthentication(): Promise<User | undefined> {
+export async function getServerSession(): Promise<User | undefined> {
    const result = await auth();
-   return result?.user ? getUserByEmail(result.user.email as string) : undefined;
+   return result?.user ? getUserByEmail(result.user.email, false) : undefined;
 }

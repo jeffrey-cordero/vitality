@@ -14,7 +14,7 @@ import {
    useState
 } from "react";
 import { users as User } from "@prisma/client";
-import { getAuthentication } from "@/lib/authentication/user";
+import { getServerSession } from "@/lib/authentication/user";
 import { NotificationProps } from "@/components/global/notification";
 
 interface AuthenticationContextType {
@@ -57,7 +57,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
    const handleAuthentication = useCallback(async() => {
       try {
-         const user = await getAuthentication();
+         const user = await getServerSession();
          setUser(user);
       } catch (error) {
          updateNotification({
