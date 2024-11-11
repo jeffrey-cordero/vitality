@@ -1,5 +1,5 @@
 "use server";
-import prisma from "@/lib/prisma/client";
+import prisma from "@/client";
 import { z } from "zod";
 import {
    VitalityResponse,
@@ -159,7 +159,7 @@ export async function updateWorkoutTag(
          error.meta?.target?.includes("user_id") &&
          error.meta?.target?.includes("title")
       ) {
-            // Workout tags must be unique by their title
+         // Workout tags must be unique by their title
          return sendErrorMessage(
             "Error",
             "Workout tag title already exists",

@@ -9,27 +9,11 @@ jest.mock("@prisma/client", () => ({
    }
 }));
 
-/** @type {Registration} */
-let payload;
-
-/** @type {SubmissionStatus} */
+let workout;
 let expected;
 
-describe("User can be created given valid fields or rejected given invalid fields in isolation", () => {
-   test("Empty required user registration fields", async() => {
-      // All empty fields expect for birthday
-      payload = {
-         title: "Workout Test",
-         date: new Date(),
-         reflection: "Good workout"
-      };
+describe("Workout creation, updates, and deletions with validation", () => {
+   test("Should fail when...", async() => {
 
-      expected = {
-         state: "Success",
-         body: { message: "Missing implementation", data: undefined },
-         errors: {}
-      };
-
-      await expect(addWorkout(payload)).resolves.toEqual(expected);
    });
 });

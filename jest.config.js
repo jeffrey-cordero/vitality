@@ -1,11 +1,15 @@
 const nextJest = require("next/jest");
 
 const createJestConfig = nextJest({
-   dir: "./"
+  dir: "./",
 });
 
 const customJestConfig = {
-   moduleDirectories: ["node_modules", "<rootDir>/"]
+  clearMocks: true,
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  setupFilesAfterEnv: ['<rootDir>/singleton.ts'],
+  moduleDirectories: ["node_modules", "<rootDir>/"]
 };
 
 module.exports = createJestConfig(customJestConfig);

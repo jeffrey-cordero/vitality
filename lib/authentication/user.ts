@@ -1,5 +1,5 @@
 "use server";
-import prisma from "@/lib/prisma/client";
+import prisma from "@/client";
 import { users as User } from "@prisma/client";
 import { auth } from "@/auth";
 

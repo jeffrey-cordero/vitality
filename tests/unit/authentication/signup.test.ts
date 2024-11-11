@@ -1,168 +1,232 @@
-import { PrismaClient } from "@prisma/client";
-import { mockDeep } from "jest-mock-extended";
 import { expect } from "@jest/globals";
-import { signup } from "@/lib/authentication/signup";
+import { Registration, signup } from "@/lib/authentication/signup";
+import { VitalityResponse } from "@/lib/global/state";
+import { prismaMock } from "@/singleton";
+import { users } from "@prisma/client";
 
-jest.mock("@prisma/client", () => ({
-   PrismaClient: function() {
-      return mockDeep<PrismaClient>();
-   }
-}));
+let registration: Registration;
+let expected: VitalityResponse<Registration>;
 
-/** @type {Registration} */
-let payload;
+describe("User creation with validation", () => {
+  test("Should fail when any required field is invalid or missing", async () => {
+    // Test empty, missing, and null fields
+    registration = {
+      name: "",
+      username: "",
+      birthday: null,
+      phone: "",
+    } as Registration;
 
-/** @type {SubmissionStatus} */
-let expected;
+    expected = {
+      status: "Error",
+      body: {
+        data: null,
+        message: "Invalid user registration fields",
+        errors: {
+          username: ["Username must be at least 3 characters"],
+          password: ["Password is required"],
+          confirmPassword: ["Confirm password is required"],
+          name: ["Name must be at least 2 characters"],
+          email: ["Email is required"],
+          birthday: ["Birthday is required"],
+        },
+      },
+    };
 
-describe("User can be created given valid fields or rejected given invalid fields in isolation", () => {
-   test("Empty required user registration fields", async() => {
-      // All empty fields expect for birthday
-      payload = {
-         name: "",
-         birthday: new Date(),
-         username: "",
-         password: "",
-         confirmPassword: "",
-         email: "",
-         phone: ""
-      };
+    await expect(signup(registration)).resolves.toEqual(expected);
 
-      expected = {
-         state: "Error",
-         body: { message: "Invalid user registration fields" },
-         errors: {
-            username: ["A username must be at least 3 characters"],
-            password: [
-               "A password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character (@$!%*#?&)"
-            ],
-            name: ["A name must be at least 2 characters"],
-            email: ["A valid email is required"],
-            phone: ["A valid phone is required if provided"]
-         }
-      };
+    // Test invalid phone number
+    registration.phone = "27382738273971238";
+    expected.body.errors.phone = ["Phone is required, if provided"];
 
-      await expect(signup(payload)).resolves.toEqual(expected);
-   });
+    await expect(signup(registration)).resolves.toEqual(expected);
 
-   test("Missing or incorrect user registration fields", async() => {
-      // No birthday or email provided
-      payload = {
-         name: "John Doe",
-         username: "johnDoe123",
-         password: "password$AAd123",
-         confirmPassword: "password$AAd3",
-         phone: "1234567890"
-      };
+    // Test future birthday
+    registration.birthday = new Date(Date.now() + 1000 * 60 * 60 * 24);
+    expected.body.errors.birthday = ["Birthday cannot be in the future"];
 
-      expected = {
-         state: "Error",
-         body: { message: "Invalid user registration fields" },
-         errors: { birthday: ["Required"], email: ["Required"] }
-      };
+    await expect(signup(registration)).resolves.toEqual(expected);
+  });
 
-      await expect(signup(payload)).resolves.toEqual(expected);
+  test("Should fail when name or username is invalid and succeed otherwise", async () => {
+    // Test username too short
+    registration = {
+      name: "Jeffrey",
+      birthday: new Date(),
+      username: "JC",
+      password: "ValidPassword1!",
+      confirmPassword: "ValidPassword1!",
+      email: "jeffrey@gmail.com",
+      phone: "1234567890",
+    };
 
-      // Username too long, name too short, user too old, phone number too long, but a valid main password
-      payload = {
-         name: "r",
-         birthday: new Date("1776-07-04"),
-         username: "Long Username                             Very Long",
-         password: "Password$AAd123",
-         confirmPassword: "Password$AAd32",
-         phone: "12345629313243443243290"
-      };
+    expected = {
+      status: "Error",
+      body: {
+        data: null,
+        message: "Invalid user registration fields",
+        errors: {
+          username: ["Username must be at least 3 characters"],
+        },
+      },
+    };
 
-      expected = {
-         state: "Error",
-         body: { message: "Invalid user registration fields" },
-         errors: {
-            name: ["A name must be at least 2 characters"],
-            birthday: ["A birthday must not be before 200 years ago"],
-            username: ["A username must be at most 30 characters"],
-            email: ["Required"],
-            phone: ["A valid phone is required if provided"]
-         }
-      };
+    await expect(signup(registration)).resolves.toEqual(expected);
 
-      await expect(signup(payload)).resolves.toEqual(expected);
+    // Test username too long
+    registration.username = registration.username.repeat(16);
+    expected.body.errors.username = ["Username must be at most 30 characters"];
 
-      // Almost a perfect user registration fields, but passwords do not match
-      payload = {
-         name: "John Doe",
-         birthday: new Date("1990-01-01"),
-         username: "johndoe123",
-         password: "0Password123$$A2A",
-         confirmPassword: "0Password123$$AA",
-         email: "john.doe@example.com",
-         phone: "1234567890"
-      };
+    await expect(signup(registration)).resolves.toEqual(expected);
 
-      expected = {
-         state: "Error",
-         body: { message: "Invalid user registration fields" },
-         errors: {
-            password: ["Passwords do not match"],
-            confirmPassword: ["Passwords do not match"]
-         }
-      };
+    // Test name too short
+    registration.name = " J ";
+    expected.body.errors.name = ["Name must be at least 2 characters"];
 
-      await expect(signup(payload)).resolves.toEqual(expected);
-   });
+    await expect(signup(registration)).resolves.toEqual(expected);
 
-   test("Valid registration with a variety of parameters", async() => {
-      payload = {
-         name: "John Doe",
-         birthday: new Date("1990-01-01"),
-         username: "johnny123",
-         password: "0Password123$$AA",
-         confirmPassword: "0Password123$$AA",
-         email: "john.doe@example.com",
-         phone: "1234567890"
-      };
+    // Test name too long
+    registration.name = registration.name.repeat(201);
+    expected.body.errors.name = ["Name must be at most 200 characters"];
 
-      expected = {
-         state: "Success",
-         body: { message: "Successfully registered", data: undefined },
-         errors: {}
-      };
+    await expect(signup(registration)).resolves.toEqual(expected);
 
-      await expect(signup(payload)).resolves.toEqual(expected);
+    // Test valid username and name lengths at minimum lengths
+    registration.username = "J_C";
+    registration.name = "JeC";
+    expected = {
+      status: "Success",
+      body: { data: null, message: "Successfully registered", errors: {} },
+    };
 
-      payload = {
-         name: "John Smith",
-         birthday: new Date("2008-01-01"),
-         username: "johnny123",
-         password: "sm&AA1293s$$AA01",
-         confirmPassword: "sm&AA1293s$$AA01",
-         email: "john.smith@gmail.com",
-         phone: "+1-888-555-1234"
-      };
+    await expect(signup(registration)).resolves.toEqual(expected);
+  });
 
-      await expect(signup(payload)).resolves.toEqual(expected);
+  test("Should fail when passwords are invalid or don't match and succeed otherwise", async () => {
+    // Test invalid password, but valid confirm password
+    registration = {
+      name: "Jeffrey",
+      birthday: new Date(),
+      username: "J_C",
+      password: "valid?",
+      confirmPassword: "ValidPassword1!",
+      email: "jeffrey@gmail.com",
+      phone: "1234567890",
+    };
 
-      payload = {
-         name: "Eric Smith",
-         birthday: new Date("2014-12-01"),
-         username: "eric192",
-         password: "sm&AA1293s$$AA01",
-         confirmPassword: "sm&AA1293s$$AA01",
-         email: "john.doe@example.com",
-         phone: "+1-212-456-7890"
-      };
+    expected = {
+      status: "Error",
+      body: {
+        data: null,
+        message: "Invalid user registration fields",
+        errors: {
+          password: [
+            "Password must contain at least 8 characters, " +
+              "one uppercase letter, one lowercase letter, " +
+              "one number, and one special character (@$!%*#?&)",
+          ],
+        },
+      },
+    };
 
-      await expect(signup(payload)).resolves.toEqual(expected);
+    await expect(signup(registration)).resolves.toEqual(expected);
 
-      payload = {
-         name: "Smith Row",
-         birthday: new Date("2004-01-01"),
-         username: "smithRow001",
-         password: "sm&AA1293s$$AA01",
-         confirmPassword: "sm&AA1293s$$AA01",
-         email: "smith.row@example.com",
-         phone: "1234567890"
-      };
+    // Test invalid password and confirm password
+    registration.confirmPassword = registration.password;
+    expected.body.errors.confirmPassword = expected.body.errors.password;
 
-      await expect(signup(payload)).resolves.toEqual(expected);
-   });
+    await expect(signup(registration)).resolves.toEqual(expected);
+
+    // Test valid passwords, but both passwords do not match
+    registration.password = "ValidPassword1!";
+    registration.confirmPassword = "ValidPassword21!";
+    expected.body.errors.password = expected.body.errors.confirmPassword = [
+      "Passwords do not match",
+    ];
+
+    await expect(signup(registration)).resolves.toEqual(expected);
+
+    // Test valid matching passwords
+    registration.confirmPassword = registration.password;
+    expected = {
+      status: "Success",
+      body: { data: null, message: "Successfully registered", errors: {} },
+    };
+
+    await expect(signup(registration)).resolves.toEqual(expected);
+  });
+
+  test("Should fail when username, email, and/or phone number are already taken or succeed otherwise", async () => {
+    // Create mock user
+    registration = {
+      name: "root",
+      birthday: new Date(),
+      username: "root2",
+      password: "ValidPassword1!",
+      confirmPassword: "ValidPassword1!",
+      email: "jeffrey@gmail.com",
+      phone: "1234567890",
+    } as Registration;
+
+    // Taken username
+    prismaMock.users.create.mockRejectedValue({
+      code: 'P2002',
+      meta: {
+        target: ['username'],
+      },
+    });
+
+    expected = {
+      status: "Error",
+      body: {
+        data: null,
+        message: "Internal database conflicts",
+        errors: {
+          username: ["Username already taken"],
+        },
+      },
+    };
+
+    // Taken email
+    prismaMock.users.create.mockRejectedValue({
+      code: 'P2002',
+      meta: {
+        target: ['email']
+      },
+    });
+
+    expected = {
+      status: "Error",
+      body: {
+        data: null,
+        message: "Internal database conflicts",
+        errors: {
+          email: ["Email already taken"],
+        },
+      },
+    };
+
+    await expect(signup(registration)).resolves.toEqual(expected);
+
+    // Taken phone number
+    prismaMock.users.create.mockRejectedValue({
+      code: 'P2002',
+      meta: {
+        target: ['phone']
+      },
+    });
+
+    expected = {
+      status: "Error",
+      body: {
+        data: null,
+        message: "Internal database conflicts",
+        errors: {
+          email: ["Phone number already taken"],
+        },
+      },
+    };
+
+    await expect(signup(registration)).resolves.toEqual(expected);
+  });
 });

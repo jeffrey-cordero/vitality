@@ -1,5 +1,5 @@
 "use server";
-import prisma from "@/lib/prisma/client";
+import prisma from "@/client";
 import { z } from "zod";
 import {
    VitalityResponse,
@@ -104,7 +104,7 @@ export async function addWorkout(
             fields.error.flatten().fieldErrors,
          );
       }
-      
+
       // Create new workout with basic properties and an additional nested create operation for applied workout tags
       const newWorkout = await prisma.workouts.create({
          data: {

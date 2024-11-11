@@ -113,7 +113,11 @@ export function sendSuccessMessage<T>(
 ): VitalityResponse<T> {
    return {
       status: "Success",
-      body: { message: message, data: data, errors: {} }
+      body: {
+         data: data,
+         message: message,
+         errors: {}
+      }
    };
 }
 
@@ -126,8 +130,8 @@ export function sendErrorMessage<T>(
    return {
       status: status,
       body: {
-         message: message,
          data: data,
+         message: message,
          errors: errors ?? {}
       }
    };

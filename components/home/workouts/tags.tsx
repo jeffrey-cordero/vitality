@@ -279,7 +279,7 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
             icon = {faTag}
             input = {localState.tagTitle}
             dispatch = {localDispatch}
-            onSubmit={() => handleTagUpdates("update")}
+            onSubmit = {() => handleTagUpdates("update")}
             autoFocus
             required
          />

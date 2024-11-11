@@ -1,5 +1,5 @@
 "use server";
-import prisma from "@/lib/prisma/client";
+import prisma from "@/client";
 import { z } from "zod";
 import {
    VitalityResponse,
