@@ -1,12 +1,18 @@
+import bcrypt from "bcryptjs";
 import { expect } from "@jest/globals";
 import { Registration, signup } from "@/lib/authentication/signup";
-import { VitalityResponse } from "@/lib/global/state";
+import { VitalityResponse } from "@/lib/global/response";
 import { prismaMock } from "@/singleton";
 
 let registration: Registration;
 let expected: VitalityResponse<Registration>;
 
-describe("User creation with validation", () => {
+jest.mock("bcryptjs", () => ({
+   genSaltSync: jest.fn(),
+   hash: jest.fn()
+}));
+
+describe("User Registration Validation", () => {
    test("Should fail when any required field is invalid or missing", async() => {
       // Test empty, missing, and null fields
       registration = {
@@ -36,7 +42,9 @@ describe("User creation with validation", () => {
 
       // Test invalid phone number
       registration.phone = "27382738273971238";
-      expected.body.errors.phone = ["Valid phone number is required, if provided"];
+      expected.body.errors.phone = [
+         "Valid phone number is required, if provided"
+      ];
 
       await expect(signup(registration)).resolves.toEqual(expected);
 
@@ -164,15 +172,15 @@ describe("User creation with validation", () => {
    });
 
    test("Should fail when username, email, and/or phone number are already taken and succeed otherwise", async() => {
-      // Create mock user
-      // @ts-ignore
-      prismaMock.users.findMany.mockReturnValue([
+      // Mock existing users
+      const existingUsers = [
          {
             id: "",
             name: "root",
             birthday: new Date(),
             username: "root",
-            password: "$2a$10$OhiZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
+            password:
+          "$2a$10$OhiZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
             email: "root@gmail.com",
             phone: "1234567890"
          },
@@ -181,11 +189,14 @@ describe("User creation with validation", () => {
             name: "test",
             birthday: new Date(),
             username: "test",
-            password: "$Vc$10$O1sZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
+            password:
+          "$Vc$10$O1sZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
             email: "test@gmail.com",
             phone: "1234567891"
          }
-      ]);
+      ];
+      // @ts-ignore
+      prismaMock.users.findMany.mockReturnValue(existingUsers);
 
       // Test username already taken
       registration = {
@@ -223,7 +234,22 @@ describe("User creation with validation", () => {
 
       await expect(signup(registration)).resolves.toEqual(expected);
 
-      // Remove mock user
+      // Test search for existing users via where statement for username, email, and/or phone number
+      // @ts-ignore
+      expect(prismaMock.users.findMany).toHaveBeenCalledWith({
+         where: {
+            OR: [
+               { username: registration.username.trim() },
+               { email: registration.email.trim() },
+               { phone: registration.phone?.trim() }
+            ]
+         }
+      });
+
+      // @ts-ignore
+      expect(prismaMock.users.findMany()).toHaveLength(2);
+
+      // Remove mock users
       prismaMock.users.findMany.mockReturnValue([] as any);
 
       // Apply unique account username, email, and phone number for a successful registration
@@ -237,6 +263,35 @@ describe("User creation with validation", () => {
             data: null,
             message: "Successfully registered",
             errors: {}
+         }
+      };
+
+      await expect(signup(registration)).resolves.toEqual(expected);
+
+      // Ensure user create database method was called with the proper parameters
+      // @ts-ignore
+      expect(prismaMock.users.create).toHaveBeenCalledWith({
+         data: {
+            username: registration.username.trim(),
+            name: registration.name.trim(),
+            email: registration.email.trim(),
+            password: bcrypt.hash(registration.password, bcrypt.genSaltSync(10)),
+            birthday: registration.birthday,
+            phone: undefined
+         }
+      });
+
+      // Test system failure during registration process
+      // @ts-ignore
+      prismaMock.users.create.mockRejectedValueOnce(new Error("Database connection error"));
+      expected = {
+         status: "Failure",
+         body: {
+            data: null,
+            message: "Database connection error",
+            errors: {
+               system: ["Database connection error"]
+            }
          }
       };
 

@@ -128,57 +128,53 @@ export default function Page(): JSX.Element {
    ]);
 
    const fetchWorkoutsData = useCallback(async() => {
-      try {
-         // Fetch user workouts and workout tags
-         const [workoutsData, tagsData] = await Promise.all([
-            fetchWorkouts(user.id),
-            fetchWorkoutTags(user.id)
-         ]);
+      // Fetch user workouts and workout tags
+      const [workoutsData, tagsData] = await Promise.all([
+         fetchWorkouts(user.id),
+         fetchWorkoutTags(user.id)
+      ]);
 
-         // Update global state to maintain up-to-date tags, workouts, and paging
-         globalDispatch({
-            type: "initializeState",
-            value: {
-               tags: {
-                  ...globalState.tags,
-                  data: {
-                     ...globalState.tags.data,
-                     options: tagsData,
-                     selected: [],
-                     filtered: [],
-                     dictionary: Object.fromEntries(
-                        tagsData.map((tag) => [tag.id, tag]),
-                     ),
-                     fetched: true
-                  }
-               },
-               workouts: {
-                  ...globalState.workouts,
-                  value: workoutsData,
-                  data: {
-                     ...globalState.workouts.data,
-                     filtered: workoutsData,
-                     appliedDateFiltering: false,
-                     appliedTagsFiltering: false,
-                     fetched: true
-                  }
-               },
-               workout: {
-                  ...globalState.workout,
-                  value: {
-                     ...globalState.workout.value,
-                     user_id: user.id
-                  }
-               },
-               paging: {
-                  ...globalState.paging,
-                  value: Number.parseInt(window.localStorage.getItem("paging") ?? "10")
+      // Update global state to maintain up-to-date tags, workouts, and paging
+      globalDispatch({
+         type: "initializeState",
+         value: {
+            tags: {
+               ...globalState.tags,
+               data: {
+                  ...globalState.tags.data,
+                  options: tagsData,
+                  selected: [],
+                  filtered: [],
+                  dictionary: Object.fromEntries(
+                     tagsData.map((tag) => [tag.id, tag]),
+                  ),
+                  fetched: true
                }
+            },
+            workouts: {
+               ...globalState.workouts,
+               value: workoutsData,
+               data: {
+                  ...globalState.workouts.data,
+                  filtered: workoutsData,
+                  appliedDateFiltering: false,
+                  appliedTagsFiltering: false,
+                  fetched: true
+               }
+            },
+            workout: {
+               ...globalState.workout,
+               value: {
+                  ...globalState.workout.value,
+                  user_id: user.id
+               }
+            },
+            paging: {
+               ...globalState.paging,
+               value: Number.parseInt(window.localStorage.getItem("paging") ?? "10")
             }
-         });
-      } catch (error) {
-         console.error(error);
-      }
+         }
+      });
    }, [
       globalState.tags,
       globalState.workouts,

@@ -14,7 +14,7 @@ import {
    useState
 } from "react";
 import { users as User } from "@prisma/client";
-import { getServerSession } from "@/lib/authentication/user";
+import { getServerSession } from "@/session";
 import { NotificationProps } from "@/components/global/notification";
 
 interface AuthenticationContextType {

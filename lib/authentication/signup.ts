@@ -4,10 +4,10 @@ import bcrypt from "bcryptjs";
 import prisma from "@/client";
 import { z } from "zod";
 import {
-   VitalityResponse,
    sendSuccessMessage,
-   sendErrorMessage
-} from "@/lib/global/state";
+   sendErrorMessage,
+   VitalityResponse
+} from "@/lib/global/response";
 
 export type Registration = {
   name: string;
@@ -97,34 +97,34 @@ export async function signup(
    }
 
    try {
-      const userRegistration = fields.data;
+      const registration = fields.data;
 
       const salt = await bcrypt.genSaltSync(10);
-      userRegistration.password = await bcrypt.hash(registration.password, salt);
+      registration.password = await bcrypt.hash(registration.password, salt);
 
       if (registration.phone) {
-         userRegistration["phone"] = registration.phone;
+         registration["phone"] = registration.phone;
       }
 
       const existingUsers = await prisma.users.findMany({
          where: {
             OR: [
-               { email: registration.email },
-               { username: registration.username },
-               { phone: registration.phone }
+               { username: registration.username.trim() },
+               { email: registration.email.trim() },
+               { phone: registration.phone?.trim() }
             ]
          }
-   });
+      });
 
       if (!existingUsers || existingUsers.length === 0) {
          await prisma.users.create({
             data: {
-               username: userRegistration.username,
-               name: userRegistration.name,
-               email: userRegistration.email,
-               password: userRegistration.password,
-               birthday: userRegistration.birthday,
-               phone: userRegistration.phone
+               username: registration.username.trim(),
+               name: registration.name.trim(),
+               email: registration.email.trim(),
+               password: registration.password,
+               birthday: registration.birthday,
+               phone: registration.phone?.trim()
             }
          });
 
@@ -133,16 +133,16 @@ export async function signup(
          // Handle taken username, email, and/or phone errors
          const errors = {};
 
-         for (const existingUser of existingUsers) {
-            if (existingUser.username === userRegistration.username) {
+         for (const user of existingUsers) {
+            if (user.username === registration.username) {
                errors["username"] = ["Username already taken"];
             }
 
-            if (existingUser.email === userRegistration.email) {
+            if (user.email === registration.email) {
                errors["email"] = ["Email already taken"];
             }
 
-            if (existingUser.phone === userRegistration.phone) {
+            if (user.phone === registration.phone) {
                errors["phone"] = ["Phone number already taken"];
             }
          }
@@ -150,10 +150,8 @@ export async function signup(
          return sendErrorMessage("Error", "Internal database conflicts", null, errors);
       }
    } catch (error) {
-      console.error(error);
-
       return sendErrorMessage("Failure", error?.message, null, {
-         system: error?.message
+         system: [error?.message]
       });
    }
 }

@@ -46,22 +46,18 @@ export default function LoginForm(): JSX.Element {
    const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();
 
-      try {
-         const credentials: Credentials = {
-            username: state.username.value.trim(),
-            password: state.password.value.trim()
-         };
+      const credentials: Credentials = {
+         username: state.username.value.trim(),
+         password: state.password.value.trim()
+      };
 
-         const response: VitalityResponse<null> = await login(credentials);
+      const response: VitalityResponse<null> = await login(credentials);
 
-         const successMethod = () => {
-            window.location.reload();
-         };
+      const successMethod = () => {
+         window.location.reload();
+      };
 
-         handleResponse(dispatch, response, successMethod, updateNotification);
-      } catch (error) {
-         console.error(error);
-      }
+      handleResponse(dispatch, response, successMethod, updateNotification);
    };
 
    return (

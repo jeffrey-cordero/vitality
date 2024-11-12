@@ -83,13 +83,7 @@ docker exec -it vitality_app npx prisma migrate dev --name <migration-name>
 Run unit tests
 
 ```bash
-npm run unit
-```
-
-Run integration tests
-
-```bash
-npm run integration
+npm run tests
 ```
 
 ## Linting

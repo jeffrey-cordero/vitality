@@ -2,10 +2,10 @@
 import prisma from "@/client";
 import { z } from "zod";
 import {
-   VitalityResponse,
    sendSuccessMessage,
-   sendErrorMessage
-} from "@/lib/global/state";
+   sendErrorMessage,
+   VitalityResponse
+} from "@/lib/global/response";
 import { uuidSchema } from "@/lib/global/zod";
 
 export type Tag = {
@@ -52,10 +52,8 @@ export async function fetchWorkoutTags(userId: string): Promise<Tag[]> {
 
       return result;
    } catch (error) {
-      console.error(error);
+      return [];
    }
-
-   return [];
 }
 
 export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
@@ -84,7 +82,6 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
 
       return sendSuccessMessage("Successfully added new workout tag", newTag);
    } catch (error) {
-      console.error(error);
 
       if (
          error.code === "P2002" &&
@@ -97,8 +94,8 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
             search: ["Workout tag already exists"]
          });
       } else {
-         return sendErrorMessage("Failure", error.meta?.message, tag, {
-            system: error.meta?.message
+         return sendErrorMessage("Failure", error?.message, null, {
+            system: [error?.message]
          });
       }
    }
@@ -151,8 +148,6 @@ export async function updateWorkoutTag(
             );
       }
    } catch (error) {
-      console.error(error);
-
       if (
          error.code === "P2002" &&
          error.meta?.modelName === "workout_tags" &&
@@ -169,8 +164,8 @@ export async function updateWorkoutTag(
             },
          );
       } else {
-         return sendErrorMessage("Failure", error.meta?.message, tag, {
-            system: error.meta?.message
+         return sendErrorMessage("Failure", error?.message, null, {
+            system: [error?.message]
          });
       }
    }

@@ -2,10 +2,10 @@
 import prisma from "@/client";
 import { z } from "zod";
 import {
-   VitalityResponse,
    sendSuccessMessage,
-   sendErrorMessage
-} from "@/lib/global/state";
+   sendErrorMessage,
+   VitalityResponse
+} from "@/lib/global/response";
 import { formatWorkout } from "@/lib/home/workouts/shared";
 import { Exercise } from "@/lib/home/workouts/exercises";
 import { uuidSchema } from "@/lib/global/zod";
@@ -83,8 +83,6 @@ export async function fetchWorkouts(userId: string): Promise<Workout[]> {
 
       return formattedWorkouts;
    } catch (error) {
-      console.error(error);
-
       return [];
    }
 }
@@ -140,10 +138,8 @@ export async function addWorkout(
 
       return sendSuccessMessage("Added new workout", formatWorkout(newWorkout));
    } catch (error) {
-      console.error(error);
-
-      return sendErrorMessage("Failure", error.meta?.message, workout, {
-         system: error.meta?.message
+      return sendErrorMessage("Failure", error?.message, null, {
+         system: [error?.message]
       });
    }
 }
@@ -241,10 +237,8 @@ export async function updateWorkout(
          );
       }
    } catch (error) {
-      console.error(error);
-
-      return sendErrorMessage("Failure", error.meta?.message, workout, {
-         system: error.meta?.message
+      return sendErrorMessage("Failure", error?.message, null, {
+         system: [error?.message]
       });
    }
 }
@@ -268,10 +262,8 @@ export async function removeWorkouts(
          response.count,
       );
    } catch (error) {
-      console.error(error);
-
-      return sendErrorMessage("Failure", error.meta?.message, 0, {
-         system: error.meta?.message
+      return sendErrorMessage("Failure", error?.message, null, {
+         system: [error?.message]
       });
    }
 }

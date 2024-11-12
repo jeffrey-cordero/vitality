@@ -71,48 +71,44 @@ function Form(): JSX.Element {
    const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();
 
-      try {
-         const registration: Registration = {
-            name: state.name.value.trim(),
-            username: state.username.value.trim(),
-            password: state.password.value.trim(),
-            confirmPassword: state.confirmPassword.value.trim(),
-            email: state.email.value.trim(),
-            birthday: new Date(state.birthday.value),
-            phone: state.phone.value.trim()
-         };
-         const response: VitalityResponse<null> = await signup(registration);
+      const registration: Registration = {
+         name: state.name.value.trim(),
+         username: state.username.value.trim(),
+         password: state.password.value.trim(),
+         confirmPassword: state.confirmPassword.value.trim(),
+         email: state.email.value.trim(),
+         birthday: new Date(state.birthday.value),
+         phone: state.phone.value.trim()
+      };
+      const response: VitalityResponse<null> = await signup(registration);
 
-         const successMethod = () => {
-            // Display login notification
-            updateNotification({
-               status: response.status,
-               message: response.body.message,
-               children: (
-                  <Link href = "/home">
-                     <Button
-                        type = "button"
-                        className = "bg-green-600 text-white p-4 text-sm h-[2rem]"
-                        icon = {faDoorOpen}
-                        onClick = {async() => {
-                           await login({
-                              username: state.username.value,
-                              password: state.password.value
-                           });
+      const successMethod = () => {
+         // Display login notification
+         updateNotification({
+            status: response.status,
+            message: response.body.message,
+            children: (
+               <Link href = "/home">
+                  <Button
+                     type = "button"
+                     className = "bg-green-600 text-white p-4 text-sm h-[2rem]"
+                     icon = {faDoorOpen}
+                     onClick = {async() => {
+                        await login({
+                           username: state.username.value,
+                           password: state.password.value
+                        });
 
-                           window.location.reload();
-                        }}>
-                Log In
-                     </Button>
-                  </Link>
-               )
-            });
-         };
+                        window.location.reload();
+                     }}>
+                        Log In
+                  </Button>
+               </Link>
+            )
+         });
+      };
 
-         handleResponse(dispatch, response, successMethod, updateNotification);
-      } catch (error) {
-         console.error(error);
-      }
+      handleResponse(dispatch, response, successMethod, updateNotification);
    };
 
    return (

@@ -2,10 +2,10 @@
 import prisma from "@/client";
 import { z } from "zod";
 import {
-   VitalityResponse,
    sendSuccessMessage,
-   sendErrorMessage
-} from "@/lib/global/state";
+   sendErrorMessage,
+   VitalityResponse
+} from "@/lib/global/response";
 import { formatWorkout } from "@/lib/home/workouts/shared";
 import { uuidSchema } from "@/lib/global/zod";
 
@@ -126,10 +126,8 @@ export async function addExercise(
          id: newExercise.id
       });
    } catch (error) {
-      console.error(error);
-
-      return sendErrorMessage("Failure", error.meta?.message, exercise, {
-         system: error.meta?.message
+      return sendErrorMessage("Failure", error?.message, null, {
+         system: [error?.message]
       });
    }
 }
@@ -286,10 +284,8 @@ export async function updateExercise(
          );
       }
    } catch (error) {
-      console.error(error);
-
-      return sendErrorMessage("Failure", error.meta?.message, null, {
-         system: error.meta?.message
+      return sendErrorMessage("Failure", error?.message, null, {
+         system: [error?.message]
       });
    }
 }
@@ -379,10 +375,8 @@ export async function updateExercises(
          formatWorkout(workout).exercises,
       );
    } catch (error) {
-      console.error(error);
-
-      return sendErrorMessage("Failure", error.meta?.message, null, {
-         system: error.meta?.message
+      return sendErrorMessage("Failure", error?.message, null, {
+         system: [error?.message]
       });
    }
 }

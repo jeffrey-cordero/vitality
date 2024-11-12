@@ -2,11 +2,9 @@
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import {
-   VitalityResponse,
-   sendSuccessMessage,
-   sendErrorMessage
-} from "@/lib/global/state";
-
+   sendErrorMessage,
+   VitalityResponse
+} from "@/lib/global/response";
 export type Credentials = {
   username: string;
   password: string;
@@ -22,8 +20,6 @@ export async function login(
 
       await signIn("credentials", userCredentials);
    } catch (error) {
-      console.error(error);
-
       if (error instanceof AuthError) {
          switch (error.type) {
             case "CallbackRouteError":
@@ -35,7 +31,7 @@ export async function login(
             default:
                return sendErrorMessage(
                   "Failure",
-                  "Internal Server Authentication Error. Please try again later.",
+                  "Internal Server Error. Please try again later.",
                   null,
                   {},
                );
@@ -44,6 +40,4 @@ export async function login(
 
       throw error;
    }
-
-   return sendSuccessMessage("Successfully logged in", null);
 }
