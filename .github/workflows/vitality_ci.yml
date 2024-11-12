@@ -37,23 +37,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run Unit tests
-        run: npm run unit
-
-  Integration:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run Integration tests
-        run: npm run integration
+      - name: Run tests
+        run: npm run tests
