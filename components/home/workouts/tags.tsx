@@ -17,13 +17,12 @@ import { addWorkoutTag, updateWorkoutTag, Tag } from "@/lib/home/workouts/tags";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
 import {
-   formReducer,
-   handleResponse,
    VitalityChildProps,
    VitalityProps,
-   VitalityResponse,
-   VitalityState
+   VitalityState,
+   formReducer
 } from "@/lib/global/state";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { Modal } from "@/components/global/modal";
 import { searchForTitle } from "@/lib/home/workouts/shared";
 

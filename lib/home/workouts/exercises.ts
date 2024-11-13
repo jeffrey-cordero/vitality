@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
    sendSuccessMessage,
    sendErrorMessage,
+   sendFailureMessage,
    VitalityResponse
 } from "@/lib/global/response";
 import { formatWorkout } from "@/lib/home/workouts/shared";
@@ -106,9 +107,7 @@ export async function addExercise(
 
       if (!fields.success) {
          return sendErrorMessage(
-            "Error",
             "Invalid exercise fields",
-            exercise,
             fields.error.flatten().fieldErrors,
          );
       }
@@ -126,9 +125,8 @@ export async function addExercise(
          id: newExercise.id
       });
    } catch (error) {
-      return sendErrorMessage("Failure", error?.message, null, {
-         system: [error?.message]
-      });
+      console.error(error);
+      return sendFailureMessage(error?.message);
    }
 }
 
@@ -144,11 +142,11 @@ export async function updateExercise(
          if (name.length === 0) {
             const error: string = "A name must be at least 1 character";
 
-            return sendErrorMessage("Error", error, null, { name: [error] });
+            return sendErrorMessage(error, { name: [error] });
          } else if (name.length > 50) {
             const error: string = "A name must be at most 50 characters";
 
-            return sendErrorMessage("Error", error, null, { name: [error] });
+            return sendErrorMessage(error, { name: [error] });
          } else {
             // Update exercise with new name
             await prisma.exercises.update({
@@ -182,17 +180,13 @@ export async function updateExercise(
 
             if (!fields.success) {
                return sendErrorMessage(
-                  "Error",
                   `Invalid exercise set fields for set ID ${set.id}`,
-                  null,
                   fields.error.flatten().fieldErrors,
                );
             } else if (isEmptySet(set)) {
                return sendErrorMessage(
-                  "Error",
                   "Set must be non-empty.",
-                  null,
-                  null,
+                  null
                );
             }
          }
@@ -284,9 +278,8 @@ export async function updateExercise(
          );
       }
    } catch (error) {
-      return sendErrorMessage("Failure", error?.message, null, {
-         system: [error?.message]
-      });
+      console.error(error);
+      return sendFailureMessage(error?.message);
    }
 }
 
@@ -299,9 +292,7 @@ export async function updateExercises(
 
       if (!fields.success) {
          return sendErrorMessage(
-            "Error",
             "Invalid exercise fields",
-            null,
             fields.error.flatten().fieldErrors,
          );
       }
@@ -375,8 +366,7 @@ export async function updateExercises(
          formatWorkout(workout).exercises,
       );
    } catch (error) {
-      return sendErrorMessage("Failure", error?.message, null, {
-         system: [error?.message]
-      });
+      console.error(error);
+      return sendFailureMessage(error?.message);
    }
 }

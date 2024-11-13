@@ -169,9 +169,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          globalDispatch({
             type: "updateErrors",
             value: sendErrorMessage(
-               "Error",
                "Invalid Date filter(s)",
-               null,
                errors,
             )
          });

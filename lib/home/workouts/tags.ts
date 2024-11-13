@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
    sendSuccessMessage,
    sendErrorMessage,
+   sendFailureMessage,
    VitalityResponse
 } from "@/lib/global/response";
 import { uuidSchema } from "@/lib/global/zod";
@@ -65,7 +66,7 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
 
       // Only error should be proposed tag title not being a valid length
       if (errors.fieldErrors.title) {
-         return sendErrorMessage("Error", "Invalid workout tag fields", tag, {
+         return sendErrorMessage("Invalid workout tag fields", {
             title: errors.fieldErrors.title ?? [""]
          });
       }
@@ -90,11 +91,11 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
          error.meta?.target?.includes("title")
       ) {
          // Workout tags must be unique
-         return sendErrorMessage("Error", "Workout tag already exists", tag, {
+         return sendErrorMessage("Workout tag already exists", {
             search: ["Workout tag already exists"]
          });
       } else {
-         return sendErrorMessage("Failure", error?.message, null, {
+         return sendErrorMessage(error?.message, {
             system: [error?.message]
          });
       }
@@ -109,12 +110,10 @@ export async function updateWorkoutTag(
 
    // Handle invalid tag id's and user fields
    if (tag.id === undefined) {
-      return sendErrorMessage("Failure", "Missing Workout Tag ID", tag, {});
+      return sendErrorMessage("Missing Workout Tag ID", null);
    } else if (!fields.success) {
       return sendErrorMessage(
-         "Error",
          "Invalid workout tag fields",
-         tag,
          fields.error.flatten().fieldErrors,
       );
    }
@@ -141,10 +140,8 @@ export async function updateWorkoutTag(
             return sendSuccessMessage("Successfully deleted workout tag", deletedTag);
          default:
             return sendErrorMessage(
-               "Failure",
                "Invalid Workout Tag Update Method",
-               tag,
-               {},
+               null
             );
       }
    } catch (error) {
@@ -155,18 +152,13 @@ export async function updateWorkoutTag(
          error.meta?.target?.includes("title")
       ) {
          // Workout tags must be unique by their title
-         return sendErrorMessage(
-            "Error",
-            "Workout tag title already exists",
-            tag,
-            {
-               title: ["Workout tag title already exists"]
-            },
+         return sendErrorMessage("Workout tag title already exists", {
+            title: ["Workout tag title already exists"]
+         },
          );
       } else {
-         return sendErrorMessage("Failure", error?.message, null, {
-            system: [error?.message]
-         });
+         console.error(error);
+         return sendFailureMessage(error?.message);
       }
    }
 }

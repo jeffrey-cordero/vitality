@@ -6,6 +6,7 @@ import { z } from "zod";
 import {
    sendSuccessMessage,
    sendErrorMessage,
+   sendFailureMessage,
    VitalityResponse
 } from "@/lib/global/response";
 
@@ -84,13 +85,11 @@ export async function signup(
 
    if (!fields.success) {
       return sendErrorMessage(
-         "Error",
          "Invalid user registration fields",
-         null,
          fields.error.flatten().fieldErrors
       );
    } else if (!(registration.password === registration.confirmPassword)) {
-      return sendErrorMessage("Error", "Invalid user registration fields", null, {
+      return sendErrorMessage("Invalid user registration fields", {
          password: ["Passwords do not match"],
          confirmPassword: ["Passwords do not match"]
       });
@@ -147,11 +146,10 @@ export async function signup(
             }
          }
 
-         return sendErrorMessage("Error", "Internal database conflicts", null, errors);
+         return sendErrorMessage("Internal database conflicts", errors);
       }
    } catch (error) {
-      return sendErrorMessage("Failure", error?.message, null, {
-         system: [error?.message]
-      });
+      console.error(error);
+      return sendFailureMessage(error?.message);
    }
 }

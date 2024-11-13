@@ -8,12 +8,11 @@ import { Modal } from "@/components/global/modal";
 import { Tags } from "@/components/home/workouts/tags";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import {
-   formReducer,
-   handleResponse,
    VitalityProps,
-   VitalityResponse,
-   VitalityState
+   VitalityState,
+   formReducer
 } from "@/lib/global/state";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import {
    addWorkout,
    removeWorkouts,
@@ -484,7 +483,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          </Modal>
          <Button
             type = "button"
-            className = "bg-primary text-white w-[10rem] h-[2.6rem] px-4 py-6"
+            className = "bg-primary text-white w-[10rem] h-[2.4rem] px-4 py-6"
             icon = {faPersonRunning}
             onClick = {() => {
                globalDispatch({

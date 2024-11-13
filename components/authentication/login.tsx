@@ -13,10 +13,9 @@ import {
 import { FormEvent, useContext, useReducer } from "react";
 import {
    VitalityState,
-   formReducer,
-   VitalityResponse,
-   handleResponse
+   formReducer
 } from "@/lib/global/state";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { login, Credentials } from "@/lib/authentication/login";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 
@@ -109,11 +108,11 @@ export default function LoginForm(): JSX.Element {
                </Button>
             </form>
             <p className = "mt-4">
-          Don&apos;t have an account?{" "}
+                  Don&apos;t have an account?{" "}
                <Link
                   href = "/signup"
                   className = "text-primary font-bold">
-            Register
+                  Register
                </Link>
             </p>
          </div>

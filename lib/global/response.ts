@@ -26,17 +26,28 @@ export function sendSuccessMessage<T>(
 }
 
 export function sendErrorMessage<T>(
-   status: "Error" | "Failure",
    message: string,
-   data: T,
-   errors: { [key: string]: string[] },
+   errors: { [key: string]: string[] }
 ): VitalityResponse<T> {
    return {
-      status: status,
+      status: "Error",
       body: {
-         data: data,
+         data: null,
          message: message,
          errors: errors ?? {}
+      }
+   };
+}
+
+export function sendFailureMessage<T>(message: string): VitalityResponse<T> {
+   return {
+      status: "Failure",
+      body: {
+         data: null,
+         message: "Internal Server Error. Please try again later.",
+         errors: {
+            system: [message]
+         }
       }
    };
 }
@@ -66,9 +77,7 @@ export function handleResponse(
          value: response
       });
 
-      document
-         .getElementsByClassName("input-error")
-         .item(0)
+      document.getElementsByClassName("input-error")?.item(0)
          ?.scrollIntoView({ behavior: "smooth", block: "center" });
    } else {
       // Display failure notification to the user

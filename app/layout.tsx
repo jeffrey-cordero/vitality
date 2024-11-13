@@ -40,7 +40,7 @@ export const NotificationContext = createContext<NotificationContextType>({
       status: "Initial",
       message: ""
    },
-   updateNotification: () => {}
+   updateNotification: (_notification: NotificationProps) => {}
 });
 
 export default function Layout({ children }: { children: React.ReactNode }) {

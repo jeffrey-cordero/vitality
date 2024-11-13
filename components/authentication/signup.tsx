@@ -18,10 +18,9 @@ import {
 import { FormEvent, useContext, useReducer } from "react";
 import {
    VitalityState,
-   formReducer,
-   VitalityResponse,
-   handleResponse
+   formReducer
 } from "@/lib/global/state";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { login } from "@/lib/authentication/login";
 import { signup, Registration } from "@/lib/authentication/signup";
 import { NotificationContext } from "@/app/layout";

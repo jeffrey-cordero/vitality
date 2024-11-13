@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
    sendSuccessMessage,
    sendErrorMessage,
+   sendFailureMessage,
    VitalityResponse
 } from "@/lib/global/response";
 import { formatWorkout } from "@/lib/home/workouts/shared";
@@ -95,10 +96,7 @@ export async function addWorkout(
       const fields = workoutsSchema.safeParse(workout);
 
       if (!fields.success) {
-         return sendErrorMessage(
-            "Error",
-            "Invalid workout tag fields",
-            workout,
+         return sendErrorMessage("Invalid workout tag fields",
             fields.error.flatten().fieldErrors,
          );
       }
@@ -138,9 +136,8 @@ export async function addWorkout(
 
       return sendSuccessMessage("Added new workout", formatWorkout(newWorkout));
    } catch (error) {
-      return sendErrorMessage("Failure", error?.message, null, {
-         system: [error?.message]
-      });
+      console.error(error);
+      return sendFailureMessage(error?.message);
    }
 }
 
@@ -151,10 +148,7 @@ export async function updateWorkout(
       const fields = workoutsSchema.safeParse(workout);
 
       if (!fields.success) {
-         return sendErrorMessage(
-            "Error",
-            "Invalid workout fields",
-            workout,
+         return sendErrorMessage("Invalid workout fields",
             fields.error.flatten().fieldErrors,
          );
       } else {
@@ -237,9 +231,8 @@ export async function updateWorkout(
          );
       }
    } catch (error) {
-      return sendErrorMessage("Failure", error?.message, null, {
-         system: [error?.message]
-      });
+      console.error(error);
+      return sendFailureMessage(error?.message);
    }
 }
 
@@ -262,8 +255,7 @@ export async function removeWorkouts(
          response.count,
       );
    } catch (error) {
-      return sendErrorMessage("Failure", error?.message, null, {
-         system: [error?.message]
-      });
+      console.error(error);
+      return sendFailureMessage(error?.message);
    }
 }

@@ -283,12 +283,14 @@ describe("User Registration Validation", () => {
 
       // Test system failure during registration process
       // @ts-ignore
-      prismaMock.users.create.mockRejectedValueOnce(new Error("Database connection error"));
+      prismaMock.users.create.mockRejectedValueOnce(
+         new Error("Database connection error")
+      );
       expected = {
          status: "Failure",
          body: {
             data: null,
-            message: "Database connection error",
+            message: "Internal Server Error. Please try again later.",
             errors: {
                system: ["Database connection error"]
             }
