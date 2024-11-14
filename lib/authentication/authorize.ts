@@ -1,21 +1,19 @@
 "use server";
 import bcrypt from "bcryptjs";
 import prisma from "@/client";
-import { users as User } from "@prisma/client";
 import { z } from "zod";
-import { Credentials } from "./login";
+import { users as User } from "@prisma/client";
+import { Credentials } from "@/lib/authentication/login";
 
 export async function getUserByUsername(
    username: string
 ): Promise<User | null> {
    try {
-      const user = await prisma.users.findFirst({
+      return await prisma.users.findFirst({
          where: {
             username: username
          }
       });
-
-      return user ?? null;
    } catch (error) {
       return null;
    }
@@ -25,13 +23,11 @@ export async function getUserByEmail(
    email: string
 ): Promise<User | null> {
    try {
-      const user = await prisma.users.findFirst({
+      return await prisma.users.findFirst({
          where: {
             email: email
          }
       });
-
-      return user ?? null;
    } catch (error) {
       return null;
    }

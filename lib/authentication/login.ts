@@ -4,6 +4,7 @@ import { AuthError } from "next-auth";
 import {
    sendErrorMessage,
    sendFailureMessage,
+   sendSuccessMessage,
    VitalityResponse
 } from "@/lib/global/response";
 export type Credentials = {
@@ -21,8 +22,6 @@ export async function login(
 
       await signIn("credentials", userCredentials);
    } catch (error) {
-      console.error(error);
-
       if (error instanceof AuthError) {
          switch (error.type) {
             case "CallbackRouteError":
@@ -32,10 +31,10 @@ export async function login(
                   password: ["Invalid credentials"]
                });
             default:
-               return sendFailureMessage(error?.message);
+               return sendFailureMessage(error);
          }
       }
-
-      throw error;
    }
+
+   return sendSuccessMessage("Successfully logged in", null);
 }

@@ -3,12 +3,7 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 import prisma from "@/client";
 import { z } from "zod";
-import {
-   sendSuccessMessage,
-   sendErrorMessage,
-   sendFailureMessage,
-   VitalityResponse
-} from "@/lib/global/response";
+import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
 
 export type Registration = {
   name: string;
@@ -101,10 +96,6 @@ export async function signup(
       const salt = await bcrypt.genSaltSync(10);
       registration.password = await bcrypt.hash(registration.password, salt);
 
-      if (registration.phone) {
-         registration["phone"] = registration.phone;
-      }
-
       const existingUsers = await prisma.users.findMany({
          where: {
             OR: [
@@ -146,10 +137,9 @@ export async function signup(
             }
          }
 
-         return sendErrorMessage("Internal database conflicts", errors);
+         return sendErrorMessage("Account registration conflicts", errors);
       }
    } catch (error) {
-      console.error(error);
-      return sendFailureMessage(error?.message);
+      return sendFailureMessage(error);
    }
 }

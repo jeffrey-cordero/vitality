@@ -83,7 +83,6 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
 
       return sendSuccessMessage("Successfully added new workout tag", newTag);
    } catch (error) {
-
       if (
          error.code === "P2002" &&
          error.meta?.modelName === "workout_tags" &&
@@ -95,9 +94,7 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
             search: ["Workout tag already exists"]
          });
       } else {
-         return sendErrorMessage(error?.message, {
-            system: [error?.message]
-         });
+         return sendFailureMessage(error);
       }
    }
 }
@@ -157,8 +154,7 @@ export async function updateWorkoutTag(
          },
          );
       } else {
-         console.error(error);
-         return sendFailureMessage(error?.message);
+         return sendFailureMessage(error);
       }
    }
 }

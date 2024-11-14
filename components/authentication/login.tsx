@@ -83,7 +83,7 @@ export default function LoginForm(): JSX.Element {
                   id = "username"
                   type = "text"
                   label = "Username"
-                  autoComplete = "username"
+                  autoComplete = "none"
                   icon = {faUserSecret}
                   input = {state.username}
                   dispatch = {dispatch}

@@ -125,8 +125,7 @@ export async function addExercise(
          id: newExercise.id
       });
    } catch (error) {
-      console.error(error);
-      return sendFailureMessage(error?.message);
+      return sendFailureMessage(error);
    }
 }
 
@@ -278,8 +277,7 @@ export async function updateExercise(
          );
       }
    } catch (error) {
-      console.error(error);
-      return sendFailureMessage(error?.message);
+      return sendFailureMessage(error);
    }
 }
 
@@ -366,7 +364,6 @@ export async function updateExercises(
          formatWorkout(workout).exercises,
       );
    } catch (error) {
-      console.error(error);
-      return sendFailureMessage(error?.message);
+      return sendFailureMessage(error);
    }
 }

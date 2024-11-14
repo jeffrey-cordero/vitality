@@ -136,8 +136,7 @@ export async function addWorkout(
 
       return sendSuccessMessage("Added new workout", formatWorkout(newWorkout));
    } catch (error) {
-      console.error(error);
-      return sendFailureMessage(error?.message);
+      return sendFailureMessage(error);
    }
 }
 
@@ -231,8 +230,7 @@ export async function updateWorkout(
          );
       }
    } catch (error) {
-      console.error(error);
-      return sendFailureMessage(error?.message);
+      return sendFailureMessage(error);
    }
 }
 
@@ -255,7 +253,6 @@ export async function removeWorkouts(
          response.count,
       );
    } catch (error) {
-      console.error(error);
-      return sendFailureMessage(error?.message);
+      return sendFailureMessage(error);
    }
 }
