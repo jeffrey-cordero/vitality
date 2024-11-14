@@ -4,13 +4,12 @@ import Button from "@/components/global/button";
 import TextArea from "@/components/global/textarea";
 import Conformation from "@/components/global/confirmation";
 import {
-   formReducer,
-   handleResponse,
    VitalityChildProps,
    VitalityProps,
-   VitalityResponse,
-   VitalityState
+   VitalityState,
+   formReducer
 } from "@/lib/global/state";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { Workout } from "@/lib/home/workouts/workouts";
 import {
    faAlignJustify,

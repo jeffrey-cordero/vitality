@@ -5,8 +5,7 @@
     "dev": "next dev --turbo",
     "start": "next start",
     "lint": "next lint",
-    "unit": "npx jest tests/unit/* --collect-coverage",
-    "integration": "npx ts-node tests/setup.ts"
+    "tests": "npx jest tests/* --collect-coverage"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.2",
@@ -20,6 +19,8 @@
     "@next/env": "^14.2.3",
     "@prisma/client": "^5.13.0",
     "@tailwindcss/forms": "^0.5.7",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/user-event": "^14.5.2",
     "autoprefixer": "10.4.15",
     "bcryptjs": "^2.4.3",
     "classnames": "^2.5.1",

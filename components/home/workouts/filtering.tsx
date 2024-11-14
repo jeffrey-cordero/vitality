@@ -4,12 +4,14 @@ import Select from "@/components/global/select";
 import Heading from "@/components/global/heading";
 import { Modal } from "@/components/global/modal";
 import {
-   sendErrorMessage,
-   sendSuccessMessage,
    VitalityInputState,
    VitalityProps,
    VitalityState
 } from "@/lib/global/state";
+import {
+   sendSuccessMessage,
+   sendErrorMessage
+} from "@/lib/global/response";
 import { Workout } from "@/lib/home/workouts/workouts";
 import {
    faCalendar,
@@ -167,9 +169,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          globalDispatch({
             type: "updateErrors",
             value: sendErrorMessage(
-               "Error",
                "Invalid Date filter(s)",
-               null,
                errors,
             )
          });

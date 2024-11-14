@@ -17,13 +17,12 @@ import { addWorkoutTag, updateWorkoutTag, Tag } from "@/lib/home/workouts/tags";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
 import {
-   formReducer,
-   handleResponse,
    VitalityChildProps,
    VitalityProps,
-   VitalityResponse,
-   VitalityState
+   VitalityState,
+   formReducer
 } from "@/lib/global/state";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { Modal } from "@/components/global/modal";
 import { searchForTitle } from "@/lib/home/workouts/shared";
 
@@ -60,6 +59,9 @@ const colors = {
    "Red": "rgb(110, 54, 48)"
 };
 
+const colorValues = Object.values(colors);
+let randomColor: string = colorValues[Math.floor(Math.random() * colorValues.length)];
+
 interface CreateTagContainerProps extends VitalityChildProps {
    onSubmit: () => void;
 }
@@ -82,7 +84,7 @@ function CreateTagContainer(props: CreateTagContainerProps) {
          }}>
          <div
             className = "relative flex justify-center items-center gap-2 px-4 py-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-white"
-            style = {{ backgroundColor: "rgb(90, 90, 90)" }}>
+            style = {{ backgroundColor: randomColor }}>
             <FontAwesomeIcon icon = {faTags} />
             {search}
          </div>
@@ -279,7 +281,7 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
             icon = {faTag}
             input = {localState.tagTitle}
             dispatch = {localDispatch}
-            onSubmit={() => handleTagUpdates("update")}
+            onSubmit = {() => handleTagUpdates("update")}
             autoFocus
             required
          />
@@ -495,7 +497,7 @@ export function Tags(props: TagsProps): JSX.Element {
          user_id: user?.id,
          id: "",
          title: localState.tagSearch.value.trim(),
-         color: "rgb(90, 90, 90)"
+         color: randomColor
       };
 
       const response: VitalityResponse<Tag> = await addWorkoutTag(tag);
@@ -503,6 +505,7 @@ export function Tags(props: TagsProps): JSX.Element {
       const successMethod = () => {
          // Add the new tag to the overall user tag options
          const newOption: Tag = response.body.data as Tag;
+         tagsByTitle[newOption.title] = newOption;
 
          const newOptions: Tag[] = [...globalState.tags.data.options, newOption];
          const newSelected: Tag[] = [...globalState.tags.data.selected, newOption];
@@ -527,6 +530,9 @@ export function Tags(props: TagsProps): JSX.Element {
                }
             }
          });
+
+         // Fetch a new random color
+         randomColor = colorValues[Math.floor(Math.random() * colorValues.length)];
       };
 
       if (response.status !== "Error") {
@@ -554,6 +560,7 @@ export function Tags(props: TagsProps): JSX.Element {
       localDispatch,
       localState.tagSearch,
       globalState.tags,
+      tagsByTitle,
       user?.id,
       updateNotification
    ]);

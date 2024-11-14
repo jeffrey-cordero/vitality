@@ -1,24 +1,11 @@
-import Link from "next/link";
 import Button from "@/components/global/button";
 import { signOut } from "@/auth";
 import {
-   faRightFromBracket,
-   faEnvelopeOpenText
+   faRightFromBracket
 } from "@fortawesome/free-solid-svg-icons";
-
 export default function Page() {
-   // const { user } = useContext(AuthenticationContext);
-   // const name = user !== undefined ? user.name : "";
-
    return (
-      <main className = "w-full mx-auto flex min-h-screen flex-col items-center justify-start text-center">
-         <Link href = "/home/feedback">
-            <Button
-               className = "flex h-[48px] grow items-center justify-center gap-2 my-4 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-primary md:flex-none md:justify-start md:p-2 md:px-3"
-               icon = {faEnvelopeOpenText}>
-          Feedback
-            </Button>
-         </Link>
+      <main className = "w-full mx-auto flex min-h-screen flex-col items-center justify-center text-center">
          <form
             action = {async() => {
                "use server";
@@ -27,7 +14,7 @@ export default function Page() {
                });
             }}>
             <Button
-               className = "flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium text-red-600 hover:bg-sky-100 hover:text-primary md:flex-none md:justify-start md:p-2 md:px-3"
+               className = "flex h-[2.4rem] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-5 text-sm font-bold text-red-600 hover:bg-sky-100 hover:text-primary md:flex-none md:justify-start"
                icon = {faRightFromBracket}>
                <p>Sign Out</p>
             </Button>

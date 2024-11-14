@@ -2,11 +2,11 @@
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import {
-   VitalityResponse,
+   sendErrorMessage,
+   sendFailureMessage,
    sendSuccessMessage,
-   sendErrorMessage
-} from "@/lib/global/state";
-
+   VitalityResponse
+} from "@/lib/global/response";
 export type Credentials = {
   username: string;
   password: string;
@@ -22,27 +22,18 @@ export async function login(
 
       await signIn("credentials", userCredentials);
    } catch (error) {
-      console.error(error);
-
       if (error instanceof AuthError) {
          switch (error.type) {
             case "CallbackRouteError":
             case "CredentialsSignin":
-               return sendErrorMessage("Error", "Invalid credentials", null, {
+               return sendErrorMessage("Invalid credentials", {
                   username: ["Invalid credentials"],
                   password: ["Invalid credentials"]
                });
             default:
-               return sendErrorMessage(
-                  "Failure",
-                  "Internal Server Authentication Error. Please try again later.",
-                  null,
-                  {},
-               );
+               return sendFailureMessage(error);
          }
       }
-
-      throw error;
    }
 
    return sendSuccessMessage("Successfully logged in", null);

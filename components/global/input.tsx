@@ -34,7 +34,6 @@ export default function Input(props: VitalityInputProps): JSX.Element {
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
       if (input.handlesOnChange) {
-         // Call the user-defined event handler (complex state)
          onChange?.call(null, event);
       } else {
          // Simple state
@@ -64,7 +63,6 @@ export default function Input(props: VitalityInputProps): JSX.Element {
          const modals: HTMLCollection = document.getElementsByClassName("modal");
 
          if (modals.length > 0) {
-            // Focus the most inner modal, if any
             (modals.item(modals.length - 1) as HTMLDivElement).focus();
          }
       } else if (event.key === "Enter") {
@@ -162,7 +160,7 @@ export default function Input(props: VitalityInputProps): JSX.Element {
          </label>
          {input.error !== null &&
             <div className = "flex justify-center align-center text-center max-w-[90%] mx-auto gap-2 mt-2 opacity-0 animate-fadeIn">
-               <p className = "text-red-500 font-bold input-error"> {input.error} </p>
+               <p className = "text-red-500 font-bold input-error"> {input.error.trim()} </p>
             </div>
          }
       </div>

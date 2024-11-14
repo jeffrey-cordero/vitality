@@ -13,10 +13,9 @@ import {
 import { FormEvent, useContext, useReducer } from "react";
 import {
    VitalityState,
-   formReducer,
-   VitalityResponse,
-   handleResponse
+   formReducer
 } from "@/lib/global/state";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { login, Credentials } from "@/lib/authentication/login";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 
@@ -46,22 +45,18 @@ export default function LoginForm(): JSX.Element {
    const handleSubmit = async(event: FormEvent) => {
       event.preventDefault();
 
-      try {
-         const credentials: Credentials = {
-            username: state.username.value.trim(),
-            password: state.password.value.trim()
-         };
+      const credentials: Credentials = {
+         username: state.username.value.trim(),
+         password: state.password.value.trim()
+      };
 
-         const response: VitalityResponse<null> = await login(credentials);
+      const response: VitalityResponse<null> = await login(credentials);
 
-         const successMethod = () => {
-            window.location.reload();
-         };
+      const successMethod = () => {
+         window.location.reload();
+      };
 
-         handleResponse(dispatch, response, successMethod, updateNotification);
-      } catch (error) {
-         console.error(error);
-      }
+      handleResponse(dispatch, response, successMethod, updateNotification);
    };
 
    return (
@@ -88,7 +83,7 @@ export default function LoginForm(): JSX.Element {
                   id = "username"
                   type = "text"
                   label = "Username"
-                  autoComplete = "username"
+                  autoComplete = "none"
                   icon = {faUserSecret}
                   input = {state.username}
                   dispatch = {dispatch}
@@ -113,11 +108,11 @@ export default function LoginForm(): JSX.Element {
                </Button>
             </form>
             <p className = "mt-4">
-          Don&apos;t have an account?{" "}
+                  Don&apos;t have an account?{" "}
                <Link
                   href = "/signup"
                   className = "text-primary font-bold">
-            Register
+                  Register
                </Link>
             </p>
          </div>

@@ -1,11 +1,12 @@
 "use server";
-import prisma from "@/lib/prisma/client";
+import prisma from "@/client";
 import { z } from "zod";
 import {
-   VitalityResponse,
    sendSuccessMessage,
-   sendErrorMessage
-} from "@/lib/global/state";
+   sendErrorMessage,
+   sendFailureMessage,
+   VitalityResponse
+} from "@/lib/global/response";
 import { formatWorkout } from "@/lib/home/workouts/shared";
 import { Exercise } from "@/lib/home/workouts/exercises";
 import { uuidSchema } from "@/lib/global/zod";
@@ -83,8 +84,6 @@ export async function fetchWorkouts(userId: string): Promise<Workout[]> {
 
       return formattedWorkouts;
    } catch (error) {
-      console.error(error);
-
       return [];
    }
 }
@@ -97,14 +96,11 @@ export async function addWorkout(
       const fields = workoutsSchema.safeParse(workout);
 
       if (!fields.success) {
-         return sendErrorMessage(
-            "Error",
-            "Invalid workout tag fields",
-            workout,
+         return sendErrorMessage("Invalid workout tag fields",
             fields.error.flatten().fieldErrors,
          );
       }
-      
+
       // Create new workout with basic properties and an additional nested create operation for applied workout tags
       const newWorkout = await prisma.workouts.create({
          data: {
@@ -140,11 +136,7 @@ export async function addWorkout(
 
       return sendSuccessMessage("Added new workout", formatWorkout(newWorkout));
    } catch (error) {
-      console.error(error);
-
-      return sendErrorMessage("Failure", error.meta?.message, workout, {
-         system: error.meta?.message
-      });
+      return sendFailureMessage(error);
    }
 }
 
@@ -155,10 +147,7 @@ export async function updateWorkout(
       const fields = workoutsSchema.safeParse(workout);
 
       if (!fields.success) {
-         return sendErrorMessage(
-            "Error",
-            "Invalid workout fields",
-            workout,
+         return sendErrorMessage("Invalid workout fields",
             fields.error.flatten().fieldErrors,
          );
       } else {
@@ -241,11 +230,7 @@ export async function updateWorkout(
          );
       }
    } catch (error) {
-      console.error(error);
-
-      return sendErrorMessage("Failure", error.meta?.message, workout, {
-         system: error.meta?.message
-      });
+      return sendFailureMessage(error);
    }
 }
 
@@ -268,10 +253,6 @@ export async function removeWorkouts(
          response.count,
       );
    } catch (error) {
-      console.error(error);
-
-      return sendErrorMessage("Failure", error.meta?.message, 0, {
-         system: error.meta?.message
-      });
+      return sendFailureMessage(error);
    }
 }
