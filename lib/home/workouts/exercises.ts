@@ -285,6 +285,7 @@ export async function updateExercises(
    workoutId: string,
    exercises: Exercise[],
 ): Promise<VitalityResponse<Exercise[]>> {
+   // TODO: // Handle missing exercise-related id's or invalid user fields
    for (const exercise of exercises) {
       const fields = exerciseSchema.safeParse(exercise);
 

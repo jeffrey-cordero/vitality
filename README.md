@@ -4,6 +4,12 @@ Your all-in-one modern fitness tracker for progress and performance to fuel your
 
 ## Development
 
+To install all node module dependencies
+
+```bash
+npm install
+```
+
 To start development processes
 
 ``` bash

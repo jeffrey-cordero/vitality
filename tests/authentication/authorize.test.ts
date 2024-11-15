@@ -3,32 +3,13 @@ import { expect } from "@jest/globals";
 import { prismaMock } from "@/singleton";
 import { Credentials } from "@/lib/authentication/login";
 import { authorize, getUserByEmail, getUserByUsername } from "@/lib/authentication/authorize";
-
-const root = {
-   id: "1",
-   name: "root",
-   birthday: new Date(),
-   username: "root",
-   password: "$Vc$10$O1sZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
-   email: "root@gmail.com",
-   phone: "1234567890"
-};
-
-const admin = {
-   id: "2",
-   name: "admin",
-   birthday: new Date(),
-   username: "admin",
-   password: "$Ac$10$O033ZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
-   email: "admin@gmail.com",
-   phone: "1234567891"
-};
+import { root, admin } from "@/tests/authentication/data";
 
 describe("User Service Validation", () => {
    beforeEach(() => {
       // @ts-ignore
       // Mock the users' database calls to return the specific users
-      prismaMock.users.findFirst.mockImplementation((params) => {
+      prismaMock.users.findFirst.mockImplementation(async(params) => {
          if (params.where.username === "root"
                || params.where.email === "root@gmail.com") {
             return root;

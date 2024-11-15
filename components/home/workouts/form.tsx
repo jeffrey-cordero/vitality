@@ -349,7 +349,7 @@ export default function Form(props: VitalityProps): JSX.Element {
       setDisplayingFormModal(false);
    }, [globalDispatch,
       globalState.workout,
-      user?.id
+      user
    ]);
 
    const handleReset = useCallback(() => {
@@ -494,7 +494,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                         ...globalState.workout,
                         value: {
                            id: "",
-                           user_id: user?.id ?? "",
+                           user_id: user.id,
                            title: "",
                            date: new Date(),
                            image: "",

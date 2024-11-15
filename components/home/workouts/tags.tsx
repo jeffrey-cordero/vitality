@@ -494,7 +494,7 @@ export function Tags(props: TagsProps): JSX.Element {
    const handleTagCreation = useCallback(async() => {
       // Default tags have gray color option
       const tag: Tag = {
-         user_id: user?.id,
+         user_id: user.id,
          id: "",
          title: localState.tagSearch.value.trim(),
          color: randomColor
@@ -561,7 +561,7 @@ export function Tags(props: TagsProps): JSX.Element {
       localState.tagSearch,
       globalState.tags,
       tagsByTitle,
-      user?.id,
+      user,
       updateNotification
    ]);
 

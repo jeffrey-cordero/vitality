@@ -10,6 +10,7 @@ import {
 import { formatWorkout } from "@/lib/home/workouts/shared";
 import { Exercise } from "@/lib/home/workouts/exercises";
 import { uuidSchema } from "@/lib/global/zod";
+import { getAppliedWorkoutTagUpdates } from "./tags";
 
 export type Workout = {
   id: string;
@@ -143,6 +144,7 @@ export async function addWorkout(
 export async function updateWorkout(
    workout: Workout,
 ): Promise<VitalityResponse<Workout>> {
+   // TODO: // Handle missing workout-related id's or invalid user fields
    try {
       const fields = workoutsSchema.safeParse(workout);
 
@@ -173,18 +175,7 @@ export async function updateWorkout(
             }
          });
 
-         // Extract existing tag IDs
-         const existingAppliedTags: Set<string> = new Set(existingWorkout?.workout_applied_tags.map((tag) => tag.tag_id) || []);
-
-         // Determine tags to connect and disconnect
-         const newAppliedTags: Set<string> = new Set(workout.tagIds);
-
-         const tagsToRemove: string[] = Array.from(existingAppliedTags).filter(
-            (id) => !newAppliedTags.has(id),
-         );
-         const tagsToAdd: string[] = Array.from(newAppliedTags).filter(
-            (id) => !existingAppliedTags.has(id),
-         );
+         const { adding, removing } = await getAppliedWorkoutTagUpdates(existingWorkout, workout);
 
          const updatedWorkout = await prisma.workouts.update({
             where: { id: workout.id },
@@ -196,11 +187,11 @@ export async function updateWorkout(
                workout_applied_tags: {
                   // Disconnect existing applied tags
                   deleteMany: {
-                     tag_id: { in: tagsToRemove }
+                     tag_id: { in: removing }
                   },
                   // Create new applied tags
                   createMany: {
-                     data: tagsToAdd.map((tagId: string) => ({
+                     data: adding.map((tagId: string) => ({
                         tag_id: tagId
                      }))
                   }
