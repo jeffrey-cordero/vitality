@@ -25,8 +25,8 @@ export type ExerciseSet = {
 const MAX_INTEGER = 2147483647;
 
 const setSchema = z.object({
-   id: uuidSchema,
-   exercise_id: uuidSchema,
+   id: uuidSchema("user", "required"),
+   exercise_id: uuidSchema("exercise", "required"),
    hours: z
       .number()
       .min(0, {
@@ -80,6 +80,10 @@ const setSchema = z.object({
    text: z.string().optional().nullable()
 });
 
+const newSetSchema = setSchema.extend({
+   id: uuidSchema("set", "new")
+});
+
 export type Exercise = {
   id: string;
   workout_id: string;
@@ -89,8 +93,8 @@ export type Exercise = {
 };
 
 const exerciseSchema = z.object({
-   id: uuidSchema,
-   workout_id: uuidSchema,
+   id: uuidSchema("exercise", "required"),
+   workout_id: uuidSchema("workout", "required"),
    name: z
       .string()
       .trim()
@@ -99,11 +103,15 @@ const exerciseSchema = z.object({
    sets: z.array(setSchema)
 });
 
+const newExerciseSchema = exerciseSchema.extend({
+   id: uuidSchema("exercise", "new")
+});
+
 export async function addExercise(
    exercise: Exercise,
 ): Promise<VitalityResponse<Exercise>> {
    try {
-      const fields = exerciseSchema.safeParse(exercise);
+      const fields = newExerciseSchema.safeParse(exercise);
 
       if (!fields.success) {
          return sendErrorMessage(
@@ -150,7 +158,8 @@ export async function updateExercise(
             // Update exercise with new name
             await prisma.exercises.update({
                where: {
-                  id: exercise.id
+                  id: exercise.id,
+                  workout_id: exercise.workout_id
                },
                data: {
                   name: exercise.name
@@ -175,7 +184,7 @@ export async function updateExercise(
          };
 
          for (const set of exercise.sets) {
-            const fields = setSchema.safeParse(set);
+            const fields = set.id.trim() === "" ? newSetSchema.safeParse(set) : setSchema.safeParse(set);
 
             if (!fields.success) {
                return sendErrorMessage(
@@ -193,7 +202,8 @@ export async function updateExercise(
          // Update exercise sets while referring to current exercise entry
          const existingExercise = await prisma.exercises.findUnique({
             where: {
-               id: exercise.id
+               id: exercise.id,
+               workout_id: exercise.workout_id
             },
             include: {
                sets: {
@@ -249,7 +259,8 @@ export async function updateExercise(
 
          const newExercise = await prisma.exercises.update({
             where: {
-               id: exercise.id
+               id: exercise.id,
+               workout_id: exercise.workout_id
             },
             data: {
                sets: {
@@ -282,7 +293,7 @@ export async function updateExercise(
 }
 
 export async function updateExercises(
-   workoutId: string,
+   workout_id: string,
    exercises: Exercise[],
 ): Promise<VitalityResponse<Exercise[]>> {
    // TODO: // Handle missing exercise-related id's or invalid user fields
@@ -301,7 +312,7 @@ export async function updateExercises(
       // Fetch existing tags first for data integrity
       const existingWorkout = await prisma.workouts.findUnique({
          where: {
-            id: workoutId
+            id: workout_id
          },
          include: {
             exercises: {
@@ -328,7 +339,9 @@ export async function updateExercises(
       );
 
       const workout = await prisma.workouts.update({
-         where: { id: workoutId },
+         where: {
+            id: workout_id
+         },
          data: {
             exercises: {
                deleteMany: {

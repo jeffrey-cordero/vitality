@@ -10,7 +10,7 @@ import { removeWorkouts, Workout } from "@/lib/home/workouts/workouts";
 import { getWorkoutDate } from "@/lib/home/workouts/shared";
 import { Tag } from "@/lib/home/workouts/tags";
 import { useCallback, useContext, useMemo } from "react";
-import { NotificationContext } from "@/app/layout";
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
 
 interface RowProps extends VitalityProps {
    workout: Workout;
@@ -176,6 +176,7 @@ interface TableProps extends VitalityProps {
 }
 
 export default function Table(props: TableProps): JSX.Element {
+   const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const { workouts, globalState, globalDispatch } = props;
    const selected: Set<Workout> = globalState.workouts.data.selected;
@@ -235,7 +236,7 @@ export default function Table(props: TableProps): JSX.Element {
    const handleWorkoutDelete = useCallback(async() => {
       const size: number = visibleSelectedWorkouts.size;
       const response: VitalityResponse<number> =
-         await removeWorkouts(Array.from(visibleSelectedWorkouts));
+         await removeWorkouts(Array.from(visibleSelectedWorkouts), user.id);
 
       if (response.body.data as number === size) {
          // Remove single or multiple workouts from overall, filtered, and selected workouts
@@ -280,6 +281,7 @@ export default function Table(props: TableProps): JSX.Element {
          timer: 1000
       });
    }, [
+      user,
       globalDispatch,
       selected,
       globalState,

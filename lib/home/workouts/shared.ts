@@ -29,21 +29,12 @@ export function formatWorkout(workout: any): Workout {
       id: workout.id,
       user_id: workout.user_id,
       title: workout.title,
-      date: workout.date,
+      date: new Date(workout.date),
       description: workout.description ?? "",
       image: workout.image ?? "",
-      tagIds:
-      workout.workout_applied_tags?.map(
-         (applied_tag: any) => applied_tag.workout_tags.id,
+      tagIds: workout.workout_applied_tags?.map(
+         (applied: any) => applied.tag_id,
       ) ?? [],
-      exercises: workout.exercises?.map((exercise: any) => {
-         return {
-            id: exercise.id,
-            workout_id: exercise.workout_id,
-            exercise_order: exercise.exercise_order,
-            name: exercise.name,
-            sets: exercise.sets ?? []
-         };
-      }) ?? []
+      exercises: workout.exercises
    };
 }

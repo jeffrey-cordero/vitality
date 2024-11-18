@@ -10,7 +10,7 @@ import {
 import { formatWorkout } from "@/lib/home/workouts/shared";
 import { Exercise } from "@/lib/home/workouts/exercises";
 import { uuidSchema } from "@/lib/global/zod";
-import { getAppliedWorkoutTagUpdates } from "./tags";
+import { getAppliedWorkoutTagUpdates } from "@/lib/home/workouts/tags";
 
 export type Workout = {
   id: string;
@@ -28,20 +28,20 @@ const nextMediaRegex =
   /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
 
 const workoutsSchema = z.object({
-   user_id: uuidSchema,
-   id: uuidSchema,
+   user_id: uuidSchema("user", "required"),
+   id: uuidSchema("workout", "required"),
    title: z
       .string()
       .trim()
-      .min(1, { message: "A title must be at least 1 character" })
-      .max(50, { message: "A title must be at most 50 characters" }),
+      .min(1, { message: "Title must be at least 1 character" })
+      .max(50, { message: "Title must be at most 50 characters" }),
    date: z
       .date({
-         required_error: "Date for workout is required",
-         invalid_type_error: "A valid date is required"
+         required_error: "Date is required",
+         invalid_type_error: "Date is required"
       })
       .max(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), {
-         message: "A workout date must not be after today"
+         message: "Date must not be after today"
       }),
    description: z.string().optional().or(z.literal("")),
    image: z
@@ -53,13 +53,18 @@ const workoutsSchema = z.object({
    tags: z.array(z.string()).optional()
 });
 
-export async function fetchWorkouts(userId: string): Promise<Workout[]> {
+const newWorkoutSchema = workoutsSchema.extend({
+   id: uuidSchema("workout", "new")
+});
+
+export async function fetchWorkouts(user_id: string): Promise<Workout[]> {
    try {
-      const workoutsWithTags = await prisma.workouts.findMany({
+      const workouts = await prisma.workouts.findMany({
          include: {
             workout_applied_tags: {
-               include: {
-                  workout_tags: true
+               select: {
+                  workout_id: true,
+                  tag_id: true
                }
             },
             exercises: {
@@ -72,18 +77,14 @@ export async function fetchWorkouts(userId: string): Promise<Workout[]> {
             }
          },
          where: {
-            user_id: userId
+            user_id: user_id
          },
          orderBy: {
             date: "desc"
          }
       });
 
-      const formattedWorkouts = workoutsWithTags.map((workout) => {
-         return formatWorkout(workout);
-      });
-
-      return formattedWorkouts;
+      return workouts.map((workout) => formatWorkout(workout));
    } catch (error) {
       return [];
    }
@@ -93,11 +94,10 @@ export async function addWorkout(
    workout: Workout,
 ): Promise<VitalityResponse<Workout>> {
    try {
-      // Validate the feedback form first
-      const fields = workoutsSchema.safeParse(workout);
+      const fields = newWorkoutSchema.safeParse(workout);
 
       if (!fields.success) {
-         return sendErrorMessage("Invalid workout tag fields",
+         return sendErrorMessage("Invalid workout fields",
             fields.error.flatten().fieldErrors,
          );
       }
@@ -111,17 +111,14 @@ export async function addWorkout(
             image: workout.image,
             description: workout.description,
             workout_applied_tags: {
-               create: workout.tagIds.map((tagId: string) => {
-                  return {
-                     tag_id: tagId
-                  };
-               })
+               create: workout.tagIds.map((tagId: string) => ({ tag_id: tagId }))
             }
          },
          include: {
             workout_applied_tags: {
-               include: {
-                  workout_tags: true
+               select: {
+                  workout_id: true,
+                  tag_id: true
                }
             },
             exercises: {
@@ -144,7 +141,6 @@ export async function addWorkout(
 export async function updateWorkout(
    workout: Workout,
 ): Promise<VitalityResponse<Workout>> {
-   // TODO: // Handle missing workout-related id's or invalid user fields
    try {
       const fields = workoutsSchema.safeParse(workout);
 
@@ -154,14 +150,16 @@ export async function updateWorkout(
          );
       } else {
          // Fetch existing tags first for data integrity
-         const existingWorkout = await prisma.workouts.findUnique({
+         const existingWorkout = await prisma.workouts.findFirst({
             where: {
-               id: workout.id
+               id: workout.id,
+               user_id: workout.user_id
             },
             include: {
                workout_applied_tags: {
-                  include: {
-                     workout_tags: true
+                  select: {
+                     workout_id: true,
+                     tag_id: true
                   }
                },
                exercises: {
@@ -175,10 +173,20 @@ export async function updateWorkout(
             }
          });
 
+         if (!existingWorkout) {
+            return sendErrorMessage(
+               "Workout does not exist based on user and/or workout ID",
+               null
+            );
+         }
+
          const { adding, removing } = await getAppliedWorkoutTagUpdates(existingWorkout, workout);
 
          const updatedWorkout = await prisma.workouts.update({
-            where: { id: workout.id },
+            where: {
+               id: workout.id,
+               user_id: workout.user_id
+            },
             data: {
                title: workout.title,
                description: workout.description,
@@ -200,8 +208,9 @@ export async function updateWorkout(
 
             include: {
                workout_applied_tags: {
-                  include: {
-                     workout_tags: true
+                  select: {
+                     workout_id: true,
+                     tag_id: true
                   }
                },
                exercises: {
@@ -227,6 +236,7 @@ export async function updateWorkout(
 
 export async function removeWorkouts(
    workouts: Workout[],
+   user_id: string,
 ): Promise<VitalityResponse<number>> {
    try {
       const ids: string[] = workouts.map((workout: Workout) => workout.id);
@@ -235,7 +245,8 @@ export async function removeWorkouts(
          where: {
             id: {
                in: ids
-            }
+            },
+            user_id: user_id
          }
       });
 

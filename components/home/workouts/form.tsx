@@ -175,7 +175,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          ? await addWorkout(payload)
          : method === "update"
             ? await updateWorkout(payload)
-            : await removeWorkouts([payload]);
+            : await removeWorkouts([payload], user.id);
 
       const successMethod = () => {
          const returnedWorkout: Workout | null =
@@ -237,6 +237,12 @@ export default function Form(props: VitalityProps): JSX.Element {
             updateNotification({
                status: "Success",
                message: "Deleted workout",
+               timer: 1000
+            });
+         } else {
+            updateNotification({
+               status: "Success",
+               message: isNewWorkout ? "Added Workout" : "Updated Workout",
                timer: 1000
             });
          }

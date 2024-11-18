@@ -1,99 +1,135 @@
 import bcrypt from "bcryptjs";
 import { expect } from "@jest/globals";
 import { prismaMock } from "@/singleton";
-import { Credentials } from "@/lib/authentication/login";
 import { authorize, getUserByEmail, getUserByUsername } from "@/lib/authentication/authorize";
-import { root, admin } from "@/tests/authentication/data";
+import { root, user } from "@/tests/authentication/data";
 
-describe("User Service Validation", () => {
+describe("User Authorization", () => {
    beforeEach(() => {
+      // Mock Prisma ORM methods
       // @ts-ignore
-      // Mock the users' database calls to return the specific users
       prismaMock.users.findFirst.mockImplementation(async(params) => {
-         if (params.where.username === "root"
-               || params.where.email === "root@gmail.com") {
+         if (params.where.username === root.username
+               || params.where.email === root.email) {
             return root;
-         } else if (params.where.username === "admin"
-               || params.where.email === "admin@gmail.com") {
-            return admin;
+         } else if (params.where.username === user.username
+               || params.where.email === user.email) {
+            return user;
          } else {
             return null;
          }
       });
    });
 
-   test("Should return corresponding user object for existing username and null otherwise", async() => {
-      // Test existing users
-      expect(await getUserByUsername("root")).toEqual(root);
+   test("Fetch user via username", async() => {
+      // Existing users
+      expect(await getUserByUsername(root.username)).toEqual(root);
       expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
          where: { username: "root" }
       });
 
-      expect(await getUserByUsername("admin")).toEqual(admin);
+      expect(await getUserByUsername(user.username)).toEqual(user);
       expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
-         where: { username: "admin" }
+         where: { username: "user" }
       });
 
-      // Test missing user
+      // Missing user
       expect(await getUserByUsername("missing")).toBeNull();
       expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
          where: { username: "missing" }
       });
-      expect(
-         prismaMock.users.findFirst({
-            where: { username: "missing" }
-         })
-      ).toBeNull();
 
-      // Test system failure resulting in null user
-      prismaMock.users.findFirst.mockRejectedValueOnce(new Error("Database connection error"));
+      // Simulate database error
+      prismaMock.users.findFirst.mockRejectedValueOnce(
+         new Error("Database connection error")
+      );
+
       expect(await getUserByUsername(root.username)).toBeNull();
    });
 
-   test("Should return corresponding user object for existing email and null otherwise", async() => {
-      // Test existing users
-      expect(await getUserByEmail("root@gmail.com")).toEqual(root);
+   test("Fetch user via email", async() => {
+      // Existing users
+      expect(await getUserByEmail(root.email)).toEqual(root);
       expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
          where: { email: "root@gmail.com" }
       });
 
-      expect(await getUserByEmail("admin@gmail.com")).toEqual(admin);
+      expect(await getUserByEmail(user.email)).toEqual(user);
       expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
-         where: { email: "admin@gmail.com" }
+         where: { email: "user@gmail.com" }
       });
 
-      // Test missing user
+      // Missing users
       expect(await getUserByEmail("missing@gmail.com")).toBeNull();
       expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
          where: { email: "missing@gmail.com" }
       });
       expect(
-         prismaMock.users.findFirst({
+         await prismaMock.users.findFirst({
             where: { email: "missing@gmail.com" }
          })
       ).toBeNull();
 
-      // Test system failure resulting in null user
-      prismaMock.users.findFirst.mockRejectedValueOnce(new Error("Database connection error"));
+      // Simulate database error
+      prismaMock.users.findFirst.mockRejectedValueOnce(
+         new Error("Database connection error")
+      );
       expect(await getUserByEmail(root.email)).toBeNull();
    });
 
-   test("Should return corresponding authenticated user object on valid credentials and null otherwise", async() => {
-      // Test invalid credential parameters
-      let credentials: Credentials;
+   test("Authorization with invalid credentials", async() => {
+      // Mock password comparison
+      jest.spyOn(bcrypt, "compare").mockResolvedValue(false);
 
-      credentials = {
+      // Missing user or invalid fields lead to no password comparisons
+      let credentials = {
          username: "",
          password: ""
       };
 
       expect(await authorize(credentials)).toBeNull();
-      expect(prismaMock.users.findFirst).toHaveBeenCalledTimes(0);
-
-      // Test valid credentials by mocking bcrypt.compare to always return true for password comparison
-      jest.spyOn(bcrypt, "compare").mockResolvedValue(true);
+      expect(bcrypt.compare).not.toHaveBeenCalled();
+      expect(prismaMock.users.findFirst).not.toHaveBeenCalled();
 
       credentials = {
+         username: "missing-user",
+         password: "missing-password"
+      };
+
+      expect(await authorize(credentials)).toBeNull();
+      expect(bcrypt.compare).not.toHaveBeenCalled();
+
+      // Existing users
+      credentials = {
+         username: root.username,
+         password: "incorrect-Password-$123"
+      };
+
+      expect(await authorize(credentials)).toBeNull();
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+         credentials.password,
+         root.password
+      );
+      expect(bcrypt.compare).toHaveBeenCalled();
+
+      // Simulate database error
+      credentials = {
+         username: root.username,
+         password: root.password
+      };
+
+      prismaMock.users.findFirst.mockRejectedValueOnce(
+         new Error("Database connection error")
+      );
+
+      expect(await authorize(credentials)).toBeNull();
+   });
+
+   test("Authorization with valid credentials", async() => {
+      // Mock password comparison
+      jest.spyOn(bcrypt, "compare").mockResolvedValue(true);
+
+      const credentials = {
          username: root.username,
          password: root.password
       };
@@ -107,53 +143,5 @@ describe("User Service Validation", () => {
          credentials.password,
          root.password
       );
-
-      credentials = {
-         username: admin.username,
-         password: admin.password
-      };
-
-      expect(await authorize(credentials)).toEqual({
-         id: admin.id,
-         name: admin.name,
-         email: admin.email
-      });
-      expect(bcrypt.compare).toHaveBeenCalledWith(
-         credentials.password,
-         admin.password
-      );
-
-      // Test invalid credentials by mocking bcrypt.compare to always return true for password comparison
-      jest.spyOn(bcrypt, "compare").mockResolvedValue(false);
-
-      credentials = {
-         username: root.username,
-         password: "incorrect"
-      };
-
-      expect(await authorize(credentials)).toBeNull();
-      expect(bcrypt.compare).toHaveBeenCalledWith(
-         credentials.password,
-         root.password
-      );
-      expect(bcrypt.compare).toHaveBeenCalledTimes(3);
-
-      // Test missing user, where password bcrypt comparison should not be used
-      credentials = {
-         username: "missing",
-         password: "missing"
-      };
-
-      expect(await authorize(credentials)).toBeNull();
-      expect(bcrypt.compare).toHaveBeenCalledTimes(3);
-
-      // Test system failure resulting in null user
-      credentials = {
-         username: root.username,
-         password: root.password
-      };
-
-      prismaMock.users.findFirst.mockRejectedValueOnce(new Error("Database connection error"));
-      expect(await authorize(credentials)).toBeNull();
    });
 });

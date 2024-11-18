@@ -92,8 +92,6 @@ export function formReducer(
             }
 
             break;
-         default:
-            return state;
       }
    });
 }

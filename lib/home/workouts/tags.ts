@@ -10,6 +10,19 @@ import {
    VitalityResponse
 } from "@/lib/global/response";
 
+const colors = new Set([
+   "rgb(55, 55, 55)",
+   "rgb(90, 90, 90)",
+   "rgb(96, 59, 44)",
+   "rgb(133, 76, 29)",
+   "rgb(131, 94, 51)",
+   "rgb(43, 89, 63)",
+   "rgb(40, 69, 108)",
+   "rgb(73, 47, 100)",
+   "rgb(105, 49, 76)",
+   "rgb(110, 54, 48)"
+]);
+
 export type Tag = {
   user_id: string;
   id: string;
@@ -18,19 +31,24 @@ export type Tag = {
 };
 
 const workoutTagSchema = z.object({
-   user_id: uuidSchema,
-   id: uuidSchema,
+   user_id: uuidSchema("user", "required"),
+   id: uuidSchema("workout tag", "required"),
    title: z
       .string()
-      .min(1, {
-         message: "Workout tag must be at least 1 character"
+      .trim()
+      .min(3, {
+         message: "Title must be at least 3 characters"
       })
       .max(30, {
-         message: "Workout tag must be less than 30 characters"
+         message: "Title must be at most 30 characters"
       }),
-   color: z.string().regex(/^rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)$/, {
-      message: "A valid color is required"
+   color: z.string().trim().refine((string) => colors.has(string), {
+      message: "Color must be one of the default options"
    })
+});
+
+const newWorkoutTagSchema = workoutTagSchema.extend({
+   id: uuidSchema("workout tag", "new")
 });
 
 export async function fetchWorkoutTags(userId: string): Promise<Tag[]> {
@@ -46,13 +64,11 @@ export async function fetchWorkoutTags(userId: string): Promise<Tag[]> {
 }
 
 export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
-   const fields = workoutTagSchema.safeParse(tag);
+   const fields = newWorkoutTagSchema.safeParse(tag);
 
    if (!fields.success) {
-      return sendErrorMessage(
-         "Invalid workout tag fields",
-         fields.error.flatten().fieldErrors
-      );
+      const errors = fields.error.flatten().fieldErrors;
+      return sendErrorMessage("Invalid workout tag fields", errors);
    }
 
    try {
@@ -89,11 +105,7 @@ export async function updateWorkoutTag(
 ): Promise<VitalityResponse<Tag>> {
    const fields = workoutTagSchema.safeParse(tag);
    // Handle missing tag-related id's or invalid user fields
-   if (tag.user_id.trim() === "") {
-      return sendErrorMessage("Missing user ID", null);
-   } else if (tag.id.trim() === "") {
-      return sendErrorMessage("Missing workout tag ID", null);
-   } else if (!fields.success) {
+   if (!fields.success) {
       return sendErrorMessage(
          "Invalid workout tag fields",
          fields.error.flatten().fieldErrors
@@ -111,7 +123,7 @@ export async function updateWorkoutTag(
 
       if (!existingTag) {
          return sendErrorMessage(
-            "Workout tag does not exist based on user ID and/or tag ID",
+            "Workout tag does not exist based on user and/or tag ID",
             null
          );
       }
@@ -121,7 +133,8 @@ export async function updateWorkoutTag(
          case "update":
             const newTag = await prisma.workout_tags.update({
                where: {
-                  id: tag.id
+                  id: tag.id,
+                  user_id: tag.user_id
                },
                data: {
                   title: tag.title.trim(),
@@ -129,14 +142,12 @@ export async function updateWorkoutTag(
                }
             });
 
-            return sendSuccessMessage(
-               "Successfully updated workout tag",
-               newTag
-            );
+            return sendSuccessMessage("Successfully updated workout tag", newTag);
          case "delete":
             const deletedTag = await prisma.workout_tags.delete({
                where: {
-                  id: tag.id
+                  id: tag.id,
+                  user_id: tag.user_id
                }
             });
 
@@ -144,8 +155,6 @@ export async function updateWorkoutTag(
                "Successfully deleted workout tag",
                deletedTag
             );
-         default:
-            return sendErrorMessage("Invalid Workout Tag Update Method", null);
       }
    } catch (error) {
       return sendFailureMessage(error);
@@ -158,7 +167,7 @@ export async function getAppliedWorkoutTagUpdates(
 ): Promise<{ adding: string[]; removing: string[] }> {
    // Extract existing applied tag IDs
    const existing: Set<string> = new Set(
-      existingWorkout?.workout_applied_tags.map((tag) => tag.tag_id) || []
+      existingWorkout.workout_applied_tags.map((tag) => tag.tag_id)
    );
 
    // Determine tags ID's to add and remove from existing workout

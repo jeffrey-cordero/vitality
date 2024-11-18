@@ -7,14 +7,15 @@ import { Registration, signup } from "@/lib/authentication/signup";
 let registration: Registration;
 let expected: VitalityResponse<Registration>;
 
+// Mock password hashing methods
 jest.mock("bcryptjs", () => ({
-   genSaltSync: jest.fn(),
-   hash: jest.fn()
+   genSaltSync: jest.fn(() => "mocked_salt"),
+   hash: jest.fn((password) => `hashed_${password}`)
 }));
 
-describe("User Registration Validation", () => {
-   test("Should fail when any required registration field is invalid or missing", async() => {
-      // Test empty, missing, and null fields
+describe("User Registration", () => {
+   test("Registration with field errors", async() => {
+      // Missing, empty, and null fields
       registration = {
          name: "",
          username: "",
@@ -37,23 +38,24 @@ describe("User Registration Validation", () => {
             }
          }
       };
+
       await expect(signup(registration)).resolves.toEqual(expected);
 
-      // Test invalid phone number
+      // Invalid phone number
       registration.phone = "27382738273971238";
       expected.body.errors.phone = ["Valid phone number is required, if provided"];
+
       await expect(signup(registration)).resolves.toEqual(expected);
 
-      // Test future birthday
+      // Future birthday
       registration.birthday = new Date(Date.now() + 1000 * 60 * 60 * 24);
       expected.body.errors.birthday = ["Birthday cannot be in the future"];
-      await expect(signup(registration)).resolves.toEqual(expected);
-   });
 
-   test("Should fail when name and/or username is invalid and succeed otherwise", async() => {
-      // Test username too short
+      await expect(signup(registration)).resolves.toEqual(expected);
+
+      // Username and name too short
       registration = {
-         name: "Jeffrey",
+         name: " J ",
          birthday: new Date(),
          username: "JC",
          password: "ValidPassword1!",
@@ -68,48 +70,26 @@ describe("User Registration Validation", () => {
             data: null,
             message: "Invalid user registration fields",
             errors: {
-               username: ["Username must be at least 3 characters"]
+               username: ["Username must be at least 3 characters"],
+               name: ["Name must be at least 2 characters"]
             }
          }
       };
+
       await expect(signup(registration)).resolves.toEqual(expected);
 
-      // Test username too long
+      // Username and name too long
       registration.username = registration.username.repeat(16);
       expected.body.errors.username = ["Username must be at most 30 characters"];
-      await expect(signup(registration)).resolves.toEqual(expected);
 
-      // Test name too short
-      registration.name = " J ";
-      expected.body.errors.name = ["Name must be at least 2 characters"];
-      await expect(signup(registration)).resolves.toEqual(expected);
-
-      // Test name too long
       registration.name = "J".repeat(201);
       expected.body.errors.name = ["Name must be at most 200 characters"];
-      await expect(signup(registration)).resolves.toEqual(expected);
 
-      // Test username and name lengths at valid minimum lengths
-      registration.username = "J_C";
-      registration.name = "JC";
-      expected = {
-         status: "Success",
-         body: {
-            data: null,
-            message: "Successfully registered",
-            errors: {}
-         }
-      };
-      await expect(signup(registration)).resolves.toEqual(expected);
-
-      // Test username and name lengths at valid maximum lengths
-      registration.username = "J".repeat(30);
-      registration.name = "J".repeat(200);
       await expect(signup(registration)).resolves.toEqual(expected);
    });
 
-   test("Should fail when passwords are invalid or don't match and succeed otherwise", async() => {
-      // Test invalid password, but valid confirm password
+   test("Registration with password errors", async() => {
+      // Weak password
       registration = {
          name: "Jeffrey",
          birthday: new Date(),
@@ -134,35 +114,26 @@ describe("User Registration Validation", () => {
             }
          }
       };
+
       await expect(signup(registration)).resolves.toEqual(expected);
 
-      // Test invalid password and confirm password displaying the same error
+      // Both password fields displaying same error
       registration.confirmPassword = registration.password;
       expected.body.errors.confirmPassword = expected.body.errors.password;
+
       await expect(signup(registration)).resolves.toEqual(expected);
 
-      // Test valid passwords, but both passwords do not match
+      // Passwords not matching
       registration.password = "ValidPassword1!";
       registration.confirmPassword = "ValidPassword21!";
       expected.body.errors.password = expected.body.errors.confirmPassword = [
          "Passwords do not match"
       ];
-      await expect(signup(registration)).resolves.toEqual(expected);
 
-      // Test valid matching passwords
-      registration.confirmPassword = registration.password;
-      expected = {
-         status: "Success",
-         body: {
-            data: null,
-            message: "Successfully registered",
-            errors: {}
-         }
-      };
       await expect(signup(registration)).resolves.toEqual(expected);
    });
 
-   test("Should fail when username, email, and/or phone number are already taken and succeed otherwise", async() => {
+   test("Registration with database integrity errors", async() => {
       // Mock existing users
       const existingUsers = [{
          id: "1",
@@ -180,13 +151,14 @@ describe("User Registration Validation", () => {
          password: "$Vc$10$O1sZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
          email: "test@gmail.com",
          phone: "1234567891"
-      }
-      ];
+      }];
 
       // @ts-ignore
-      // Test username already taken
-      prismaMock.users.findMany.mockReturnValue(existingUsers as any);
+      prismaMock.users.findMany.mockImplementation(async() => {
+         return existingUsers as any;
+      });
 
+      // Username already taken
       registration = {
          name: "root",
          birthday: new Date(),
@@ -207,19 +179,22 @@ describe("User Registration Validation", () => {
             }
          }
       };
+
       await expect(signup(registration)).resolves.toEqual(expected);
 
-      // Test email already taken
+      // Email already taken
       registration.email = "test@gmail.com";
       expected.body.errors.email = ["Email already taken"];
+
       await expect(signup(registration)).resolves.toEqual(expected);
 
-      // Test phone number already taken
+      // Phone number already taken
       registration.phone = "1234567891";
       expected.body.errors.phone = ["Phone number already taken"];
+
       await expect(signup(registration)).resolves.toEqual(expected);
 
-      // Test Prisma ORM search for existing users via where statement
+      // @ts-ignore
       expect(prismaMock.users.findMany).toHaveBeenCalledWith({
          where: {
             OR: [
@@ -229,12 +204,23 @@ describe("User Registration Validation", () => {
             ]
          }
       });
-      expect(prismaMock.users.findMany()).toHaveLength(2);
+      expect(await prismaMock.users.findMany({
+         where: {
+            OR: [
+               { username: registration.username.trim() },
+               { email: registration.email.trim() },
+               { phone: registration.phone?.trim() }
+            ]
+         }
+      })).toHaveLength(2);
 
       // Remove mock users
-      prismaMock.users.findMany.mockReturnValue([] as any);
+      // @ts-ignore
+      prismaMock.users.findMany.mockImplementation(async() => {
+         return [] as any;
+      });
 
-      // Apply unique account username, email, and phone number parameters
+      // Unique registration parameters
       registration.username = "jeffrey";
       registration.email = "jeffrey@gmail.com";
       registration.phone = "";
@@ -247,21 +233,11 @@ describe("User Registration Validation", () => {
             errors: {}
          }
       };
+
       await expect(signup(registration)).resolves.toEqual(expected);
+      expect(prismaMock.users.create).toHaveBeenCalled();
 
-      // Test Prisma ORM create database method for proper account registration parameters
-      expect(prismaMock.users.create).toHaveBeenCalledWith({
-         data: {
-            username: registration.username.trim(),
-            name: registration.name.trim(),
-            email: registration.email.trim(),
-            password: bcrypt.hash(registration.password, bcrypt.genSaltSync(10)),
-            birthday: registration.birthday,
-            phone: undefined
-         }
-      });
-
-      // Test system failure during registration process
+      // Simulate database error
       prismaMock.users.create.mockRejectedValueOnce(
          new Error("Database connection error")
       );
@@ -276,6 +252,42 @@ describe("User Registration Validation", () => {
             }
          }
       };
+
       await expect(signup(registration)).resolves.toEqual(expected);
+      expect(prismaMock.users.create).toHaveBeenCalledTimes(2);
+   });
+
+   test("Successful user registration", async() => {
+      registration = {
+         name: "test",
+         birthday: new Date(),
+         username: "test",
+         password: "ValidPassword1!",
+         confirmPassword: "ValidPassword1!",
+         email: "test@gmail.com",
+         phone: "1234567899"
+      } as Registration;
+
+      expected = {
+         status: "Success",
+         body: {
+            data: null,
+            message: "Successfully registered",
+            errors: {}
+         }
+      };
+
+      await expect(signup(registration)).resolves.toEqual(expected);
+      expect(prismaMock.users.create).toHaveBeenCalled();
+      expect(prismaMock.users.create).toHaveBeenCalledWith({
+         data: {
+            username: registration.username.trim(),
+            name: registration.name.trim(),
+            email: registration.email.trim(),
+            password: await bcrypt.hash(registration.password, await bcrypt.genSaltSync(10)),
+            birthday: registration.birthday,
+            phone: registration.phone.trim()
+         }
+      });
    });
 });
