@@ -4,13 +4,7 @@ import { prismaMock } from "@/singleton";
 import { VitalityResponse } from "@/lib/global/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { workout, tags } from "@/tests/home/workouts/data";
-import {
-   addWorkoutTag,
-   fetchWorkoutTags,
-   getAppliedWorkoutTagUpdates,
-   Tag,
-   updateWorkoutTag
-} from "@/lib/home/workouts/tags";
+import { addWorkoutTag, fetchWorkoutTags, getAppliedWorkoutTagUpdates, Tag, updateWorkoutTag } from "@/lib/home/workouts/tags";
 
 let tagsByTitle: { [key: string]: Tag } = {};
 let tagsById: { [key: string]: Tag } = {};

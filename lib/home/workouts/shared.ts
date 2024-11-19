@@ -24,7 +24,7 @@ export function getWorkoutDate(date: Date): string {
 }
 
 export function formatWorkout(workout: any): Workout {
-   // Uniform workout object containing all potential properties, tags, and exercises
+   // Uniform workout object containing all potential properties, tag ID's, and exercises
    return {
       id: workout.id,
       user_id: workout.user_id,
@@ -35,6 +35,6 @@ export function formatWorkout(workout: any): Workout {
       tagIds: workout.workout_applied_tags?.map(
          (applied: any) => applied.tag_id,
       ) ?? [],
-      exercises: workout.exercises
+      exercises: workout.exercises ?? []
    };
 }

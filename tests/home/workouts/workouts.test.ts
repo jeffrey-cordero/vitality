@@ -3,63 +3,63 @@ import { root } from "@/tests/authentication/data";
 import { prismaMock } from "@/singleton";
 import { VitalityResponse } from "@/lib/global/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { workouts } from "@/tests/home/workouts/data";
-import {
-   addWorkout,
-   fetchWorkouts,
-   Workout
-} from "@/lib/home/workouts/workouts";
+import { tags, workouts } from "@/tests/home/workouts/data";
+import { addWorkout, fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
 import { formatWorkout } from "@/lib/home/workouts/shared";
 
 let workoutsById;
 let workout: Workout;
 let expected: VitalityResponse<Workout>;
 
+const handleDatabaseConstraints = async(params, method) => {
+   const isInvalidUser: boolean =
+    (method === "create" && params.data.user_id !== root.id) ||
+    (method !== "create" && params.where.user_id !== root.id);
+
+   if (isInvalidUser) {
+      throw new PrismaClientKnownRequestError(
+         "Foreign key constraint violated: `workout_tags_user_id_fkey (index)`",
+         {
+            code: "P2003",
+            clientVersion: "5.22.0",
+            meta: {
+               modelName: "workout_tags",
+               field_name: "workout_tags_user_id_fkey (index)"
+            }
+         }
+      );
+   }
+
+   const newWorkout = {
+      ...params.data,
+      id: method === "create" ? "Mock-ID" : params.where.id,
+      user_id: method === "create" ? params.data.user_id : params.where.user_id
+   };
+
+   if (method !== "create") {
+      delete workoutsById[newWorkout.id];
+   } else {
+      // Mock application of new workout tags
+      newWorkout.workout_applied_tags = params.data.workout_applied_tags.create.map((tag) => ({
+         workout_id: "Mock-ID",
+         tag_id: tag.tag_id
+      }));
+   }
+
+   if (method !== "delete") {
+      workoutsById[newWorkout.id] = newWorkout;
+   }
+
+   return newWorkout;
+};
+
 describe("Workout Tracking Validation", () => {
    beforeEach(() => {
-      // Mock workout table methods
+      // Initialize mock workout mappings
       workoutsById = {
          [workouts[0].id]: workouts[0],
          [workouts[1].id]: workouts[1],
          [workouts[2].id]: workouts[2]
-      };
-
-      const handleDatabaseConstraints = async(params, method) => {
-         if (
-            (method === "create" && params.data.user_id !== root.id) ||
-        (method !== "create" && params.where.user_id !== root.id)
-         ) {
-            // Failure to create/update/delete workout on invalid user ID
-            throw new PrismaClientKnownRequestError(
-               "Foreign key constraint violated: `workout_tags_user_id_fkey (index)`",
-               {
-                  code: "P2003",
-                  clientVersion: "5.22.0",
-                  meta: {
-                     modelName: "workout_tags",
-                     field_name: "workout_tags_user_id_fkey (index)"
-                  }
-               }
-            );
-         } else {
-            // Create/update/delete workout on existing user ID
-            const newWorkout = {
-               ...params.data,
-               id: method === "create" ? "Mock-ID" : params.where.id,
-               user_id:
-            method === "create" ? params.data.user_id : params.where.user_id
-            };
-
-            if (method !== "create") {
-               delete workoutsById[newWorkout.id];
-            }
-
-            if (method !== "delete") {
-               workoutsById[newWorkout.id] = newWorkout;
-            }
-
-            return newWorkout;
-         }
       };
 
       // @ts-ignore
@@ -76,32 +76,79 @@ describe("Workout Tracking Validation", () => {
          }
       });
 
-      ["create", "update", "delete"].forEach((method) => {
       // @ts-ignore
+      ["create", "update", "delete"].forEach((method) => {
          prismaMock.workouts[method].mockImplementation(async(params) => {
             return handleDatabaseConstraints(params, method);
          });
       });
    });
 
-   test("Should return a list of all user workouts on an existing user ID", async() => {
-      // Mock the formatted workouts after fetching from the database
+   test("Fetch user workouts", async() => {
+      // Mock formatted workouts from database resulting rows
       const formatted = [...workouts].map((workout) => formatWorkout(workout));
 
       expect(await fetchWorkouts(root.id)).toEqual(formatted);
+      expect(prismaMock.workouts.findMany).toHaveBeenCalledWith({
+         include: {
+            workout_applied_tags: {
+               select: {
+                  workout_id: true,
+                  tag_id: true
+               }
+            },
+            exercises: {
+               include: {
+                  sets: true
+               },
+               orderBy: {
+                  exercise_order: "asc"
+               }
+            }
+         },
+         where: {
+            user_id: root.id
+         },
+         orderBy: {
+            date: "desc"
+         }
+      });
       expect(await fetchWorkouts("Missing-User-ID")).toEqual([]);
+      expect(prismaMock.workouts.findMany).toHaveBeenCalledWith({
+         include: {
+            workout_applied_tags: {
+               select: {
+                  workout_id: true,
+                  tag_id: true
+               }
+            },
+            exercises: {
+               include: {
+                  sets: true
+               },
+               orderBy: {
+                  exercise_order: "asc"
+               }
+            }
+         },
+         where: {
+            user_id: "Missing-User-ID"
+         },
+         orderBy: {
+            date: "desc"
+         }
+      });
 
-      // Test system failure leading to empty workouts for any client
+      // Simulate database error
       prismaMock.workouts.findMany.mockRejectedValue(
          new Error("Database Connection Error")
       );
 
       expect(await fetchWorkouts(root.id)).toEqual([]);
-      expect(await fetchWorkouts("Another-User-ID")).toEqual([]);
+      expect(await fetchWorkouts("Another-Missing-User-ID")).toEqual([]);
    });
 
-   test("Should fail to create a workout on invalid properties and constraints or succeed otherwise", async() => {
-      // Test missing user ID, empty title, and future date
+   test("Create workout with field errors", async() => {
       workout = {
          id: "",
          user_id: "",
@@ -128,7 +175,6 @@ describe("Workout Tracking Validation", () => {
 
       expect(await addWorkout(workout)).toEqual(expected);
 
-      // Test long title, invalid ID, missing date, and invalid image URL
       workout = {
          ...workout,
          user_id: root.id,
@@ -153,8 +199,10 @@ describe("Workout Tracking Validation", () => {
       };
 
       expect(await addWorkout(workout)).toEqual(expected);
+   });
 
-      // Test invalid user ID failing due to database constraints
+   test("Create workout with database integrity errors", async() => {
+      // Invalid user
       workout = {
          ...workout,
          id: "",
@@ -178,11 +226,66 @@ describe("Workout Tracking Validation", () => {
       };
 
       expect(await addWorkout(workout)).toEqual(expected);
-
-      //  console.log(JSON.stringify(await addWorkout(workout)));
+      expect(prismaMock.workouts.create).toHaveBeenCalled();
    });
 
-   test("Should validate shared workout property and filtering methods", async() => {
-      // verifyImageURL, searchForTitle, getWorkoutDate
+   test("Create workout", async() => {
+      workout = {
+         id: "",
+         user_id: root.id,
+         title: "Title",
+         date: new Date(),
+         image: "https://www.obbstartersandalternators.com/images/test.png",
+         description: "Description",
+         tagIds: [tags[0].id, tags[1].id],
+         exercises: []
+      };
+
+      expected = {
+         status: "Success",
+         body: {
+            data: {
+               ...formatWorkout({
+                  ...workout,
+                  id: "Mock-ID",
+                  workout_applied_tags: [
+                     {
+                        tag_id: tags[0].id,
+                        workout_id: "Mock-ID"
+                     },
+                     {
+                        tag_id: tags[1].id,
+                        workout_id: "Mock-ID"
+                     }
+                  ]
+               })
+            },
+            message: "Added new workout",
+            errors: {}
+         }
+      };
+
+      expect(await addWorkout(workout)).toEqual(expected);
+   });
+
+   test("Update or delete workout with field errors", async() => {
+      // TODO
+   });
+
+   test("Update or delete workout with database integrity errors", async() => {
+      // TODO
+   });
+
+   test("Update workout", async() => {
+      // TODO
+   });
+
+   test("Delete workout", async() => {
+      // TODO
+   });
+
+   test("Shared Workout Methods", async() => {
+      // TODO
+      // verifyImageURL(), searchForTitle(), getWorkoutDate()
    });
 });
