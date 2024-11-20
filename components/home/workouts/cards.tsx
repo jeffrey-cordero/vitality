@@ -2,7 +2,6 @@ import clsx from "clsx";
 import Image from "next/image";
 import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { getWorkoutDate } from "@/lib/home/workouts/shared";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 import { useMemo } from "react";
@@ -14,6 +13,11 @@ interface CardProps extends CardsProps {
 
 function Card(props: CardProps): JSX.Element {
    const { workout, globalState, globalDispatch } = props;
+
+   const formattedDate = useMemo(() => {
+      return workout.date.toISOString().slice(0, 10);
+   }, [workout.date]);
+
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
          // Fetch workout tag, which may be missing in up-to-date dictionary due to a removal
@@ -81,7 +85,7 @@ function Card(props: CardProps): JSX.Element {
                <h2 className = "font-bold text-2xl px-6 py-4 overflow-clip max-w-[90%] text-ellipsis whitespace-nowrap leading-none tracking-tight">
                   {workout.title}
                </h2>
-               <p className = "font-bold text-sm">{getWorkoutDate(workout.date)}</p>
+               <p className = "font-bold text-sm">{formattedDate}</p>
                <div
                   className = {clsx(
                      "w-full max-h-[15rem] flex flex-row flex-wrap justify-center items-center gap-2 p-2 overflow-auto scrollbar-hide",

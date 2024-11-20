@@ -15,7 +15,7 @@ import {
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import {
    addWorkout,
-   removeWorkouts,
+   deleteWorkouts,
    updateWorkout,
    Workout
 } from "@/lib/home/workouts/workouts";
@@ -175,7 +175,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          ? await addWorkout(payload)
          : method === "update"
             ? await updateWorkout(payload)
-            : await removeWorkouts([payload], user.id);
+            : await deleteWorkouts([payload], user.id);
 
       const successMethod = () => {
          const returnedWorkout: Workout | null =
@@ -489,7 +489,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          </Modal>
          <Button
             type = "button"
-            className = "bg-primary text-white w-[10rem] h-[2.4rem] px-4 py-6"
+            className = "bg-primary text-white w-[10rem] h-[2.4rem] text-md px-4 py-5"
             icon = {faPersonRunning}
             onClick = {() => {
                globalDispatch({

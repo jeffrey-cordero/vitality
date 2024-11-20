@@ -98,7 +98,17 @@ export const workouts = [
       date: new Date("2024-11-10T00:00:00.000Z"),
       description: "A great workout on 11/10/2024",
       image: "/workouts/weights.png",
-      workout_applied_tags: [],
+      workout_applied_tags: [
+         {
+            workout_id: "dd29ecb7-a142-4f15-b828-6379cf4a8815",
+            tag_id: tags[0].id
+         },
+         {
+            workout_id: "dd29ecb7-a142-4f15-b828-6379cf4a8815",
+            tag_id: tags[1].id
+         }
+      ],
+      tagIds: [tags[0].id, tags[1].id],
       exercises: []
    },
    {
@@ -106,9 +116,10 @@ export const workouts = [
       user_id: root.id,
       title: "Workout #3",
       date: new Date("2024-11-08T00:00:00.000Z"),
-      description: "A great workout on 11/08/2024",
-      image: "",
-      workout_applied_tags: [],
+      description: undefined,
+      image: undefined,
+      workout_applied_tags: undefined,
+      tagIds: undefined,
       exercises: []
    }
 ];

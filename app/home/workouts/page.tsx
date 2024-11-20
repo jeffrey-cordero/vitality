@@ -15,7 +15,6 @@ import {
    useState
 } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
-import { searchForTitle } from "@/lib/home/workouts/shared";
 
 const workouts: VitalityState = {
    search: {
@@ -105,8 +104,8 @@ export default function Page(): JSX.Element {
    const results: Workout[] = useMemo(() => {
       // Visible workouts are based on current applied workout filters
       const filtered: Workout[] = globalState.workouts.data.filtered;
-
-      return searchForTitle(filtered, search);
+      return search === "" ?
+         filtered : filtered.filter((w) => w.title.toLowerCase().includes(search.toLowerCase()));
    }, [
       globalState.workouts.data.filtered,
       search

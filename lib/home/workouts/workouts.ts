@@ -47,9 +47,8 @@ const workoutsSchema = z.object({
    image: z
       .string()
       .refine((value) => urlRegex.test(value) || nextMediaRegex.test(value), {
-         message: "Invalid URL"
-      })
-      .or(z.literal("")),
+         message: "Image URL must be valid"
+      }).or(z.literal("")),
    tags: z.array(z.string()).optional()
 });
 
@@ -106,10 +105,10 @@ export async function addWorkout(
       const newWorkout = await prisma.workouts.create({
          data: {
             user_id: workout.user_id,
-            title: workout.title,
+            title: workout.title.trim(),
             date: workout.date,
-            image: workout.image,
-            description: workout.description,
+            description: workout.description?.trim(),
+            image: workout.image?.trim(),
             workout_applied_tags: {
                create: workout.tagIds.map((tagId: string) => ({ tag_id: tagId }))
             }
@@ -188,10 +187,10 @@ export async function updateWorkout(
                user_id: workout.user_id
             },
             data: {
-               title: workout.title,
-               description: workout.description,
+               title: workout.title.trim(),
                date: workout.date,
-               image: workout.image,
+               description: workout.description?.trim(),
+               image: workout.image?.trim(),
                workout_applied_tags: {
                   // Disconnect existing applied tags
                   deleteMany: {
@@ -205,7 +204,6 @@ export async function updateWorkout(
                   }
                }
             },
-
             include: {
                workout_applied_tags: {
                   select: {
@@ -234,12 +232,31 @@ export async function updateWorkout(
    }
 }
 
-export async function removeWorkouts(
+export async function deleteWorkouts(
    workouts: Workout[],
    user_id: string,
 ): Promise<VitalityResponse<number>> {
+   const errors = {};
+
+   if (!uuidSchema("user", "required").safeParse(user_id).success) {
+      errors["user_id"] = ["ID for user must be in UUID format"];
+   }
+
    try {
-      const ids: string[] = workouts.map((workout: Workout) => workout.id);
+      const ids: string[] = [];
+
+      for (const workout of workouts) {
+         if (!uuidSchema("workout", "required").safeParse(workout.id).success) {
+            errors["id"] = ["ID for all workouts must be in UUID format"];
+            break;
+         }
+
+         ids.push(workout.id);
+      }
+
+      if (Object.keys(errors).length > 0) {
+         return sendErrorMessage("Invalid workout ID fields", errors);
+      }
 
       const response = await prisma.workouts.deleteMany({
          where: {

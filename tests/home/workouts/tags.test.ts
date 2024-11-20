@@ -474,6 +474,11 @@ describe("Workout Tags", () => {
          "69b62ca8-9222-4d68-b83a-c352c3989a50"
       ];
 
+      const existingTagIds = [
+         tagsByTitle["Strength"].id,
+         tagsByTitle["Running"].id
+      ];
+
       const existingWorkout = {
          ...workout,
          workout_applied_tags: [
@@ -496,14 +501,14 @@ describe("Workout Tags", () => {
          ...workout,
          tagIds: [
             ...newTagIds,
-            tagsByTitle["Strength"].id,
-            tagsByTitle["Running"].id
+            ...existingTagIds
          ]
       };
 
       expect(
          await getAppliedWorkoutTagUpdates(existingWorkout, newWorkout)
       ).toEqual({
+         existing: existingTagIds,
          adding: newTagIds,
          removing: [tagsByTitle["Swimming"].id]
       });

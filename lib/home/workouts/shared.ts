@@ -9,20 +9,6 @@ export function verifyImageURL(url: string): boolean {
    return url.trim().length === 0 || urlRegex.test(url) || defaultImageRegex.test(url);
 }
 
-export function searchForTitle(array: any[], search: string): any[] {
-   if (search === "") {
-      return array;
-   }
-
-   // Partial match search (case-insensitive)
-   return array.filter((t) => t.title.toLowerCase().includes(search.toLowerCase()));
-}
-
-export function getWorkoutDate(date: Date): string {
-   // Format: YYYY-MM-DD
-   return date.toISOString().slice(0, 10);
-}
-
 export function formatWorkout(workout: any): Workout {
    // Uniform workout object containing all potential properties, tag ID's, and exercises
    return {

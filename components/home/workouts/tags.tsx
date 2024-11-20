@@ -24,7 +24,6 @@ import {
 } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { Modal } from "@/components/global/modal";
-import { searchForTitle } from "@/lib/home/workouts/shared";
 
 const form: VitalityState = {
    tagTitle: {
@@ -474,7 +473,8 @@ export function Tags(props: TagsProps): JSX.Element {
 
    // Search results
    const searchResults: Tag[] = useMemo(() => {
-      return searchForTitle(searchOptions, search);
+      return search === "" ?
+         searchOptions : searchOptions.filter((o) => o.title.toLowerCase().includes(search.toLowerCase()));
    }, [
       searchOptions,
       search

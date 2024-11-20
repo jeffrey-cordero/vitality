@@ -122,6 +122,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
          className = "m-0 p-0 overflow-x-hidden w-full">
          <head>
             <title>Vitality</title>
+            <link rel="icon" type="image/x-icon" href="favicon.ico"></link>
             <meta
                name = "description"
                content = "A modern fitness tracker to fuel your fitness goals"

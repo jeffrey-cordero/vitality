@@ -164,7 +164,7 @@ export async function updateWorkoutTag(
 export async function getAppliedWorkoutTagUpdates(
    existingWorkout,
    newWorkout: Workout
-): Promise<{ adding: string[]; removing: string[] }> {
+): Promise<{ existing: string[], adding: string[]; removing: string[] }> {
    // Extract existing applied tag IDs
    const existing: Set<string> = new Set(
       existingWorkout.workout_applied_tags.map((tag) => tag.tag_id)
@@ -181,7 +181,12 @@ export async function getAppliedWorkoutTagUpdates(
       (id) => !adding.has(id)
    );
 
+   const existingTags: string[] = Array.from(existing).filter(
+      (id) => existing.has(id) && adding.has(id)
+   );
+
    return {
+      existing: existingTags,
       adding: addingTags,
       removing: removingTags
    };

@@ -6,8 +6,7 @@ import { VitalityProps } from "@/lib/global/state";
 import { VitalityResponse } from "@/lib/global/response";
 import { faImage, faPencil } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { removeWorkouts, Workout } from "@/lib/home/workouts/workouts";
-import { getWorkoutDate } from "@/lib/home/workouts/shared";
+import { deleteWorkouts, Workout } from "@/lib/home/workouts/workouts";
 import { Tag } from "@/lib/home/workouts/tags";
 import { useCallback, useContext, useMemo } from "react";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
@@ -22,7 +21,7 @@ function Row(props: RowProps) {
    const selected: Set<Workout> = globalState.workouts.data.selected;
 
    const formattedDate = useMemo(() => {
-      return getWorkoutDate(new Date(workout.date));
+      return workout.date.toISOString().slice(0, 10);
    }, [workout.date]);
 
    const handleWorkoutToggle = useCallback(() => {
@@ -100,7 +99,7 @@ function Row(props: RowProps) {
          </div>
          <div className = "w-full lg:w-[12rem] lg:max-h-[12rem] overflow-auto scrollbar-hide text-xl lg:text-base font-medium px-12 lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
             <div
-               className = {clsx("w-full max-h-[15rem] flex flex-row flex-wrap justify-center items-center gap-2 p-2 overflow-auto scrollbar-hide", {
+               className = {clsx("w-full max-h-[14rem] flex flex-row flex-wrap justify-center items-center gap-2 p-2 overflow-auto scrollbar-hide", {
                   "cursor-all-scroll": workoutTags.length > 0
                })}>
                {workoutTags}
@@ -110,7 +109,7 @@ function Row(props: RowProps) {
             className = {clsx("relative order-first lg:order-none mt-8 lg:mt-0 text-xl lg:text-base font-medium whitespace-pre-wrap break-all text-black")}>
             {
                workout.image ? (
-                  <div className = "relative w-[15rem] h-[15rem] lg:w-[8rem] lg:h-[8rem] flex justify-center items-center">
+                  <div className = "relative w-[14rem] h-[14rem] lg:w-[7rem] lg:h-[7rem] flex justify-center items-center">
                      <Image
                         fill
                         priority
@@ -118,11 +117,11 @@ function Row(props: RowProps) {
                         sizes = "100%"
                         src = {workout.image}
                         alt = "workout-image"
-                        className = {clsx("w-full h-full mx-auto object-cover object-center rounded-full overflow-hidden shadow-lg")}
+                        className = {clsx("w-full h-full mx-auto object-cover object-center rounded-full overflow-hidden shadow-sm")}
                      />
                   </div>
                ) : (
-                  <div className = "w-[15rem] h-[15rem] lg:w-[8rem] lg:h-[8rem] flex justify-center items-center rounded-full overflow-hidden text-primary">
+                  <div className = "w-[14rem] h-[14rem] lg:w-[7rem] lg:h-[7rem] flex justify-center items-center rounded-full overflow-hidden text-primary">
                      <FontAwesomeIcon
                         className = "text-4xl"
                         icon = {faImage}
@@ -236,7 +235,7 @@ export default function Table(props: TableProps): JSX.Element {
    const handleWorkoutDelete = useCallback(async() => {
       const size: number = visibleSelectedWorkouts.size;
       const response: VitalityResponse<number> =
-         await removeWorkouts(Array.from(visibleSelectedWorkouts), user.id);
+         await deleteWorkouts(Array.from(visibleSelectedWorkouts), user.id);
 
       if (response.body.data as number === size) {
          // Remove single or multiple workouts from overall, filtered, and selected workouts
@@ -320,7 +319,7 @@ export default function Table(props: TableProps): JSX.Element {
                <div className = "w-[12rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
                   Tags
                </div>
-               <div className = "w-[8rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
+               <div className = "w-[7rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
                   Image
                </div>
                <div className = "w-[3rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
