@@ -88,7 +88,7 @@ function Card(props: CardProps): JSX.Element {
                <p className = "font-bold text-sm">{formattedDate}</p>
                <div
                   className = {clsx(
-                     "w-full max-h-[15rem] flex flex-row flex-wrap justify-center items-center gap-2 p-2 overflow-auto scrollbar-hide",
+                     "w-full max-h-[15rem] flex flex-row flex-wrap justify-center items-center gap-2 py-2 px-4 overflow-auto scrollbar-hide",
                      {
                         "cursor-all-scroll": workoutTags.length > 0
                      },

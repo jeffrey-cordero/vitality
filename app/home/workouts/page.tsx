@@ -95,17 +95,17 @@ export default function Page(): JSX.Element {
    const [globalState, globalDispatch] = useReducer(formReducer, workouts);
    const [view, setView] = useState<"table" | "cards">("table");
 
-   // Lower case search string value for case-insensitive comparison
    const search: string = useMemo(() => {
       return globalState.search.value.trim().toLowerCase();
    }, [globalState.search]);
 
-   // Search results for workouts, accounting for pagination
+   // Workout results for case-insensitive title comparison
    const results: Workout[] = useMemo(() => {
-      // Visible workouts are based on current applied workout filters
       const filtered: Workout[] = globalState.workouts.data.filtered;
+      const lower = search.toLowerCase();
+
       return search === "" ?
-         filtered : filtered.filter((w) => w.title.toLowerCase().includes(search.toLowerCase()));
+         filtered : filtered.filter((w) => w.title.toLowerCase().includes(lower));
    }, [
       globalState.workouts.data.filtered,
       search

@@ -454,11 +454,6 @@ export function Tags(props: TagsProps): JSX.Element {
 
    const fetched: boolean = globalState.tags.data.fetched;
 
-   // Convert search string to lower case for case-insensitive comparison
-   const search: string = useMemo(() => {
-      return localState.tagSearch.value.trim().toLowerCase();
-   }, [localState.tagSearch]);
-
    // Differentiate between selected and unselected options
    const selectedOptions: Set<Tag> = useMemo(() => {
       return new Set<Tag>(selected);
@@ -471,10 +466,16 @@ export function Tags(props: TagsProps): JSX.Element {
       selectedOptions
    ]);
 
-   // Search results
+   const search: string = useMemo(() => {
+      return localState.tagSearch.value.trim();
+   }, [localState.tagSearch]);
+
+   // Workout tag results through case-insensitive title comparison
    const searchResults: Tag[] = useMemo(() => {
+      const lower = search.toLowerCase();
+
       return search === "" ?
-         searchOptions : searchOptions.filter((o) => o.title.toLowerCase().includes(search.toLowerCase()));
+         searchOptions : searchOptions.filter((t) => t.title.toLowerCase().includes(lower));
    }, [
       searchOptions,
       search
@@ -505,7 +506,6 @@ export function Tags(props: TagsProps): JSX.Element {
       const successMethod = () => {
          // Add the new tag to the overall user tag options
          const newOption: Tag = response.body.data as Tag;
-         tagsByTitle[newOption.title] = newOption;
 
          const newOptions: Tag[] = [...globalState.tags.data.options, newOption];
          const newSelected: Tag[] = [...globalState.tags.data.selected, newOption];
@@ -560,7 +560,6 @@ export function Tags(props: TagsProps): JSX.Element {
       localDispatch,
       localState.tagSearch,
       globalState.tags,
-      tagsByTitle,
       user,
       updateNotification
    ]);
@@ -629,7 +628,7 @@ export function Tags(props: TagsProps): JSX.Element {
                      })}
                   </ul>
                )}
-               {search.trim().length > 0 && user !== undefined && tagsByTitle[search] === undefined && (
+               {search.trim().length > 0 && !tagsByTitle[search] && (
                   <CreateTagContainer
                      {...props}
                      localState = {localState}

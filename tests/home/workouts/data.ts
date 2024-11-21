@@ -48,6 +48,13 @@ export const workout: Workout = {
          exercise_order: 1,
          name: "Exercise 2",
          sets: []
+      },
+      {
+         id: "dd29ecb7-a142-4f15-b828-6379cf4a8823",
+         workout_id: "69b62ca8-9222-4d68-b83a-c352c2989a48",
+         exercise_order: 2,
+         name: "Exercise 3",
+         sets: []
       }
    ]
 };

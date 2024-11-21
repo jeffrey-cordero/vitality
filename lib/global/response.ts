@@ -70,8 +70,7 @@ export function handleResponse(
 
       // Call the success method
       successMethod.call(null);
-   } else if (response.status === "Error" &&
-         Object.keys(response.body.errors).length > 0) {
+   } else if (response.status === "Error" && Object.keys(response.body.errors).length > 0) {
       // Update state to display all errors relative to the response
       dispatch({
          type: "updateErrors",

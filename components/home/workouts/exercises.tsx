@@ -38,7 +38,7 @@ import {
    updateExercise,
    Exercise,
    ExerciseSet,
-   updateExercises
+   updateExerciseOrderings
 } from "@/lib/home/workouts/exercises";
 import { NotificationContext } from "@/app/layout";
 import { useDoubleTap } from "use-double-tap";
@@ -693,9 +693,9 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       const newExercises: Exercise[] = [...workout.exercises].filter(
          (e) => e.id !== exercise.id,
       );
-      const response: VitalityResponse<Exercise[]> = await updateExercises(
-         workout.id,
+      const response: VitalityResponse<Exercise[]> = await updateExerciseOrderings(
          newExercises,
+         workout.id
       );
 
       const successMethod = () => {
@@ -1044,9 +1044,9 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                }),
             );
 
-            const response: VitalityResponse<Exercise[]> = await updateExercises(
-               workout.id,
+            const response: VitalityResponse<Exercise[]> = await updateExerciseOrderings(
                newExercises,
+               workout.id
             );
 
             const successMethod = () => {

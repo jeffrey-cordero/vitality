@@ -104,7 +104,7 @@ export async function updateWorkoutTag(
    method: "update" | "delete"
 ): Promise<VitalityResponse<Tag>> {
    const fields = workoutTagSchema.safeParse(tag);
-   // Handle missing tag-related id's or invalid user fields
+
    if (!fields.success) {
       return sendErrorMessage(
          "Invalid workout tag fields",
@@ -162,7 +162,7 @@ export async function updateWorkoutTag(
 }
 
 export async function getAppliedWorkoutTagUpdates(
-   existingWorkout,
+   existingWorkout: any,
    newWorkout: Workout
 ): Promise<{ existing: string[], adding: string[]; removing: string[] }> {
    // Extract existing applied tag IDs
