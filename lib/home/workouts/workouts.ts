@@ -1,5 +1,5 @@
 "use server";
-import prisma from "@/client";
+import prisma from "@/lib/prisma/client";
 import { z } from "zod";
 import {
    sendSuccessMessage,

@@ -157,6 +157,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
             onSubmit = {() => handleCreateNewExercise()}
             autoComplete = "none"
             autoFocus
+            scrollIntoView
             required
          />
          <Button
@@ -180,8 +181,8 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
 }
 
 interface ExerciseSetProps extends ExerciseProps {
-  set: ExerciseSet | undefined;
-  reset: () => void;
+   set: ExerciseSet | undefined;
+   reset: () => void;
 }
 
 function SetContainer(props: ExerciseSetProps): JSX.Element {
@@ -202,17 +203,17 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
    const editingExerciseId: string = localState.exerciseId.value;
    const editingExerciseSetId: string = localState.exerciseId.data.setId;
    const displayEditInputs =
-    editSet &&
-    editingExerciseId === exercise.id &&
-    ((set === undefined && editingExerciseSetId === "") ||
-      set?.id === editingExerciseSetId);
+      editSet &&
+      editingExerciseId === exercise.id &&
+      ((set === undefined && editingExerciseSetId === "") ||
+         set?.id === editingExerciseSetId);
 
    // Prevent drag and drop mechanisms when creating or editing a set
    const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-       id: set?.id,
-       disabled: set === undefined || displayEditInputs
-    });
+      useSortable({
+         id: set?.id,
+         disabled: set === undefined || displayEditInputs
+      });
 
    const style = {
       transform: CSS.Transform.toString(transform),
@@ -446,6 +447,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                         input = {localState.seconds}
                         dispatch = {localDispatch}
                         onSubmit = {() => handleExerciseSetUpdates("update")}
+                        scrollIntoView
                      />
                   </div>
                </div>
@@ -456,7 +458,6 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                   icon = {faAlignJustify}
                   input = {localState.text}
                   dispatch = {localDispatch}
-                  required
                />
                <Button
                   type = "button"
@@ -547,9 +548,9 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
 }
 
 interface ExerciseProps extends ExercisesProps, VitalityChildProps {
-  exercise: Exercise;
-  saveExercises: (_updatingExercises: Exercise[]) => void;
-  onBlur?: () => void;
+   exercise: Exercise;
+   saveExercises: (_updatingExercises: Exercise[]) => void;
+   onBlur?: () => void;
 }
 
 function ExerciseContainer(props: ExerciseProps): JSX.Element {
@@ -580,7 +581,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
    // Prevent drag and drop mechanisms when editing exercise
    const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: exercise.id, disabled: displayEditName || addSet });
+      useSortable({ id: exercise.id, disabled: displayEditName || addSet });
 
    const style = {
       transform: CSS.Transform.toString(transform),
@@ -827,6 +828,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   onSubmit = {() => handleExerciseNameUpdates()}
                   autoComplete = "none"
                   autoFocus
+                  scrollIntoView
                   required
                />
                <Button
@@ -884,7 +886,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                                  {...props}
                                  set = {set}
                                  reset = {() => handleReset(set.id)}
-                                 onBlur = {() => {}}
+                                 onBlur = {() => { }}
                                  key = {set.id}
                               />
                            );
@@ -921,7 +923,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 }
 
 interface ExercisesProps extends VitalityProps {
-  workout: Workout;
+   workout: Workout;
 }
 
 export default function Exercises(props: ExercisesProps): JSX.Element {
@@ -1108,7 +1110,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                      className = "w-full bg-white text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
                      icon = {faPlus}
                      onClick = {handleInitializeNewExerciseInput}>
-                      New Exercise
+                     New Exercise
                   </Button>
                </div>
             )}

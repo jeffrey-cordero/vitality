@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { expect } from "@jest/globals";
-import { prismaMock } from "@/singleton";
+import { prismaMock } from "@/tests/singleton";
 import { authorize, getUserByEmail, getUserByUsername } from "@/lib/authentication/authorize";
 import { root, user } from "@/tests/authentication/data";
 

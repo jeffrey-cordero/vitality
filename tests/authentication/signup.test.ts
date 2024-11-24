@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { expect } from "@jest/globals";
-import { prismaMock } from "@/singleton";
+import { prismaMock } from "@/tests/singleton";
 import { VitalityResponse } from "@/lib/global/response";
 import { Registration, signup } from "@/lib/authentication/signup";
 

@@ -1,6 +1,6 @@
 "use client";
 import clsx from "clsx";
-import { ChangeEvent, useCallback } from "react";
+import { ChangeEvent, useCallback, useEffect, useRef } from "react";
 import { VitalityInputProps } from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -18,9 +18,18 @@ export default function Select(props: SelectProps): JSX.Element {
       placeholder,
       className,
       onChange,
+      autoFocus,
       input,
       dispatch
    } = props;
+   const selectRef = useRef<HTMLSelectElement>(null);
+
+   useEffect(() => {
+      selectRef.current && autoFocus && selectRef.current.focus();
+   }, [
+      autoFocus,
+      input.error
+   ]);
 
    const handleSelectChange = useCallback(
       (event: ChangeEvent<HTMLSelectElement>) => {
@@ -51,6 +60,7 @@ export default function Select(props: SelectProps): JSX.Element {
    return (
       <div className = "relative">
          <select
+            ref = {selectRef}
             id = {id}
             value = {value ?? input.value}
             placeholder = {placeholder ?? ""}

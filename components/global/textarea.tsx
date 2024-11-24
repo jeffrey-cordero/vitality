@@ -5,10 +5,17 @@ import { VitalityInputProps } from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function TextArea(props: VitalityInputProps): JSX.Element {
-   const { id, label, icon, onChange, placeholder, required, input, dispatch } =
+   const { id, label, icon, onChange, placeholder, required, autoFocus, input, dispatch } =
     props;
    const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
    const [visible, setVisible] = useState<boolean>(false);
+
+   useEffect(() => {
+      textAreaRef.current && autoFocus && textAreaRef.current.focus();
+   }, [
+      autoFocus,
+      input.error
+   ]);
 
    const handleTextAreaChange = useCallback(
       (event: ChangeEvent<HTMLTextAreaElement>) => {

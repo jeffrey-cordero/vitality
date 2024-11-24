@@ -311,6 +311,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                   label = "Type"
                   icon = {faCalendar}
                   dispatch = {globalDispatch}
+                  autoFocus
                />
                {input !== undefined ? (
                   // Min or max

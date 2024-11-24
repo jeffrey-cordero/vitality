@@ -1,6 +1,6 @@
 import { expect } from "@jest/globals";
 import { root } from "@/tests/authentication/data";
-import { prismaMock } from "@/singleton";
+import { prismaMock } from "@/tests/singleton";
 import { VitalityResponse } from "@/lib/global/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { workout, tags } from "@/tests/home/workouts/data";
@@ -53,17 +53,13 @@ const handleDatabaseConstraints = (params: any, method: string): Tag | null => {
 describe("Workout Tags", () => {
    beforeEach(() => {
       // Initialize mock tag mappings
-      tagsByTitle = {
-         Strength: tags[0],
-         Running: tags[1],
-         Swimming: tags[2]
-      };
+      tagsByTitle = Object.fromEntries(
+         tags.map((tag) => [tag.title, tag])
+      );
 
-      tagsById = {
-         [tags[0].id]: tags[0],
-         [tags[1].id]: tags[1],
-         [tags[2].id]: tags[2]
-      };
+      tagsById = Object.fromEntries(
+         tags.map((tag) => [tag.id, tag])
+      );
 
       // Mock Prisma ORM methods
       // @ts-ignore

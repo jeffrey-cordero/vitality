@@ -30,7 +30,7 @@ export const workout: Workout = {
                text: "Text"
             },
             {
-               id: "33b33227-56b1-4f10-844a-660b523e546g",
+               id: "33b33227-56b1-4f10-844a-660b523e546c",
                exercise_id: "33b33227-56b1-4f10-844a-660b523e546e",
                set_order: 1,
                weight: 230,
@@ -38,6 +38,14 @@ export const workout: Workout = {
                hours: 1,
                minutes: 50,
                seconds: 30,
+               text: "Text"
+            },
+            {
+               id: "33b33227-56b1-4f10-844a-660b523e546h",
+               exercise_id: "33b33227-56b1-4f10-844a-660b523e546e",
+               set_order: 2,
+               weight: 300,
+               repetitions: 10,
                text: "Text"
             }
          ]

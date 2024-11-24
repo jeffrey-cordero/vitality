@@ -1,6 +1,6 @@
 "use server";
 import bcrypt from "bcryptjs";
-import prisma from "@/client";
+import prisma from "@/lib/prisma/client";
 import { z } from "zod";
 import { users as User } from "@prisma/client";
 import { Credentials } from "@/lib/authentication/login";

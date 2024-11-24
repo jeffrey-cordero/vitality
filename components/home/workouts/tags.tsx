@@ -608,6 +608,7 @@ export function Tags(props: TagsProps): JSX.Element {
                            handleTagCreation();
                         }
                      }}
+                     autoFocus = {onReset !== undefined}
                   />
                </div>
                {searchResults.length > 0 && (

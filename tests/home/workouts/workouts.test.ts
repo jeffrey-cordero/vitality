@@ -1,6 +1,6 @@
 import { expect } from "@jest/globals";
 import { root } from "@/tests/authentication/data";
-import { prismaMock } from "@/singleton";
+import { prismaMock } from "@/tests/singleton";
 import { VitalityResponse } from "@/lib/global/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { tags, workouts } from "@/tests/home/workouts/data";
@@ -58,20 +58,22 @@ const handleDatabaseConstraints = async(params, method) => {
    if (method === "create") {
       // Mock application of new workout tags
       newWorkout.workout_applied_tags =
-      params.data.workout_applied_tags.create.map((tag: { tag_id: string} ) => ({
-         workout_id: "Mock-ID",
-         tag_id: tag.tag_id
-      }));
+      params.data.workout_applied_tags.create.map(
+         (tag: { tag_id: string }) => ({
+            workout_id: "Mock-ID",
+            tag_id: tag.tag_id
+         })
+      );
    } else {
       delete workoutsById[params.data.id];
 
       if (method === "update") {
-         // Mock createMany and deleteMany workout tags methods
+      // Mock createMany and deleteMany workout tags methods
          const existingWorkout = workoutsById[params.where.id];
 
          const addingTags = new Set(
             params.data.workout_applied_tags?.createMany.data.map(
-               (tag: { tag_id: string}) => tag.tag_id
+               (tag: { tag_id: string }) => tag.tag_id
             )
          );
 
@@ -106,11 +108,9 @@ const handleDatabaseConstraints = async(params, method) => {
 describe("Workout Tracking Validation", () => {
    beforeEach(() => {
       // Initialize mock workout mappings
-      workoutsById = {
-         [workouts[0].id]: workouts[0],
-         [workouts[1].id]: workouts[1],
-         [workouts[2].id]: workouts[2]
-      };
+      workoutsById = Object.fromEntries(
+         workouts.map((workout) => [workout.id, workout])
+      );
 
       // @ts-ignore
       prismaMock.workouts.findMany.mockImplementation(async(params) => {
@@ -119,11 +119,9 @@ describe("Workout Tracking Validation", () => {
 
       // @ts-ignore
       prismaMock.workouts.findFirst.mockImplementation(async(params) => {
-         if (params.where.user_id !== root.id) {
-            return null;
-         } else {
-            return workoutsById[params.where.id as string];
-         }
+         return params.where.user_id === root.id
+            ? (workoutsById[params.where.id as string] ?? null)
+            : null;
       });
 
       // @ts-ignore

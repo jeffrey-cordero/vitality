@@ -15,20 +15,21 @@ export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
    icon?: IconProp;
    onBlur?: () => void;
    onSubmit?: () => void;
+   scrollIntoView?: boolean;
 }
 
 export default function Input(props: VitalityInputProps): JSX.Element {
-   const { id, label, type, icon, placeholder, className, min, autoFocus, autoComplete, onChange, onSubmit, required, input, dispatch } = props;
+   const { id, label, type, icon, placeholder, className, min, autoFocus, scrollIntoView, autoComplete, onChange, onSubmit, required, input, dispatch } = props;
    const inputType = input.data.type ?? type;
    const inputRef = useRef<HTMLInputElement>(null);
    const passwordButton = useRef<SVGSVGElement | null>(null);
 
    useEffect(() => {
-      if (inputRef.current && autoFocus) {
-         inputRef.current.focus();
-      }
+      inputRef.current && autoFocus && inputRef.current.focus();
+      inputRef.current && scrollIntoView && inputRef.current.scrollIntoView({ behavior: "instant", block: "center" });
    }, [
       autoFocus,
+      scrollIntoView,
       input.error
    ]);
 

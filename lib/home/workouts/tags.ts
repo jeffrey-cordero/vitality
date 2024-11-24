@@ -1,5 +1,5 @@
 "use server";
-import prisma from "@/client";
+import prisma from "@/lib/prisma/client";
 import { z } from "zod";
 import { uuidSchema } from "@/lib/global/zod";
 import { Workout } from "@/lib/home/workouts/workouts";
