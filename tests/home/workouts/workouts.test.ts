@@ -18,22 +18,14 @@ let workout: Workout;
 let expected: VitalityResponse<Workout>;
 
 const handleDatabaseConstraints = async(params, method) => {
-   const isInvalidUser: boolean =
-    (method === "create" && params.data.user_id !== root.id) ||
-    (method !== "create" && params.where.user_id !== root.id);
+   const isInvalidUser = method === "create" ?
+      params.data.user_id !==root.id : params.where.user_id !== root.id;
 
    if (isInvalidUser) {
-      throw new PrismaClientKnownRequestError(
-         "Foreign key constraint violated: `workouts_user_id_fkey (index)`",
-         {
-            code: "P2003",
-            clientVersion: "5.22.0",
-            meta: {
-               modelName: "workout",
-               field_name: "workout_user_id_fkey (index)"
-            }
-         }
-      );
+      throw new PrismaClientKnownRequestError("Foreign key constraint violated", {
+         code: "P2003",
+         clientVersion: "5.22.0"
+      });
    }
 
    if (method === "deleteMany") {
@@ -269,7 +261,7 @@ describe("Workout Tracking Validation", () => {
             message: "Something went wrong. Please try again.",
             errors: {
                system: [
-                  "Foreign key constraint violated: `workouts_user_id_fkey (index)`"
+                  "Foreign key constraint violated"
                ]
             }
          }
@@ -438,7 +430,7 @@ describe("Workout Tracking Validation", () => {
             message: "Something went wrong. Please try again.",
             errors: {
                system: [
-                  "Foreign key constraint violated: `workouts_user_id_fkey (index)`"
+                  "Foreign key constraint violated"
                ]
             }
          }

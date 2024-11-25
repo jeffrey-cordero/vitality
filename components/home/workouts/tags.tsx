@@ -194,7 +194,7 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
                   : [...selected.filter(mapOrFilter)];
 
             // Holds valid existing workout tags to account for removals in other tag view containers
-            const newDictionary: { [key: string]: Tag } = Object.fromEntries(
+            const newDictionary: Record<string, Tag> = Object.fromEntries(
                newTags.map((tag) => [tag.id, tag]),
             );
 
@@ -511,7 +511,7 @@ export function Tags(props: TagsProps): JSX.Element {
          const newSelected: Tag[] = [...globalState.tags.data.selected, newOption];
 
          // Dictionary of tags are essential to ignore deleted tags applied to existing workouts
-         const newDictionary: { [key: string]: Tag } = Object.fromEntries(
+         const newDictionary: Record<string, Tag> = Object.fromEntries(
             newOptions.map((tag) => [tag.id, tag]),
          );
 

@@ -232,18 +232,18 @@ export default function Form(props: VitalityProps): JSX.Element {
 
          // Close the form modal after a successful deletion
          if (method === "delete") {
-            formModalRef.current?.close();
-
             updateNotification({
                status: "Success",
                message: "Deleted workout",
-               timer: 1000
+               timer: 700
             });
+
+            formModalRef.current?.close();
          } else {
             updateNotification({
                status: "Success",
                message: isNewWorkout ? "Added Workout" : "Updated Workout",
-               timer: 1000
+               timer: 700
             });
          }
       };

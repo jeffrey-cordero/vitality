@@ -283,7 +283,7 @@ export default function Table(props: TableProps): JSX.Element {
       updateNotification({
          status: response.status,
          message: response.body.message,
-         timer: 1000
+         timer: 700
       });
    }, [
       user,

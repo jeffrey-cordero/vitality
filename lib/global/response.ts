@@ -7,7 +7,7 @@ export interface VitalityResponse<T> {
    body: {
      message: string;
      data: T;
-     errors: { [key: string]: string[] | undefined };
+     errors: Record<string, string[] | undefined>;
    };
  }
 
@@ -27,7 +27,7 @@ export function sendSuccessMessage<T>(
 
 export function sendErrorMessage<T>(
    message: string,
-   errors: { [key: string]: string[] }
+   errors: Record<string, string[] | undefined>
 ): VitalityResponse<T> {
    return {
       status: "Error",

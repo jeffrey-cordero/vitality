@@ -303,7 +303,7 @@ export async function getExerciseSetUpdates(
   updating: { where: { id: string; exercise_id: string }; data: ExerciseSet }[];
   removing: { id: { in: string[] }};
   error?: string;
-  errors?: { [key: string]: string[] };
+  errors?: Record<string, string[] | undefined>
 }> {
    const existingExerciseSets: string[] = existingExercise.sets.map(
       (set) => set.id
