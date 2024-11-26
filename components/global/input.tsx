@@ -25,8 +25,8 @@ export default function Input(props: VitalityInputProps): JSX.Element {
    const passwordButton = useRef<SVGSVGElement | null>(null);
 
    useEffect(() => {
-      inputRef.current && autoFocus && inputRef.current.focus();
-      inputRef.current && scrollIntoView && inputRef.current.scrollIntoView({ behavior: "instant", block: "center" });
+      autoFocus && inputRef.current?.focus();
+      scrollIntoView && inputRef.current?.scrollIntoView({ behavior: "instant", block: "center" });
    }, [
       autoFocus,
       scrollIntoView,

@@ -11,7 +11,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
    const [visible, setVisible] = useState<boolean>(false);
 
    useEffect(() => {
-      textAreaRef.current && autoFocus && textAreaRef.current.focus();
+      autoFocus && textAreaRef.current?.focus();
    }, [
       autoFocus,
       input.error

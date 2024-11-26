@@ -13,14 +13,14 @@ import {
    useEffect,
    useState
 } from "react";
-import { users as User } from "@prisma/client";
 import { getServerSession } from "@/lib/authentication/session";
 import { NotificationProps } from "@/components/global/notification";
+import { User as NextAuthUser } from "next-auth";
 
 interface AuthenticationContextType {
-   user: User | undefined;
+   user: NextAuthUser | undefined;
    fetched: boolean;
-   updateUser: (_user: SetStateAction<User | undefined>) => void;
+   updateUser: (_user: SetStateAction<NextAuthUser | undefined>) => void;
 }
 
 interface NotificationContextType {
@@ -45,13 +45,13 @@ export const NotificationContext = createContext<NotificationContextType>({
 
 export default function Layout({ children }: { children: React.ReactNode }) {
    // Layouts holds context for both user and potential notifications
-   const [user, setUser] = useState<User | undefined>(undefined);
+   const [user, setUser] = useState<NextAuthUser | undefined>(undefined);
    const [fetched, setFetched] = useState<boolean>(false);
    const [notification, setNotification] = useState<
       NotificationProps | undefined
    >(undefined);
 
-   const updateUser = (user: SetStateAction<User | undefined>) => {
+   const updateUser = (user: SetStateAction<NextAuthUser | undefined>) => {
       setUser(user);
    };
 

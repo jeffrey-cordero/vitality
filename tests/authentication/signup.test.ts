@@ -6,6 +6,7 @@ import { prismaMock } from "@/tests/singleton";
 import { Registration, signup } from "@/lib/authentication/signup";
 
 // Constants for common test mock values
+const EXISTING_USERS = [root, user];
 const VALID_REGISTRATION: Registration = {
    name: "user",
    birthday: new Date(),
@@ -15,21 +16,18 @@ const VALID_REGISTRATION: Registration = {
    email: "user@gmail.com",
    phone: "1234567890"
 };
-
-const EXISTING_USERS = [root, user];
-
 const INVALID_PASSWORD_MESSAGE =
   "Password must contain at least 8 characters, " +
   "one uppercase letter, one lowercase letter, " +
   "one number, and one special character (@$!%*#?&)";
 
-// Mock password hashing methods
+// Mock bcrypt password hashing methods
 jest.mock("bcryptjs", () => ({
    genSaltSync: jest.fn(() => "mockedSalt"),
    hash: jest.fn((password) => `hashed${password}`)
 }));
 
-describe("User Registration", () => {
+describe("User Registration Service", () => {
    beforeEach(() => {
       jest.clearAllMocks();
    });

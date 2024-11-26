@@ -91,7 +91,7 @@ const handleDatabaseMethods = async(params, method) => {
    return newWorkout;
 };
 
-describe("Workout Tracking Validation", () => {
+describe("Workout Tracking Service", () => {
    // Helper function to simulate database error situations
    const simulateDatabaseError = (method: string) => {
       // @ts-ignore

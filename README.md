@@ -1,6 +1,6 @@
 # Vitality
 
-Your all-in-one modern fitness tracker for progress and performance to fuel your fitness goals. Feel free to use any of the related code for your own projects! The application can be accessed [http://localhost:3000/](http://localhost:3000/) after setting up development environment. Note that this project is a work in progress.
+Your all-in-one modern fitness tracker for progress and performance to fuel your fitness goals. Feel free to use any of the related code for your own projects! The application can be accessed [http://localhost/](http://localhost/) after setting up development environment. Note that this project is a work in progress.
 
 ## Development
 

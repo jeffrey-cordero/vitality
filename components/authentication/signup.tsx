@@ -170,6 +170,7 @@ function Form(): JSX.Element {
                id = "birthday"
                type = "date"
                label = "Birthday"
+               name = "bday"
                autoComplete = "bday"
                icon = {faCalendar}
                input = {state.birthday}

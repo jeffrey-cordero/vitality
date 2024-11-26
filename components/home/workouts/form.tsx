@@ -172,8 +172,7 @@ export default function Form(props: VitalityProps): JSX.Element {
       };
 
       const response: VitalityResponse<Workout | number> = isNewWorkout
-         ? await addWorkout(payload)
-         : method === "update"
+         ? await addWorkout(payload) : method === "update"
             ? await updateWorkout(payload)
             : await deleteWorkouts([payload], user.id);
 
@@ -428,7 +427,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      icon = {faSignature}
                      input = {localState.title}
                      dispatch = {localDispatch}
-                     onSubmit = {() => handleUpdateWorkout("update")}
+                     onSubmit = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
                      autoFocus
                      required
                   />
@@ -439,7 +438,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      icon = {faCalendar}
                      input = {localState.date}
                      dispatch = {localDispatch}
-                     onSubmit = {() => handleUpdateWorkout("update")}
+                     onSubmit = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
                      required
                   />
                   <Tags
@@ -459,7 +458,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      label = "Description"
                      icon = {faBook}
                      input = {localState.description}
-                     onSubmit = {() => handleUpdateWorkout("update")}
+                     onSubmit = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
                      dispatch = {localDispatch}
                   />
                   <Button

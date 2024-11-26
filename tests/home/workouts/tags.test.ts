@@ -49,7 +49,7 @@ const handleDatabaseMethods = (params: any, method: string): Tag | null => {
    return newTag;
 };
 
-describe("Workout Tags", () => {
+describe("Workout Tags Service", () => {
    // Helper function to simulate database error situations
    const simulateDatabaseError = (method: string) => {
       // @ts-ignore

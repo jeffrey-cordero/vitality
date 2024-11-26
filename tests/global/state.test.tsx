@@ -196,6 +196,7 @@ function Container(): JSX.Element {
             input = {state.name}
             dispatch = {dispatch}
             autoFocus
+            scrollIntoView
             required>
             {state.name.value}
          </Input>
@@ -221,6 +222,7 @@ function Container(): JSX.Element {
             label = "Text"
             input = {state.text}
             dispatch = {dispatch}
+            autoFocus
          />
          <Select
             id = "options"
@@ -229,6 +231,7 @@ function Container(): JSX.Element {
             label = "Options"
             input = {state.options}
             dispatch = {dispatch}
+            autoFocus
          />
          <div
             id = "tags"
@@ -264,7 +267,9 @@ function Container(): JSX.Element {
    );
 }
 
-describe("State Management", () => {
+describe("State Management Service", () => {
+   Element.prototype.scrollIntoView = jest.fn();
+
    test("Dispatch Initialize State", async() => {
       const dom = render(<Container />);
 

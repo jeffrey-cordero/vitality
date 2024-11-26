@@ -903,20 +903,18 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      </ul>
                   </SortableContext>
                </DndContext>
-               {
-                  <div className = "w-full mx-auto px-4 sm:px-8">
-                     <Button
-                        type = "button"
-                        className = "w-full bg-white text-black text-md px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
-                        icon = {faPersonRunning}
-                        onClick = {() => {
-                           handleReset("");
-                           setAddSet(true);
-                        }}>
-                        New Entry
-                     </Button>
-                  </div>
-               }
+               <div className = "w-full mx-auto px-4 sm:px-8">
+                  <Button
+                     type = "button"
+                     className = "w-full bg-white text-black text-md px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                     icon = {faPersonRunning}
+                     onClick = {() => {
+                        handleReset("");
+                        setAddSet(true);
+                     }}>
+                     New Entry
+                  </Button>
+               </div>
             </div>
          )}
       </li>

@@ -25,7 +25,7 @@ export default function Select(props: SelectProps): JSX.Element {
    const selectRef = useRef<HTMLSelectElement>(null);
 
    useEffect(() => {
-      selectRef.current && autoFocus && selectRef.current.focus();
+      autoFocus && selectRef.current?.focus();
    }, [
       autoFocus,
       input.error

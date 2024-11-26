@@ -1,9 +1,7 @@
 "use server";
 import { auth } from "@/auth";
-import { users as User } from "@prisma/client";
-import { getUserByEmail } from "@/lib/authentication/authorize";
+import { User as NextAuthUser } from "next-auth";
 
-export async function getServerSession(): Promise<User | undefined> {
-   const result = await auth();
-   return result?.user ? getUserByEmail(result.user.email) : undefined;
+export async function getServerSession(): Promise<NextAuthUser | undefined> {
+   return (await auth())?.user ?? undefined;
 }
