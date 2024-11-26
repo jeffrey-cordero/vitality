@@ -75,7 +75,7 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
       const existingTag = await prisma.workout_tags.findFirst({
          where: {
             title: tag.title.trim(),
-            user_id: tag.user_id.trim()
+            user_id: tag.user_id
          }
       });
 
@@ -131,18 +131,36 @@ export async function updateWorkoutTag(
       // Update or remove the workout tag
       switch (method) {
          case "update":
-            const newTag = await prisma.workout_tags.update({
+            const existingWorkoutTagTitle = await prisma.workout_tags.findFirst({
                where: {
-                  id: tag.id,
-                  user_id: tag.user_id
-               },
-               data: {
                   title: tag.title.trim(),
-                  color: tag.color.trim()
+                  user_id: tag.user_id,
+                  NOT: {
+                     id: tag.id
+                  }
                }
             });
 
-            return sendSuccessMessage("Successfully updated workout tag", newTag);
+            if (existingWorkoutTagTitle) {
+               return sendErrorMessage(
+                  "Workout tag title already exists", {
+                     title: ["Workout tag title already exists"]
+                  }
+               );
+            } else {
+               const newTag = await prisma.workout_tags.update({
+                  where: {
+                     id: tag.id,
+                     user_id: tag.user_id
+                  },
+                  data: {
+                     title: tag.title.trim(),
+                     color: tag.color.trim()
+                  }
+               });
+
+               return sendSuccessMessage("Successfully updated workout tag", newTag);
+            }
          case "delete":
             const deletedTag = await prisma.workout_tags.delete({
                where: {

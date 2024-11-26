@@ -6,7 +6,7 @@ import { workout, tags } from "@/tests/home/workouts/data";
 import { addWorkoutTag, fetchWorkoutTags, getAppliedWorkoutTagUpdates, Tag, updateWorkoutTag } from "@/lib/home/workouts/tags";
 
 // Constant for valid workout tag
-const VALID_WORKOUT_TAG: Tag = {
+const MOCK_WORKOUT_TAG: Tag = {
    id: "",
    user_id: root.id,
    title: "New Workout Title",
@@ -14,12 +14,12 @@ const VALID_WORKOUT_TAG: Tag = {
 };
 
 // Mocked data structures
-let tag: Tag; 
+let tag: Tag;
 let tagsByTitle: Record<string, Tag> = {};
 let tagsById: Record<string, Tag> = {};
 
-// Utility function to handle database constraints in mock implementations
-const handleDatabaseConstraints = (params: any, method: string): Tag | null => {
+// Utility function to handle database methods in mock implementations
+const handleDatabaseMethods = (params: any, method: string): Tag | null => {
    const isInvalidUser = method === "create" ?
       params.data.user_id !== root.id : params.where.user_id !== root.id;
 
@@ -61,7 +61,7 @@ describe("Workout Tags", () => {
       const invalidWorkoutTags = [
          {
             tag: {
-               ...VALID_WORKOUT_TAG,
+               ...MOCK_WORKOUT_TAG,
                id: method === "create" ? "" : "69b62ca8-9222-4d68-b83a-c352c3989a48",
                user_id: "",
                title: "",
@@ -75,7 +75,7 @@ describe("Workout Tags", () => {
          },
          {
             tag: {
-               ...VALID_WORKOUT_TAG,
+               ...MOCK_WORKOUT_TAG,
                id: method === "create" ? "Non-Empty-ID" : "",
                user_id: root.id,
                title: "A".repeat(31),
@@ -91,7 +91,8 @@ describe("Workout Tags", () => {
 
       for (const { tag, errors } of invalidWorkoutTags) {
          expect(
-            method === "create" ? await addWorkoutTag(tag as Tag) : await updateWorkoutTag(tag as Tag, method)
+            method === "create" ?
+               await addWorkoutTag(tag as Tag) : await updateWorkoutTag(tag as Tag, method)
          ).toEqual({
             status: "Error",
             body: {
@@ -106,10 +107,20 @@ describe("Workout Tags", () => {
    };
 
    const handleDatabaseIntegrityErrors = async(method: "create" | "update" | "delete") => {
+      // Delete method should correspond to a successful response for final test scenario
+      const expectedRemoval = {
+         status: "Success",
+         body: {
+            data: { id: tags[0].id, user_id: root.id },
+            message: "Successfully deleted workout tag",
+            errors: {}
+         }
+      };
+
       const invalidWorkoutTags = [
          {
             tag: {
-               ...VALID_WORKOUT_TAG,
+               ...MOCK_WORKOUT_TAG,
                id: method === "create" ? "" : "69b62ca8-9222-4d68-b83a-c352c3989a48",
                title: tags[0].title
             },
@@ -125,18 +136,19 @@ describe("Workout Tags", () => {
             }
          }, {
             tag: {
-               ...VALID_WORKOUT_TAG,
+               ...MOCK_WORKOUT_TAG,
                id: method === "create" ? "" : tags[0].id,
-               user_id: "550e8400-e29b-41d4-a716-446655440002"
+               title: method === "update" ? tags[1].title : "New Workout Title",
+               user_id: method === "create" ? "550e8400-e29b-41d4-a716-446655440002" : root.id
             },
-            expected: {
+            expected: method === "delete" ? expectedRemoval : {
                status: method === "create" ? "Failure" : "Error",
                body: {
                   data: null,
                   message: method === "create" ?
-                     "Something went wrong. Please try again." : "Workout tag does not exist based on user and/or tag ID",
+                     "Something went wrong. Please try again." : "Workout tag title already exists",
                   errors: method === "create" ?
-                     { system: ["Foreign key constraint violated"] } : { }
+                     { system: ["Foreign key constraint violated"] } : { title: ["Workout tag title already exists"] }
                }
             }
          }
@@ -144,7 +156,8 @@ describe("Workout Tags", () => {
 
       for (const { tag, expected } of invalidWorkoutTags) {
          expect(
-            method === "create" ? await addWorkoutTag(tag as Tag) : await updateWorkoutTag(tag as Tag, method)
+            method === "create" ?
+               await addWorkoutTag(tag as Tag) : await updateWorkoutTag(tag as Tag, method)
          ).toEqual(expected);
       }
 
@@ -152,12 +165,13 @@ describe("Workout Tags", () => {
       simulateDatabaseError(method);
 
       tag = {
-         ...VALID_WORKOUT_TAG,
-         id: method === "create" ? "" : tags[0].id
+         ...MOCK_WORKOUT_TAG,
+         id: method === "create" ? "" : tags[1].id
       };
 
       expect(
-         method === "create" ? await addWorkoutTag(tag as Tag) : await updateWorkoutTag(tag as Tag, method)
+         method === "create" ?
+            await addWorkoutTag(tag as Tag) : await updateWorkoutTag(tag as Tag, method)
       ).toEqual({
          status: "Failure",
          body: {
@@ -191,7 +205,7 @@ describe("Workout Tags", () => {
       ["create", "update", "delete"].forEach((method) => {
          // @ts-ignore
          prismaMock.workout_tags[method].mockImplementation(async(params) =>
-            handleDatabaseConstraints(params, method)
+            handleDatabaseMethods(params, method)
          );
       });
    });
@@ -222,7 +236,7 @@ describe("Workout Tags", () => {
 
    test("Create workout tag", async() => {
       tag = {
-         ...VALID_WORKOUT_TAG,
+         ...MOCK_WORKOUT_TAG,
          user_id: root.id,
          title: "New Workout Tag Title",
          color: "rgb(133, 76, 29)"
@@ -269,7 +283,7 @@ describe("Workout Tags", () => {
 
    test("Update workout tags", async() => {
       tag = {
-         ...VALID_WORKOUT_TAG,
+         ...MOCK_WORKOUT_TAG,
          id: tags[0].id,
          title: "Updated Workout Tag Title",
          color: "rgb(110, 54, 48)"
@@ -319,7 +333,7 @@ describe("Workout Tags", () => {
 
    test("Delete workout tag", async() => {
       tag = {
-         ...VALID_WORKOUT_TAG,
+         ...MOCK_WORKOUT_TAG,
          id: tags[0].id,
          title: "Deleting Workout Tag Title"
       };
@@ -399,4 +413,4 @@ describe("Workout Tags", () => {
          removing: [tags[2].id]
       });
    });
-});``
+});

@@ -38,7 +38,7 @@ import {
    updateExercise,
    Exercise,
    ExerciseSet,
-   updateExerciseOrderings
+   updateExercises
 } from "@/lib/home/workouts/exercises";
 import { NotificationContext } from "@/app/layout";
 import { useDoubleTap } from "use-double-tap";
@@ -694,9 +694,11 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       const newExercises: Exercise[] = [...workout.exercises].filter(
          (e) => e.id !== exercise.id,
       );
-      const response: VitalityResponse<Exercise[]> = await updateExerciseOrderings(
-         newExercises,
-         workout.id
+      const response: VitalityResponse<Exercise[]> = await updateExercises(
+         {
+            ...workout,
+            exercises: newExercises
+         }
       );
 
       const successMethod = () => {
@@ -711,12 +713,11 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
       handleResponse(localDispatch, response, successMethod, updateNotification);
    }, [
+      workout,
       exercise.id,
       localDispatch,
       saveExercises,
       updateNotification,
-      workout.exercises,
-      workout.id,
       collapsedId
    ]);
 
@@ -1046,9 +1047,11 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                }),
             );
 
-            const response: VitalityResponse<Exercise[]> = await updateExerciseOrderings(
-               newExercises,
-               workout.id
+            const response: VitalityResponse<Exercise[]> = await updateExercises(
+               {
+                  ...workout,
+                  exercises: newExercises
+               }
             );
 
             const successMethod = () => {

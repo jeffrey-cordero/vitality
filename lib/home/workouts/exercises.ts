@@ -9,6 +9,7 @@ import {
 } from "@/lib/global/response";
 import { formatWorkout } from "@/lib/home/workouts/shared";
 import { uuidSchema } from "@/lib/global/zod";
+import { Workout } from "./workouts";
 
 export type ExerciseSet = {
   id: string;
@@ -25,7 +26,7 @@ export type ExerciseSet = {
 const MAX_NUMBER: number = 2147483647;
 
 const setSchema = z.object({
-   id: uuidSchema("user", "required"),
+   id: uuidSchema("set", "required"),
    exercise_id: uuidSchema("exercise", "required"),
    set_order: z.number().min(0, {
       message: "Set order must be non-negative"
@@ -119,7 +120,7 @@ function isEmptyExerciseSet(set: ExerciseSet) {
       !set.hours &&
       !set.minutes &&
       !set.seconds &&
-      (!set.text || set.text?.trim() === "")
+      set.text?.trim() === ""
    );
 }
 
@@ -160,24 +161,29 @@ export async function addExercise(
             "Exercise order must match current workout exercises length",
             null
          );
-      }
-
-      const newExercise = await prisma.exercises.create({
-         data: {
-            workout_id: exercise.workout_id,
-            name: exercise.name.trim(),
-            exercise_order: exercise.exercise_order
-         },
-         include: {
-            sets: {
-               orderBy: {
-                  set_order: "asc"
+      } else if (exercise.sets.length > 0) {
+         return sendErrorMessage(
+            "Exercise sets must be empty",
+            null
+         );
+      } else {
+         const newExercise = await prisma.exercises.create({
+            data: {
+               workout_id: exercise.workout_id,
+               name: exercise.name.trim(),
+               exercise_order: exercise.exercise_order
+            },
+            include: {
+               sets: {
+                  orderBy: {
+                     set_order: "asc"
+                  }
                }
             }
-         }
-      });
+         });
 
-      return sendSuccessMessage("Successfully added new exercise", newExercise);
+         return sendSuccessMessage("Successfully added new exercise", newExercise);
+      }
    } catch (error) {
       return sendFailureMessage(error);
    }
@@ -305,7 +311,7 @@ export async function getExerciseSetUpdates(
   error?: string;
   errors?: Record<string, string[] | undefined>
 }> {
-   const existingExerciseSets: string[] = existingExercise.sets.map(
+   const existingExerciseSets: string[] = existingExercise?.sets.map(
       (set) => set.id
    );
    const newExerciseSets: Set<string> = new Set(
@@ -323,17 +329,15 @@ export async function getExerciseSetUpdates(
       const set = newExercise.sets[i];
 
       // Handle validating new or existing exercise set fields
-      const fields =
-      set.id.trim() === ""
-         ? newSetSchema.safeParse(set)
-         : setSchema.safeParse(set);
+      const fields = set.id.trim() === ""
+         ? newSetSchema.safeParse(set) : setSchema.safeParse(set);
 
       if (!fields.success) {
          return {
             creating: null,
             updating: null,
             removing: null,
-            error: `Invalid exercise set fields for set ID ${set.id}`,
+            error: `Invalid exercise set fields for set with ID \`${set.id}\``,
             errors: fields.error.flatten().fieldErrors
          };
       } else if (isEmptyExerciseSet(set)) {
@@ -376,17 +380,16 @@ export async function getExerciseSetUpdates(
    };
 }
 
-export async function updateExerciseOrderings(
-   exercises: Exercise[],
-   workout_id: string
+export async function updateExercises(
+   workout: Workout
 ): Promise<VitalityResponse<Exercise[]>> {
-   if (!uuidSchema("workout", "required").safeParse(workout_id).success) {
+   if (!uuidSchema("workout", "required").safeParse(workout.id).success) {
       return sendErrorMessage("Invalid workout ID fields", {
          workout_id: ["ID for workout must be in UUID format"]
       });
    }
 
-   for (const exercise of exercises) {
+   for (const exercise of workout.exercises) {
       const fields = exerciseSchema.safeParse(exercise);
 
       if (!fields.success) {
@@ -401,7 +404,7 @@ export async function updateExerciseOrderings(
       // Fetch existing tags first for data integrity
       const existingWorkout = await prisma.workouts.findFirst({
          where: {
-            id: workout_id
+            id: workout.id
          },
          include: {
             exercises: {
@@ -423,14 +426,14 @@ export async function updateExerciseOrderings(
          );
       }
 
-      const { updating, removing } = await getExerciseOrderingUpdates(
+      const { updating, removing } = await getExercisesUpdates(
          existingWorkout,
-         exercises
+         workout
       );
 
       const newWorkout = await prisma.workouts.update({
          where: {
-            id: workout_id
+            id: workout.id
          },
          data: {
             exercises: {
@@ -463,9 +466,9 @@ export async function updateExerciseOrderings(
    }
 }
 
-export async function getExerciseOrderingUpdates(
+export async function getExercisesUpdates(
    existingWorkout: any,
-   newExercises: Exercise[]
+   workout: Workout
 ): Promise<{
   updating: {
     where: { id: string; workout_id: string };
@@ -477,7 +480,7 @@ export async function getExerciseOrderingUpdates(
       (exercise) => exercise.id
    );
    const newExercisesIds: Set<string> = new Set(
-      newExercises.map((exercise) => exercise.id)
+      workout.exercises.map((exercise) => exercise.id)
    );
 
    // Format updating exercise entries and determine removing exercise ID's
@@ -485,7 +488,7 @@ export async function getExerciseOrderingUpdates(
       (id: string) => !newExercisesIds.has(id)
    );
 
-   const updating = newExercises.map((exercise: Exercise, index: number) => ({
+   const updating = workout.exercises.map((exercise: Exercise, index: number) => ({
       where: {
          id: exercise.id,
          workout_id: exercise.workout_id
