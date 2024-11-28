@@ -12,7 +12,7 @@ const MOCK_WORKOUT = workouts[0];
 let workout: Workout;
 let workoutsById: Record<string, Workout>;
 
-describe("Workout Tracking Service", () => {
+describe("Workouts Tests", () => {
    const handleFieldErrors = async(method: "create" | "update") => {
       const invalidWorkouts = [
          {
@@ -66,7 +66,8 @@ describe("Workout Tracking Service", () => {
          });
          expect(verifyImageURL(workout.image)).toBe(errors.image === undefined);
       }
-      
+
+      // @ts-ignore
       expect(prismaMock.workouts[method]).not.toHaveBeenCalled();
    };
 
@@ -76,7 +77,7 @@ describe("Workout Tracking Service", () => {
             workout: {
                ...MOCK_WORKOUT,
                id: method === "create" ? "" : MOCK_WORKOUT.id,
-               user_id: "dd29ecb7-a142-4f15-b828-6379cf4a8817",
+               user_id: MOCK_ID,
                title: "Title",
                date: new Date(),
                image: ""
@@ -101,14 +102,13 @@ describe("Workout Tracking Service", () => {
          ).toEqual(expected);
       }
 
-      // Simulate database error during mock database method
       workout = {
          ...MOCK_WORKOUT,
          id: method === "create" ? "" : MOCK_WORKOUT.id
       };
 
       simulateDatabaseError("workouts", method, method === "create" ?
-         async () => addWorkout(workout) : async () =>  updateWorkout(workout)
+         async() => addWorkout(workout) : async() =>  updateWorkout(workout)
       );
    };
 
@@ -141,7 +141,7 @@ describe("Workout Tracking Service", () => {
       };
 
       if (method === "create") {
-         // Mock application of new workout tags
+         // Mock creation of applied workout tags
          newWorkout.workout_applied_tags = params.data.workout_applied_tags.create.map(
             (tag: { tag_id: string }) => ({
                workout_id: MOCK_ID,
@@ -152,7 +152,7 @@ describe("Workout Tracking Service", () => {
          delete workoutsById[params.data.id];
 
          if (method === "update") {
-            // Mock createMany and deleteMany workout tags methods
+            // Mock createMany and deleteMany workout tag application methods
             const existingWorkout = workoutsById[params.where.id];
 
             const creatingTags = new Set(
@@ -212,315 +212,321 @@ describe("Workout Tracking Service", () => {
       });
    });
 
-   test("Fetch user workouts", async() => {
-      // Mock formatted workouts from database resulting rows
-      const formatted = [...workouts].map((workout) => formatWorkout(workout));
+   describe("Fetch workouts", () => {
+      test("Fetch workouts for existing and missing users", async() => {
+         // Mock formatted workouts from database queries
+         const formatted = [...workouts].map((workout) => formatWorkout(workout));
 
-      expect(await fetchWorkouts(root.id)).toEqual(formatted);
-      expect(prismaMock.workouts.findMany).toHaveBeenCalledWith({
-         include: {
-            workout_applied_tags: {
-               select: {
-                  workout_id: true,
-                  tag_id: true
-               }
-            },
-            exercises: {
-               include: {
-                  sets: true
-               },
-               orderBy: {
-                  exercise_order: "asc"
-               }
-            }
-         },
-         where: {
-            user_id: root.id
-         },
-         orderBy: {
-            date: "desc"
-         }
-      });
-
-      expect(await fetchWorkouts("Missing-User-ID")).toEqual([]);
-      expect(prismaMock.workouts.findMany).toHaveBeenCalledWith({
-         include: {
-            workout_applied_tags: {
-               select: {
-                  workout_id: true,
-                  tag_id: true
-               }
-            },
-            exercises: {
-               include: {
-                  sets: true
-               },
-               orderBy: {
-                  exercise_order: "asc"
-               }
-            }
-         },
-         where: {
-            user_id: "Missing-User-ID"
-         },
-         orderBy: {
-            date: "desc"
-         }
-      });
-
-      // @ts-ignore
-      prismaMock.workouts.findMany.mockRejectedValue(
-         new Error("Database Error")
-      );
-
-      expect(await fetchWorkouts(root.id)).toEqual([]);
-      expect(await fetchWorkouts("Another-Missing-User-ID")).toEqual([]);
-   });
-
-   test("Create workout with field errors", async() => {
-      await handleFieldErrors("create");
-   });
-
-   test("Create workout with database integrity errors", async() => {
-      await handleDatabaseErrors("create");
-   });
-
-   test("Create workout", async() => {
-      workout = {
-         id: "",
-         user_id: root.id,
-         title: "Title",
-         date: new Date("2024-11-20T13:16:23.400Z"),
-         image: "https://www.obbstartersandalternators.com/images/test.png",
-         description: "",
-         tagIds: [tags[0].id, tags[1].id],
-         exercises: []
-      };
-
-      expect(await addWorkout(workout)).toEqual({
-         status: "Success",
-         body: {
-            data: formatWorkout({
-               ...workout,
-               id: MOCK_ID,
-               workout_applied_tags: [
-                  {
-                     tag_id: tags[0].id,
-                     workout_id: MOCK_ID
-                  },
-                  {
-                     tag_id: tags[1].id,
-                     workout_id: MOCK_ID
+         expect(await fetchWorkouts(root.id)).toEqual(formatted);
+         expect(prismaMock.workouts.findMany).toHaveBeenCalledWith({
+            include: {
+               workout_applied_tags: {
+                  select: {
+                     workout_id: true,
+                     tag_id: true
                   }
-               ]
-            }),
-            message: "Added new workout",
-            errors: {}
-         }
+               },
+               exercises: {
+                  include: {
+                     sets: true
+                  },
+                  orderBy: {
+                     exercise_order: "asc"
+                  }
+               }
+            },
+            where: {
+               user_id: root.id
+            },
+            orderBy: {
+               date: "desc"
+            }
+         } as any);
+
+         expect(await fetchWorkouts(MOCK_ID)).toEqual([]);
+         expect(prismaMock.workouts.findMany).toHaveBeenCalledWith({
+            include: {
+               workout_applied_tags: {
+                  select: {
+                     workout_id: true,
+                     tag_id: true
+                  }
+               },
+               exercises: {
+                  include: {
+                     sets: true
+                  },
+                  orderBy: {
+                     exercise_order: "asc"
+                  }
+               }
+            },
+            where: {
+               user_id: MOCK_ID
+            },
+            orderBy: {
+               date: "desc"
+            }
+         } as any);
       });
-      expect(verifyImageURL(workout.image)).toBe(true);
-      expect(prismaMock.workouts.create).toHaveBeenCalledWith({
-         data: {
-            user_id: workout.user_id,
-            title: workout.title.trim(),
-            description: "",
+
+      test("Handle database errors when fetching workouts", async() => {
+         // @ts-ignore
+         prismaMock.workouts.findMany.mockRejectedValue(
+            new Error("Database Error")
+         );
+
+         expect(await fetchWorkouts(root.id)).toEqual([]);
+         expect(await fetchWorkouts(MOCK_ID)).toEqual([]);
+      });
+   });
+
+   describe("Create workout", () => {
+      test("Create workout with errors", async() => {
+         await handleFieldErrors("create");
+      });
+
+      test("Handle database constraints when creating workout", async() => {
+         await handleDatabaseErrors("create");
+      });
+
+      test("Create valid workout", async() => {
+         workout = {
+            id: "",
+            user_id: root.id,
+            title: "Title",
             date: new Date("2024-11-20T13:16:23.400Z"),
-            image: workout.image.trim(),
-            workout_applied_tags: {
-               create: [{ tag_id: tags[0].id }, { tag_id: tags[1].id }]
-            }
-         },
-         include: {
-            workout_applied_tags: {
-               select: { workout_id: true, tag_id: true }
-            },
-            exercises: {
-               include: { sets: true },
-               orderBy: { exercise_order: "asc" }
-            }
-         }
-      });
-   });
-
-   test("Update workout with field errors", async() => {
-      await handleFieldErrors("update");
-   });
-
-   test("Delete workouts with field errors", async() => {
-      workout = {
-         ...MOCK_WORKOUT,
-         id: "",
-         user_id: ""
-      };
-
-      expect(await deleteWorkouts([workout], workout.user_id)).toEqual({
-         status: "Error",
-         body: {
-            data: null,
-            message: "Invalid workout ID fields",
-            errors: {
-               user_id: ["ID for user must be in UUID format"],
-               id: ["ID for all workouts must be in UUID format"]
-            }
-         }
-      });
-
-      workout = {
-         ...MOCK_WORKOUT,
-         id: ""
-      };
-
-      expect(await deleteWorkouts([workout], workout.user_id)).toEqual({
-         status: "Error",
-         body: {
-            data: null,
-            message: "Invalid workout ID fields",
-            errors: {
-               id: ["ID for all workouts must be in UUID format"]
-            }
-         }
-      });
-   });
-
-   test("Update workout with database integrity errors", async() => {
-      await handleDatabaseErrors("update");
-   });
-
-   test("Delete workouts with database integrity errors", async() => {
-      workout = {
-         ...MOCK_WORKOUT,
-         id: workouts[0].id,
-         user_id: "dd29ecb7-a142-4f15-b828-6379cf4a8817",
-         title: "Title",
-         date: new Date(),
-         image: ""
-      };
-
-      expect(await deleteWorkouts([workout], workout.user_id)).toEqual({
-         status: "Failure",
-         body: {
-            data: null,
-            message: "Something went wrong. Please try again.",
-            errors: {
-               system: [
-                  "Foreign key constraint violated"
-               ]
-            }
-         }
-      });
-   });
-
-   test("Update workout", async() => {
-      workout = {
-         id: workouts[1].id,
-         user_id: root.id,
-         title: "Title",
-         date: new Date("2024-11-20T13:16:23.400Z"),
-         image: "",
-         description: "",
-         tagIds: [tags[1].id, tags[2].id],
-         exercises: []
-      };
-
-      expect(await updateWorkout(workout)).toEqual({
-         status: "Success",
-         body: {
-            data: {
-               id: workout.id,
-               user_id: root.id,
-               title: "Title",
-               date: new Date("2024-11-20T13:16:23.400Z"),
-               description: "",
-               image: "",
-               tagIds: [tags[1].id, tags[2].id],
-               exercises: []
-            },
-            message: "Successfully updated workout",
-            errors: {}
-         }
-      });
-
-      expect(prismaMock.workouts.update).toHaveBeenCalledWith({
-         where: {
-            id: workout.id,
-            user_id: workout.user_id
-         },
-         data: {
-            title: workout.title.trim(),
+            image: "https://www.obbstartersandalternators.com/images/test.png",
             description: "",
+            tagIds: [tags[0].id, tags[1].id],
+            exercises: []
+         };
+
+         expect(await addWorkout(workout)).toEqual({
+            status: "Success",
+            body: {
+               data: formatWorkout({
+                  ...workout,
+                  id: MOCK_ID,
+                  workout_applied_tags: [
+                     {
+                        tag_id: tags[0].id,
+                        workout_id: MOCK_ID
+                     },
+                     {
+                        tag_id: tags[1].id,
+                        workout_id: MOCK_ID
+                     }
+                  ]
+               }),
+               message: "Added new workout",
+               errors: {}
+            }
+         });
+         expect(verifyImageURL(workout.image)).toBe(true);
+         expect(prismaMock.workouts.create).toHaveBeenCalledWith({
+            data: {
+               user_id: workout.user_id,
+               title: workout.title.trim(),
+               description: "",
+               date: new Date("2024-11-20T13:16:23.400Z"),
+               image: workout.image.trim(),
+               workout_applied_tags: {
+                  create: [{ tag_id: tags[0].id }, { tag_id: tags[1].id }]
+               }
+            },
+            include: {
+               workout_applied_tags: {
+                  select: { workout_id: true, tag_id: true }
+               },
+               exercises: {
+                  include: { sets: true },
+                  orderBy: { exercise_order: "asc" }
+               }
+            }
+         } as any);
+      });
+   });
+
+   describe("Update workout", () => {
+      test("Update workout with errors", async() => {
+         await handleFieldErrors("update");
+      });
+
+      test("Handle database constraints when updating workout", async() => {
+         await handleDatabaseErrors("update");
+      });
+
+      test("Update valid workout", async() => {
+         workout = {
+            id: workouts[1].id,
+            user_id: root.id,
+            title: "Title",
             date: new Date("2024-11-20T13:16:23.400Z"),
             image: "",
-            workout_applied_tags: {
-               deleteMany: {
-                  tag_id: { in: [tags[0].id] }
+            description: "",
+            tagIds: [tags[1].id, tags[2].id],
+            exercises: []
+         };
+
+         expect(await updateWorkout(workout)).toEqual({
+            status: "Success",
+            body: {
+               data: {
+                  id: workout.id,
+                  user_id: root.id,
+                  title: "Title",
+                  date: new Date("2024-11-20T13:16:23.400Z"),
+                  description: "",
+                  image: "",
+                  tagIds: [tags[1].id, tags[2].id],
+                  exercises: []
                },
-               createMany: {
-                  data: [{ tag_id: tags[2].id }]
+               message: "Successfully updated workout",
+               errors: {}
+            }
+         });
+         expect(prismaMock.workouts.update).toHaveBeenCalledWith({
+            where: {
+               id: workout.id,
+               user_id: workout.user_id
+            },
+            data: {
+               title: workout.title.trim(),
+               description: "",
+               date: new Date("2024-11-20T13:16:23.400Z"),
+               image: "",
+               workout_applied_tags: {
+                  deleteMany: {
+                     tag_id: { in: [tags[0].id] }
+                  },
+                  createMany: {
+                     data: [{ tag_id: tags[2].id }]
+                  }
+               }
+            },
+            include: {
+               workout_applied_tags: {
+                  select: { workout_id: true, tag_id: true }
+               },
+               exercises: {
+                  include: { sets: true },
+                  orderBy: { exercise_order: "asc" }
                }
             }
-         },
-         include: {
-            workout_applied_tags: {
-               select: { workout_id: true, tag_id: true }
-            },
-            exercises: {
-               include: { sets: true },
-               orderBy: { exercise_order: "asc" }
-            }
-         }
+         } as any);
       });
-
-      simulateDatabaseError("workouts", "update", async () => updateWorkout(workout));
    });
 
-   test("Delete workouts", async() => {
-      // Delete single workout
-      workout = workouts[0];
+   describe("Delete workouts", () => {
+      test("Delete workouts with errors", async() => {
+         workout = {
+            ...MOCK_WORKOUT,
+            id: "",
+            user_id: ""
+         };
 
-      expect(await deleteWorkouts([workout], workout.user_id)).toEqual({
-         status: "Success",
-         body: { data: 1, message: "Deleted 1 workout", errors: {} }
-      });
-      expect(prismaMock.workouts.deleteMany).toBeCalledWith({
-         where: {
-            id: { in: [workout.id] },
-            user_id: workout.user_id
-         }
-      });
-      expect(workoutsById[workout.id]).toBeUndefined();
+         expect(await deleteWorkouts([workout], workout.user_id)).toEqual({
+            status: "Error",
+            body: {
+               data: null,
+               message: "Invalid workout ID fields",
+               errors: {
+                  user_id: ["ID for user must be in UUID format"],
+                  id: ["ID for all workouts must be in UUID format"]
+               }
+            }
+         });
 
-      // Delete multiple workouts with missing workouts included
-      expect(
-         await deleteWorkouts(
-            [workouts[0], workouts[1], workouts[2]],
-            workout.user_id
-         )
-      ).toEqual({
-         status: "Success",
-         body: { data: 2, message: "Deleted 2 workouts", errors: {} }
-      });
-      expect(prismaMock.workouts.deleteMany).toBeCalledWith({
-         where: {
-            id: { in: [workouts[0].id, workouts[1].id, workouts[2].id] },
-            user_id: workout.user_id
-         }
-      });
-      expect(workoutsById[workouts[1].id]).toBeUndefined();
-      expect(workoutsById[workouts[2].id]).toBeUndefined();
-      expect(Object.keys(workoutsById).length).toBe(0);
+         workout = {
+            ...MOCK_WORKOUT,
+            id: ""
+         };
 
-      // Empty workouts array
-      expect(await deleteWorkouts([], workout.user_id)).toEqual({
-         status: "Success",
-         body: { data: 0, message: "Deleted 0 workouts", errors: {} }
-      });
-      expect(prismaMock.workouts.deleteMany).toBeCalledWith({
-         where: {
-            id: { in: [] },
-            user_id: workout.user_id
-         }
+         expect(await deleteWorkouts([workout], workout.user_id)).toEqual({
+            status: "Error",
+            body: {
+               data: null,
+               message: "Invalid workout ID fields",
+               errors: {
+                  id: ["ID for all workouts must be in UUID format"]
+               }
+            }
+         });
       });
 
-      simulateDatabaseError("workouts", "deleteMany", async ()=> deleteWorkouts([], workout.user_id))
+      test("Handle database constraints when deleting workouts", async() => {
+         // Missing user
+         workout = {
+            ...MOCK_WORKOUT,
+            id: workouts[0].id,
+            user_id: "dd29ecb7-a142-4f15-b828-6379cf4a8817",
+            title: "Title",
+            date: new Date(),
+            image: ""
+         };
+
+         expect(await deleteWorkouts([workout], workout.user_id)).toEqual({
+            status: "Failure",
+            body: {
+               data: null,
+               message: "Something went wrong. Please try again.",
+               errors: {
+                  system: [
+                     "Foreign key constraint violated"
+                  ]
+               }
+            }
+         });
+      });
+
+      test("Delete valid workouts", async() => {
+         // Delete single workout
+         workout = workouts[0];
+
+         expect(await deleteWorkouts([workout], workout.user_id)).toEqual({
+            status: "Success",
+            body: { data: 1, message: "Deleted 1 workout", errors: {} }
+         });
+         expect(prismaMock.workouts.deleteMany).toBeCalledWith({
+            where: {
+               id: { in: [workout.id] },
+               user_id: workout.user_id
+            }
+         });
+         expect(workoutsById[workout.id]).toBeUndefined();
+
+         // Delete multiple workouts while including missing workouts
+         expect(
+            await deleteWorkouts(
+               [workouts[0], workouts[1], workouts[2]],
+               workout.user_id
+            )
+         ).toEqual({
+            status: "Success",
+            body: { data: 2, message: "Deleted 2 workouts", errors: {} }
+         });
+         expect(prismaMock.workouts.deleteMany).toBeCalledWith({
+            where: {
+               id: { in: [workouts[0].id, workouts[1].id, workouts[2].id] },
+               user_id: workout.user_id
+            }
+         });
+         expect(workoutsById[workouts[1].id]).toBeUndefined();
+         expect(workoutsById[workouts[2].id]).toBeUndefined();
+         expect(Object.keys(workoutsById).length).toBe(0);
+
+         // Empty workouts array
+         expect(await deleteWorkouts([], workout.user_id)).toEqual({
+            status: "Success",
+            body: { data: 0, message: "Deleted 0 workouts", errors: {} }
+         });
+         expect(prismaMock.workouts.deleteMany).toBeCalledWith({
+            where: {
+               id: { in: [] },
+               user_id: workout.user_id
+            }
+         });
+      });
    });
 });

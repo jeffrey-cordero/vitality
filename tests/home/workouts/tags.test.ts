@@ -17,7 +17,7 @@ let tag: Tag;
 let tagsByTitle: Record<string, Tag> = {};
 let tagsById: Record<string, Tag> = {};
 
-describe("Workout Tags Service", () => {
+describe("Workout Tags Tests", () => {
    const handlePrismaMockMethods = (params: any, method: string): Tag | null => {
       const isInvalidUser = method === "create" ?
          params.data.user_id !== root.id : params.where.user_id !== root.id;
@@ -67,7 +67,7 @@ describe("Workout Tags Service", () => {
          {
             tag: {
                ...MOCK_WORKOUT_TAG,
-               id: method === "create" ? "Non-Empty-ID" : "",
+               id: method === "create" ? MOCK_ID : "",
                user_id: root.id,
                title: "A".repeat(31),
                color: "rgb(73, 47, 100)"
@@ -158,7 +158,7 @@ describe("Workout Tags Service", () => {
       };
 
       simulateDatabaseError("workout_tags", method, method === "create" ?
-         async () => addWorkoutTag(tag) : async () => updateWorkoutTag(tag, method)
+         async() => addWorkoutTag(tag) : async() => updateWorkoutTag(tag, method)
       );
    };
 
@@ -181,8 +181,8 @@ describe("Workout Tags Service", () => {
          }
       });
 
+      // @ts-ignore
       ["create", "update", "delete"].forEach((method) => {
-         // @ts-ignore
          prismaMock.workout_tags[method].mockImplementation(async(params) =>
             handlePrismaMockMethods(params, method)
          );
@@ -194,15 +194,15 @@ describe("Workout Tags Service", () => {
          expect(await fetchWorkoutTags(root.id)).toEqual(tags);
          expect(prismaMock.workout_tags.findMany).toHaveBeenCalledWith({
             where: { user_id: root.id }
-         });
-   
+         } as any);
+
          expect(await fetchWorkoutTags(MOCK_ID)).toEqual([]);
          expect(prismaMock.workout_tags.findMany).toHaveBeenCalledWith({
             where: { user_id: MOCK_ID }
-         });
+         } as any);
       });
 
-      test("Handles database errors while fetching workout tags", async() => {
+      test("Handle database errors when fetching workout tags", async() => {
          // @ts-ignore
          prismaMock.workout_tags.findMany.mockRejectedValue(
             new Error("Database Error")
@@ -213,22 +213,22 @@ describe("Workout Tags Service", () => {
    });
 
    describe("Create workout tag", () => {
-      test("Create workout tag with field errors", async() => {
+      test("Create workout tag with errors", async() => {
          await handleFieldErrors("create");
       });
 
-      test("Handles database constraints or errors while creating workout tag", async() => {
+      test("Handle database constraints when creating workout tag", async() => {
          await handleDatabaseErrors("create");
       });
 
-      test("Create workout tag with valid fields", async() => {
+      test("Create valid workout tag", async() => {
          tag = {
             ...MOCK_WORKOUT_TAG,
             user_id: root.id,
             title: "  New Workout Tag Title  ",
             color: "rgb(133, 76, 29)"
          };
-   
+
          expect(await addWorkoutTag(tag)).toEqual({
             status: "Success",
             body: {
@@ -256,27 +256,27 @@ describe("Workout Tags Service", () => {
                title: tag.title.trim(),
                color: tag.color.trim()
             }
-         });
+         } as any);
       });
    });
 
    describe("Update workout tag", () => {
-      test("Update workout tag with field errors", async() => {
+      test("Update workout tag with errors", async() => {
          await handleFieldErrors("update");
       });
 
-      test("Handles database constraints or errors while updating workout tag", async() => {
+      test("Handle database constraints when updating workout tag", async() => {
          await handleDatabaseErrors("update");
       });
 
-      test("Update workout tag with valid fields", async() => {
+      test("Update valid workout tag", async() => {
          tag = {
             ...MOCK_WORKOUT_TAG,
             id: tags[0].id,
             title: "  Updated Workout Tag Title  ",
             color: "rgb(110, 54, 48)"
          };
-         
+
          expect(await updateWorkoutTag(tag, "update")).toEqual({
             status: "Success",
             body: {
@@ -299,7 +299,6 @@ describe("Workout Tags Service", () => {
          ).toEqual(
             tagsByTitle["Updated Workout Tag Title"]
          );
-         // @ts-ign
          expect(await prismaMock.workout_tags.findFirst({
             where: {
                title: tags[0].title,
@@ -308,7 +307,6 @@ describe("Workout Tags Service", () => {
          })
          ).toBeNull();
          expect(tagsByTitle[tags[0].title]).toBeUndefined();
-         // @ts-ignore
          expect(prismaMock.workout_tags.update).toHaveBeenCalledWith({
             where: {
                id: tag.id,
@@ -318,26 +316,26 @@ describe("Workout Tags Service", () => {
                title: tag.title.trim(),
                color: tag.color.trim()
             }
-         });
+         } as any);
       });
    });
 
    describe("Delete workout tag", () => {
-      test("Delete workout tag with field errors", async() => {
+      test("Delete workout tag with errors", async() => {
          await handleFieldErrors("delete");
       });
 
-      test("Handles database constraints or errors while deleting workout tag", async() => {
+      test("Handle database constraints when deleting workout tag", async() => {
          await handleDatabaseErrors("delete");
       });
 
-      test("Delete workout tag with valid fields", async() => {
+      test("Delete valid workout tag", async() => {
          tag = {
             ...MOCK_WORKOUT_TAG,
             id: tags[0].id,
             title: "  Deleting Workout Tag Title  "
          };
-   
+
          expect(await updateWorkoutTag(tag, "delete")).toEqual({
             status: "Success",
             body: {
@@ -364,23 +362,23 @@ describe("Workout Tags Service", () => {
                user_id: tag.user_id
             },
             data: undefined
-         });
+         } as any);
       });
    });
 
    describe("Update workout tags", () => {
-      test("Calculate updates in applied workout tags for workouts", async() => {
+      test("Update applied workouts tags", async() => {
          // Mock applied workout tags and workout entries
          const newTagIds = [
             "69b62ca8-9222-4d68-b83a-c352c3989a49",
             "69b62ca8-9222-4d68-b83a-c352c3989a50"
          ];
-   
+
          const remainingTagIds = [
             tags[0].id,
             tags[1].id
          ];
-   
+
          const existingWorkout = {
             ...workout,
             workout_applied_tags: [
@@ -398,7 +396,7 @@ describe("Workout Tags Service", () => {
                }
             ]
          };
-   
+
          const newWorkout = {
             ...workout,
             tagIds: [
@@ -406,7 +404,7 @@ describe("Workout Tags Service", () => {
                ...remainingTagIds
             ]
          };
-   
+
          expect(
             await getAppliedWorkoutTagUpdates(existingWorkout, newWorkout)
          ).toEqual({
@@ -415,5 +413,5 @@ describe("Workout Tags Service", () => {
             removing: [tags[2].id]
          });
       });
-   });   
+   });
 });

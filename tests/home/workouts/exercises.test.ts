@@ -1,41 +1,32 @@
 import { expect } from "@jest/globals";
 import { prismaMock } from "@/tests/singleton";
-import { MOCK_ID } from "@/tests/shared";
+import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
 import { workouts } from "@/tests/home/workouts/data";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { addExercise, Exercise, ExerciseSet, getExercisesUpdates, getExerciseSetUpdates, updateExercise, updateExercises } from "@/lib/home/workouts/exercises";
+import { addExercise, Exercise, getExercisesUpdates, getExerciseSetUpdates, updateExercise, updateExercises } from "@/lib/home/workouts/exercises";
 
-// Constant for valid workout
 const MOCK_WORKOUTS = workouts;
 const MOCK_WORKOUT: Workout = MOCK_WORKOUTS[0];
 const MOCK_EXERCISE: Exercise = {
    id: "",
-   workout_id: MOCK_WORKOUT.id,
    exercise_order: 0,
+   workout_id: MOCK_WORKOUT.id,
    name: "Name",
    sets: []
 };
 
-// Mocked data structures
 let workout: Workout;
 let exercise: Exercise;
 let exercisesByIds: { [id: string]: Exercise };
 let workoutsByIds: { [id: string]: Workout };
 
-describe("Workout Exercises Service", () => {
-   // Helper function to simulate database error situations
-   const simulateDatabaseError = (table: string, method: string) => {
-      // @ts-ignore
-      prismaMock[table][method].mockRejectedValue(new Error("Database Error"));
-   };
-
-   // Helper function to handle validation errors for create/update/delete exercise methods
+describe("Workout Exercises Tests", () => {
    const handleExerciseFieldErrors = async(method: "create" | "update") => {
       const invalidExercises = [
          {
             exercise: {
                ...MOCK_EXERCISE,
-               id: method === "create" ? "Non-Empty-ID" : "",
+               id: method === "create" ? MOCK_ID : "",
                workout_id: "",
                exercise_order: -1,
                name: "      ",
@@ -122,6 +113,7 @@ describe("Workout Exercises Service", () => {
             }
          });
       }
+
       // @ts-ignore
       expect(prismaMock.exercises[method]).not.toHaveBeenCalled();
    };
@@ -132,7 +124,7 @@ describe("Workout Exercises Service", () => {
             exercise: {
                ...MOCK_EXERCISE,
                id: method === "create" ? "" : workout.exercises[0].id,
-               workout_id: "33b33227-56b1-4f10-844a-660b523e546c",
+               workout_id: MOCK_ID,
                exercise_order: 4,
                name: "A".repeat(50),
                sets: []
@@ -149,7 +141,7 @@ describe("Workout Exercises Service", () => {
          {
             exercise: {
                ...MOCK_EXERCISE,
-               id: method === "create" ? "" : "33b33227-56b1-4f10-844a-660b523e546c",
+               id: method === "create" ? "" : MOCK_ID,
                workout_id: workout.id,
                exercise_order: 4
             },
@@ -172,27 +164,14 @@ describe("Workout Exercises Service", () => {
          ).toEqual(expected);
       }
 
-      // Simulate database error during mock database method
-      simulateDatabaseError("exercises", method);
-
       exercise = {
          ...MOCK_EXERCISE,
          id: method === "create" ? "" : MOCK_WORKOUT.exercises[0].id,
          exercise_order: method === "create" ? 3 : 0
       };
 
-      expect(
-         method === "create" ?
-            await addExercise(exercise) : await updateExercise(exercise, "sets")
-      ).toEqual({
-         status: "Failure",
-         body: {
-            data: null,
-            message: "Something went wrong. Please try again.",
-            errors: { system: ["Database Error"] }
-         }
-      });
-      expect(prismaMock.exercises[method]).toHaveBeenCalledTimes(1);
+      simulateDatabaseError("exercises", method, method === "create" ?
+         async() => addExercise(exercise) : async() => updateExercise(exercise, "sets"));
    };
 
    const handlePrismaMockExerciseMethods = async(params, method) => {
@@ -205,7 +184,7 @@ describe("Workout Exercises Service", () => {
          };
 
          if (params.data.sets) {
-            // Account for adding, removing, and updating mock exercise set entries
+            // Mock adding, removing, and updating exercise set entries
             newExercise.sets = [
                ...params.data.sets.updateMany.map((update) => ({
                   ...update.data,
@@ -232,6 +211,7 @@ describe("Workout Exercises Service", () => {
    };
 
    const handlePrismaMockWorkoutMethods = async(params) => {
+      // Mock updating/deleting workout exercise entries
       const updating = params.data.exercises.updateMany;
 
       const newWorkout: Workout = {
@@ -264,9 +244,13 @@ describe("Workout Exercises Service", () => {
       workout = MOCK_WORKOUT;
 
       // Initialize mock exercise and workout mappings
-      exercisesByIds = Object.fromEntries(MOCK_WORKOUT.exercises.map((exercise) => [exercise.id, exercise]));
+      exercisesByIds = Object.fromEntries(MOCK_WORKOUT.exercises.map(
+         (exercise) => [exercise.id, exercise])
+      );
 
-      workoutsByIds = Object.fromEntries(MOCK_WORKOUTS.map((workout) => [workout.id, workout]));
+      workoutsByIds = Object.fromEntries(MOCK_WORKOUTS.map(
+         (workout) => [workout.id, workout])
+      );
 
       // @ts-ignore
       prismaMock.exercises.findFirst.mockImplementation(async(params) => {
@@ -291,343 +275,317 @@ describe("Workout Exercises Service", () => {
       });
    });
 
-   test("Add exercise with field errors", async() => {
-      await handleExerciseFieldErrors("create");
-   });
-
-   test("Add exercise with database integrity errors", async() => {
-      await handleExerciseDatabaseErrors("create");
-   });
-
-   test("Add exercise", async() => {
-      exercise = {
-         ...MOCK_EXERCISE,
-         id: "",
-         workout_id: workout.id,
-         exercise_order: 3,
-         name: "Name",
-         sets: []
-      };
-
-      expect(await addExercise(exercise)).toEqual({
-         status: "Success",
-         body: {
-            data: {
-               ...exercise,
-               id: MOCK_ID
-            },
-            message: "Successfully added new exercise",
-            errors: {}
-         }
+   describe("Add workout exercise", () => {
+      test("Add workout exercise with errors", async() => {
+         await handleExerciseFieldErrors("create");
       });
-      expect(prismaMock.exercises.create).toHaveBeenCalledWith({
-         data: {
+
+      test("Handle database constraints when adding workout exercise", async() => {
+         await handleExerciseDatabaseErrors("create");
+      });
+
+      test("Add valid workout exercise", async() => {
+         exercise = {
+            ...MOCK_EXERCISE,
+            id: "",
             workout_id: workout.id,
-            name: exercise.name.trim(),
-            exercise_order: 3
-         },
-         include: {
-            sets: {
-               orderBy: {
-                  set_order: "asc"
-               }
+            exercise_order: 3,
+            name: "Name",
+            sets: []
+         };
+
+         expect(await addExercise(exercise)).toEqual({
+            status: "Success",
+            body: {
+               data: {
+                  ...exercise,
+                  id: MOCK_ID
+               },
+               message: "Successfully added new exercise",
+               errors: {}
             }
-         }
-      });
-
-      simulateDatabaseError("exercises", "create");
-
-      expect(await addExercise(exercise)).toEqual({
-         status: "Failure",
-         body: {
-            data: null,
-            message: "Something went wrong. Please try again.",
-            errors: { system: ["Database Error"] }
-         }
-      });
-      expect(prismaMock.exercises.create).toHaveBeenCalledTimes(2);
-   });
-
-   test("Update exercise with field errors", async() => {
-      await handleExerciseFieldErrors("update");
-   });
-
-   test("Update exercise with database integrity errors", async() => {
-      await handleExerciseDatabaseErrors("update");
-   });
-
-   test("Update exercise", async() => {
-      // Update exercise name
-      exercise = {
-         ...MOCK_WORKOUT.exercises[0],
-         name: "Updated name"
-      };
-
-      expect(await updateExercise(exercise, "name")).toEqual({
-         status: "Success",
-         body: {
+         });
+         expect(prismaMock.exercises.create).toHaveBeenCalledWith({
             data: {
-               ...exercise,
-               name: exercise.name.trim()
+               workout_id: workout.id,
+               name: exercise.name.trim(),
+               exercise_order: 3
             },
-            message: "Successfully updated exercise name",
-            errors: {}
-         }
-      });
-      expect(prismaMock.exercises.update).toHaveBeenCalledWith({
-         where: {
-            id: exercise.id,
-            workout_id: workout.id
-         },
-         data: {
-            name: exercise.name.trim()
-         },
-         include: {
-            sets: {
-               orderBy: {
-                  set_order: "asc"
+            include: {
+               sets: {
+                  orderBy: {
+                     set_order: "asc"
+                  }
                }
             }
-         }
+         } as any);
       });
-
-      // Update exercise sets
-      const newExerciseSets: ExerciseSet[] = [
-         {
-            id: "",
-            exercise_id: exercise.id,
-            set_order: 2,
-            weight: 100,
-            repetitions: 100,
-            text: "text"
-         },
-         {
-            id: "",
-            exercise_id: exercise.id,
-            set_order: 3,
-            hours: 1
-         }
-      ];
-
-      exercise = {
-         ...exercise,
-         sets: [
-            workout.exercises[0].sets[0],
-            workout.exercises[0].sets[1],
-            ...newExerciseSets
-         ]
-      };
-
-      const { creating, updating, removing, error, errors } =
-         await getExerciseSetUpdates(workout.exercises[0], exercise);
-
-      expect(removing.id.in).toEqual([workout.exercises[0].sets[2].id]);
-      expect(creating.data).toHaveLength(2);
-      expect(updating).toHaveLength(2);
-      expect(error).toBeUndefined();
-      expect(errors).toBeUndefined();
-
-      const expectedNewExercise = {
-         ...exercise,
-         sets: [
-            exercise.sets[0],
-            exercise.sets[1],
-            {
-               ...newExerciseSets[0],
-               id: `${MOCK_ID}${0}`,
-            },
-            {
-               ...newExerciseSets[1],
-               id: `${MOCK_ID}${1}`
-            }
-         ]
-      };
-
-      expect(await updateExercise(exercise, "sets")).toEqual({
-         status: "Success",
-         body: {
-            data: expectedNewExercise,
-            message: "Successfully updated exercise sets",
-            errors: {}
-         }
-      });
-      expect(exercisesByIds[exercise.id]).toEqual(expectedNewExercise);
-      expect(prismaMock.exercises.update).toHaveBeenCalledWith({
-         where: {
-            id: exercise.id,
-            workout_id: workout.id
-         },
-         data: {
-            sets: {
-               deleteMany: removing,
-               updateMany: updating,
-               createMany: creating
-            }
-         },
-         include: {
-            sets: {
-               orderBy: {
-                  set_order: "asc"
-               }
-            }
-         }
-      });
-
-      simulateDatabaseError("exercises", "update");
-
-      expect(await updateExercise(exercise, "sets")).toEqual({
-         status: "Failure",
-         body: {
-            data: null,
-            message: "Something went wrong. Please try again.",
-            errors: { system: ["Database Error"] }
-         }
-      });
-      expect(prismaMock.exercises.update).toHaveBeenCalledTimes(3);
    });
 
-   test("Update exercises with field errors", async() => {
-      // Invalid workout ID
-      workout = {
-         ...MOCK_WORKOUT,
-         id: ""
-      };
-
-      expect(
-         await updateExercises(workout)
-      ).toEqual({
-         status: "Error",
-         body: {
-            data: null,
-            message: "Invalid workout ID fields",
-            errors: { workout_id: ["ID for workout must be in UUID format"] }
-         }
+   describe("Update workout exercise", () => {
+      test("Update workout exercise with errors", async() => {
+         await handleExerciseFieldErrors("update");
       });
 
-      // Invalid exercise fields
-      workout = {
-         ...workout,
-         id: MOCK_WORKOUT.id,
-         exercises: [
-            workout.exercises[0],
-            workout.exercises[1],
+      test("Handle database constraints when updating workout exercise", async() => {
+         await handleExerciseDatabaseErrors("update");
+      });
+
+      test("Update valid workout exercise", async() => {
+         // Update workout exercise name
+         exercise = {
+            ...MOCK_WORKOUT.exercises[0],
+            name: " Updated name "
+         };
+
+         expect(await updateExercise(exercise, "name")).toEqual({
+            status: "Success",
+            body: {
+               data: {
+                  ...exercise,
+                  name: "Updated name"
+               },
+               message: "Successfully updated exercise name",
+               errors: {}
+            }
+         });
+         expect(prismaMock.exercises.update).toHaveBeenCalledWith({
+            where: {
+               id: exercise.id,
+               workout_id: workout.id
+            },
+            data: {
+               name: "Updated name"
+            },
+            include: {
+               sets: {
+                  orderBy: {
+                     set_order: "asc"
+                  }
+               }
+            }
+         } as any);
+
+         // Update workout exercise sets
+         const newExerciseSets = [
             {
-               ...workout.exercises[2],
                id: "",
-               name: "",
-               exercise_order: -1
-            }
-         ]
-      };
-
-      expect(
-         await updateExercises(workout)
-      ).toEqual({
-         status: "Error",
-         body: {
-            data: null,
-            message: "Invalid exercise fields",
-            errors: {
-               id: ["ID for exercise must be in UUID format"],
-               exercise_order: ["Exercise order must be non-negative"],
-               name: ["A name must be at least 1 character."]
-            }
-         }
-      });
-   });
-
-   test("Update exercises with database integrity errors", async() => {
-      // Missing workout
-      workout = {
-         ...MOCK_WORKOUT,
-         id: MOCK_WORKOUT.exercises[0].id
-      };
-
-      expect(
-         await updateExercises(workout)
-      ).toEqual({
-         status: "Error",
-         body: {
-            data: null,
-            message: "Workout does not exist based on workout ID",
-            errors: {}
-         }
-      });
-   });
-
-   test("Update exercises", async() => {
-      // Remove first exercise and swap last two exercises
-      workout = {
-         ...MOCK_WORKOUT,
-         exercises: [
-            {
-               ...MOCK_WORKOUT.exercises[2],
-               exercise_order: 0
+               exercise_id: exercise.id,
+               set_order: 2,
+               weight: 100,
+               repetitions: 100,
+               text: "text"
             },
             {
-               ...MOCK_WORKOUT.exercises[1],
-               exercise_order: 10
+               id: "",
+               exercise_id: exercise.id,
+               set_order: 3,
+               hours: 1
             }
-         ]
-      };
+         ];
 
-      const { updating, removing } = await getExercisesUpdates(
-         MOCK_WORKOUT,
-         workout
-      );
+         exercise = {
+            ...exercise,
+            sets: [
+               workout.exercises[0].sets[0],
+               workout.exercises[0].sets[1],
+               ...newExerciseSets
+            ]
+         };
 
-      expect(removing.id.in).toEqual([MOCK_WORKOUT.exercises[0].id]);
-      expect(updating).toHaveLength(2);
+         const { creating, updating, removing, error, errors } =
+            await getExerciseSetUpdates(workout.exercises[0], exercise);
 
-      expect(
-         await updateExercises(workout)
-      ).toEqual({
-         status: "Success",
-         body: {
-            // Ensure exercise_order for all exercises remain within 0th index range
-            data: [
+         expect(removing.id.in).toEqual(
+            [workout.exercises[0].sets[2].id]
+         );
+         expect(creating.data).toHaveLength(2);
+         expect(updating).toHaveLength(2);
+         expect(error).toBeUndefined();
+         expect(errors).toBeUndefined();
+
+         const expectedNewExercise = {
+            ...exercise,
+            name:  "Updated name",
+            sets: [
+               exercise.sets[0],
+               exercise.sets[1],
                {
-                  ...workout.exercises[0],
+                  ...newExerciseSets[0],
+                  id: `${MOCK_ID}${0}`
+               },
+               {
+                  ...newExerciseSets[1],
+                  id: `${MOCK_ID}${1}`
+               }
+            ]
+         };
+
+         expect(await updateExercise(exercise, "sets")).toEqual({
+            status: "Success",
+            body: {
+               data: expectedNewExercise,
+               message: "Successfully updated exercise sets",
+               errors: {}
+            }
+         });
+         expect(exercisesByIds[exercise.id]).toEqual(expectedNewExercise);
+         expect(prismaMock.exercises.update).toHaveBeenCalledWith({
+            where: {
+               id: exercise.id,
+               workout_id: workout.id
+            },
+            data: {
+               sets: {
+                  deleteMany: removing,
+                  updateMany: updating,
+                  createMany: creating
+               }
+            },
+            include: {
+               sets: {
+                  orderBy: {
+                     set_order: "asc"
+                  }
+               }
+            }
+         } as any);
+      });
+   });
+
+   describe("Update overall workout exercises", () => {
+      test("Update overall workout exercises with errors", async() => {
+         // Invalid workout ID
+         workout = {
+            ...MOCK_WORKOUT,
+            id: ""
+         };
+
+         expect(
+            await updateExercises(workout)
+         ).toEqual({
+            status: "Error",
+            body: {
+               data: null,
+               message: "Invalid workout ID fields",
+               errors: { workout_id: ["ID for workout must be in UUID format"] }
+            }
+         });
+
+         // Invalid exercise fields
+         workout = {
+            ...workout,
+            id: MOCK_WORKOUT.id,
+            exercises: [
+               workout.exercises[0],
+               workout.exercises[1],
+               {
+                  ...workout.exercises[2],
+                  id: "",
+                  name: "",
+                  exercise_order: -1
+               }
+            ]
+         };
+
+         expect(
+            await updateExercises(workout)
+         ).toEqual({
+            status: "Error",
+            body: {
+               data: null,
+               message: "Invalid exercise fields",
+               errors: {
+                  id: ["ID for exercise must be in UUID format"],
+                  exercise_order: ["Exercise order must be non-negative"],
+                  name: ["A name must be at least 1 character."]
+               }
+            }
+         });
+      });
+
+      test("Handle database constraints when updating overall exercises", async() => {
+         // Missing workout
+         workout = {
+            ...MOCK_WORKOUT,
+            id: MOCK_ID
+         };
+
+         expect(
+            await updateExercises(workout)
+         ).toEqual({
+            status: "Error",
+            body: {
+               data: null,
+               message: "Workout does not exist based on workout ID",
+               errors: {}
+            }
+         });
+      });
+
+      test("Update valid overall workout exercises", async() => {
+         // Remove first exercise and swap last two exercises
+         workout = {
+            ...MOCK_WORKOUT,
+            exercises: [
+               {
+                  ...MOCK_WORKOUT.exercises[2],
                   exercise_order: 0
                },
                {
-                  ...workout.exercises[1],
-                  exercise_order: 1
+                  ...MOCK_WORKOUT.exercises[1],
+                  exercise_order: 10
                }
-            ],
-            message: "Successfully updated workout exercise ordering",
-            errors: {}
-         }
-      });
-      expect(prismaMock.workouts.update).toHaveBeenCalledWith({
-         where: { id: workout.id },
-         data: {
-            exercises: {
-               deleteMany: removing,
-               updateMany: updating
-            }
-         },
-         include: {
-            exercises: {
-               include: { sets: { orderBy: { set_order: "asc" } } },
-               orderBy: { exercise_order: "asc" }
-            }
-         }
-      });
-      expect(exercisesByIds[MOCK_WORKOUT.exercises[2].id].exercise_order).toBe(0);
-      expect(exercisesByIds[MOCK_WORKOUT.exercises[1].id].exercise_order).toBe(1);
-      expect(exercisesByIds[MOCK_WORKOUT.exercises[0].id]).toBeUndefined();
+            ]
+         };
 
-      simulateDatabaseError("workouts", "update");
+         const { updating, removing } = await getExercisesUpdates(
+            MOCK_WORKOUT,
+            workout
+         );
 
-      expect(await updateExercises(workout)).toEqual({
-         status: "Failure",
-         body: {
-            data: null,
-            message: "Something went wrong. Please try again.",
-            errors: { system: ["Database Error"] }
-         }
+         expect(removing.id.in).toEqual([MOCK_WORKOUT.exercises[0].id]);
+         expect(updating).toHaveLength(2);
+         // Ensure exercise_order for all exercises remain within 0th index range
+         expect(
+            await updateExercises(workout)
+         ).toEqual({
+            status: "Success",
+            body: {
+               data: [
+                  {
+                     ...workout.exercises[0],
+                     exercise_order: 0
+                  },
+                  {
+                     ...workout.exercises[1],
+                     exercise_order: 1
+                  }
+               ],
+               message: "Successfully updated workout exercise ordering",
+               errors: {}
+            }
+         });
+         expect(prismaMock.workouts.update).toHaveBeenCalledWith({
+            where: { id: workout.id },
+            data: {
+               exercises: {
+                  deleteMany: removing,
+                  updateMany: updating
+               }
+            },
+            include: {
+               exercises: {
+                  include: { sets: { orderBy: { set_order: "asc" } } },
+                  orderBy: { exercise_order: "asc" }
+               }
+            }
+         } as any);
+         expect(exercisesByIds[MOCK_WORKOUT.exercises[2].id].exercise_order).toBe(0);
+         expect(exercisesByIds[MOCK_WORKOUT.exercises[1].id].exercise_order).toBe(1);
+         expect(exercisesByIds[MOCK_WORKOUT.exercises[0].id]).toBeUndefined();
+
+         simulateDatabaseError("workouts", "update", async() => await updateExercises(workout));
       });
-      expect(prismaMock.workouts.update).toHaveBeenCalledTimes(2);
    });
 });

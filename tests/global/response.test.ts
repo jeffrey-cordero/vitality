@@ -11,9 +11,9 @@ const updateNotification: (_notification: NotificationProps) => void = jest.fn()
 
 let response: VitalityResponse<any>;
 
-describe("Backend Response Service", () => {
+describe("Backend Response Tests", () => {
    describe("Success response", () => {
-      test("Handles a successful backend response", () => {
+      test("Handle successful backend response", () => {
          // Ensure notification is reset and success method is called
          response = sendSuccessMessage(
             "Successfully processed request",
@@ -40,7 +40,7 @@ describe("Backend Response Service", () => {
    });
 
    describe("Error response", () => {
-      test("Handles a backend response with errors", () => {
+      test("Handle backend error response", () => {
          // Mock DOM methods to ensure error elements are target
          const mockElement = Object.assign(document.createElement("p"), {
             className: "input-error",
@@ -80,7 +80,7 @@ describe("Backend Response Service", () => {
    });
 
    describe("Failure response", () => {
-      test("Handles failure backend responses gracefully", () => {
+      test("Handle failure backend responses gracefully", () => {
          // Mock console.error and node environment for failure message logging
          jest.spyOn(console, "error").mockImplementation();
          Object.defineProperty(process.env, "NODE_ENV", {

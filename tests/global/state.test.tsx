@@ -258,7 +258,7 @@ function Component(): JSX.Element {
    );
 }
 
-describe("State Management Service", () => {
+describe("State Management Tests", () => {
    // Mock scrollIntoView method for DOM elements
    Element.prototype.scrollIntoView = jest.fn();
 
@@ -276,7 +276,7 @@ describe("State Management Service", () => {
    };
 
    describe("Initialize state", () => {
-      test("Initialize state through dispatch method", async() => {
+      test("Initialize state with dispatch method", async() => {
          const dom = render(<Component />);
 
          await act(async() => {
@@ -302,7 +302,7 @@ describe("State Management Service", () => {
    });
 
    describe("Update state", () => {
-      test("Update inputs through dispatch method", async() => {
+      test("Update input with dispatch", async() => {
          const dom = render(<Component />);
 
          // Validate password input type management through icon element
@@ -348,7 +348,7 @@ describe("State Management Service", () => {
          });
       });
 
-      test("Update multiple inputs through dispatch method", async() => {
+      test("Update multiple inputs with dispatch", async() => {
          const dom = render(<Component />);
 
          await act(async() => {
@@ -367,7 +367,7 @@ describe("State Management Service", () => {
          });
       });
 
-      test("Update multiple input errors through dispatch", async() => {
+      test("Update multiple input errors with dispatch", async() => {
          const dom = render(<Component />);
 
          await act(async() => {
@@ -401,7 +401,7 @@ describe("State Management Service", () => {
          });
       });
 
-      test("Validate state changes for inputs with handlesOnChange defined", async() => {
+      test("Validate no changes for inputs with handlesOnChange defined", async() => {
          const dom = render(<Component />);
 
          // Apply handlesOnChange to name, text, and options inputs
@@ -430,7 +430,7 @@ describe("State Management Service", () => {
    });
 
    describe("Reset state", () => {
-      test("Reset multiple inputs through dispatch method", async() => {
+      test("Reset multiple inputs with dispatch", async() => {
          const dom = render(<Component />);
 
          await act(async() => {

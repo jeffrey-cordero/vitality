@@ -1,10 +1,11 @@
 import bcrypt from "bcryptjs";
 import { expect } from "@jest/globals";
-import { users } from "@prisma/client";
-import { root, user } from "@/tests/authentication/data";
 import { prismaMock } from "@/tests/singleton";
-import { simulateDatabaseError } from "@/tests/shared";
+import { root, user } from "@/tests/authentication/data";
+import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
 import { Registration, signup } from "@/lib/authentication/signup";
+import { fetchUser, authorizeServerSession } from "@/lib/authentication/authorize";
+import { users } from "@prisma/client";
 
 const EXISTING_USERS = [root, user];
 const VALID_REGISTRATION: Registration = {
@@ -24,12 +25,13 @@ const INVALID_PASSWORD_MESSAGE =
 // Mock bcrypt password hashing methods
 jest.mock("bcryptjs", () => ({
    genSaltSync: jest.fn(() => "mockedSalt"),
-   hash: jest.fn((password) => `hashed${password}`)
+   hash: jest.fn((password) => `hashed${password}`),
+   compare: jest.fn((one, two) => one === two)
 }));
 
-describe("User Registration Service", () => {
-   describe("Invalid registration", () => {
-      test("Register invalid registration fields", async() => {
+describe("Authentication Tests", () => {
+   describe("Registration", () => {
+      test("Register with invalid fields", async() => {
          const invalidRegistrations = [
             {
                registration: {
@@ -105,7 +107,7 @@ describe("User Registration Service", () => {
          }
       });
 
-      test("Register with password comparison errors", async() => {
+      test("Register with password errors", async() => {
          const invalidRegistrations = [
             {
                password: "ValidPassword1?",
@@ -142,8 +144,7 @@ describe("User Registration Service", () => {
          }
       });
 
-      test("Handles database constraints or errors during registration", async() => {
-         // Mock existing users
+      test("Handle database errors during registration", async() => {
          // @ts-ignore
          prismaMock.users.findMany.mockResolvedValue(
             EXISTING_USERS as unknown as users[]
@@ -221,10 +222,8 @@ describe("User Registration Service", () => {
 
          simulateDatabaseError("users", "create", async() => signup(uniqueRegistration));
       });
-   });
 
-   describe("Successful registration", () => {
-      test("Register with valid registration fields", async() => {
+      test("Sign up with valid fields", async() => {
          const registration = {
             ...VALID_REGISTRATION,
             username: "unique",
@@ -240,7 +239,7 @@ describe("User Registration Service", () => {
                errors: {}
             }
          });
-
+         // @ts-ignore
          expect(prismaMock.users.create).toHaveBeenCalledWith({
             data: {
                username: registration.username.trim(),
@@ -253,7 +252,81 @@ describe("User Registration Service", () => {
                birthday: registration.birthday,
                phone: undefined
             }
+         } as any);
+      });
+   });
+
+   describe("Authorization", () => {
+      beforeEach(() => {
+         // @ts-ignore
+         prismaMock.users.findFirst.mockImplementation(async(params) => {
+            if (params.where.username === root.username || params.where.email === root.email) {
+               return root;
+            } else if (params.where.username === user.username || params.where.email === user.email) {
+               return user;
+            } else {
+               return null;
+            }
          });
+      });
+
+      test("Fetch existing and missing users", async() => {
+         expect(await fetchUser(root.username)).toEqual(root);
+         expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
+            where: { username: root.username }
+         } as any);
+
+         expect(await fetchUser(MOCK_ID)).toBeNull();
+         expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
+            where: { username: MOCK_ID }
+         } as any);
+      });
+
+      test("Handle database errors when fetching user", async() => {
+         prismaMock.users.findFirst.mockRejectedValueOnce(
+            new Error("Database connection error")
+         );
+         expect(await fetchUser(root.username)).toBeNull();
+      });
+
+      test("Attempt authorization with invalid credentials", async() => {
+         // Mock invalid password comparison
+         bcrypt.compare.mockResolvedValue(false);
+
+         const credentials = {
+            username: root.username,
+            password: "invalidPassword"
+         };
+
+         expect(await authorizeServerSession(credentials)).toBeNull();
+         expect(bcrypt.compare).toHaveBeenCalledWith(
+            "invalidPassword",
+            root.password
+         );
+      });
+
+      test("Authorize with valid credentials", async() => {
+         // Mock valid password comparison
+         bcrypt.compare.mockResolvedValue(true);
+
+         const credentials = { username: root.username, password: root.password };
+
+         expect(await authorizeServerSession(credentials)).toEqual({
+            id: root.id,
+            name: root.name,
+            email: root.email
+         });
+         expect(bcrypt.compare).toHaveBeenCalledWith(root.password, root.password);
+      });
+
+      test("Handle database errors during authorization", async() => {
+         prismaMock.users.findFirst.mockRejectedValueOnce(
+            new Error("Database connection error")
+         );
+
+         const credentials = { username: root.username, password: root.password };
+
+         expect(await authorizeServerSession(credentials)).toBeNull();
       });
    });
 });
