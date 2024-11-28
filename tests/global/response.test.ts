@@ -4,81 +4,109 @@ import { VitalityAction } from "@/lib/global/state";
 import { NotificationProps } from "@/components/global/notification";
 import { handleResponse, sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
 
+// Mocked dependencies
 const dispatch: Dispatch<VitalityAction<any>> = jest.fn();
-let response: VitalityResponse<any>;
 const successMethod: () => void = jest.fn();
 const updateNotification: (_notification: NotificationProps) => void = jest.fn();
 
-describe("Backend Response Validation", () => {
-   test("Should remove current notifications and call success method on a successful backend response", async() => {
-      response = sendSuccessMessage("Successfully processed request", true);
-      handleResponse(dispatch, response, successMethod, updateNotification);
+let response: VitalityResponse<any>;
 
-      expect(dispatch).not.toHaveBeenCalled();
-      expect(successMethod).toHaveBeenCalled();
-      expect(response.body.data).toEqual(true);
-      expect(updateNotification).toHaveBeenCalledWith({
-         status: "Initial",
-         message: ""
+describe("Backend Response Tests", () => {
+   describe("Success response", () => {
+      test("Handle successful backend response", () => {
+         // Ensure notification is reset and success method is called
+         response = sendSuccessMessage(
+            "Successfully processed request",
+            Number.MAX_VALUE
+         );
+
+         handleResponse(dispatch, response, successMethod, updateNotification);
+
+         expect(response).toEqual({
+            status: "Success",
+            body: {
+               data: Number.MAX_VALUE,
+               message: "Successfully processed request",
+               errors: {}
+            }
+         });
+         expect(updateNotification).toHaveBeenCalledWith({
+            status: "Initial",
+            message: ""
+         });
+         expect(successMethod).toHaveBeenCalled();
+         expect(dispatch).not.toHaveBeenCalled();
       });
    });
 
-   test("Should update errors in state, if applicable, and scroll any error elements into view for errors caught", async() => {
-      response = sendErrorMessage("Error in user registration fields", {
-         name: ["Name must be at least 2 characters"]
+   describe("Error response", () => {
+      test("Handle backend error response", () => {
+         // Mock DOM methods to ensure error elements are target
+         const mockElement = Object.assign(document.createElement("p"), {
+            className: "input-error",
+            scrollIntoView: jest.fn()
+         });
+
+         jest.spyOn(document, "getElementsByClassName").mockReturnValue({
+            item: jest.fn().mockReturnValue(mockElement),
+            length: 1
+         } as unknown as HTMLCollection);
+
+         response = sendErrorMessage("Error in user registration fields", {
+            name: ["Name must be at least 2 characters"]
+         });
+
+         handleResponse(dispatch, response, successMethod, updateNotification);
+
+         expect(response).toEqual({
+            status: "Error",
+            body: {
+               data: null,
+               message: "Error in user registration fields",
+               errors: { name: ["Name must be at least 2 characters"] }
+            }
+         });
+         expect(dispatch).toHaveBeenCalledWith({
+            type: "updateErrors",
+            value: response
+         });
+         expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
+            behavior: "smooth",
+            block: "center"
+         });
+         expect(successMethod).not.toHaveBeenCalled();
+         expect(updateNotification).not.toHaveBeenCalled();
       });
-
-      // Mock error container within the DOM
-      const mockElement = document.createElement("p");
-      mockElement.className = "input-error";
-      mockElement.scrollIntoView = jest.fn();
-
-      jest.spyOn(document, "getElementsByClassName").mockReturnValue({
-         item: jest.fn().mockReturnValue(mockElement),
-         length: 1
-      } as any);
-
-      handleResponse(dispatch, response, successMethod, updateNotification);
-
-      // Ensure null data in response and no success/notification methods are called
-      expect(response.body.data).toBeNull();
-      expect(updateNotification).not.toHaveBeenCalled();
-      expect(successMethod).not.toHaveBeenCalled();
-
-      // Ensure errors are updated and error elements are scrolled into view
-      expect(dispatch).toHaveBeenCalledWith({
-         type: "updateErrors",
-         value: response
-      });
-      expect(document.getElementsByClassName).toHaveBeenCalledWith("input-error");
-      expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
-         behavior: "smooth",
-         block: "center"
-      });
-
-      // Ensure null errors parameter in uniform error message method defaults to an empty errors object
-      response = sendErrorMessage("Missing user ID", null);
-      expect(response.body.errors).toEqual({});
    });
 
-   test("Should display failure notification for failure caught on the backend", async() => {
-      jest.spyOn(console, "error").mockImplementation();
+   describe("Failure response", () => {
+      test("Handle failure backend responses gracefully", () => {
+         // Mock console.error and node environment for failure message logging
+         jest.spyOn(console, "error").mockImplementation();
+         Object.defineProperty(process.env, "NODE_ENV", {
+            value: "development",
+            configurable: true
+         });
 
-      response = sendFailureMessage(new Error("Database connection error"));
-      handleResponse(dispatch, response, successMethod, updateNotification);
+         response = sendFailureMessage(new Error("Database connection error"));
 
-      expect(response.body.data).toBeNull();
-      expect(dispatch).not.toHaveBeenCalled();
-      expect(successMethod).not.toHaveBeenCalled();
+         handleResponse(dispatch, response, successMethod, updateNotification);
 
-      // Ensure failure notification matches response and errors only log strictly within a development environment
-      expect(updateNotification).toHaveBeenCalledWith({
-         status: "Failure",
-         message: "Something went wrong. Please try again."
+         expect(response).toEqual({
+            status: "Failure",
+            body: {
+               data: null,
+               message: "Something went wrong. Please try again.",
+               errors: { system: ["Database connection error"] }
+            }
+         });
+         expect(updateNotification).toHaveBeenCalledWith({
+            status: "Failure",
+            message: "Something went wrong. Please try again."
+         });
+         expect(console.error).toHaveBeenCalled();
+         expect(dispatch).not.toHaveBeenCalled();
+         expect(successMethod).not.toHaveBeenCalled();
       });
-      expect(response.body.errors).toEqual({
-         system: ["Database connection error"]
-      });
-      expect(console.error).not.toHaveBeenCalled();
    });
 });

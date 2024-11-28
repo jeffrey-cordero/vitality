@@ -71,10 +71,3 @@ CREATE TABLE "workout_applied_tags" (
 
 CREATE INDEX "workout_tags_workout_index" ON "workout_applied_tags" (workout_id);
 CREATE INDEX "workout_tags_tag_index" ON "workout_applied_tags" (tag_id);
-
-CREATE TABLE "feedback" (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      name VARCHAR(255) NOT NULL,
-      email TEXT NOT NULL,
-      message TEXT NOT NULL
-);

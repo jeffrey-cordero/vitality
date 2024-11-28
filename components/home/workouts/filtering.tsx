@@ -282,7 +282,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "bg-gray-300 text-black font-semibold w-full h-[2.4rem] text-sm">
+               className = "bg-gray-200 text-black font-semibold w-full h-[2.4rem] text-sm">
                <FontAwesomeIcon
                   icon = {faCalendar}
                   className = "text-sm"
@@ -311,6 +311,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                   label = "Type"
                   icon = {faCalendar}
                   dispatch = {globalDispatch}
+                  autoFocus
                />
                {input !== undefined ? (
                   // Min or max
@@ -478,7 +479,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "bg-gray-300 text-black font-semibold w-full h-[2.4rem] text-sm"
+               className = "bg-gray-200 text-black font-semibold w-full h-[2.4rem] text-sm"
                onClick = {handleInitializeFilteredTags}>
                <FontAwesomeIcon
                   icon = {faTag}

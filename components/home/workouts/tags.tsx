@@ -24,7 +24,6 @@ import {
 } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { Modal } from "@/components/global/modal";
-import { searchForTitle } from "@/lib/home/workouts/shared";
 
 const form: VitalityState = {
    tagTitle: {
@@ -195,7 +194,7 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
                   : [...selected.filter(mapOrFilter)];
 
             // Holds valid existing workout tags to account for removals in other tag view containers
-            const newDictionary: { [key: string]: Tag } = Object.fromEntries(
+            const newDictionary: Record<string, Tag> = Object.fromEntries(
                newTags.map((tag) => [tag.id, tag]),
             );
 
@@ -455,11 +454,6 @@ export function Tags(props: TagsProps): JSX.Element {
 
    const fetched: boolean = globalState.tags.data.fetched;
 
-   // Convert search string to lower case for case-insensitive comparison
-   const search: string = useMemo(() => {
-      return localState.tagSearch.value.trim().toLowerCase();
-   }, [localState.tagSearch]);
-
    // Differentiate between selected and unselected options
    const selectedOptions: Set<Tag> = useMemo(() => {
       return new Set<Tag>(selected);
@@ -472,9 +466,16 @@ export function Tags(props: TagsProps): JSX.Element {
       selectedOptions
    ]);
 
-   // Search results
+   const search: string = useMemo(() => {
+      return localState.tagSearch.value.trim();
+   }, [localState.tagSearch]);
+
+   // Workout tag results through case-insensitive title comparison
    const searchResults: Tag[] = useMemo(() => {
-      return searchForTitle(searchOptions, search);
+      const lower = search.toLowerCase();
+
+      return search === "" ?
+         searchOptions : searchOptions.filter((t) => t.title.toLowerCase().includes(lower));
    }, [
       searchOptions,
       search
@@ -494,7 +495,7 @@ export function Tags(props: TagsProps): JSX.Element {
    const handleTagCreation = useCallback(async() => {
       // Default tags have gray color option
       const tag: Tag = {
-         user_id: user?.id,
+         user_id: user.id,
          id: "",
          title: localState.tagSearch.value.trim(),
          color: randomColor
@@ -505,13 +506,12 @@ export function Tags(props: TagsProps): JSX.Element {
       const successMethod = () => {
          // Add the new tag to the overall user tag options
          const newOption: Tag = response.body.data as Tag;
-         tagsByTitle[newOption.title] = newOption;
 
          const newOptions: Tag[] = [...globalState.tags.data.options, newOption];
          const newSelected: Tag[] = [...globalState.tags.data.selected, newOption];
 
          // Dictionary of tags are essential to ignore deleted tags applied to existing workouts
-         const newDictionary: { [key: string]: Tag } = Object.fromEntries(
+         const newDictionary: Record<string, Tag> = Object.fromEntries(
             newOptions.map((tag) => [tag.id, tag]),
          );
 
@@ -560,8 +560,7 @@ export function Tags(props: TagsProps): JSX.Element {
       localDispatch,
       localState.tagSearch,
       globalState.tags,
-      tagsByTitle,
-      user?.id,
+      user,
       updateNotification
    ]);
 
@@ -609,6 +608,7 @@ export function Tags(props: TagsProps): JSX.Element {
                            handleTagCreation();
                         }
                      }}
+                     autoFocus = {onReset !== undefined}
                   />
                </div>
                {searchResults.length > 0 && (
@@ -629,7 +629,7 @@ export function Tags(props: TagsProps): JSX.Element {
                      })}
                   </ul>
                )}
-               {search.trim().length > 0 && user !== undefined && tagsByTitle[search] === undefined && (
+               {search.trim().length > 0 && !tagsByTitle[search] && (
                   <CreateTagContainer
                      {...props}
                      localState = {localState}

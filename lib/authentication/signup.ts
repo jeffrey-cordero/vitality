@@ -1,7 +1,7 @@
 "use server";
 import validator from "validator";
 import bcrypt from "bcryptjs";
-import prisma from "@/client";
+import prisma from "@/lib/prisma/client";
 import { z } from "zod";
 import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
 

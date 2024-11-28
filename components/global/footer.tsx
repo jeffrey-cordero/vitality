@@ -18,28 +18,28 @@ export default function Footer(): JSX.Element {
                      <li>
                         <Link
                            className = "hover:text-slate-500"
-                           href = "http://localhost:3000/#">
+                           href = "http://localhost/#">
                   About
                         </Link>
                      </li>
                      <li>
                         <Link
                            className = "hover:text-slate-500"
-                           href = "http://localhost:3000/#">
+                           href = "http://localhost/#">
                   Privacy
                         </Link>
                      </li>
                      <li>
                         <Link
                            className = "hover:text-slate-500"
-                           href = "http://localhost:3000/#">
+                           href = "http://localhost/#">
                   Policy
                         </Link>
                      </li>
                      <li>
                         <Link
                            className = "hover:text-slate-500"
-                           href = "http://localhost:3000/#">
+                           href = "http://localhost/#">
                   Contact
                         </Link>
                      </li>
@@ -96,7 +96,7 @@ export default function Footer(): JSX.Element {
             </div>
             <div className = "text-center m-4">
                <span className = "text-sm text-black sm:text-center font-bold">
-            © {year} <Link href = "http://localhost:3000">Vitality™</Link>. All
+            © {year} <Link href = "http://localhost">Vitality™</Link>. All
             Rights Reserved.
                </span>
             </div>

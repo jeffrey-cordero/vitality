@@ -1,54 +1,178 @@
 /** @jest-environment jsdom */
-import userEvent from "@testing-library/user-event";
 import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import Select from "@/components/global/select";
 import TextArea from "@/components/global/textarea";
+import userEvent from "@testing-library/user-event";
 import { sendErrorMessage } from "@/lib/global/response";
-import { useEffect, useReducer } from "react";
-import { act, render, waitFor } from "@testing-library/react";
+import { useCallback, useEffect, useReducer } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
-
-const form: VitalityState = {
-   name: {
-      value: "",
-      error: null,
-      data: {
-         valid: undefined
-      }
-   },
-   password: {
-      value: "",
-      error: null,
-      data: {}
-   },
-   text: {
-      value: "",
-      error: null,
-      data: {}
-   },
-   options: {
-      value: "",
-      error: null,
-      data: {}
-   },
-   email: {
-      value: "",
-      error: null,
-      data: {}
-   },
-   tags: {
-      value: [],
-      error: null,
-      data: {},
-      handlesOnChange: true
-   }
-};
+import { act, render, waitFor } from "@testing-library/react";
 
 let globalState: VitalityState;
 
-function StateTesting(): JSX.Element {
-   const [state, dispatch] = useReducer(formReducer, form);
+// Initial state
+const initialState: VitalityState = {
+   name: { value: "", error: null, data: { valid: undefined } },
+   password: { value: "", error: null, data: {} },
+   text: { value: "", error: null, data: {} },
+   options: { value: "", error: null, data: {} },
+   email: { value: "", error: null, data: {} },
+   tags: { value: [], error: null, data: {}, handlesOnChange: true }
+};
+
+function Component(): JSX.Element {
+   const [state, dispatch] = useReducer(formReducer, initialState);
+
+   // Mock dispatch callback methods
+   const handleUpdateTags = useCallback(() => {
+      dispatch({
+         type: "updateState",
+         value: {
+            id: "tags",
+            input: {
+               ...state.tags,
+               value: [...state.tags.value, "Extend"]
+            }
+         }
+      });
+   }, [state.tags]);
+
+   const handleInitializeState = useCallback(() => {
+      dispatch({
+         type: "initializeState",
+         value: {
+            name: {
+               ...state.name,
+               value: "initializeName"
+            },
+            password: {
+               ...state.password,
+               value: "initializePassword"
+            },
+            text: {
+               ...state.text,
+               value: "initializeText"
+            },
+            options: {
+               ...state.options,
+               value: "1"
+            },
+            email: {
+               ...state.email,
+               value: "initialize@gmail.com"
+            },
+            tags: {
+               ...state.tags,
+               value: ["One", "Two", "Three"]
+            }
+         }
+      });
+   }, [
+      state.email,
+      state.name,
+      state.options,
+      state.password,
+      state.tags,
+      state.text
+   ]);
+
+   const handleResetState = useCallback(() => {
+      dispatch({
+         type: "resetState",
+         value: {
+            name: {
+               value: "resetName",
+               data: {
+                  valid: false,
+                  reset: true
+               }
+            },
+            text: {
+               value: "resetText",
+               data: {
+                  reset: true
+               }
+            },
+            tags: {
+               value: ["Four", "Five", "Six"],
+               data: {
+                  reset: true
+               }
+            }
+         }
+      });
+   }, []);
+
+   const handleUpdateStates = useCallback(() => {
+      dispatch({
+         type: "updateStates",
+         value: {
+            name: {
+               ...state.name,
+               value: "updateName",
+               data: {
+                  valid: true
+               },
+               handlesOnChange: true
+            },
+            email: {
+               ...state.email,
+               value: "update@gmail.com"
+            },
+            text: {
+               ...state.text,
+               value: "updateText",
+               handlesOnChange: true
+            },
+            options: {
+               ...state.options,
+               value: "2",
+               handlesOnChange: true
+            }
+         }
+      });
+   }, [
+      state.email,
+      state.name,
+      state.options,
+      state.text
+   ]);
+
+   const handleUpdateErrors = useCallback(() => {
+      dispatch({
+         type: "updateErrors",
+         value: sendErrorMessage("Errors", {
+            name: ["Name must be at least 2 characters"],
+            password: ["Password must be non-empty"]
+         })
+      });
+   }, []);
+
+   const handleUpdateHandlesChanges = useCallback(() => {
+      dispatch({
+         type: "updateStates",
+         value: {
+            name: {
+               ...state.name,
+               handlesOnChange: true
+            },
+            text: {
+               ...state.text,
+               handlesOnChange: true
+            },
+            options: {
+               ...state.options,
+               handlesOnChange: true
+            }
+
+         }
+      });
+   }, [
+      state.name,
+      state.options,
+      state.text
+   ]);
 
    useEffect(() => {
       globalState = state;
@@ -63,6 +187,7 @@ function StateTesting(): JSX.Element {
             input = {state.name}
             dispatch = {dispatch}
             autoFocus
+            scrollIntoView
             required>
             {state.name.value}
          </Input>
@@ -88,6 +213,7 @@ function StateTesting(): JSX.Element {
             label = "Text"
             input = {state.text}
             dispatch = {dispatch}
+            autoFocus
          />
          <Select
             id = "options"
@@ -96,335 +222,237 @@ function StateTesting(): JSX.Element {
             label = "Options"
             input = {state.options}
             dispatch = {dispatch}
+            autoFocus
          />
          <div
             id = "tags"
-            onClick = {() => {
-               dispatch({
-                  type: "updateState",
-                  value: {
-                     id: "tags",
-                     input: {
-                        ...state.tags,
-                        value: [...state.tags.value, "Extend"]
-                     }
-                  }
-               });
-            }}>
+            onClick = {handleUpdateTags}>
             {state.tags.value.toString()}
          </div>
          <Button
             id = "initialize"
-            onClick = {() => {
-               dispatch({
-                  type: "initializeState",
-                  value: {
-                     name: {
-                        ...state.name,
-                        value: "test"
-                     },
-                     password: {
-                        ...state.password,
-                        value: ""
-                     },
-                     text: {
-                        ...state.text,
-                        value: "test-text"
-                     },
-                     options: {
-                        ...state.text,
-                        value: "2"
-                     },
-                     email: {
-                        ...state.email,
-                        value: "test@gmail.com"
-                     },
-                     tags: {
-                        ...state.tags,
-                        value: ["One", "Two", "Three"]
-                     }
-                  }
-               });
-            }}>
+            onClick = {handleInitializeState}>
             Initialize State
          </Button>
          <Button
-            id = "reset"
-            onClick = {() => {
-               dispatch({
-                  type: "resetState",
-                  value: {
-                     name: {
-                        value: "reset",
-                        data: {
-                           valid: false
-                        }
-                     },
-                     text: {
-                        value: "reset-text",
-                        data: {}
-                     },
-                     tags: {
-                        value: ["Four", "Five", "Six"],
-                        data: {
-                           updated: true
-                        }
-                     }
-
-                  }
-               });
-            }}>
-            Reset States
+            id = "updates"
+            onClick = {handleUpdateStates}>
+            Update States
          </Button>
          <Button
-            id = "updates"
-            onClick = {() => {
-               dispatch({
-                  type: "updateStates",
-                  value: {
-                     name: {
-                        ...state.name,
-                        value: "updates",
-                        data: {
-                           valid: true
-                        },
-                        handlesOnChange: true
-                     },
-                     email: {
-                        ...state.email,
-                        value: "updates@gmail.com"
-                     },
-                     text: {
-                        ...state.text,
-                        handlesOnChange: true
-                     },
-                     options: {
-                        ...state.options,
-                        value: "3",
-                        handlesOnChange: true
-                     }
-                  }
-               });
-            }}>
-            Update Multiple States
+            id = "reset"
+            onClick = {handleResetState}>
+            Reset State
          </Button>
          <Button
             id = "errors"
-            onClick = {() => {
-               const errors = {
-                  name: ["Name must be at least 2 characters"],
-                  text: ["Password must be non-empty"]
-               };
-
-               dispatch({
-                  type: "updateErrors",
-                  value: sendErrorMessage("Errors", errors)
-               });
-            }}>
+            onClick = {handleUpdateErrors}>
             Update Errors
+         </Button>
+         <Button
+            id = "handles"
+            onClick = {handleUpdateHandlesChanges}>
+            Handle Changes
          </Button>
       </div>
    );
 }
 
-describe("State Management Validation", () => {
-   test("Should properly initialize state and display appropriate changes", async() => {
-      const dom = render(<StateTesting />);
+describe("State Management Tests", () => {
+   // Mock scrollIntoView method for DOM elements
+   Element.prototype.scrollIntoView = jest.fn();
 
-      // Ensure empty values on initial render based on initial state
-      expect((dom.container.querySelector("#name") as HTMLInputElement).value).toBe("");
-      expect((dom.container.querySelector("#password") as HTMLInputElement).value).toBe("");
-      expect((dom.container.querySelector("#email") as HTMLInputElement).value).toBe("");
-      expect((dom.container.querySelector("#text") as HTMLTextAreaElement).value).toBe("");
-      expect((dom.container.querySelector("#options") as HTMLSelectElement).value).toBe("");
-      expect((dom.container.querySelector("#tags") as HTMLDivElement).textContent).toBe("");
+   const validateStateChanges = (dom: any, state: VitalityState) => {
+      // Validate DOM state-related elements
+      expect((dom.container.querySelector("#name") as HTMLInputElement).value).toBe(state.name.value);
+      expect((dom.container.querySelector("#password") as HTMLInputElement).value).toBe(state.password.value);
+      expect((dom.container.querySelector("#email") as HTMLInputElement).value).toBe(state.email.value);
+      expect((dom.container.querySelector("#text") as HTMLTextAreaElement).value).toBe(state.text.value);
+      expect((dom.container.querySelector("#options") as HTMLSelectElement).value).toBe(state.options.value);
+      expect((dom.container.querySelector("#tags") as HTMLDivElement).textContent).toBe(state.tags.value.toString());
 
-      // Click button for fire initialize state dispatch method
-      await act(async() => {
-         await userEvent.click(dom.container.querySelector("#initialize"));
-      });
+      // Validate global state
+      expect(globalState).toEqual(state);
+   };
 
-      // Validate changes in state
-      await waitFor(() => {
-         expect((dom.container.querySelector("#name") as HTMLInputElement).value).toBe("test");
-         expect((dom.container.querySelector("#password") as HTMLInputElement).value).toBe("");
-         expect((dom.container.querySelector("#email") as HTMLInputElement).value).toBe("test@gmail.com");
-         expect((dom.container.querySelector("#text") as HTMLTextAreaElement).value).toBe("test-text");
-         expect((dom.container.querySelector("#options") as HTMLSelectElement).value).toBe("2");
-         expect((dom.container.querySelector("#tags") as HTMLDivElement).textContent).toBe("One,Two,Three");
+   describe("Initialize state", () => {
+      test("Initialize state with dispatch method", async() => {
+         const dom = render(<Component />);
+
+         await act(async() => {
+            await userEvent.click(dom.container.querySelector("#initialize"));
+         });
+
+         await waitFor(() => {
+            validateStateChanges(dom, {
+               name: { value: "initializeName", error: null, data: { valid: undefined } },
+               password: { value: "initializePassword", error: null, data: {} },
+               text: { value: "initializeText", error: null, data: {} },
+               options: { value: "1", error: null, data: {} },
+               email: { value: "initialize@gmail.com", error: null, data: {} },
+               tags: {
+                  value: [ "One", "Two", "Three" ],
+                  error: null,
+                  data: {},
+                  handlesOnChange: true
+               }
+            });
+         });
       });
    });
 
-   test("Should ensure that all input-related components lead to updates in state", async() => {
-      const dom = render(<StateTesting />);
+   describe("Update state", () => {
+      test("Update input with dispatch", async() => {
+         const dom = render(<Component />);
 
-      // Ensure password icons are visible
-      expect(dom.container.querySelectorAll(".password-icon")).not.toBeNull();
-      expect(dom.container.querySelector("#password") as HTMLInputElement).toHaveProperty("type", "password");
-      expect(globalState.password.data).toEqual({});
+         // Validate password input type management through icon element
+         const passwordIcon = dom.container.querySelectorAll(".password-icon")[0];
 
-      // Ensure password icon leads to changes in the input component and state
-      await act(async() => {
-         await userEvent.click(dom.container.querySelectorAll(".password-icon")[0]);
-      });
-
-      await waitFor(() => {
-         expect(dom.container.querySelector("#password") as HTMLInputElement).toHaveProperty("type", "text");
-         expect(globalState.password.data).toEqual({ type: "text" });
-      });
-
-      // Fire update events for each respective input
-      await act(async() => {
-         await userEvent.type(dom.container.querySelector("#name"), "Jeffrey");
-         await userEvent.keyboard("{Escape}");
-         await userEvent.type(dom.container.querySelector("#password"), "ValidPassword1$");
-         await userEvent.keyboard("{Enter}");
-         await userEvent.type(dom.container.querySelector("#email"), "Jeffrey@gmail.com");
-         await userEvent.type(dom.container.querySelector("#text"), "Hello\nWorld");
-         await userEvent.keyboard("{Escape}");
-         await userEvent.selectOptions(dom.container.querySelector("#options"), "3");
-         await userEvent.click(dom.container.querySelector("#tags"));
-         await userEvent.click(dom.container.querySelectorAll(".password-icon")[0]);
-      });
-
-      // Validate changes in state
-      await waitFor(() => {
-         expect((dom.container.querySelector("#name") as HTMLInputElement).value).toBe("Jeffrey");
-         expect((dom.container.querySelector("#password") as HTMLInputElement).value).toBe("ValidPassword1$");
+         expect(passwordIcon).not.toBeNull();
+         expect(globalState.password.data).toEqual({});
          expect(dom.container.querySelector("#password") as HTMLInputElement).toHaveProperty("type", "password");
-         expect((dom.container.querySelector("#email") as HTMLInputElement).value).toBe("Jeffrey@gmail.com");
-         expect((dom.container.querySelector("#text") as HTMLTextAreaElement).value).toBe("Hello\nWorld");
-         expect((dom.container.querySelector("#options") as HTMLSelectElement).value).toBe("3");
-         expect((dom.container.querySelector("#tags") as HTMLDivElement).textContent).toBe("Extend");
 
-         expect(globalState).toEqual({
-            "name": { value: "Jeffrey", error: null, data: {} },
-            "password": { value: "ValidPassword1$", error: null, data: { type: "password" } },
-            "text": { value: "Hello\nWorld", error: null, data: {} },
-            "options": { value: "3", error: null, data: {} },
-            "email": { value: "Jeffrey@gmail.com", error: null, data: {} },
-            "tags": { value: ["Extend"], error: null, data: {}, handlesOnChange: true }
+         await act(async() => {
+            await userEvent.click(passwordIcon);
+         });
+
+         await waitFor(() => {
+            expect(dom.container.querySelector("#password") as HTMLInputElement).toHaveProperty("type", "text");
+            expect(globalState.password.data).toEqual({ type: "text" });
+         });
+
+         await act(async() => {
+            await userEvent.type(dom.container.querySelector("#name"), "user");
+            await userEvent.keyboard("{Escape}");
+            await userEvent.type(dom.container.querySelector("#password"), "password");
+            await userEvent.keyboard("{Enter}");
+            await userEvent.type(dom.container.querySelector("#email"), "user@gmail.com");
+            await userEvent.type(dom.container.querySelector("#text"), "Hello\nWorld");
+            await userEvent.keyboard("{Escape}");
+            await userEvent.selectOptions(dom.container.querySelector("#options"), "3");
+            await userEvent.click(dom.container.querySelector("#tags"));
+            await userEvent.click(passwordIcon);
+         });
+
+         await waitFor(() => {
+            expect(dom.container.querySelector("#password") as HTMLInputElement).toHaveProperty("type", "password");
+
+            validateStateChanges(dom, {
+               "name": { value: "user", error: null, data: {} },
+               "password": { value: "password", error: null, data: { type: "password" } },
+               "text": { value: "Hello\nWorld", error: null, data: {} },
+               "options": { value: "3", error: null, data: {} },
+               "email": { value: "user@gmail.com", error: null, data: {} },
+               "tags": { value: ["Extend"], error: null, data: {}, handlesOnChange: true }
+            });
+         });
+      });
+
+      test("Update multiple inputs with dispatch", async() => {
+         const dom = render(<Component />);
+
+         await act(async() => {
+            await userEvent.click(dom.container.querySelector("#updates"));
+         });
+
+         await waitFor(() => {
+            validateStateChanges(dom, {
+               name: { value: "updateName", error: null, data: { valid: true }, handlesOnChange: true },
+               password: { value: "", error: null, data: {} },
+               text: { value: "updateText", error: null, data: {}, handlesOnChange: true },
+               options: { value: "2", error: null, data: {}, handlesOnChange: true },
+               email: { value: "update@gmail.com", error: null, data: {} },
+               tags: { value: [], error: null, data: {}, handlesOnChange: true }
+            });
+         });
+      });
+
+      test("Update multiple input errors with dispatch", async() => {
+         const dom = render(<Component />);
+
+         await act(async() => {
+            await userEvent.click(dom.container.querySelector("#errors"));
+         });
+
+         await waitFor(() => {
+            // Validate error elements displaying in the DOM with respective messages
+            const errors = dom.container.querySelectorAll(".input-error");
+
+            expect(errors).toHaveLength(2);
+            expect(errors[0].textContent.trim()).toEqual("Name must be at least 2 characters");
+            expect(errors[1].textContent.trim()).toEqual("Password must be non-empty");
+
+            validateStateChanges(dom, {
+               name: {
+                  value: "",
+                  error: "Name must be at least 2 characters",
+                  data: { valid: undefined }
+               },
+               password: {
+                  value: "",
+                  error: "Password must be non-empty",
+                  data: {}
+               },
+               text: { value: "", error: null, data: {} },
+               options: { value: "", error: null, data: {} },
+               email: { value: "", error: null, data: {} },
+               tags: { value: [], error: null, data: {}, handlesOnChange: true }
+            });
+         });
+      });
+
+      test("Validate no changes for inputs with handlesOnChange defined", async() => {
+         const dom = render(<Component />);
+
+         // Apply handlesOnChange to name, text, and options inputs
+         await act(async() => {
+            await userEvent.click(dom.container.querySelector("#handles"));
+         });
+
+         await act(async() => {
+            await userEvent.type(dom.container.querySelector("#name"), "Handles onChange?");
+            await userEvent.type(dom.container.querySelector("#text"), "Handles onChange?");
+            await userEvent.selectOptions(dom.container.querySelector("#options"), "3");
+         });
+
+         // Validate no changes for name, text, and options inputs
+         await waitFor(() => {
+            validateStateChanges(dom, {
+               name: { value: "", error: null, data: { valid: undefined }, handlesOnChange: true },
+               password: { value: "", error: null, data: {} },
+               text: { value: "", error: null, data: {}, handlesOnChange: true },
+               options: { value: "", error: null, data: {}, handlesOnChange: true },
+               email: { value: "", error: null, data: {} },
+               tags: { value: [], error: null, data: {}, handlesOnChange: true }
+            });
          });
       });
    });
 
-   test("Should validate bulk changes in state", async() => {
-      const dom = render(<StateTesting />);
+   describe("Reset state", () => {
+      test("Reset multiple inputs with dispatch", async() => {
+         const dom = render(<Component />);
 
-      // Fire reset state button click after altering some inputs
-      await act(async() => {
-         await userEvent.type(dom.container.querySelector("#name"), "Another");
-         await userEvent.type(dom.container.querySelector("#password"), "AnotherPassword1$");
-         await userEvent.click(dom.container.querySelector("#reset"));
-      });
-
-      await waitFor(() => {
-         expect(globalState).toEqual({
-            name: { value: "reset", error: null, data: { valid: false } },
-            password: { value: "", error: null, data: {} },
-            text: { value: "reset-text", error: null, data: {} },
-            options: { value: "", error: null, data: {} },
-            email: { value: "", error: null, data: {} },
-            tags: {
-               value: ["Four", "Five", "Six"],
-               error: null,
-               data: { updated: true },
-               handlesOnChange: true
-            }
+         await act(async() => {
+            await userEvent.type(dom.container.querySelector("#name"), "newName");
+            await userEvent.type(dom.container.querySelector("#password"), "newPassword");
+            await userEvent.click(dom.container.querySelector("#reset"));
          });
-      });
 
-      // Fire update multiple states button
-      await act(async() => {
-         await userEvent.click(dom.container.querySelector("#updates"));
-      });
-
-      await waitFor(() => {
-         expect(globalState).toEqual({
-            name: { value: "updates", error: null, data: { valid: true }, handlesOnChange: true },
-            password: { value: "", error: null, data: {} },
-            text: { value: "reset-text", error: null, data: {}, handlesOnChange: true },
-            options: { value: "3", error: null, data: {}, handlesOnChange: true },
-            email: { value: "updates@gmail.com", error: null, data: {} },
-            tags: {
-               value: ["Four", "Five", "Six"],
-               error: null,
-               data: { updated: true },
-               handlesOnChange: true
-            }
-         });
-      });
-
-      // Fire update multiple errors button
-      expect(dom.container.querySelectorAll(".input-error")).toHaveLength(0);
-
-      await act(async() => {
-         await userEvent.click(dom.container.querySelector("#errors"));
-      });
-
-      await waitFor(() => {
-         // Ensure only two error containers are displaying their respective errors
-         expect(dom.container.querySelectorAll(".input-error")).toHaveLength(2);
-         expect(dom.container.querySelectorAll(".input-error")[0].textContent.trim())
-            .toEqual("Name must be at least 2 characters");
-         expect(dom.container.querySelectorAll(".input-error")[1].textContent.trim())
-            .toEqual("Password must be non-empty");
-
-         expect(globalState).toEqual({
-            name: {
-               value: "updates",
-               error: "Name must be at least 2 characters",
-               data: { valid: true },
-               handlesOnChange: true
-            },
-            password: { value: "", error: null, data: {} },
-            text: {
-               value: "reset-text",
-               error: "Password must be non-empty",
-               data: {},
-               handlesOnChange: true
-            },
-            options: { value: "3", error: null, data: {}, handlesOnChange: true },
-            email: { value: "updates@gmail.com", error: null, data: {} },
-            tags: {
-               value: ["Four", "Five", "Six"],
-               error: null,
-               data: { updated: true },
-               handlesOnChange: true
-            }
-         });
-      });
-
-      // Ensure all input components with handlesOnChange variable lead to no default changes in state based on event handling
-      await act(async() => {
-         await userEvent.type(dom.container.querySelector("#name"), "Handles");
-         await userEvent.type(dom.container.querySelector("#text"), "Handles");
-         await userEvent.selectOptions(dom.container.querySelector("#options"), "2");
-      });
-
-      await waitFor(() => {
-         expect(globalState).toEqual({
-            name: {
-               value: "updates",
-               error: "Name must be at least 2 characters",
-               data: { valid: true },
-               handlesOnChange: true
-            },
-            password: { value: "", error: null, data: {} },
-            text: {
-               value: "reset-text",
-               error: "Password must be non-empty",
-               data: {},
-               handlesOnChange: true
-            },
-            options: { value: "3", error: null, data: {}, handlesOnChange: true },
-            email: { value: "updates@gmail.com", error: null, data: {} },
-            tags: {
-               value: ["Four", "Five", "Six"],
-               error: null,
-               data: { updated: true },
-               handlesOnChange: true
-            }
+         await waitFor(() => {
+            validateStateChanges(dom, {
+               name: { value: "resetName", error: null, data: { valid: false, reset: true } },
+               password: { value: "", error: null, data: {} },
+               text: { value: "resetText", error: null, data: { reset: true } },
+               options: { value: "", error: null, data: {} },
+               email: { value: "", error: null, data: {} },
+               tags: {
+                  value: ["Four", "Five", "Six"],
+                  error: null,
+                  data: { reset: true },
+                  handlesOnChange: true
+               }
+            });
          });
       });
    });

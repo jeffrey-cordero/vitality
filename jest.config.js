@@ -8,7 +8,7 @@ const customJestConfig = {
    clearMocks: true,
    preset: "ts-jest",
    testEnvironment: "node",
-   setupFilesAfterEnv: ["<rootDir>/singleton.ts"],
+   setupFilesAfterEnv: ["<rootDir>/tests/singleton.ts"],
    moduleDirectories: ["node_modules", "<rootDir>/"],
    moduleNameMapper: {
       "^@/(.*)$": "<rootDir>/$1"

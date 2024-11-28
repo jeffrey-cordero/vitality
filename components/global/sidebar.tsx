@@ -20,8 +20,8 @@ import {
    faPeopleGroup,
    faHandshakeAngle,
    faGears,
-   faDumbbell,
-   faBarsStaggered
+   faBarsStaggered,
+   faDumbbell
 } from "@fortawesome/free-solid-svg-icons";
 import { AuthenticationContext } from "@/app/layout";
 
@@ -103,7 +103,7 @@ export function SideBar(): JSX.Element {
    return (
       <div>
          <div className = "absolute top-0 left-0 z-30">
-            <div className = "relative top-0 left-0 transform translate-x-[15px] translate-y-[25px] z-30">
+            <div className = "relative top-0 left-0 transform translate-x-[10px] translate-y-[20px] z-30">
                <FontAwesomeIcon
                   id = "sideBarButton"
                   icon = {visibleSideBar ? faAnglesRight : faBarsStaggered}

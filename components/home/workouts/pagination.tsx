@@ -83,7 +83,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
 
    return (
       workouts.length > 0 && (
-         <div className = "max-w-sm mt-6 justify-self-end text-lg">
+         <div className = "max-w-sm my-6 justify-self-end text-lg">
             <div className = "max-w-xs relative flex flex-row justify-center items-center mx-4">
                <FontAwesomeIcon
                   icon = {faCircleChevronLeft}

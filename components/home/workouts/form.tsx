@@ -15,7 +15,7 @@ import {
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import {
    addWorkout,
-   removeWorkouts,
+   deleteWorkouts,
    updateWorkout,
    Workout
 } from "@/lib/home/workouts/workouts";
@@ -172,10 +172,9 @@ export default function Form(props: VitalityProps): JSX.Element {
       };
 
       const response: VitalityResponse<Workout | number> = isNewWorkout
-         ? await addWorkout(payload)
-         : method === "update"
+         ? await addWorkout(payload) : method === "update"
             ? await updateWorkout(payload)
-            : await removeWorkouts([payload]);
+            : await deleteWorkouts([payload], user.id);
 
       const successMethod = () => {
          const returnedWorkout: Workout | null =
@@ -232,12 +231,18 @@ export default function Form(props: VitalityProps): JSX.Element {
 
          // Close the form modal after a successful deletion
          if (method === "delete") {
-            formModalRef.current?.close();
-
             updateNotification({
                status: "Success",
                message: "Deleted workout",
-               timer: 1000
+               timer: 700
+            });
+
+            formModalRef.current?.close();
+         } else {
+            updateNotification({
+               status: "Success",
+               message: isNewWorkout ? "Added Workout" : "Updated Workout",
+               timer: 700
             });
          }
       };
@@ -349,7 +354,7 @@ export default function Form(props: VitalityProps): JSX.Element {
       setDisplayingFormModal(false);
    }, [globalDispatch,
       globalState.workout,
-      user?.id
+      user
    ]);
 
    const handleReset = useCallback(() => {
@@ -422,7 +427,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      icon = {faSignature}
                      input = {localState.title}
                      dispatch = {localDispatch}
-                     onSubmit = {() => handleUpdateWorkout("update")}
+                     onSubmit = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
                      autoFocus
                      required
                   />
@@ -433,7 +438,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      icon = {faCalendar}
                      input = {localState.date}
                      dispatch = {localDispatch}
-                     onSubmit = {() => handleUpdateWorkout("update")}
+                     onSubmit = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
                      required
                   />
                   <Tags
@@ -453,7 +458,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      label = "Description"
                      icon = {faBook}
                      input = {localState.description}
-                     onSubmit = {() => handleUpdateWorkout("update")}
+                     onSubmit = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
                      dispatch = {localDispatch}
                   />
                   <Button
@@ -483,7 +488,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          </Modal>
          <Button
             type = "button"
-            className = "bg-primary text-white w-[10rem] h-[2.4rem] px-4 py-6"
+            className = "bg-primary text-white w-[10rem] h-[2.4rem] text-md px-4 py-5"
             icon = {faPersonRunning}
             onClick = {() => {
                globalDispatch({
@@ -494,7 +499,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                         ...globalState.workout,
                         value: {
                            id: "",
-                           user_id: user?.id ?? "",
+                           user_id: user.id,
                            title: "",
                            date: new Date(),
                            image: "",

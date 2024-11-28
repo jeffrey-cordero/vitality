@@ -15,20 +15,21 @@ export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
    icon?: IconProp;
    onBlur?: () => void;
    onSubmit?: () => void;
+   scrollIntoView?: boolean;
 }
 
 export default function Input(props: VitalityInputProps): JSX.Element {
-   const { id, label, type, icon, placeholder, className, min, autoFocus, autoComplete, onChange, onSubmit, required, input, dispatch } = props;
+   const { id, label, type, icon, placeholder, className, min, autoFocus, scrollIntoView, autoComplete, onChange, onSubmit, required, input, dispatch } = props;
    const inputType = input.data.type ?? type;
    const inputRef = useRef<HTMLInputElement>(null);
    const passwordButton = useRef<SVGSVGElement | null>(null);
 
    useEffect(() => {
-      if (inputRef.current && autoFocus) {
-         inputRef.current.focus();
-      }
+      autoFocus && inputRef.current?.focus();
+      scrollIntoView && inputRef.current?.scrollIntoView({ behavior: "instant", block: "center" });
    }, [
       autoFocus,
+      scrollIntoView,
       input.error
    ]);
 
@@ -159,7 +160,7 @@ export default function Input(props: VitalityInputProps): JSX.Element {
             {icon && <FontAwesomeIcon icon = {icon} />} {label}
          </label>
          {input.error !== null &&
-            <div className = "flex justify-center align-center text-center max-w-[90%] mx-auto gap-2 mt-2 opacity-0 animate-fadeIn">
+            <div className = "flex justify-center align-center text-center max-w-[90%] mx-auto gap-2 my-3 opacity-0 animate-fadeIn">
                <p className = "text-red-500 font-bold input-error"> {input.error.trim()} </p>
             </div>
          }

@@ -5,11 +5,11 @@ import { VitalityResponse } from "@/lib/global/response";
 export interface VitalityInputState {
   value: any;
   error: string | null;
-  data: { [key: string]: any };
+  data: Record<string, any>;
   handlesOnChange?: boolean;
 }
 
-export type VitalityState = { [key: string]: VitalityInputState };
+export type VitalityState = Record<string, VitalityInputState>;
 export type VitalityUpdateState = { id: string; input: VitalityInputState };
 
 export interface VitalityProps {
@@ -22,12 +22,10 @@ export interface VitalityChildProps extends VitalityProps {
   localDispatch: Dispatch<VitalityAction<any>>;
 }
 
-export interface VitalityResetState {
-  [key: string]: {
-    value: any;
-    data: { [key: string]: any };
-  };
-}
+export type VitalityResetState = Record<string, {
+   value: any;
+   data: { [key: string]: any };
+}>
 
 export interface VitalityAction<T> {
   type:
@@ -92,8 +90,6 @@ export function formReducer(
             }
 
             break;
-         default:
-            return state;
       }
    });
 }
