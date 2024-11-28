@@ -1,5 +1,6 @@
 import { expect } from "@jest/globals";
 import { prismaMock } from "@/tests/singleton";
+import { MOCK_ID } from "@/tests/shared";
 import { workouts } from "@/tests/home/workouts/data";
 import { Workout } from "@/lib/home/workouts/workouts";
 import { addExercise, Exercise, ExerciseSet, getExercisesUpdates, getExerciseSetUpdates, updateExercise, updateExercises } from "@/lib/home/workouts/exercises";
@@ -21,71 +22,6 @@ let exercise: Exercise;
 let exercisesByIds: { [id: string]: Exercise };
 let workoutsByIds: { [id: string]: Workout };
 
-// Utility functions to handle database methods in mock implementations
-const handleExercisesDatabaseMethods = async(params, method) => {
-   let newExercise: Exercise;
-
-   if (method === "update") {
-      newExercise = {
-         ...exercisesByIds[params.where.id],
-         ...params.data
-      };
-
-      if (params.data.sets) {
-         // Account for adding, removing, and updating mock exercise set entries
-         newExercise.sets = [
-            ...params.data.sets.updateMany.map((update) => ({
-               ...update.data,
-               exercise_id: params.where.id
-            })),
-            ...params.data.sets.createMany.data.map((create, index) => ({
-               ...create,
-               id: `Mock-ID-${index}`,
-               exercise_id: params.where.id
-            }))
-         ];
-      }
-   } else {
-      newExercise = {
-         ...params.data,
-         id: "Mock-ID",
-         sets: []
-      };
-   }
-
-   exercisesByIds[newExercise.id] = newExercise;
-
-   return newExercise;
-};
-
-const handleWorkoutsDatabaseMethods = async(params) => {
-   const updating = params.data.exercises.updateMany;
-
-   const newWorkout: Workout = {
-      ...workoutsByIds[params.where.id as string],
-      exercises: updating.map((update) => {
-         const newExercise = {
-            ...exercisesByIds[update.where.id],
-            exercise_order: update.data.exercise_order
-         };
-
-         exercisesByIds[update.where.id as string] = newExercise;
-
-         return newExercise;
-      })
-   };
-
-   const removing = params.data.exercises.deleteMany.id.in;
-
-   for (const exerciseID of removing) {
-      delete exercisesByIds[exerciseID];
-   }
-
-   workoutsByIds[newWorkout.id] = newWorkout;
-
-   return newWorkout;
-};
-
 describe("Workout Exercises Service", () => {
    // Helper function to simulate database error situations
    const simulateDatabaseError = (table: string, method: string) => {
@@ -94,7 +30,7 @@ describe("Workout Exercises Service", () => {
    };
 
    // Helper function to handle validation errors for create/update/delete exercise methods
-   const handleExerciseValidationErrors = async(method: "create" | "update") => {
+   const handleExerciseFieldErrors = async(method: "create" | "update") => {
       const invalidExercises = [
          {
             exercise: {
@@ -133,7 +69,7 @@ describe("Workout Exercises Service", () => {
                exercise_order: method === "create" ? 3 : 0,
                sets: [
                   {
-                     id: "Invalid-ID",
+                     id: `${MOCK_ID}$`,
                      exercise_id: "",
                      set_order: -1
                   }
@@ -145,7 +81,7 @@ describe("Workout Exercises Service", () => {
                exercise_id: ["ID for exercise must be in UUID format"]
             },
             message: method === "create" ?
-               "Exercise sets must be empty" : "Invalid exercise set fields for set with ID `Invalid-ID`"
+               "Exercise sets must be empty" : `Invalid exercise set fields for set with ID \`${MOCK_ID}$\``
          },
          {
             exercise: {
@@ -176,7 +112,7 @@ describe("Workout Exercises Service", () => {
       for (const { exercise, errors, message } of invalidExercises) {
          expect(
             method === "create" ?
-               await addExercise(exercise as Exercise) : await updateExercise(exercise, "sets")
+               await addExercise(exercise) : await updateExercise(exercise, "sets")
          ).toEqual({
             status: "Error",
             body: {
@@ -190,7 +126,7 @@ describe("Workout Exercises Service", () => {
       expect(prismaMock.exercises[method]).not.toHaveBeenCalled();
    };
 
-   const handleExerciseDatabaseIntegrityErrors = async(method: "create" | "update") => {
+   const handleExerciseDatabaseErrors = async(method: "create" | "update") => {
       const invalidExercises = [
          {
             exercise: {
@@ -232,7 +168,7 @@ describe("Workout Exercises Service", () => {
       for (const { exercise, expected } of invalidExercises) {
          expect(
             method === "create" ?
-               await addExercise(exercise as Exercise) : await updateExercise(exercise, "sets")
+               await addExercise(exercise) : await updateExercise(exercise, "sets")
          ).toEqual(expected);
       }
 
@@ -247,7 +183,7 @@ describe("Workout Exercises Service", () => {
 
       expect(
          method === "create" ?
-            await addExercise(exercise as Exercise) : await updateExercise(exercise, "sets")
+            await addExercise(exercise) : await updateExercise(exercise, "sets")
       ).toEqual({
          status: "Failure",
          body: {
@@ -257,6 +193,70 @@ describe("Workout Exercises Service", () => {
          }
       });
       expect(prismaMock.exercises[method]).toHaveBeenCalledTimes(1);
+   };
+
+   const handlePrismaMockExerciseMethods = async(params, method) => {
+      let newExercise: Exercise;
+
+      if (method === "update") {
+         newExercise = {
+            ...exercisesByIds[params.where.id],
+            ...params.data
+         };
+
+         if (params.data.sets) {
+            // Account for adding, removing, and updating mock exercise set entries
+            newExercise.sets = [
+               ...params.data.sets.updateMany.map((update) => ({
+                  ...update.data,
+                  exercise_id: params.where.id
+               })),
+               ...params.data.sets.createMany.data.map((create, index) => ({
+                  ...create,
+                  id: `${MOCK_ID}${index}`,
+                  exercise_id: params.where.id
+               }))
+            ];
+         }
+      } else {
+         newExercise = {
+            ...params.data,
+            id: MOCK_ID,
+            sets: []
+         };
+      }
+
+      exercisesByIds[newExercise.id] = newExercise;
+
+      return newExercise;
+   };
+
+   const handlePrismaMockWorkoutMethods = async(params) => {
+      const updating = params.data.exercises.updateMany;
+
+      const newWorkout: Workout = {
+         ...workoutsByIds[params.where.id as string],
+         exercises: updating.map((update) => {
+            const newExercise = {
+               ...exercisesByIds[update.where.id],
+               exercise_order: update.data.exercise_order
+            };
+
+            exercisesByIds[update.where.id as string] = newExercise;
+
+            return newExercise;
+         })
+      };
+
+      const removing = params.data.exercises.deleteMany.id.in;
+
+      for (const exerciseID of removing) {
+         delete exercisesByIds[exerciseID];
+      }
+
+      workoutsByIds[newWorkout.id] = newWorkout;
+
+      return newWorkout;
    };
 
    beforeEach(() => {
@@ -280,23 +280,23 @@ describe("Workout Exercises Service", () => {
 
       // @ts-ignore
       prismaMock.workouts.update.mockImplementation(async(params) => {
-         return handleWorkoutsDatabaseMethods(params);
+         return handlePrismaMockWorkoutMethods(params);
       });
 
       // @ts-ignore
       ["create", "update"].forEach((method) => {
          prismaMock.exercises[method].mockImplementation(async(params) => {
-            return handleExercisesDatabaseMethods(params, method);
+            return handlePrismaMockExerciseMethods(params, method);
          });
       });
    });
 
    test("Add exercise with field errors", async() => {
-      await handleExerciseValidationErrors("create");
+      await handleExerciseFieldErrors("create");
    });
 
    test("Add exercise with database integrity errors", async() => {
-      await handleExerciseDatabaseIntegrityErrors("create");
+      await handleExerciseDatabaseErrors("create");
    });
 
    test("Add exercise", async() => {
@@ -314,7 +314,7 @@ describe("Workout Exercises Service", () => {
          body: {
             data: {
                ...exercise,
-               id: "Mock-ID"
+               id: MOCK_ID
             },
             message: "Successfully added new exercise",
             errors: {}
@@ -349,11 +349,11 @@ describe("Workout Exercises Service", () => {
    });
 
    test("Update exercise with field errors", async() => {
-      await handleExerciseValidationErrors("update");
+      await handleExerciseFieldErrors("update");
    });
 
    test("Update exercise with database integrity errors", async() => {
-      await handleExerciseDatabaseIntegrityErrors("update");
+      await handleExerciseDatabaseErrors("update");
    });
 
    test("Update exercise", async() => {
@@ -434,11 +434,11 @@ describe("Workout Exercises Service", () => {
             exercise.sets[1],
             {
                ...newExerciseSets[0],
-               id: "Mock-ID-0"
+               id: `${MOCK_ID}${0}`,
             },
             {
                ...newExerciseSets[1],
-               id: "Mock-ID-1"
+               id: `${MOCK_ID}${1}`
             }
          ]
       };

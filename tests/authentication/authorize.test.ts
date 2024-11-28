@@ -33,7 +33,7 @@ describe("User Authorization Service", () => {
          });
       });
 
-      test("Handle database errors while fetching user", async() => {
+      test("Handles database errors while fetching user", async() => {
          prismaMock.users.findFirst.mockRejectedValueOnce(
             new Error("Database connection error")
          );
@@ -41,7 +41,7 @@ describe("User Authorization Service", () => {
       });
    });
 
-   describe("Authorization", () => {
+   describe("Authorize user", () => {
       beforeEach(() => {
          jest.spyOn(bcrypt, "compare");
       });
@@ -76,7 +76,7 @@ describe("User Authorization Service", () => {
          expect(bcrypt.compare).toHaveBeenCalledWith(root.password, root.password);
       });
 
-      test("Handle database errors while authorizing user", async() => {
+      test("Handles database errors while authorizing user", async() => {
          prismaMock.users.findFirst.mockRejectedValueOnce(
             new Error("Database connection error")
          );

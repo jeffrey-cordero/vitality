@@ -1,105 +1,19 @@
 import { expect } from "@jest/globals";
 import { root } from "@/tests/authentication/data";
 import { prismaMock } from "@/tests/singleton";
+import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { tags, workouts } from "@/tests/home/workouts/data";
 import { formatWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
 import { addWorkout, deleteWorkouts, fetchWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
 
-// Constant for valid workout
 const MOCK_WORKOUT = workouts[0];
 
-// Mocked data structures
 let workout: Workout;
 let workoutsById: Record<string, Workout>;
 
-// Utility function to handle database methods in mock implementations
-const handleDatabaseMethods = async(params, method) => {
-   const isInvalidUser = method === "create" ?
-      params.data.user_id !== root.id : params.where.user_id !== root.id;
-
-   if (isInvalidUser) {
-      throw new PrismaClientKnownRequestError("Foreign key constraint violated", {
-         code: "P2003",
-         clientVersion: "5.22.0"
-      });
-   }
-
-   if (method === "deleteMany") {
-      const ids = params.where.id.in.filter(
-         (id: string) => workoutsById[id] !== undefined
-      );
-
-      ids.forEach((id: string) => delete workoutsById[id]);
-
-      return { count: ids.length };
-   }
-
-   const newWorkout = {
-      ...params.data,
-      workout_applied_tags: [],
-      id: method === "create" ? "Mock-ID" : params.where.id,
-      user_id: method === "create" ? params.data.user_id : params.where.user_id
-   };
-
-   if (method === "create") {
-      // Mock application of new workout tags
-      newWorkout.workout_applied_tags = params.data.workout_applied_tags.create.map(
-         (tag: { tag_id: string }) => ({
-            workout_id: "Mock-ID",
-            tag_id: tag.tag_id
-         })
-      );
-   } else {
-      delete workoutsById[params.data.id];
-
-      if (method === "update") {
-         // Mock createMany and deleteMany workout tags methods
-         const existingWorkout = workoutsById[params.where.id];
-
-         const creatingTags = new Set(
-            params.data.workout_applied_tags?.createMany.data.map(
-               (tag: { tag_id: string }) => tag.tag_id
-            )
-         );
-
-         const removingTags = new Set(
-            params.data.workout_applied_tags?.deleteMany.tag_id.in
-         );
-
-         const existingTags = existingWorkout.tagIds.filter(
-            (id: string) => !creatingTags.has(id) && !removingTags.has(id)
-         );
-
-         newWorkout.workout_applied_tags = [
-            ...Array.from(existingTags).map((id: string) => ({
-               workout_id: params.where.id,
-               tag_id: id
-            })),
-            ...Array.from(creatingTags).map((id: string) => ({
-               workout_id: params.where.id,
-               tag_id: id
-            }))
-         ];
-      }
-   }
-
-   if (method !== "delete") {
-      workoutsById[newWorkout.id] = newWorkout;
-   }
-
-   return newWorkout;
-};
-
 describe("Workout Tracking Service", () => {
-   // Helper function to simulate database error situations
-   const simulateDatabaseError = (method: string) => {
-      // @ts-ignore
-      prismaMock.workouts[method].mockRejectedValue(new Error("Database Error"));
-   };
-
-   // Helper function to handle validation errors for create/update/delete workout methods
-   const handleValidationErrors = async(method: "create" | "update") => {
+   const handleFieldErrors = async(method: "create" | "update") => {
       const invalidWorkouts = [
          {
             workout: {
@@ -123,7 +37,7 @@ describe("Workout Tracking Service", () => {
             workout: {
                ...MOCK_WORKOUT,
                user_id: root.id,
-               id: "Invalid-ID",
+               id: `${MOCK_ID}$`,
                title: "a".repeat(51),
                date: undefined,
                image: "/invalid/image.jpg"
@@ -141,7 +55,7 @@ describe("Workout Tracking Service", () => {
       for (const { workout, errors } of invalidWorkouts) {
          expect(
             method === "create" ?
-               await addWorkout(workout as Workout) : await updateWorkout(workout as Workout)
+               await addWorkout(workout) : await updateWorkout(workout)
          ).toEqual({
             status: "Error",
             body: {
@@ -152,11 +66,11 @@ describe("Workout Tracking Service", () => {
          });
          expect(verifyImageURL(workout.image)).toBe(errors.image === undefined);
       }
-
+      
       expect(prismaMock.workouts[method]).not.toHaveBeenCalled();
    };
 
-   const handleDatabaseIntegrityErrors = async(method: "create" | "update") => {
+   const handleDatabaseErrors = async(method: "create" | "update") => {
       const invalidWorkouts = [
          {
             workout: {
@@ -183,29 +97,96 @@ describe("Workout Tracking Service", () => {
       for (const { workout, expected } of invalidWorkouts) {
          expect(
             method === "create"
-               ? await addWorkout(workout as Workout) : await updateWorkout(workout as Workout)
+               ? await addWorkout(workout) : await updateWorkout(workout)
          ).toEqual(expected);
       }
 
       // Simulate database error during mock database method
-      simulateDatabaseError(method);
-
       workout = {
          ...MOCK_WORKOUT,
          id: method === "create" ? "" : MOCK_WORKOUT.id
       };
 
-      expect(
-         method === "create"
-            ? await addWorkout(workout as Workout) : await updateWorkout(workout as Workout)
-      ).toEqual({
-         status: "Failure",
-         body: {
-            data: null,
-            message: "Something went wrong. Please try again.",
-            errors: { system: ["Database Error"] }
+      simulateDatabaseError("workouts", method, method === "create" ?
+         async () => addWorkout(workout) : async () =>  updateWorkout(workout)
+      );
+   };
+
+   const handlePrismaMockMethods = async(params, method) => {
+      const isInvalidUser = method === "create" ?
+         params.data.user_id !== root.id : params.where.user_id !== root.id;
+
+      if (isInvalidUser) {
+         throw new PrismaClientKnownRequestError("Foreign key constraint violated", {
+            code: "P2003",
+            clientVersion: "5.22.0"
+         });
+      }
+
+      if (method === "deleteMany") {
+         const ids = params.where.id.in.filter(
+            (id: string) => workoutsById[id] !== undefined
+         );
+
+         ids.forEach((id: string) => delete workoutsById[id]);
+
+         return { count: ids.length };
+      }
+
+      const newWorkout = {
+         ...params.data,
+         workout_applied_tags: [],
+         id: method === "create" ? MOCK_ID : params.where.id,
+         user_id: method === "create" ? params.data.user_id : params.where.user_id
+      };
+
+      if (method === "create") {
+         // Mock application of new workout tags
+         newWorkout.workout_applied_tags = params.data.workout_applied_tags.create.map(
+            (tag: { tag_id: string }) => ({
+               workout_id: MOCK_ID,
+               tag_id: tag.tag_id
+            })
+         );
+      } else {
+         delete workoutsById[params.data.id];
+
+         if (method === "update") {
+            // Mock createMany and deleteMany workout tags methods
+            const existingWorkout = workoutsById[params.where.id];
+
+            const creatingTags = new Set(
+               params.data.workout_applied_tags?.createMany.data.map(
+                  (tag: { tag_id: string }) => tag.tag_id
+               )
+            );
+
+            const removingTags = new Set(
+               params.data.workout_applied_tags?.deleteMany.tag_id.in
+            );
+
+            const existingTags = existingWorkout.tagIds.filter(
+               (id: string) => !creatingTags.has(id) && !removingTags.has(id)
+            );
+
+            newWorkout.workout_applied_tags = [
+               ...Array.from(existingTags).map((id: string) => ({
+                  workout_id: params.where.id,
+                  tag_id: id
+               })),
+               ...Array.from(creatingTags).map((id: string) => ({
+                  workout_id: params.where.id,
+                  tag_id: id
+               }))
+            ];
          }
-      });
+      }
+
+      if (method !== "delete") {
+         workoutsById[newWorkout.id] = newWorkout;
+      }
+
+      return newWorkout;
    };
 
    beforeEach(() => {
@@ -226,7 +207,7 @@ describe("Workout Tracking Service", () => {
       // @ts-ignore
       ["create", "update", "delete", "deleteMany"].forEach((method) => {
          prismaMock.workouts[method].mockImplementation(async(params) => {
-            return handleDatabaseMethods(params, method);
+            return handlePrismaMockMethods(params, method);
          });
       });
    });
@@ -287,18 +268,21 @@ describe("Workout Tracking Service", () => {
          }
       });
 
-      simulateDatabaseError("findMany");
+      // @ts-ignore
+      prismaMock.workouts.findMany.mockRejectedValue(
+         new Error("Database Error")
+      );
 
       expect(await fetchWorkouts(root.id)).toEqual([]);
       expect(await fetchWorkouts("Another-Missing-User-ID")).toEqual([]);
    });
 
    test("Create workout with field errors", async() => {
-      await handleValidationErrors("create");
+      await handleFieldErrors("create");
    });
 
    test("Create workout with database integrity errors", async() => {
-      await handleDatabaseIntegrityErrors("create");
+      await handleDatabaseErrors("create");
    });
 
    test("Create workout", async() => {
@@ -318,15 +302,15 @@ describe("Workout Tracking Service", () => {
          body: {
             data: formatWorkout({
                ...workout,
-               id: "Mock-ID",
+               id: MOCK_ID,
                workout_applied_tags: [
                   {
                      tag_id: tags[0].id,
-                     workout_id: "Mock-ID"
+                     workout_id: MOCK_ID
                   },
                   {
                      tag_id: tags[1].id,
-                     workout_id: "Mock-ID"
+                     workout_id: MOCK_ID
                   }
                ]
             }),
@@ -359,7 +343,7 @@ describe("Workout Tracking Service", () => {
    });
 
    test("Update workout with field errors", async() => {
-      await handleValidationErrors("update");
+      await handleFieldErrors("update");
    });
 
    test("Delete workouts with field errors", async() => {
@@ -399,7 +383,7 @@ describe("Workout Tracking Service", () => {
    });
 
    test("Update workout with database integrity errors", async() => {
-      await handleDatabaseIntegrityErrors("update");
+      await handleDatabaseErrors("update");
    });
 
    test("Delete workouts with database integrity errors", async() => {
@@ -442,8 +426,8 @@ describe("Workout Tracking Service", () => {
          status: "Success",
          body: {
             data: {
-               id: "dd29ecb7-a142-4f15-b828-6379cf4a8815",
-               user_id: "550e8400-e29b-41d4-a716-446655440000",
+               id: workout.id,
+               user_id: root.id,
                title: "Title",
                date: new Date("2024-11-20T13:16:23.400Z"),
                description: "",
@@ -486,17 +470,7 @@ describe("Workout Tracking Service", () => {
          }
       });
 
-      simulateDatabaseError("update");
-
-      expect(await updateWorkout(workout)).toEqual({
-         status: "Failure",
-         body: {
-            data: null,
-            message: "Something went wrong. Please try again.",
-            errors: { system: ["Database Error"] }
-         }
-      });
-      expect(prismaMock.workouts.update).toHaveBeenCalledTimes(2);
+      simulateDatabaseError("workouts", "update", async () => updateWorkout(workout));
    });
 
    test("Delete workouts", async() => {
@@ -547,17 +521,6 @@ describe("Workout Tracking Service", () => {
          }
       });
 
-      simulateDatabaseError("deleteMany");
-
-      expect(await deleteWorkouts([], workout.user_id)).toEqual({
-         status: "Failure",
-         body: {
-            data: null,
-            message: "Something went wrong. Please try again.",
-            errors: { system: ["Database Error"] }
-         }
-      });
-
-      expect(prismaMock.workouts.deleteMany).toHaveBeenCalledTimes(4);
+      simulateDatabaseError("workouts", "deleteMany", async ()=> deleteWorkouts([], workout.user_id))
    });
 });
