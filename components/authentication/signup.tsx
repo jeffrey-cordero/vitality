@@ -111,7 +111,7 @@ function Form(): JSX.Element {
    };
 
    return (
-      <div className = "w-10/12 lg:w-1/2 mx-auto mt-4">
+      <div className = "w-10/12 lg:w-1/2 mx-auto mt-6">
          <form
             className = "relative w-full mx-auto flex flex-col justify-center align-center gap-3"
             onSubmit = {handleSubmit}>
@@ -217,7 +217,7 @@ function Form(): JSX.Element {
 
 export default function SignUpForm(): JSX.Element {
    return (
-      <div className = "w-full mx-auto mt-8 flex flex-col items-center justify-center text-center">
+      <div className = "w-full mx-auto mt-6 flex flex-col items-center justify-center text-center">
          <Heading
             title = "Sign Up"
             description = "Create an account to get started"

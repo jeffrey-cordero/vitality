@@ -61,7 +61,7 @@ function Card(props: CardProps): JSX.Element {
                }
             });
          }}
-         className = "relative cursor-pointer flex flex-col justify-center items-center gap-2 w-full sm:w-[16rem] h-[26rem] sm:h-[22rem] mx-auto sm:m-2 rounded-2xl overflow-hidden shadow-lg bg-white hover:scale-[1.02] transition duration-300 ease-in-out">
+         className = "relative cursor-pointer flex flex-col justify-center items-center gap-2 w-full sm:w-[16rem] h-[26rem] sm:h-[22rem] mx-auto sm:m-2 rounded-2xl overflow-hidden shadow-md bg-white hover:scale-[1.02] transition duration-300 ease-in-out">
          <div className = "relative w-full h-full mx-auto">
             {workout.image ? (
                <Image

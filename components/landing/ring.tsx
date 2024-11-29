@@ -42,9 +42,9 @@ function Counter(props: CounterProps): JSX.Element {
 
 export default function Ring(): JSX.Element {
    return (
-      <div className = "relative h-full w-full my-[4rem]">
+      <div className = "relative h-full w-full my-10">
          <motion.svg
-            className = "absolute inset-0 m-auto w-[80px] md:w-[100px] h-[80px] md:h-[100px]"
+            className = "absolute inset-0 m-auto w-[80px] xsm:w-[85px] h-[80px] xsm:h-[85px] "
             viewBox = "0 0 100 100">
             <motion.circle
                initial = {{ pathLength: 0 }}
@@ -67,7 +67,7 @@ export default function Ring(): JSX.Element {
             value = {100}
             start = {0}
             duration = {3500}
-            className = "relative inset-0 mx-auto flex items-center justify-center font-display text-2xl sm:text-3xl text-green-500"
+            className = "relative inset-0 mx-auto flex items-center justify-center font-display text-2xl text-green-500"
          />
       </div>
    );

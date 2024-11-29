@@ -2,9 +2,9 @@ import Heading from "@/components/global/heading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import {
-   faPaintbrush,
-   faCode,
-   faChartColumn
+   faHeartCircleBolt,
+   faFlask,
+   faCodeCompare
 } from "@fortawesome/free-solid-svg-icons";
 
 interface CardProps {
@@ -17,19 +17,19 @@ function Card(props: CardProps): JSX.Element {
    const { icon, title, description } = props;
 
    return (
-      <div className = "flex justify-center w-[20rem] h-[25rem] max-w-[90%] text-center rounded-2xl border border-gray-200 bg-white shadow-md">
-         <div className = "w-full mx-auto flex flex-col text-center justify-center items-center gap-8 px-6 text-black">
+      <div className = "flex justify-center items-center w-[17rem] h-[24rem] mx-2 sm:mx-8 text-center rounded-2xl border border-gray-200 bg-white shadow-md hover:scale-[1.05] transition duration-300 ease-in-out cursor-move">
+         <div className = "w-full mx-auto flex flex-col text-center justify-center items-center gap-4 px-6 text-black">
             <div>
                <FontAwesomeIcon
                   icon = {icon}
-                  className = "text-4xl text-primary"
+                  className = "text-5xl text-primary"
                />
-               <h1 className = "font-bold text-2xl md:text-3xl text-primary mt-8">
+               <h1 className = "font-bold text-2xl text-primary mt-8 whitespace-nowrap">
                   {title}
                </h1>
             </div>
             <div>
-               <p className = "text-sm md:text-md font-medium text-slate-500">
+               <p className = "text-md font-medium text-slate-500 px-1">
                   {description}
                </p>
             </div>
@@ -40,26 +40,26 @@ function Card(props: CardProps): JSX.Element {
 
 export default function Highlights(): JSX.Element {
    return (
-      <div className = "w-full mx-auto mt-8">
+      <div className = "w-full mx-auto">
          <Heading
             title = "Optimized Fitness Tracking"
-            description = "We've developed a cutting-edge fitness tracker that empowers users to effortlessly monitor their progress, set goals, and achieve optimal fitness levels"
+            description = "Our cutting-edge fitness tracker empowers you to effortlessly track progress, set goals, and reach peak fitness"
          />
-         <div className = "relative w-full mx-auto flex flex-row flex-wrap justify-center align-center gap-8">
+         <div className = "relative container mx-auto flex flex-row flex-wrap justify-center align-center gap-8 p-2 py-6">
             <Card
-               icon = {faPaintbrush}
+               icon = {faFlask}
                title = "Modern Design"
-               description = "Carefully crafted a precise design, with harmonious typography and perfect padding around every component"
+               description = "Designed with precision, balanced typography, and perfectly spaced components."
             />
             <Card
-               icon = {faCode}
+               icon = {faCodeCompare}
                title = "Efficiency"
-               description = "Achieve your goals efficiently and effectively with data-driven insights and a multitude of analytic tools right at your fingertips."
+               description = "Achieve your goals with ease using data-driven insights and powerful analytic tools."
             />
             <Card
-               icon = {faChartColumn}
+               icon = {faHeartCircleBolt}
                title = "Diversity"
-               description = "A diverse range of fitness trackers tailored to suit every lifestyle and fitness goal. We’ve got your fitness journey covered"
+               description = "Explore a diverse range of fitness trackers designed for every lifestyle and goal."
             />
          </div>
       </div>

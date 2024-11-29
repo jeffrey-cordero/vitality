@@ -9,6 +9,7 @@ import {
 
 export default function Footer(): JSX.Element {
    const year = new Date().getFullYear();
+
    return (
       <footer className = "w-full">
          <div className = "w-full mx-auto max-w-screen-xl">
@@ -19,28 +20,28 @@ export default function Footer(): JSX.Element {
                         <Link
                            className = "hover:text-slate-500"
                            href = "http://localhost/#">
-                  About
+                           About
                         </Link>
                      </li>
                      <li>
                         <Link
                            className = "hover:text-slate-500"
                            href = "http://localhost/#">
-                  Privacy
+                           Privacy
                         </Link>
                      </li>
                      <li>
                         <Link
                            className = "hover:text-slate-500"
                            href = "http://localhost/#">
-                  Policy
+                           Policy
                         </Link>
                      </li>
                      <li>
                         <Link
                            className = "hover:text-slate-500"
                            href = "http://localhost/#">
-                  Contact
+                           Contact
                         </Link>
                      </li>
                   </ul>
@@ -96,8 +97,7 @@ export default function Footer(): JSX.Element {
             </div>
             <div className = "text-center m-4">
                <span className = "text-sm text-black sm:text-center font-bold">
-            © {year} <Link href = "http://localhost">Vitality™</Link>. All
-            Rights Reserved.
+                  © {year} <Link href = "http://localhost">Vitality™</Link>. All Rights Reserved.
                </span>
             </div>
          </div>

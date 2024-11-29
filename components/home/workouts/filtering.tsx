@@ -282,7 +282,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "bg-gray-200 text-black font-semibold w-full h-[2.4rem] text-sm">
+               className = "bg-gray-200 text-black font-semibold w-full h-[2.5rem] text-sm">
                <FontAwesomeIcon
                   icon = {faCalendar}
                   className = "text-sm"
@@ -349,7 +349,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                )}
                <Button
                   type = "button"
-                  className = "bg-primary text-white font-bold w-full h-[2.4rem] text-sm mt-3"
+                  className = "bg-primary text-white font-bold w-full h-[2.5rem] text-sm mt-3"
                   icon = {faMagnifyingGlass}
                   onClick = {handleApplyFilterClick}>
                   Apply

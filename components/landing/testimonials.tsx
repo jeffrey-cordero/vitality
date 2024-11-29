@@ -19,16 +19,16 @@ function Testimonial(props: TestimonialProps): JSX.Element {
    const { testimonial, name, stars, image } = props;
 
    return (
-      <div className = "flex flex-col box-border gap-1 justify-center align-center w-full min-h-[25rem] max-h-full mx-auto">
+      <div className = "flex flex-col box-border gap-1 justify-center align-center w-full h-[30rem] sm:h-[23rem] max-h-full mx-auto py-4">
          <FontAwesomeIcon
             icon = {faQuoteLeft}
-            className = "text-4xl text-primary"
+            className = "text-3xl text-primary"
          />
-         <p className = "font-semibold text-md w-3/4 mx-auto my-4">
+         <p className = "font-medium text-md w-3/4 px-2 mx-auto mt-3">
             {testimonial}
          </p>
          <div>
-            <div className = "flex flex-row flex-wrap gap-3 justify-center items-center w-full mx-auto p-5">
+            <div className = "flex flex-col sm:flex-row gap-3 justify-center items-center w-full mx-auto px-4 pt-4">
                <Image
                   priority
                   width = {200}
@@ -39,13 +39,13 @@ function Testimonial(props: TestimonialProps): JSX.Element {
                   alt = "Rounded avatar"
                />
                <div>
-                  <p className = "font-semibold text-md">{name}</p>
+                  <p className = "font-semibold">{name}</p>
                   {stars.map((rating, index) => {
                      return (
                         <FontAwesomeIcon
                            key = {index}
                            icon = {faStar}
-                           className = {clsx("text-lg my-2", {
+                           className = {clsx("text-md sm:text-sm my-2", {
                               "text-yellow-500": rating,
                               "text-slate-500": !rating
                            })}
@@ -70,12 +70,12 @@ export default function Testimonials(): JSX.Element {
    });
 
    return (
-      <div className = "w-full mx-auto mt-4 mb-12">
+      <div className = "w-full mx-auto mb-20">
          <Heading
             title = "Testimonials"
-            description = "Discover the firsthand experiences of our valued users as they share insights into their fitness journey with our app"
+            description = "Explore firsthand stories from our users, sharing their fitness journeys with our app"
          />
-         <div className = "w-10/12 md:w-8/12 mx-auto">
+         <div className = "w-10/12 sm:w-7/12 mx-auto mt-6">
             <Carousel
                items = {testimonialElements}
                columns = {1}

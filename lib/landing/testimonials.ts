@@ -1,43 +1,43 @@
 const testimonialData = [
    {
       testimonial:
-      "This app has revolutionized the way I approach my fitness routine. Its seamless interface and user-friendly design make tracking workouts, steps, and calories a simple and enjoyable task. With just a few taps, I can access all the data I need to stay on track towards my fitness goals.",
-      name: "Micheal Wong",
+      "This app has transformed my fitness routine. Its intuitive interface makes tracking workouts, steps, and calories quick and easy, helping me stay on track with my goals.",
+      name: "Micheal",
       stars: [1, 1, 1, 1, 1],
       image: "/landing/testimonial-one.jpg"
    },
    {
       testimonial:
-      "I've tried numerous fitness apps in the past, but none compare to the user-friendly experience and comprehensive features of this one. From tracking my daily steps to monitoring my heart rate during workouts, this app covers all the bases.",
-      name: "Avril Song",
+      "I've tried many fitness apps, but none match the user-friendly experience and features of this one. From tracking steps to monitoring heart rate during workouts, it covers everything.",
+      name: "Avril",
       stars: [1, 1, 1, 1, 1],
       image: "/landing/testimonial-two.jpg"
    },
    {
       testimonial:
-      "I've always struggled with maintaining a consistent fitness routine, but this app has completely changed the game for me. Its intuitive features and motivational reminders keep me accountable and motivated to reach my fitness goals.",
-      name: "Emily Johnson",
+      "I've struggled with consistency in my fitness routine, but this app has changed that. Its intuitive features and motivational reminders keep me accountable and focused on my goals.",
+      name: "Emily",
       stars: [1, 1, 1, 1, 1],
       image: "/landing/testimonial-three.jpg"
    },
    {
       testimonial:
-      "As a busy professional, finding time for fitness can be challenging. However, this app has made it incredibly convenient for me to stay active throughout the day. Its seamless integration with my smart devices allows me to effortlessly track my activity levels and make healthier choices.",
-      name: "John Smith",
+      "As a busy professional, finding time for fitness is tough, but this app makes it easy to stay active and track my activity through smart device integration.",
+      name: "John",
       stars: [1, 1, 1, 1, 1],
       image: "/landing/testimonial-four.jpg"
    },
    {
       testimonial:
-      "Being a fitness enthusiast, I've tried my fair share of workout apps, but none have impressed me as much as this one. Its comprehensive exercise library caters to all fitness levels, and the customizable workout plans have helped me push my limits and achieve results beyond my expectations.",
-      name: "Sophia Martinez",
+      "As a fitness enthusiast, I've tried many workout apps, but this one stands out. Its extensive exercise library and customizable workout plans have helped me push my limits.",
+      name: "Sophia",
       stars: [1, 1, 1, 1, 1],
       image: "/landing/testimonial-five.jpg"
    },
    {
       testimonial:
-      "This app has become my go-to fitness companion for its seamless integration with my daily routine. From tracking my nutrition intake to providing insightful analytics on my sleep patterns, it has empowered me to make informed decisions about my health and well-being.",
-      name: "Daniel Patel",
+      "This app has become my go-to fitness companion, seamlessly integrating into my daily routine. From tracking nutrition to providing insights on sleep patterns, it empowers my health.",
+      name: "Daniel",
       stars: [1, 1, 1, 1, 1],
       image: "/landing/testimonial-six.jpg"
    }

@@ -245,14 +245,14 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                   onClick = {handleImageURLReset}
                   className = "w-full px-4 py-2 mt-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
                   icon = {faTrashCan}>
-                  Remove Image
+                  Remove
                </Button>
                <Button
                   type = "button"
                   onClick = {handleImageURLUpdates}
                   className = "w-full bg-primary text-white mt-2 font-semibold h-[2.4rem] placeholder:text-transparent"
                   icon = {faPaperclip}>
-                  Add Image
+                  Add
                </Button>
             </div>
          )}

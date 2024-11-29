@@ -16,77 +16,69 @@ interface ServiceProps {
   title: string;
   background: string;
   color: string;
-  divider: string;
 }
 
 function Service(props: ServiceProps): JSX.Element {
-   const { icon, title, background, color, divider } = props;
+   const { icon, title, background, color } = props;
    return (
       <div
          className = {cx(
             background,
             color,
-            "flex flex-col align-center justify-center gap-1 w-[11rem] max-w-[90%] md:max-w-none h-[11rem] text-center rounded-2xl border border-gray-200 shadow-md p-4 mx-auto",
+            "flex flex-col align-center justify-center gap-2 max-w-[90%] w-[12rem] xsm:w-[10rem] h-[12rem] xsm:h-[10rem] text-center rounded-2xl border border-gray-200 shadow-md mx-auto hover:scale-[1.05] transition duration-300 ease-in-out cursor-move",
          )}>
          <FontAwesomeIcon
             icon = {icon}
-            className = {cx(color, "text-4xl")}
+            className = {cx(color, "text-5xl xsm:text-4xl")}
          />
-         <div className = {cx(divider, "w-1/2 mx-auto my-1")} />
-         <h1 className = "font-semibold text-2xl">{title}</h1>
+         <h1 className = "font-bold text-2xl xsm:text-xl">{title}</h1>
       </div>
    );
 }
 
 export default function Services(): JSX.Element {
    return (
-      <div className = "w-full mx-auto my-4">
+      <div className = "w-full lg:w-8/12 mx-auto">
          <Heading
             title = "Our Services"
-            description = "With a commitment to innovation, we're constantly exploring new avenues to enhance your wellness experience"
+            description = "Driven by innovation, we continually explore new ways to elevate your wellness journey"
          />
-         <div className = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 justify-center content-center gap-x-[60px] gap-y-[60px] md:gap-y-[60px] w-full md:w-8/12 sm:w-11/12 mx-auto py-4">
+         <div className = "relative grid grid-cols-1 xsm:grid-cols-2 lg:grid-cols-3 gap-y-[20px] xsm:gap-y-[40px] justify-center content-center container mx-auto py-6">
             <Service
                background = "bg-white"
                color = "text-primary"
                icon = {faPersonRunning}
                title = "Workouts"
-               divider = "bg-primary"
             />
             <Service
                background = "bg-primary"
                color = "text-white"
                icon = {faUtensils}
                title = "Nutrition"
-               divider = "bg-white"
             />
             <Service
                background = "bg-white"
                color = "text-primary"
                icon = {faWeightScale}
                title = "Weight"
-               divider = "bg-primary"
             />
             <Service
                background = "bg-primary"
                color = "text-white"
                icon = {faBottleWater}
                title = "Hydration"
-               divider = "bg-white"
             />
             <Service
                background = "bg-white"
                color = "text-primary"
                icon = {faBullseye}
                title = "Goals"
-               divider = "bg-primary"
             />
             <Service
                background = "bg-primary"
                color = "text-white"
                icon = {faBrain}
                title = "Mood"
-               divider = "bg-white"
             />
          </div>
       </div>

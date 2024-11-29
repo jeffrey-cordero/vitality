@@ -103,7 +103,7 @@ export function SideBar(): JSX.Element {
    return (
       <div>
          <div className = "absolute top-0 left-0 z-30">
-            <div className = "relative top-0 left-0 transform translate-x-[10px] translate-y-[20px] z-30">
+            <div className = "relative top-0 left-0 transform translate-x-[10px] translate-y-[15px] z-30">
                <FontAwesomeIcon
                   id = "sideBarButton"
                   icon = {visibleSideBar ? faAnglesRight : faBarsStaggered}

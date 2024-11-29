@@ -488,7 +488,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          </Modal>
          <Button
             type = "button"
-            className = "bg-primary text-white w-[10rem] h-[2.4rem] text-md px-4 py-5"
+            className = "bg-primary text-white w-[10.5rem] h-[2.8rem] text-md p-3"
             icon = {faPersonRunning}
             onClick = {() => {
                globalDispatch({
