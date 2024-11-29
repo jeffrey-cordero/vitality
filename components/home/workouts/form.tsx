@@ -7,39 +7,13 @@ import Conformation from "@/components/global/confirmation";
 import { Modal } from "@/components/global/modal";
 import { Tags } from "@/components/home/workouts/tags";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import {
-   VitalityProps,
-   VitalityState,
-   formReducer
-} from "@/lib/global/state";
+import { VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import {
-   addWorkout,
-   deleteWorkouts,
-   updateWorkout,
-   Workout
-} from "@/lib/home/workouts/workouts";
+import { addWorkout, deleteWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
 import { Tag } from "@/lib/home/workouts/tags";
-import {
-   faArrowRotateLeft,
-   faPersonRunning,
-   faSquarePlus,
-   faCloudArrowUp,
-   faSignature,
-   faCalendar,
-   faBook,
-   faLink
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faPersonRunning, faSquarePlus,   faCloudArrowUp, faSignature, faCalendar,   faBook, faLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-   useCallback,
-   useContext,
-   useEffect,
-   useMemo,
-   useReducer,
-   useRef,
-   useState
-} from "react";
+import { useCallback, useContext, useEffect, useMemo, useReducer,   useRef, useState } from "react";
 import { filterWorkout } from "@/components/home/workouts/filtering";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
 
@@ -234,7 +208,7 @@ export default function Form(props: VitalityProps): JSX.Element {
             updateNotification({
                status: "Success",
                message: "Deleted workout",
-               timer: 700
+               timer: 1000
             });
 
             formModalRef.current?.close();
@@ -242,7 +216,7 @@ export default function Form(props: VitalityProps): JSX.Element {
             updateNotification({
                status: "Success",
                message: isNewWorkout ? "Added Workout" : "Updated Workout",
-               timer: 700
+               timer: 1000
             });
          }
       };
@@ -408,9 +382,9 @@ export default function Form(props: VitalityProps): JSX.Element {
                <div className = "flex flex-col justify-center align-center text-center gap-2">
                   <FontAwesomeIcon
                      icon = {faPersonRunning}
-                     className = "text-6xl text-primary mt-6"
+                     className = "text-5xl sm:text-6xl text-primary mt-6"
                   />
-                  <h1 className = "text-3xl font-bold text-black mb-2">
+                  <h1 className = "text-2xl sm:text-3xl font-bold text-black mb-2">
                      {isNewWorkout ? "New" : "Edit"} Workout
                   </h1>
                </div>

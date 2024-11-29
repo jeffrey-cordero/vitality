@@ -25,7 +25,7 @@ export default function Carousel(props: CarouselProps): JSX.Element {
    };
 
    return (
-      <div className = "relative w-full mx-auto bg-white rounded-2xl p-2 sm:p-0 shadow-lg">
+      <div className = "relative w-full mx-auto bg-white rounded-2xl p-2 sm:p-0  shadow-md">
          <div
             className = "carousel-inner flex transition-[opacity,transform] ease-in-out duration-500"
             style = {{

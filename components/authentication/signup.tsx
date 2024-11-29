@@ -4,22 +4,9 @@ import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-   faArrowRotateLeft,
-   faDoorOpen,
-   faFeather,
-   faKey,
-   faEnvelope,
-   faPhone,
-   faUserSecret,
-   faCalendar,
-   faUserCheck
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faDoorOpen, faFeather, faKey, faEnvelope, faPhone, faUserSecret, faCalendar, faUserCheck } from "@fortawesome/free-solid-svg-icons";
 import { FormEvent, useContext, useReducer } from "react";
-import {
-   VitalityState,
-   formReducer
-} from "@/lib/global/state";
+import { VitalityState, formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { login } from "@/lib/authentication/login";
 import { signup, Registration } from "@/lib/authentication/signup";

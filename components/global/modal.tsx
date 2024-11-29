@@ -1,12 +1,5 @@
 import clsx from "clsx";
-import {
-   forwardRef,
-   useCallback,
-   useEffect,
-   useImperativeHandle,
-   useRef,
-   useState
-} from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
@@ -80,9 +73,7 @@ export const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                      // Close the active modal in the DOM through the escape key
                      const target = event.target as HTMLElement;
 
-                     if (
-                        event.key === "Escape" &&
-                target.classList.contains("modal")
+                     if (event.key === "Escape" && target.classList.contains("modal")
                      ) {
                         handleOnClose();
                      }

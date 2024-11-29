@@ -6,23 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname } from "next/navigation";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import {
-   faAnglesRight,
-   faPlaneArrival,
-   faUserPlus,
-   faDoorOpen,
-   faHouse,
-   faUtensils,
-   faBrain,
-   faHeartCircleBolt,
-   faBullseye,
-   faShuffle,
-   faPeopleGroup,
-   faHandshakeAngle,
-   faGears,
-   faBarsStaggered,
-   faDumbbell
-} from "@fortawesome/free-solid-svg-icons";
+import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faUtensils, faBrain, faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears, faBarsStaggered, faDumbbell } from "@fortawesome/free-solid-svg-icons";
 import { AuthenticationContext } from "@/app/layout";
 
 interface SideBarProps {

@@ -3,61 +3,16 @@ import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import TextArea from "@/components/global/textarea";
 import Conformation from "@/components/global/confirmation";
-import {
-   VitalityChildProps,
-   VitalityProps,
-   VitalityState,
-   formReducer
-} from "@/lib/global/state";
+import { VitalityChildProps, VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { Workout } from "@/lib/home/workouts/workouts";
-import {
-   faAlignJustify,
-   faArrowRotateLeft,
-   faArrowUp91,
-   faCloudArrowUp,
-   faDumbbell,
-   faPenRuler,
-   faPlus,
-   faRotateLeft,
-   faStopwatch,
-   faCaretRight,
-   faCaretDown,
-   faCircleNotch,
-   faPersonRunning
-} from "@fortawesome/free-solid-svg-icons";
-import {
-   useCallback,
-   useContext,
-   useEffect,
-   useReducer,
-   useState
-} from "react";
-import {
-   addExercise,
-   updateExercise,
-   Exercise,
-   ExerciseSet,
-   updateExercises
-} from "@/lib/home/workouts/exercises";
+import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCloudArrowUp, faDumbbell, faPenRuler, faPlus, faRotateLeft, faStopwatch, faCaretRight, faCaretDown, faCircleNotch,   faPersonRunning } from "@fortawesome/free-solid-svg-icons";
+import { useCallback, useContext, useEffect, useReducer, useState } from "react";
+import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises } from "@/lib/home/workouts/exercises";
 import { NotificationContext } from "@/app/layout";
 import { useDoubleTap } from "use-double-tap";
-import {
-   DndContext,
-   closestCenter,
-   KeyboardSensor,
-   PointerSensor,
-   useSensor,
-   useSensors,
-   TouchSensor
-} from "@dnd-kit/core";
-import {
-   arrayMove,
-   SortableContext,
-   sortableKeyboardCoordinates,
-   useSortable,
-   verticalListSortingStrategy
-} from "@dnd-kit/sortable";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, TouchSensor } from "@dnd-kit/core";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -291,6 +246,12 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
             saveExercises(newExercises);
             setEditSet(false);
             onBlur();
+
+            updateNotification({
+               status: "Success",
+               message: `${set === undefined ? "Added" : method === "update" ? "Updated" : "Deleted"} exercise set`,
+               timer: 1000
+            });
          };
 
          handleResponse(
@@ -536,7 +497,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                               className = "self-start pt-1 text-primary"
                               icon = {faAlignJustify}
                            />
-                           <p>{set.text}</p>
+                           <p className = "line-clamp-2">{set.text}</p>
                         </div>
                      )}
                   </div>
@@ -564,8 +525,10 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    const [isCollapsed, setIsCollapsed] = useState(() => {
       return !!localStorage.getItem(collapsedId);
    });
+   const editingExerciseId: string = localState.exerciseId.value;
    const editingExerciseSetId: string = localState.exerciseId.data.setId;
    const displayEditName = editName && editing && id === exercise.id;
+   const hideNewEntryButton = addSet && editingExerciseSetId === "" &&  editingExerciseId === exercise.id;
 
    useEffect(() => {
       // Save the collapsed state of a given exercise to localStorage
@@ -648,6 +611,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                const newExercises: Exercise[] = [...workout.exercises].map((e) =>
                   e.id !== exercise.id ? e : response.body.data as Exercise,
                );
+
                saveExercises(newExercises);
             };
 
@@ -678,6 +642,12 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
          setEditName(false);
          saveExercises(newExercises);
+
+         updateNotification({
+            status: "Success",
+            message: "Updated exercise name",
+            timer: 1000
+         });
       };
 
       handleResponse(localDispatch, response, successMethod, updateNotification);
@@ -903,18 +873,23 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      </ul>
                   </SortableContext>
                </DndContext>
-               <div className = "w-full mx-auto px-4 sm:px-8">
-                  <Button
-                     type = "button"
-                     className = "w-full bg-white text-black text-md px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
-                     icon = {faPersonRunning}
-                     onClick = {() => {
-                        handleReset("");
-                        setAddSet(true);
-                     }}>
-                     New Entry
-                  </Button>
-               </div>
+               {
+                  !hideNewEntryButton && (
+                     <div className = "w-full mx-auto px-4 sm:px-8">
+                        <Button
+                           type = "button"
+                           className = "w-full bg-white text-black text-md px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                           icon = {faPersonRunning}
+                           onClick = {() => {
+                              handleReset("");
+                              setAddSet(true);
+                           }}>
+                           New Entry
+                        </Button>
+                     </div>
+                  )
+               }
+
             </div>
          )}
       </li>

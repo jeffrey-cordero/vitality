@@ -6,13 +6,7 @@ import Footer from "@/components/global/footer";
 import Notification from "@/components/global/notification";
 import { sfPro, inter } from "@/app/fonts";
 import { SideBar } from "@/components/global/sidebar";
-import {
-   createContext,
-   SetStateAction,
-   useCallback,
-   useEffect,
-   useState
-} from "react";
+import { createContext, SetStateAction, useCallback, useEffect, useState } from "react";
 import { getServerSession } from "@/lib/authentication/session";
 import { NotificationProps } from "@/components/global/notification";
 import { User as NextAuthUser } from "next-auth";

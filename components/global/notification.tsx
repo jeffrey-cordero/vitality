@@ -2,11 +2,7 @@
 import React, { useRef } from "react";
 import clsx from "clsx";
 import { useContext } from "react";
-import {
-   faCircleCheck,
-   faTriangleExclamation,
-   faXmark
-} from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faTriangleExclamation, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NotificationContext } from "@/app/layout";
 
@@ -69,7 +65,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      </div>
                      <div className = "flex w-full items-center justify-between px-4 py-3">
                         <div>
-                           <div className = "my-2 flex flex-col gap-2 font-bold">
+                           <div className = "my-2 flex flex-col gap-2 font-bold pr-1">
                               <p>{message}</p>
                               {children}
                            </div>

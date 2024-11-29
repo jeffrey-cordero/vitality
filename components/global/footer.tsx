@@ -1,11 +1,6 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-   faGithub,
-   faYoutube,
-   faXTwitter,
-   faMeta
-} from "@fortawesome/free-brands-svg-icons";
+import { faGithub, faYoutube, faXTwitter, faMeta } from "@fortawesome/free-brands-svg-icons";
 
 export default function Footer(): JSX.Element {
    const year = new Date().getFullYear();

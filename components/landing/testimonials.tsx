@@ -19,7 +19,7 @@ function Testimonial(props: TestimonialProps): JSX.Element {
    const { testimonial, name, stars, image } = props;
 
    return (
-      <div className = "flex flex-col box-border gap-1 justify-center align-center w-full h-[30rem] sm:h-[23rem] max-h-full mx-auto py-4">
+      <div className = "relative flex flex-col box-border gap-1 justify-center align-center w-full min-h-[27rem] sm:min-h-[20rem] max-h-full mx-auto py-4">
          <FontAwesomeIcon
             icon = {faQuoteLeft}
             className = "text-3xl text-primary"
@@ -70,12 +70,12 @@ export default function Testimonials(): JSX.Element {
    });
 
    return (
-      <div className = "w-full mx-auto mb-20">
+      <div className = "w-full mx-auto">
          <Heading
             title = "Testimonials"
             description = "Explore firsthand stories from our users, sharing their fitness journeys with our app"
          />
-         <div className = "w-10/12 sm:w-7/12 mx-auto mt-6">
+         <div className = "w-10/12 sm:w-7/12 mx-auto py-6">
             <Carousel
                items = {testimonialElements}
                columns = {1}

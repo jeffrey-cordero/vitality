@@ -1,12 +1,7 @@
 "use server";
 import prisma from "@/lib/prisma/client";
 import { z } from "zod";
-import {
-   sendSuccessMessage,
-   sendErrorMessage,
-   sendFailureMessage,
-   VitalityResponse
-} from "@/lib/global/response";
+import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
 import { formatWorkout } from "@/lib/home/workouts/shared";
 import { uuidSchema } from "@/lib/global/zod";
 import { Workout } from "./workouts";
@@ -345,7 +340,7 @@ export async function getExerciseSetUpdates(
             creating: null,
             updating: null,
             removing: null,
-            error: "All exercise sets must be non-empty",
+            error: "All exercise sets must be valid and non-empty",
             errors: null
          };
       } else {

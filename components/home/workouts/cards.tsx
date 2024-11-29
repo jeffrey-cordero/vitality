@@ -61,7 +61,7 @@ function Card(props: CardProps): JSX.Element {
                }
             });
          }}
-         className = "relative cursor-pointer flex flex-col justify-center items-center gap-2 w-full sm:w-[16rem] h-[26rem] sm:h-[22rem] mx-auto sm:m-2 rounded-2xl overflow-hidden shadow-md bg-white hover:scale-[1.02] transition duration-300 ease-in-out">
+         className = "relative cursor-pointer flex flex-col justify-center items-center gap-2 w-full sm:w-[16rem] h-[26rem] sm:h-[22rem] mx-auto sm:m-2 rounded-2xl overflow-hidden shadow-md bg-white hover:scale-[1.05] transition duration-300 ease-in-out">
          <div className = "relative w-full h-full mx-auto">
             {workout.image ? (
                <Image
@@ -110,7 +110,7 @@ export default function Cards(props: CardsProps): JSX.Element {
 
    return (
       <div className = "relative w-full mx-auto">
-         <div className = "flex flex-row flex-wrap justify-center items-center gap-6 my-6">
+         <div className = "container mx-auto flex flex-row flex-wrap justify-center items-center gap-6 my-6">
             {workouts.map((workout: Workout) => (
                <Card
                   {...props}

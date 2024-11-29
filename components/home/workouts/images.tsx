@@ -4,13 +4,7 @@ import Button from "@/components/global/button";
 import Input, { VitalityInputProps } from "@/components/global/input";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal } from "@/components/global/modal";
-import {
-   faCameraRetro,
-   faGlobe,
-   faPaperclip,
-   faPenToSquare,
-   faTrashCan
-} from "@fortawesome/free-solid-svg-icons";
+import { faCameraRetro, faGlobe, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
 

@@ -2,14 +2,7 @@ import cx from "classnames";
 import Heading from "@/components/global/heading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import {
-   faPersonRunning,
-   faUtensils,
-   faBullseye,
-   faWeightScale,
-   faBottleWater,
-   faBrain
-} from "@fortawesome/free-solid-svg-icons";
+import { faPersonRunning, faUtensils, faBullseye, faWeightScale, faBottleWater, faBrain } from "@fortawesome/free-solid-svg-icons";
 
 interface ServiceProps {
   icon: IconProp;
@@ -25,13 +18,13 @@ function Service(props: ServiceProps): JSX.Element {
          className = {cx(
             background,
             color,
-            "flex flex-col align-center justify-center gap-2 max-w-[90%] w-[12rem] xsm:w-[10rem] h-[12rem] xsm:h-[10rem] text-center rounded-2xl border border-gray-200 shadow-md mx-auto hover:scale-[1.05] transition duration-300 ease-in-out cursor-move",
+            "flex flex-col align-center justify-center gap-2 max-w-[90%] w-[11rem] xsm:w-[10rem] h-[11rem] xsm:h-[10rem] text-center rounded-2xl border border-gray-200 shadow-md mx-auto hover:scale-[1.05] transition duration-300 ease-in-out",
          )}>
          <FontAwesomeIcon
             icon = {icon}
-            className = {cx(color, "text-5xl xsm:text-4xl")}
+            className = {cx(color, "text-4xl")}
          />
-         <h1 className = "font-bold text-2xl xsm:text-xl">{title}</h1>
+         <h1 className = "font-bold text-xl">{title}</h1>
       </div>
    );
 }

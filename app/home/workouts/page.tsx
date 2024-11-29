@@ -6,14 +6,7 @@ import Pagination from "@/components/home/workouts/pagination";
 import { AuthenticationContext } from "@/app/layout";
 import { fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
 import { fetchWorkoutTags } from "@/lib/home/workouts/tags";
-import {
-   useCallback,
-   useContext,
-   useEffect,
-   useMemo,
-   useReducer,
-   useState
-} from "react";
+import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
 
 const workouts: VitalityState = {
@@ -199,7 +192,7 @@ export default function Page(): JSX.Element {
    ]);
 
    return (
-      <main className = "relative w-full lg:w-11/12 mx-auto mt-8 flex flex-col justify-start items-center text-center">
+      <main className = "relative w-full lg:w-11/12 mx-auto flex flex-col justify-start items-center text-center mt-10 mb-20">
          <Filtering
             globalState = {globalState}
             globalDispatch = {globalDispatch}

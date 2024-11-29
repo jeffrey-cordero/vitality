@@ -5,11 +5,7 @@ import Cards from "@/components/home/workouts/cards";
 import Loading from "@/components/global/loading";
 import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/home/workouts/workouts";
-import {
-   faPersonRunning,
-   faPhotoFilm,
-   faTable
-} from "@fortawesome/free-solid-svg-icons";
+import { faPersonRunning, faPhotoFilm, faTable } from "@fortawesome/free-solid-svg-icons";
 import { Dispatch } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -51,7 +47,7 @@ export default function View(props: ViewProps): JSX.Element {
          </div>
          <div
             id = "workoutsView"
-            className = "w-11/12 xl:w-8/12 flex-grow flex flex-col justify-start items-center">
+            className = "w-full xl:w-9/12 flex-grow flex flex-col justify-start items-center">
             {workouts.length === 0 ? (
                <div className = "w-full h-[40vh] mx-auto text-center flex justify-center items-center">
                   {fetched ? (

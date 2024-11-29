@@ -1,11 +1,6 @@
 import Button from "@/components/global/button";
 import { Modal } from "@/components/global/modal";
-import {
-   faArrowRotateBack,
-   faSquareCheck,
-   faTrash,
-   faTrashCan
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateBack, faSquareCheck, faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRef } from "react";
 

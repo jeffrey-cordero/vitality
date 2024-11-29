@@ -28,7 +28,7 @@ export default function Journey(): JSX.Element {
                                     quality = {100}
                                     src = "/landing/journey.jpg"
                                     alt = ""
-                                    className = "rounded-2xl"
+                                    className = "rounded-2xl shadow-sm hover:scale-[1.05] transition duration-300 ease-in-out"
                                  />
 
                               </div>
@@ -40,7 +40,7 @@ export default function Journey(): JSX.Element {
                                     quality = {100}
                                     src = "/landing/food.jpg"
                                     alt = ""
-                                    className = "w-full h-full shadow-sm rounded-2xl"
+                                    className = "w-full h-full rounded-2xl shadow-sm hover:scale-[1.05] transition duration-300 ease-in-out"
                                  />
                               </div>
                            </div>
@@ -54,7 +54,7 @@ export default function Journey(): JSX.Element {
                                  quality = {100}
                                  src = "/landing/mountains.jpg"
                                  alt = ""
-                                 className = "w-full h-full shadow-sm rounded-2xl"
+                                 className = "w-full h-full rounded-2xl shadow-sm hover:scale-[1.05] transition duration-300 ease-in-out"
                               />
                            </div>
                         </div>

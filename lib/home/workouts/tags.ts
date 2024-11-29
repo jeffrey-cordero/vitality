@@ -3,12 +3,7 @@ import prisma from "@/lib/prisma/client";
 import { z } from "zod";
 import { uuidSchema } from "@/lib/global/zod";
 import { Workout } from "@/lib/home/workouts/workouts";
-import {
-   sendSuccessMessage,
-   sendErrorMessage,
-   sendFailureMessage,
-   VitalityResponse
-} from "@/lib/global/response";
+import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
 
 const colors = new Set([
    "rgb(55, 55, 55)",

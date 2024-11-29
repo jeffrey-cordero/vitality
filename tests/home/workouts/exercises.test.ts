@@ -96,7 +96,7 @@ describe("Workout Exercises Tests", () => {
             },
             errors: {},
             message: method === "create" ?
-               "Exercise sets must be empty" : "All exercise sets must be non-empty"
+               "Exercise sets must be empty" : "All exercise sets must be valid and non-empty"
          }
       ];
 

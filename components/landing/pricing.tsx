@@ -30,7 +30,7 @@ function PricingCard(props: PricingCardProps): JSX.Element {
          perspective = {1000}
          scale = {1.05}
          transitionSpeed = {300}
-         className = "relative cursor-move flex justify-center items-center w-[19.5rem] h-[32rem] mx-2 xsm:mx-0">
+         className = "relative cursor-move flex justify-center items-center w-[20.5rem] h-[33.5rem] mx-2 xsm:mx-0">
          <div
             className = "w-full h-full flex justify-center text-center rounded-2xl border-[1.5px] border-gray-200 bg-white shadow-md"
             {...doubleTap}>
@@ -44,7 +44,7 @@ function PricingCard(props: PricingCardProps): JSX.Element {
                   / {subscription}
                   </span>
                </h2>
-               <div className = "my-5 px-2 flex flex-col justify-center gap-4 h-[12.5rem] font-medium text-base text-body-color">
+               <div className = "my-6 flex flex-col justify-center gap-6 h-[14rem] font-semibold text-slate-500 px-2">
                   {children}
                </div>
                <Link
@@ -52,7 +52,7 @@ function PricingCard(props: PricingCardProps): JSX.Element {
                   href = "/signup">
                   <Button
                      icon = {faWandMagicSparkles}
-                     className = "w-[12rem] xsm:w-[14rem] mx-auto rounded-md border border-primary bg-primary p-3 text-center text-white cursor-pointer">
+                     className = "max-w-[90%] w-[12rem] mx-auto rounded-md border border-primary bg-primary p-3 text-center text-white cursor-pointer">
                      {text}
                   </Button>
                </Link>
@@ -69,17 +69,17 @@ export default function Pricing(): JSX.Element {
             title = "Choose Your Plan"
             description = "Select a plan that best suits your needs and goals"
          />
-         <div className = "w-full mx-auto py-6">
+         <div className = "w-full mx-auto">
             <div className = "relative container mx-auto flex flex-row flex-wrap justify-center align-center gap-8 p-2 py-6">
                <PricingCard
                   type = "Regular"
                   price = "$0"
                   subscription = "year"
-                  text = "Choose Regular">
+                  text = "Select Regular">
                   <>
-                     <p>Access to basic features</p>
-                     <p>Track your workouts</p>
-                     <p>Set fitness goals</p>
+                     <p>Basic features</p>
+                     <p>Workout tracking</p>
+                     <p>Fitness goal setting</p>
                      <p>Basic analytics</p>
                      <p>Limited support</p>
                   </>
@@ -88,10 +88,10 @@ export default function Pricing(): JSX.Element {
                   type = "Member"
                   price = "$99"
                   subscription = "year"
-                  text = "Choose Member">
+                  text = "Select Member">
                   <>
                      <p>All Regular features</p>
-                     <p>Advanced workout tracking</p>
+                     <p>Advanced tracking</p>
                      <p>Customized fitness plans</p>
                      <p>Enhanced analytics</p>
                      <p>Priority support</p>
@@ -101,13 +101,13 @@ export default function Pricing(): JSX.Element {
                   type = "Veteran"
                   price = "$199"
                   subscription = "year"
-                  text = "Choose Veteran">
+                  text = "Select Veteran">
                   <>
                      <p>All Member features</p>
-                     <p>Exclusive workouts and challenges</p>
-                     <p>Personalized coaching sessions</p>
+                     <p>Exclusive workouts</p>
+                     <p>Personalized coaching</p>
                      <p>24/7 premium support</p>
-                     <p>Early access to new features</p>
+                     <p>Early feature access</p>
                   </>
                </PricingCard>
             </div>

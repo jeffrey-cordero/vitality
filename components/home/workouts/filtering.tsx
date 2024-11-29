@@ -3,25 +3,10 @@ import Input from "@/components/global/input";
 import Select from "@/components/global/select";
 import Heading from "@/components/global/heading";
 import { Modal } from "@/components/global/modal";
-import {
-   VitalityInputState,
-   VitalityProps,
-   VitalityState
-} from "@/lib/global/state";
-import {
-   sendSuccessMessage,
-   sendErrorMessage
-} from "@/lib/global/response";
+import { VitalityInputState, VitalityProps, VitalityState } from "@/lib/global/state";
+import { sendSuccessMessage, sendErrorMessage } from "@/lib/global/response";
 import { Workout } from "@/lib/home/workouts/workouts";
-import {
-   faCalendar,
-   faMagnifyingGlass,
-   faArrowsUpDown,
-   faArrowRight,
-   faArrowLeft,
-   faArrowRotateLeft,
-   faTag
-} from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, faMagnifyingGlass, faArrowsUpDown, faArrowRight, faArrowLeft, faArrowRotateLeft, faTag } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useMemo, useRef } from "react";
 import { Tags } from "@/components/home/workouts/tags";
@@ -524,19 +509,17 @@ export default function Filtering(props: VitalityProps): JSX.Element {
             title = "Workouts"
             description = "Ready to crush your goals? Create a new workout and let's make today count!"
          />
-         <div className = "w-full mx-auto grid grid-rows-2 gap-4 px-4">
-            <div className = "row-span-1 col-span-full">
-               <Input
-                  id = "search"
-                  type = "text"
-                  label = "Search"
-                  icon = {faMagnifyingGlass}
-                  input = {globalState.search}
-                  dispatch = {globalDispatch}
-                  autoFocus
-               />
-            </div>
-            <div className = "w-full mx-auto grid grid-cols-2 gap-2">
+         <div className = "w-full mx-auto flex flex-col gap-2 px-4 my-4">
+            <Input
+               id = "search"
+               type = "text"
+               label = "Search"
+               icon = {faMagnifyingGlass}
+               input = {globalState.search}
+               dispatch = {globalDispatch}
+               autoFocus
+            />
+            <div className = "w-full mx-auto grid grid-cols-1 xsm:grid-cols-2 gap-2">
                <FilterByDate {...props} />
                <FilterByTags {...props} />
             </div>

@@ -283,7 +283,7 @@ export default function Table(props: TableProps): JSX.Element {
       updateNotification({
          status: response.status,
          message: response.body.message,
-         timer: 700
+         timer: 1000
       });
    }, [
       user,
@@ -296,7 +296,7 @@ export default function Table(props: TableProps): JSX.Element {
 
    return (
       <div className = "relative w-full mx-auto">
-         <div className = "my-6 overflow-hidden rounded-xl shadow-md">
+         <div className = "container mx-auto my-6 overflow-hidden rounded-xl shadow-md">
             <div className = "block lg:hidden bg-white p-4">
                <input
                   id = "workout-select-all-mobile"

@@ -1,11 +1,7 @@
 import Heading from "@/components/global/heading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import {
-   faHeartCircleBolt,
-   faFlask,
-   faCodeCompare
-} from "@fortawesome/free-solid-svg-icons";
+import { faHeartCircleBolt, faCodeCompare, faPalette } from "@fortawesome/free-solid-svg-icons";
 
 interface CardProps {
   icon: IconProp;
@@ -17,7 +13,7 @@ function Card(props: CardProps): JSX.Element {
    const { icon, title, description } = props;
 
    return (
-      <div className = "flex justify-center items-center w-[17rem] h-[24rem] mx-2 sm:mx-8 text-center rounded-2xl border border-gray-200 bg-white shadow-md hover:scale-[1.05] transition duration-300 ease-in-out cursor-move">
+      <div className = "flex justify-center items-center w-[17rem] h-[24rem] mx-2 sm:mx-8 text-center rounded-2xl border border-gray-200 bg-white shadow-md hover:scale-[1.05] transition duration-300 ease-in-out">
          <div className = "w-full mx-auto flex flex-col text-center justify-center items-center gap-4 px-6 text-black">
             <div>
                <FontAwesomeIcon
@@ -47,7 +43,7 @@ export default function Highlights(): JSX.Element {
          />
          <div className = "relative container mx-auto flex flex-row flex-wrap justify-center align-center gap-8 p-2 py-6">
             <Card
-               icon = {faFlask}
+               icon = {faPalette}
                title = "Modern Design"
                description = "Designed with precision, balanced typography, and perfectly spaced components."
             />

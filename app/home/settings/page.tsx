@@ -1,8 +1,6 @@
 import Button from "@/components/global/button";
 import { signOut } from "@/auth";
-import {
-   faRightFromBracket
-} from "@fortawesome/free-solid-svg-icons";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 export default function Page() {
    return (
