@@ -1,11 +1,11 @@
 import Button from "@/components/global/button";
-import Input from "@/components/global/input";
 import TextArea from "@/components/global/textarea";
 import Images from "@/components/home/workouts/images";
 import Exercises from "@/components/home/workouts/exercises";
 import Conformation from "@/components/global/confirmation";
-import { Modal } from "@/components/global/modal";
-import { Tags } from "@/components/home/workouts/tags";
+import Modal from "@/components/global/modal";
+import Tags from "@/components/home/workouts/tags";
+import { Input } from "@/components/global/input";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
@@ -373,35 +373,35 @@ export default function Form(props: VitalityProps): JSX.Element {
    return (
       <div className = "flex justify-center w-full mx-auto my-4">
          <Modal
-            display = {null}
+            display = { null }
             className = "max-w-3xl"
-            ref = {formModalRef}
-            onClose = {handleFormModalClose}
-            onClick = {handleInitializeWorkoutState}>
+            ref = { formModalRef }
+            onClose = { handleFormModalClose }
+            onClick = { handleInitializeWorkoutState }>
             <div className = "relative">
                <div className = "flex flex-col justify-center align-center text-center gap-2">
                   <FontAwesomeIcon
-                     icon = {faPersonRunning}
+                     icon = { faPersonRunning }
                      className = "text-5xl sm:text-6xl text-primary mt-6"
                   />
                   <h1 className = "text-2xl sm:text-3xl font-bold text-black mb-2">
-                     {isNewWorkout ? "New" : "Edit"} Workout
+                     { isNewWorkout ? "New" : "Edit" } Workout
                   </h1>
                </div>
                <div className = "relative mt-8 w-full flex flex-col justify-center align-center text-left gap-2">
                   <FontAwesomeIcon
-                     icon = {faArrowRotateLeft}
-                     onClick = {handleReset}
+                     icon = { faArrowRotateLeft }
+                     onClick = { handleReset }
                      className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                   />
                   <Input
                      id = "title"
                      type = "text"
                      label = "Title"
-                     icon = {faSignature}
-                     input = {localState.title}
-                     dispatch = {localDispatch}
-                     onSubmit = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
+                     icon = { faSignature }
+                     input = { localState.title }
+                     dispatch = { localDispatch }
+                     onSubmit = { () => handleUpdateWorkout(isNewWorkout ? "add" : "update") }
                      autoFocus
                      required
                   />
@@ -409,85 +409,92 @@ export default function Form(props: VitalityProps): JSX.Element {
                      id = "date"
                      type = "date"
                      label = "Title"
-                     icon = {faCalendar}
-                     input = {localState.date}
-                     dispatch = {localDispatch}
-                     onSubmit = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
+                     icon = { faCalendar }
+                     input = { localState.date }
+                     dispatch = { localDispatch }
+                     onSubmit = { () => handleUpdateWorkout(isNewWorkout ? "add" : "update") }
                      required
                   />
                   <Tags
-                     {...props}
+                     { ...props }
                   />
                   <Images
                      id = "image"
                      type = "text"
                      label = "URL"
-                     icon = {faLink}
-                     input = {localState.image}
-                     dispatch = {localDispatch}
+                     icon = { faLink }
+                     input = { localState.image }
+                     dispatch = { localDispatch }
                   />
                   <TextArea
                      id = "description"
                      type = "text"
                      label = "Description"
-                     icon = {faBook}
-                     input = {localState.description}
-                     onSubmit = {() => handleUpdateWorkout(isNewWorkout ? "add" : "update")}
-                     dispatch = {localDispatch}
+                     icon = { faBook }
+                     input = { localState.description }
+                     onSubmit = { () => handleUpdateWorkout(isNewWorkout ? "add" : "update") }
+                     dispatch = { localDispatch }
                   />
                   <Button
                      type = "button"
                      className = "bg-primary text-white h-[2.4rem]"
-                     icon = {props !== undefined ? faCloudArrowUp : faSquarePlus}
-                     onClick = {() =>
-                        handleUpdateWorkout(isNewWorkout ? "add" : "update")
+                     icon = { props !== undefined ? faCloudArrowUp : faSquarePlus }
+                     onClick = {
+                        () =>
+                           handleUpdateWorkout(isNewWorkout ? "add" : "update")
                      }>
-                     {isNewWorkout ? "Create" : "Update"}
+                     { isNewWorkout ? "Create" : "Update" }
                   </Button>
-                  {!isNewWorkout && (
-                     <Conformation
-                        message = "Delete this workout?"
-                        onConformation = {() => handleUpdateWorkout("delete")}
-                     />
-                  )}
-                  {!isNewWorkout && (
-                     <Exercises
-                        workout = {workout}
-                        globalState = {globalState}
-                        globalDispatch = {globalDispatch}
-                     />
-                  )}
+                  {
+                     !isNewWorkout && (
+                        <Conformation
+                           message = "Delete this workout?"
+                           onConformation = { () => handleUpdateWorkout("delete") }
+                        />
+                     )
+                  }
+                  {
+                     !isNewWorkout && (
+                        <Exercises
+                           workout = { workout }
+                           globalState = { globalState }
+                           globalDispatch = { globalDispatch }
+                        />
+                     )
+                  }
                </div>
             </div>
          </Modal>
          <Button
             type = "button"
             className = "bg-primary text-white w-[10.5rem] h-[2.8rem] text-md p-3"
-            icon = {faPersonRunning}
-            onClick = {() => {
-               globalDispatch({
-                  type: "updateState",
-                  value: {
-                     id: "workout",
-                     input: {
-                        ...globalState.workout,
-                        value: {
-                           id: "",
-                           user_id: user.id,
-                           title: "",
-                           date: new Date(),
-                           image: "",
-                           description: "",
-                           tagIds: [],
-                           exercises: []
-                        },
-                        data: {
-                           display: true
+            icon = { faPersonRunning }
+            onClick = {
+               () => {
+                  globalDispatch({
+                     type: "updateState",
+                     value: {
+                        id: "workout",
+                        input: {
+                           ...globalState.workout,
+                           value: {
+                              id: "",
+                              user_id: user.id,
+                              title: "",
+                              date: new Date(),
+                              image: "",
+                              description: "",
+                              tagIds: [],
+                              exercises: []
+                           },
+                           data: {
+                              display: true
+                           }
                         }
                      }
-                  }
-               });
-            }}>
+                  });
+               }
+            }>
             New Workout
          </Button>
       </div>

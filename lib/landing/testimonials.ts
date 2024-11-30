@@ -1,4 +1,4 @@
-const testimonialData = [
+const testimonials = [
    {
       testimonial:
       "This app has transformed my fitness routine. Its intuitive interface makes tracking workouts, steps, and calories quick and easy, helping me stay on track with my goals.",
@@ -43,4 +43,4 @@ const testimonialData = [
    }
 ];
 
-export default testimonialData;
+export default testimonials;

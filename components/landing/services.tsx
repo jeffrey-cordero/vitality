@@ -15,16 +15,18 @@ function Service(props: ServiceProps): JSX.Element {
    const { icon, title, background, color } = props;
    return (
       <div
-         className = {cx(
-            background,
-            color,
-            "flex flex-col align-center justify-center gap-2 max-w-[90%] w-[11rem] xsm:w-[10rem] h-[11rem] xsm:h-[10rem] text-center rounded-2xl border border-gray-200 shadow-md mx-auto hover:scale-[1.05] transition duration-300 ease-in-out",
-         )}>
+         className = {
+            cx(
+               background,
+               color,
+               "flex flex-col align-center justify-center gap-2 max-w-[90%] w-[11rem] xsm:w-[10rem] h-[11rem] xsm:h-[10rem] text-center rounded-2xl border border-gray-200 shadow-md mx-auto hover:scale-[1.05] transition duration-300 ease-in-out",
+            )
+         }>
          <FontAwesomeIcon
-            icon = {icon}
-            className = {cx(color, "text-4xl")}
+            icon = { icon }
+            className = { cx(color, "text-4xl") }
          />
-         <h1 className = "font-bold text-xl">{title}</h1>
+         <h1 className = "font-bold text-xl">{ title }</h1>
       </div>
    );
 }
@@ -40,37 +42,37 @@ export default function Services(): JSX.Element {
             <Service
                background = "bg-white"
                color = "text-primary"
-               icon = {faPersonRunning}
+               icon = { faPersonRunning }
                title = "Workouts"
             />
             <Service
                background = "bg-primary"
                color = "text-white"
-               icon = {faUtensils}
+               icon = { faUtensils }
                title = "Nutrition"
             />
             <Service
                background = "bg-white"
                color = "text-primary"
-               icon = {faWeightScale}
+               icon = { faWeightScale }
                title = "Weight"
             />
             <Service
                background = "bg-primary"
                color = "text-white"
-               icon = {faBottleWater}
+               icon = { faBottleWater }
                title = "Hydration"
             />
             <Service
                background = "bg-white"
                color = "text-primary"
-               icon = {faBullseye}
+               icon = { faBullseye }
                title = "Goals"
             />
             <Service
                background = "bg-primary"
                color = "text-white"
-               icon = {faBrain}
+               icon = { faBrain }
                title = "Mood"
             />
          </div>

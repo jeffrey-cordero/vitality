@@ -194,24 +194,24 @@ export default function Page(): JSX.Element {
    return (
       <main className = "relative w-full lg:w-11/12 mx-auto flex flex-col justify-start items-center text-center mt-10 mb-20">
          <Filtering
-            globalState = {globalState}
-            globalDispatch = {globalDispatch}
+            globalState = { globalState }
+            globalDispatch = { globalDispatch }
          />
          <View
-            view = {view}
-            setView = {setView}
-            workouts = {workoutsSection}
-            globalState = {globalState}
-            globalDispatch = {globalDispatch}
+            view = { view }
+            setView = { setView }
+            workouts = { workoutsSection }
+            globalState = { globalState }
+            globalDispatch = { globalDispatch }
          />
          <Form
-            globalState = {globalState}
-            globalDispatch = {globalDispatch}
+            globalState = { globalState }
+            globalDispatch = { globalDispatch }
          />
          <Pagination
-            workouts = {results}
-            globalState = {globalState}
-            globalDispatch = {globalDispatch}
+            workouts = { results }
+            globalState = { globalState }
+            globalDispatch = { globalDispatch }
          />
       </main>
    );

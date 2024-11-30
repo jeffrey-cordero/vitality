@@ -17,16 +17,16 @@ function Card(props: CardProps): JSX.Element {
          <div className = "w-full mx-auto flex flex-col text-center justify-center items-center gap-4 px-6 text-black">
             <div>
                <FontAwesomeIcon
-                  icon = {icon}
+                  icon = { icon }
                   className = "text-5xl text-primary"
                />
                <h1 className = "font-bold text-2xl text-primary mt-8 whitespace-nowrap">
-                  {title}
+                  { title }
                </h1>
             </div>
             <div>
                <p className = "text-md font-medium text-slate-500 px-1">
-                  {description}
+                  { description }
                </p>
             </div>
          </div>
@@ -43,17 +43,17 @@ export default function Highlights(): JSX.Element {
          />
          <div className = "relative container mx-auto flex flex-row flex-wrap justify-center align-center gap-8 p-2 py-6">
             <Card
-               icon = {faPalette}
+               icon = { faPalette }
                title = "Modern Design"
                description = "Designed with precision, balanced typography, and perfectly spaced components."
             />
             <Card
-               icon = {faCodeCompare}
+               icon = { faCodeCompare }
                title = "Efficiency"
                description = "Achieve your goals with ease using data-driven insights and powerful analytic tools."
             />
             <Card
-               icon = {faHeartCircleBolt}
+               icon = { faHeartCircleBolt }
                title = "Diversity"
                description = "Explore a diverse range of fitness trackers designed for every lifestyle and goal."
             />

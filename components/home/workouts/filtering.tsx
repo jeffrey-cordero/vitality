@@ -1,15 +1,15 @@
 import Button from "@/components/global/button";
-import Input from "@/components/global/input";
 import Select from "@/components/global/select";
 import Heading from "@/components/global/heading";
-import { Modal } from "@/components/global/modal";
+import Modal from "@/components/global/modal";
+import Tags from "@/components/home/workouts/tags";
+import { Input } from "@/components/global/input";
 import { VitalityInputState, VitalityProps, VitalityState } from "@/lib/global/state";
 import { sendSuccessMessage, sendErrorMessage } from "@/lib/global/response";
 import { Workout } from "@/lib/home/workouts/workouts";
 import { faCalendar, faMagnifyingGlass, faArrowsUpDown, faArrowRight, faArrowLeft, faArrowRotateLeft, faTag } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useMemo, useRef } from "react";
-import { Tags } from "@/components/home/workouts/tags";
 import { Tag } from "@/lib/home/workouts/tags";
 
 export function filterByTags(
@@ -81,18 +81,18 @@ function DateInput(props: DateInputProps) {
       <div className = "flex flex-col justify-center items-center mt-2">
          <div className = "text-primary">
             <FontAwesomeIcon
-               icon = {icon}
+               icon = { icon }
                className = "text-lg text-primary my-2"
             />
          </div>
          <div className = "w-full mx-auto">
             <Input
-               id = {isMinDate ? "minDate" : "maxDate"}
+               id = { isMinDate ? "minDate" : "maxDate" }
                type = "date"
                label = "Title"
-               icon = {faCalendar}
-               input = {input}
-               dispatch = {globalDispatch}
+               icon = { faCalendar }
+               input = { input }
+               dispatch = { globalDispatch }
                required
             />
          </div>
@@ -263,13 +263,13 @@ function FilterByDate(props: VitalityProps): JSX.Element {
 
    return (
       <Modal
-         ref = {filterModalRef}
+         ref = { filterModalRef }
          display = {
             <Button
                type = "button"
                className = "bg-gray-200 text-black font-semibold w-full h-[2.5rem] text-sm">
                <FontAwesomeIcon
-                  icon = {faCalendar}
+                  icon = { faCalendar }
                   className = "text-sm"
                />
                Filter by Date
@@ -278,65 +278,67 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          className = "max-w-xl">
          <div className = "flex flex-col justify-center align-center text-center gap-2">
             <FontAwesomeIcon
-               icon = {faCalendar}
+               icon = { faCalendar }
                className = "text-3xl text-primary mt-6"
             />
             <h1 className = "text-2xl font-bold text-black mb-2">Filter by Date</h1>
             <div className = "relative mt-8">
                <FontAwesomeIcon
-                  icon = {faArrowRotateLeft}
-                  onClick = {handleReset}
+                  icon = { faArrowRotateLeft }
+                  onClick = { handleReset }
                   className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                />
                <Select
                   id = "dateFilter"
                   type = "select"
-                  values = {["Is on or after", "Is on or before", "Is between"]}
-                  input = {globalState.dateFilter}
+                  values = { ["Is on or after", "Is on or before", "Is between"] }
+                  input = { globalState.dateFilter }
                   label = "Type"
-                  icon = {faCalendar}
-                  dispatch = {globalDispatch}
+                  icon = { faCalendar }
+                  dispatch = { globalDispatch }
                   autoFocus
                />
-               {input !== undefined ? (
+               {
+                  input !== undefined ? (
                   // Min or max
-                  <div>
-                     <DateInput
-                        {...props}
-                        input = {input}
-                     />
-                  </div>
-               ) : (
-                  <div className = "my-2">
-                     <Input
-                        id = "minDate"
-                        type = "date"
-                        label = "Min"
-                        icon = {faCalendar}
-                        input = {globalState.minDate}
-                        dispatch = {globalDispatch}
-                        required
-                     />
-                     <FontAwesomeIcon
-                        icon = {faArrowsUpDown}
-                        className = "text-lg text-primary my-2"
-                     />
-                     <Input
-                        id = "maxDate"
-                        type = "date"
-                        label = "Max"
-                        icon = {faCalendar}
-                        input = {globalState.maxDate}
-                        dispatch = {globalDispatch}
-                        required
-                     />
-                  </div>
-               )}
+                     <div>
+                        <DateInput
+                           { ...props }
+                           input = { input }
+                        />
+                     </div>
+                  ) : (
+                     <div className = "my-2">
+                        <Input
+                           id = "minDate"
+                           type = "date"
+                           label = "Min"
+                           icon = { faCalendar }
+                           input = { globalState.minDate }
+                           dispatch = { globalDispatch }
+                           required
+                        />
+                        <FontAwesomeIcon
+                           icon = { faArrowsUpDown }
+                           className = "text-lg text-primary my-2"
+                        />
+                        <Input
+                           id = "maxDate"
+                           type = "date"
+                           label = "Max"
+                           icon = { faCalendar }
+                           input = { globalState.maxDate }
+                           dispatch = { globalDispatch }
+                           required
+                        />
+                     </div>
+                  )
+               }
                <Button
                   type = "button"
                   className = "bg-primary text-white font-bold w-full h-[2.5rem] text-sm mt-3"
-                  icon = {faMagnifyingGlass}
-                  onClick = {handleApplyFilterClick}>
+                  icon = { faMagnifyingGlass }
+                  onClick = { handleApplyFilterClick }>
                   Apply
                </Button>
             </div>
@@ -460,14 +462,14 @@ function FilterByTags(props: VitalityProps): JSX.Element {
 
    return (
       <Modal
-         ref = {filterModalRef}
+         ref = { filterModalRef }
          display = {
             <Button
                type = "button"
                className = "bg-gray-200 text-black font-semibold w-full h-[2.4rem] text-sm"
-               onClick = {handleInitializeFilteredTags}>
+               onClick = { handleInitializeFilteredTags }>
                <FontAwesomeIcon
-                  icon = {faTag}
+                  icon = { faTag }
                   className = "text-sm"
                />
                Filter by Tags
@@ -476,21 +478,21 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          className = "max-w-xl">
          <div className = "flex flex-col justify-center align-center text-center gap-2">
             <FontAwesomeIcon
-               icon = {faTag}
+               icon = { faTag }
                className = "text-3xl text-primary mt-6"
             />
             <h1 className = "text-2xl font-bold text-black mb-2">Filter by Tags</h1>
             <div className = "relative">
                <div className = "w-full mx-auto my-2">
                   <Tags
-                     {...props}
-                     onReset = {handleReset}
+                     { ...props }
+                     onReset = { handleReset }
                   />
                   <Button
                      type = "button"
                      className = "bg-primary text-white font-bold w-full h-[2.4rem] text-sm mt-3"
-                     icon = {faMagnifyingGlass}
-                     onClick = {handleApplyFilterClick}>
+                     icon = { faMagnifyingGlass }
+                     onClick = { handleApplyFilterClick }>
                      Apply
                   </Button>
                </div>
@@ -514,14 +516,14 @@ export default function Filtering(props: VitalityProps): JSX.Element {
                id = "search"
                type = "text"
                label = "Search"
-               icon = {faMagnifyingGlass}
-               input = {globalState.search}
-               dispatch = {globalDispatch}
+               icon = { faMagnifyingGlass }
+               input = { globalState.search }
+               dispatch = { globalDispatch }
                autoFocus
             />
             <div className = "w-full mx-auto grid grid-cols-1 xsm:grid-cols-2 gap-2">
-               <FilterByDate {...props} />
-               <FilterByTags {...props} />
+               <FilterByDate { ...props } />
+               <FilterByTags { ...props } />
             </div>
          </div>
       </div>

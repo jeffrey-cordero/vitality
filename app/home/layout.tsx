@@ -8,7 +8,7 @@ function useValidateAuthenticatedURL() {
    const pathname = usePathname();
 
    useEffect(() => {
-      if (!pathname.startsWith("/home")) {
+      if (!pathname?.startsWith("/home")) {
          window.location.reload();
       }
    });

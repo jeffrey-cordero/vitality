@@ -146,22 +146,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             />
          </head>
          <body
-            className = {cx(
-               sfPro.variable,
-               inter.variable,
-               "box-border m-0 p-0 overflow-x-hidden max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black",
-            )}
-            suppressHydrationWarning = {true}>
-            <AuthenticationContext.Provider value = {{ user, fetched, updateUser }}>
+            className = {
+               cx(
+                  sfPro.variable,
+                  inter.variable,
+                  "box-border m-0 p-0 overflow-x-hidden max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black",
+               )
+            }
+            suppressHydrationWarning = { true }>
+            <AuthenticationContext.Provider value = { { user, fetched, updateUser } }>
                <SideBar />
                <NotificationContext.Provider
-                  value = {{ notification, updateNotification }}>
-                  <div>{children}</div>
+                  value = { { notification, updateNotification } }>
+                  <div>{ children }</div>
                   <div>
-                     {notification !== undefined &&
-                        notification.status !== "Initial" && (
-                        <Notification {...notification} />
-                     )}
+                     {
+                        notification !== undefined && notification.status !== "Initial" && (
+                           <Notification { ...notification } />
+                        )
+                     }
                   </div>
                </NotificationContext.Provider>
                <Footer />

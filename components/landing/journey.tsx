@@ -23,9 +23,9 @@ export default function Journey(): JSX.Element {
                               <div className = "relative my-4">
                                  <Image
                                     priority
-                                    width = {2010}
-                                    height = {1441}
-                                    quality = {100}
+                                    width = { 2010 }
+                                    height = { 1441 }
+                                    quality = { 100 }
                                     src = "/landing/journey.jpg"
                                     alt = ""
                                     className = "rounded-2xl shadow-sm hover:scale-[1.05] transition duration-300 ease-in-out"
@@ -35,9 +35,9 @@ export default function Journey(): JSX.Element {
                               <div className = "relative">
                                  <Image
                                     priority
-                                    width = {640}
-                                    height = {960}
-                                    quality = {100}
+                                    width = { 640 }
+                                    height = { 960 }
+                                    quality = { 100 }
                                     src = "/landing/food.jpg"
                                     alt = ""
                                     className = "w-full h-full rounded-2xl shadow-sm hover:scale-[1.05] transition duration-300 ease-in-out"
@@ -49,9 +49,9 @@ export default function Journey(): JSX.Element {
                            <div className = "py-3 sm:py-4">
                               <Image
                                  priority
-                                 width = {1920}
-                                 height = {2880}
-                                 quality = {100}
+                                 width = { 1920 }
+                                 height = { 2880 }
+                                 quality = { 100 }
                                  src = "/landing/mountains.jpg"
                                  alt = ""
                                  className = "w-full h-full rounded-2xl shadow-sm hover:scale-[1.05] transition duration-300 ease-in-out"
@@ -72,7 +72,7 @@ export default function Journey(): JSX.Element {
                         </p>
                         <Link href = "/signup">
                            <Button
-                              icon = {faBullseye}
+                              icon = { faBullseye }
                               className = "text-white text-md bg-primary whitespace-nowrap w-[10.5rem] h-[2.8rem] text-md p-3">
                               Start Today
                            </Button>

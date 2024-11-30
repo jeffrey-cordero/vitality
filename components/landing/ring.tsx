@@ -37,7 +37,7 @@ function Counter(props: CounterProps): JSX.Element {
       duration
    ]);
 
-   return <p className = {className}>{Intl.NumberFormat().format(count)}</p>;
+   return <p className = { className }>{ Intl.NumberFormat().format(count) }</p>;
 }
 
 export default function Ring(): JSX.Element {
@@ -47,12 +47,12 @@ export default function Ring(): JSX.Element {
             className = "absolute inset-0 m-auto w-[80px] xsm:w-[85px] h-[80px] xsm:h-[85px] "
             viewBox = "0 0 100 100">
             <motion.circle
-               initial = {{ pathLength: 0 }}
-               animate = {{ pathLength: 1 }}
-               whileInView = {{ pathLength: 1 }}
-               viewport = {{ once: true }}
-               transition = {{ delay: 0.3, duration: 3, ease: "easeOut" }}
-               strokeWidth = {7}
+               initial = { { pathLength: 0 } }
+               animate = { { pathLength: 1 } }
+               whileInView = { { pathLength: 1 } }
+               viewport = { { once: true } }
+               transition = { { delay: 0.3, duration: 3, ease: "easeOut" } }
+               strokeWidth = { 7 }
                strokeDasharray = "0 1"
                strokeLinecap = "round"
                transform = "rotate(-90 50 50)"
@@ -64,9 +64,9 @@ export default function Ring(): JSX.Element {
             />
          </motion.svg>
          <Counter
-            value = {100}
-            start = {0}
-            duration = {3500}
+            value = { 100 }
+            start = { 0 }
+            duration = { 3500 }
             className = "relative inset-0 mx-auto flex items-center justify-center font-display text-2xl text-green-500"
          />
       </div>

@@ -1,8 +1,8 @@
 "use client";
-import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import TextArea from "@/components/global/textarea";
 import Conformation from "@/components/global/confirmation";
+import { Input } from "@/components/global/input";
 import { VitalityChildProps, VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { Workout } from "@/lib/home/workouts/workouts";
@@ -106,10 +106,10 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
             id = "name"
             type = "text"
             label = "Name"
-            icon = {faPenRuler}
-            input = {localState.name}
-            dispatch = {localDispatch}
-            onSubmit = {() => handleCreateNewExercise()}
+            icon = { faPenRuler }
+            input = { localState.name }
+            dispatch = { localDispatch }
+            onSubmit = { () => handleCreateNewExercise() }
             autoComplete = "none"
             autoFocus
             scrollIntoView
@@ -118,17 +118,19 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          <Button
             type = "button"
             className = "w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
-            icon = {faRotateLeft}
-            onClick = {() => {
-               onBlur();
-            }}>
+            icon = { faRotateLeft }
+            onClick = {
+               () => {
+                  onBlur();
+               }
+            }>
             Cancel
          </Button>
          <Button
             type = "button"
             className = "w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
-            icon = {faPenRuler}
-            onClick = {handleCreateNewExercise}>
+            icon = { faPenRuler }
+            onClick = { handleCreateNewExercise }>
             Add Exercise
          </Button>
       </div>
@@ -343,167 +345,181 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
 
    return (
       <div
-         ref = {setNodeRef}
-         style = {style}
+         ref = { setNodeRef }
+         style = { style }
          className = "w-full mx-auto px-4 sm:px-8">
-         {displayEditInputs ? (
-            <li className = "relative flex flex-col justify-start items-stretch gap-2 w-full mx-auto mt-6 text-center font-medium">
-               <FontAwesomeIcon
-                  icon = {faArrowRotateLeft}
-                  onClick = {reset}
-                  className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
-               />
-               <Input
-                  id = "weight"
-                  type = "number"
-                  label = "Weight"
-                  min = "0"
-                  icon = {faDumbbell}
-                  input = {localState.weight}
-                  dispatch = {localDispatch}
-                  onSubmit = {() => handleExerciseSetUpdates("update")}
-               />
-               <Input
-                  id = "repetitions"
-                  type = "number"
-                  label = "Repetitions"
-                  min = "0"
-                  icon = {faArrowUp91}
-                  input = {localState.repetitions}
-                  dispatch = {localDispatch}
-                  onSubmit = {() => handleExerciseSetUpdates("update")}
-               />
-               <div className = "flex flex-col sm:flex-row justify-between items-start gap-2">
-                  <div className = "w-full mx-auto">
-                     <Input
-                        id = "hours"
-                        type = "number"
-                        label = "Hours"
-                        min = "0"
-                        icon = {faStopwatch}
-                        input = {localState.hours}
-                        dispatch = {localDispatch}
-                        onSubmit = {() => handleExerciseSetUpdates("update")}
-                     />
-                  </div>
-                  <div className = "w-full mx-auto">
-                     <Input
-                        id = "minutes"
-                        type = "number"
-                        label = "Minutes"
-                        min = "0"
-                        icon = {faStopwatch}
-                        input = {localState.minutes}
-                        dispatch = {localDispatch}
-                        onSubmit = {() => handleExerciseSetUpdates("update")}
-                     />
-                  </div>
-                  <div className = "w-full mx-auto">
-                     <Input
-                        id = "seconds"
-                        type = "number"
-                        label = "Seconds"
-                        min = "0"
-                        icon = {faStopwatch}
-                        input = {localState.seconds}
-                        dispatch = {localDispatch}
-                        onSubmit = {() => handleExerciseSetUpdates("update")}
-                        scrollIntoView
-                     />
-                  </div>
-               </div>
-               <TextArea
-                  id = "text"
-                  type = "text"
-                  label = "Text"
-                  icon = {faAlignJustify}
-                  input = {localState.text}
-                  dispatch = {localDispatch}
-               />
-               <Button
-                  type = "button"
-                  className = "w-full px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
-                  icon = {faRotateLeft}
-                  onClick = {() => {
-                     if (set === undefined) {
-                        // Remove from DOM for new exercise set inputs
-                        onBlur();
-                     }
-
-                     setEditSet(false);
-                  }}>
-                  Cancel
-               </Button>
-               <Button
-                  type = "button"
-                  className = "w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
-                  icon = {faCloudArrowUp}
-                  onClick = {() => handleExerciseSetUpdates("update")}>
-                  {set !== undefined ? "Update" : "Create"}
-               </Button>
-               {set !== undefined && (
-                  <Conformation
-                     message = "Delete this set?"
-                     onConformation = {() => handleExerciseSetUpdates("delete")}
+         {
+            displayEditInputs ? (
+               <li className = "relative flex flex-col justify-start items-stretch gap-2 w-full mx-auto mt-6 text-center font-medium">
+                  <FontAwesomeIcon
+                     icon = { faArrowRotateLeft }
+                     onClick = { reset }
+                     className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                   />
-               )}
-            </li>
-         ) : (
-            set !== undefined && (
-               <li className = "flex flex-row justify-start items-start font-semibold gap-2 w-full mx-auto pt-2 text-left text-md cursor-move whitespace-pre-wrap break-all">
-                  <div
-                     className = "cursor-ns-resize text-sm pt-1"
-                     {...attributes}
-                     {...listeners}>
-                     <FontAwesomeIcon icon = {faCircleNotch} />
+                  <Input
+                     id = "weight"
+                     type = "number"
+                     label = "Weight"
+                     min = "0"
+                     icon = { faDumbbell }
+                     input = { localState.weight }
+                     dispatch = { localDispatch }
+                     onSubmit = { () => handleExerciseSetUpdates("update") }
+                  />
+                  <Input
+                     id = "repetitions"
+                     type = "number"
+                     label = "Repetitions"
+                     min = "0"
+                     icon = { faArrowUp91 }
+                     input = { localState.repetitions }
+                     dispatch = { localDispatch }
+                     onSubmit = { () => handleExerciseSetUpdates("update") }
+                  />
+                  <div className = "flex flex-col sm:flex-row justify-between items-start gap-2">
+                     <div className = "w-full mx-auto">
+                        <Input
+                           id = "hours"
+                           type = "number"
+                           label = "Hours"
+                           min = "0"
+                           icon = { faStopwatch }
+                           input = { localState.hours }
+                           dispatch = { localDispatch }
+                           onSubmit = { () => handleExerciseSetUpdates("update") }
+                        />
+                     </div>
+                     <div className = "w-full mx-auto">
+                        <Input
+                           id = "minutes"
+                           type = "number"
+                           label = "Minutes"
+                           min = "0"
+                           icon = { faStopwatch }
+                           input = { localState.minutes }
+                           dispatch = { localDispatch }
+                           onSubmit = { () => handleExerciseSetUpdates("update") }
+                        />
+                     </div>
+                     <div className = "w-full mx-auto">
+                        <Input
+                           id = "seconds"
+                           type = "number"
+                           label = "Seconds"
+                           min = "0"
+                           icon = { faStopwatch }
+                           input = { localState.seconds }
+                           dispatch = { localDispatch }
+                           onSubmit = { () => handleExerciseSetUpdates("update") }
+                           scrollIntoView
+                        />
+                     </div>
                   </div>
-                  <div
-                     className = "flex flex-col gap-2 pl-6 cursor-pointer"
-                     {...doubleTap}>
-                     {set.weight !== null && (
-                        <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
-                           <FontAwesomeIcon
-                              className = "self-start pt-1 text-primary"
-                              icon = {faDumbbell}
-                           />
-                           <p>{set.weight}</p>
-                        </div>
-                     )}
-                     {set.repetitions !== null && (
-                        <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
-                           <FontAwesomeIcon
-                              className = "self-start pt-1 text-primary"
-                              icon = {faArrowUp91}
-                           />
-                           <p>{set.repetitions}</p>
-                        </div>
-                     )}
-                     {(set.hours !== null || set.minutes !== null || set.seconds !== null) && (
-                        <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
-                           <FontAwesomeIcon
-                              className = "self-start pt-1 text-primary"
-                              icon = {faStopwatch}
-                           />
-                           <p>
-                              {String(set.hours ?? 0).padStart(2, "0")}:
-                              {String(set.minutes ?? 0).padStart(2, "0")}:
-                              {String(set.seconds ?? 0).padStart(2, "0")}
-                           </p>
-                        </div>
-                     )}
-                     {set.text && (
-                        <div className = "flex flex-row items-center justify-start gap-2 font-semibold text-md">
-                           <FontAwesomeIcon
-                              className = "self-start pt-1 text-primary"
-                              icon = {faAlignJustify}
-                           />
-                           <p className = "line-clamp-2">{set.text}</p>
-                        </div>
-                     )}
-                  </div>
+                  <TextArea
+                     id = "text"
+                     type = "text"
+                     label = "Text"
+                     icon = { faAlignJustify }
+                     input = { localState.text }
+                     dispatch = { localDispatch }
+                  />
+                  <Button
+                     type = "button"
+                     className = "w-full px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
+                     icon = { faRotateLeft }
+                     onClick = {
+                        () => {
+                           if (set === undefined) {
+                              // Remove from DOM for new exercise set inputs
+                              onBlur();
+                           }
+
+                           setEditSet(false);
+                        }
+                     }>
+                  Cancel
+                  </Button>
+                  <Button
+                     type = "button"
+                     className = "w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                     icon = { faCloudArrowUp }
+                     onClick = { () => handleExerciseSetUpdates("update") }>
+                     { set !== undefined ? "Update" : "Create" }
+                  </Button>
+                  {
+                     set !== undefined && (
+                        <Conformation
+                           message = "Delete this set?"
+                           onConformation = { () => handleExerciseSetUpdates("delete") }
+                        />
+                     )
+                  }
                </li>
+            ) : (
+               set !== undefined && (
+                  <li className = "flex flex-row justify-start items-start font-semibold gap-2 w-full mx-auto pt-2 text-left text-md cursor-move whitespace-pre-wrap break-all">
+                     <div
+                        className = "cursor-ns-resize text-sm pt-1"
+                        { ...attributes }
+                        { ...listeners }>
+                        <FontAwesomeIcon icon = { faCircleNotch } />
+                     </div>
+                     <div
+                        className = "flex flex-col gap-2 pl-6 cursor-pointer"
+                        { ...doubleTap }>
+                        {
+                           set.weight !== null && (
+                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
+                                 <FontAwesomeIcon
+                                    className = "self-start pt-1 text-primary"
+                                    icon = { faDumbbell }
+                                 />
+                                 <p>{ set.weight }</p>
+                              </div>
+                           )
+                        }
+                        {
+                           set.repetitions !== null && (
+                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
+                                 <FontAwesomeIcon
+                                    className = "self-start pt-1 text-primary"
+                                    icon = { faArrowUp91 }
+                                 />
+                                 <p>{ set.repetitions }</p>
+                              </div>
+                           )
+                        }
+                        {
+                           (set.hours !== null || set.minutes !== null || set.seconds !== null) && (
+                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
+                                 <FontAwesomeIcon
+                                    className = "self-start pt-1 text-primary"
+                                    icon = { faStopwatch }
+                                 />
+                                 <p>
+                                    { String(set.hours ?? 0).padStart(2, "0") }:
+                                    { String(set.minutes ?? 0).padStart(2, "0") }:
+                                    { String(set.seconds ?? 0).padStart(2, "0") }
+                                 </p>
+                              </div>
+                           )
+                        }
+                        {
+                           set.text && (
+                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold text-md">
+                                 <FontAwesomeIcon
+                                    className = "self-start pt-1 text-primary"
+                                    icon = { faAlignJustify }
+                                 />
+                                 <p className = "line-clamp-2">{ set.text }</p>
+                              </div>
+                           )
+                        }
+                     </div>
+                  </li>
+               )
             )
-         )}
+         }
       </div>
    );
 }
@@ -783,115 +799,127 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    return (
       <li
          className = "w-full mx-auto p-2 sm:p-4 text-left"
-         style = {style}
-         ref = {setNodeRef}>
-         {displayEditName ? (
-            <div>
-               <Input
-                  id = "name"
-                  type = "text"
-                  label = "Name"
-                  className = "mb-2"
-                  icon = {faPenRuler}
-                  input = {localState.name}
-                  dispatch = {localDispatch}
-                  onBlur = {() => setEditName(false)}
-                  onSubmit = {() => handleExerciseNameUpdates()}
-                  autoComplete = "none"
-                  autoFocus
-                  scrollIntoView
-                  required
-               />
-               <Button
-                  type = "button"
-                  className = "w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
-                  icon = {faRotateLeft}
-                  onClick = {() => {
-                     setEditName(false);
-                  }}>
-                  Cancel
-               </Button>
-               <Button
-                  type = "button"
-                  className = "w-full bg-green-600 text-white text-md my-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
-                  icon = {faPenRuler}
-                  onClick = {handleExerciseNameUpdates}>
-                  Update
-               </Button>
-               <Conformation
-                  message = "Delete this exercise?"
-                  onConformation = {() => handleExerciseDeletion()}
-               />
-            </div>
-         ) : (
-            <h1 className = "cursor-default text-xl flex justify-start items-center">
-               <span>
-                  <FontAwesomeIcon
-                     className = "cursor-ns-resize hover:text-primary text-2xl pt-1"
-                     icon = {isCollapsed ? faCaretRight : faCaretDown}
-                     onClick = {() => setIsCollapsed(!isCollapsed)}
-                     {...attributes}
-                     {...listeners}
+         style = { style }
+         ref = { setNodeRef }>
+         {
+            displayEditName ? (
+               <div>
+                  <Input
+                     id = "name"
+                     type = "text"
+                     label = "Name"
+                     className = "mb-2"
+                     icon = { faPenRuler }
+                     input = { localState.name }
+                     dispatch = { localDispatch }
+                     onBlur = { () => setEditName(false) }
+                     onSubmit = { () => handleExerciseNameUpdates() }
+                     autoComplete = "none"
+                     autoFocus
+                     scrollIntoView
+                     required
                   />
-               </span>
-               <span
-                  className = "cursor-pointer pl-4"
-                  {...doubleTap}>
-                  {exercise.name}
-               </span>
-            </h1>
-         )}
-         {!isCollapsed && (
-            <div className = "flex flex-col justify-start items-start gap-4">
-               <DndContext
-                  sensors = {sensors}
-                  collisionDetection = {closestCenter}
-                  onDragEnd = {handleDragEnd}>
-                  <SortableContext
-                     items = {exercise.sets.map((set) => set.id)}
-                     strategy = {verticalListSortingStrategy}>
-                     <ul className = "w-full mx-auto list-disc text-black flex flex-col gap-6 pt-2">
-                        {exercise.sets.map((set: ExerciseSet) => {
-                           return (
-                              <SetContainer
-                                 {...props}
-                                 set = {set}
-                                 reset = {() => handleReset(set.id)}
-                                 onBlur = {() => { }}
-                                 key = {set.id}
-                              />
-                           );
-                        })}
-                        {addSet && (
-                           <SetContainer
-                              {...props}
-                              set = {undefined}
-                              reset = {() => handleReset("")}
-                              onBlur = {() => setAddSet(false)}
-                           />
-                        )}
-                     </ul>
-                  </SortableContext>
-               </DndContext>
-               {
-                  !hideNewEntryButton && (
-                     <div className = "w-full mx-auto px-4 sm:px-8">
-                        <Button
-                           type = "button"
-                           className = "w-full bg-white text-black text-md px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
-                           icon = {faPersonRunning}
-                           onClick = {() => {
-                              handleReset("");
-                              setAddSet(true);
-                           }}>
+                  <Button
+                     type = "button"
+                     className = "w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
+                     icon = { faRotateLeft }
+                     onClick = {
+                        () => {
+                           setEditName(false);
+                        }
+                     }>
+                  Cancel
+                  </Button>
+                  <Button
+                     type = "button"
+                     className = "w-full bg-green-600 text-white text-md my-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                     icon = { faPenRuler }
+                     onClick = { handleExerciseNameUpdates }>
+                  Update
+                  </Button>
+                  <Conformation
+                     message = "Delete this exercise?"
+                     onConformation = { () => handleExerciseDeletion() }
+                  />
+               </div>
+            ) : (
+               <h1 className = "cursor-default text-xl flex justify-start items-center">
+                  <span>
+                     <FontAwesomeIcon
+                        className = "cursor-ns-resize hover:text-primary text-2xl pt-1"
+                        icon = { isCollapsed ? faCaretRight : faCaretDown }
+                        onClick = { () => setIsCollapsed(!isCollapsed) }
+                        { ...attributes }
+                        { ...listeners }
+                     />
+                  </span>
+                  <span
+                     className = "cursor-pointer pl-4"
+                     { ...doubleTap }>
+                     { exercise.name }
+                  </span>
+               </h1>
+            )
+         }
+         {
+            !isCollapsed && (
+               <div className = "flex flex-col justify-start items-start gap-4">
+                  <DndContext
+                     sensors = { sensors }
+                     collisionDetection = { closestCenter }
+                     onDragEnd = { handleDragEnd }>
+                     <SortableContext
+                        items = { exercise.sets.map((set) => set.id) }
+                        strategy = { verticalListSortingStrategy }>
+                        <ul className = "w-full mx-auto list-disc text-black flex flex-col gap-6 pt-2">
+                           {
+                              exercise.sets.map((set: ExerciseSet) => {
+                                 return (
+                                    <SetContainer
+                                       { ...props }
+                                       set = { set }
+                                       reset = { () => handleReset(set.id) }
+                                       onBlur = { () => { } }
+                                       key = { set.id }
+                                    />
+                                 );
+                              })
+                           }
+                           {
+                              addSet && (
+                                 <SetContainer
+                                    { ...props }
+                                    set = { undefined }
+                                    reset = { () => handleReset("") }
+                                    onBlur = { () => setAddSet(false) }
+                                 />
+                              )
+                           }
+                        </ul>
+                     </SortableContext>
+                  </DndContext>
+                  {
+                     !hideNewEntryButton && (
+                        <div className = "w-full mx-auto px-4 sm:px-8">
+                           <Button
+                              type = "button"
+                              className = "w-full bg-white text-black text-md px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                              icon = { faPersonRunning }
+                              onClick = {
+                                 () => {
+                                    handleReset("");
+                                    setAddSet(true);
+                                 }
+                              }>
                            New Entry
-                        </Button>
-                     </div>
-                  )
-               }
+                           </Button>
+                        </div>
+                     )
+                  }
 
-            </div>
-         )}
+               </div>
+            )
+         }
       </li>
    );
 }
@@ -1045,51 +1073,57 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
       <div className = "w-full mx-auto text-center font-bold flex flex-col justify-center items-center">
          <hr className = "text-black w-full my-2" />
          <DndContext
-            sensors = {sensors}
-            collisionDetection = {closestCenter}
-            onDragEnd = {handleDragEnd}>
+            sensors = { sensors }
+            collisionDetection = { closestCenter }
+            onDragEnd = { handleDragEnd }>
             <SortableContext
-               items = {exercises.map((exercise) => exercise.id)}
-               strategy = {verticalListSortingStrategy}>
+               items = { exercises.map((exercise) => exercise.id) }
+               strategy = { verticalListSortingStrategy }>
                <ol className = "w-full mx-auto">
-                  {exercises.map((exercise: Exercise) => {
-                     return (
-                        <ExerciseContainer
-                           {...props}
-                           localState = {localState}
-                           localDispatch = {localDispatch}
-                           saveExercises = {handleSaveExercises}
-                           exercise = {exercise}
-                           key = {exercise.id}
-                        />
-                     );
-                  })}
+                  {
+                     exercises.map((exercise: Exercise) => {
+                        return (
+                           <ExerciseContainer
+                              { ...props }
+                              localState = { localState }
+                              localDispatch = { localDispatch }
+                              saveExercises = { handleSaveExercises }
+                              exercise = { exercise }
+                              key = { exercise.id }
+                           />
+                        );
+                     })
+                  }
                </ol>
             </SortableContext>
          </DndContext>
          <div className = "w-full mx-auto my-2">
-            {displayNewExerciseInput ? (
-               <CreateExercise
-                  {...props}
-                  localState = {localState}
-                  localDispatch = {localDispatch}
-                  exercise = {null}
-                  saveExercises = {handleSaveExercises}
-                  onBlur = {() => {
-                     setAddExercise(false);
-                  }}
-               />
-            ) : (
-               <div className = "w-full mx-auto">
-                  <Button
-                     type = "button"
-                     className = "w-full bg-white text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
-                     icon = {faPlus}
-                     onClick = {handleInitializeNewExerciseInput}>
+            {
+               displayNewExerciseInput ? (
+                  <CreateExercise
+                     { ...props }
+                     localState = { localState }
+                     localDispatch = { localDispatch }
+                     exercise = { null }
+                     saveExercises = { handleSaveExercises }
+                     onBlur = {
+                        () => {
+                           setAddExercise(false);
+                        }
+                     }
+                  />
+               ) : (
+                  <div className = "w-full mx-auto">
+                     <Button
+                        type = "button"
+                        className = "w-full bg-white text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                        icon = { faPlus }
+                        onClick = { handleInitializeNewExerciseInput }>
                      New Exercise
-                  </Button>
-               </div>
-            )}
+                     </Button>
+                  </div>
+               )
+            }
          </div>
       </div>
    );

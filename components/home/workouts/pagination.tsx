@@ -81,50 +81,58 @@ export default function Pagination(props: PaginationProps): JSX.Element {
          <div className = "max-w-sm my-6 justify-self-end text-lg">
             <div className = "max-w-xs relative flex flex-row justify-center items-center mx-4">
                <FontAwesomeIcon
-                  icon = {faCircleChevronLeft}
+                  icon = { faCircleChevronLeft }
                   className = "cursor-pointer text-primary text-xl"
-                  onClick = {handleLeftClick}
+                  onClick = { handleLeftClick }
                />
-               {low > 0 && (
-                  <div className = "flex flex-row justify-center items-center gap-4 ml-4">
-                     <Button
-                        key = "min"
-                        onClick = {() => handlePageClick(0)}>
+               {
+                  low > 0 && (
+                     <div className = "flex flex-row justify-center items-center gap-4 ml-4">
+                        <Button
+                           key = "min"
+                           onClick = { () => handlePageClick(0) }>
                         1
-                     </Button>
-                     <Button key = "low">...</Button>
-                  </div>
-               )}
-               {pagination.slice(low, high).map((index) => {
-                  const isSelected: boolean = index === page + 1;
+                        </Button>
+                        <Button key = "low">...</Button>
+                     </div>
+                  )
+               }
+               {
+                  pagination.slice(low, high).map((index) => {
+                     const isSelected: boolean = index === page + 1;
 
-                  return (
-                     <Button
-                        key = {index}
-                        onClick = {() => handlePageClick(index - 1)}
-                        className = {clsx("rounded-lg w-[3rem] h-[2.2rem]", {
-                           "font-bold text-primary border-2 border-primary bg-blue-100": isSelected,
-                           "ml-2": isSelected && index === 1,
-                           "mr-2": isSelected && index === pages
-                        })}>
-                        {index}
-                     </Button>
-                  );
-               })}
-               {high < pages && (
-                  <div className = "flex flex-row justify-center items-center gap-4 mr-4">
-                     <Button key = "higher">...</Button>
-                     <Button
-                        key = "min"
-                        onClick = {() => handlePageClick(pages - 1)}>
-                        {pages}
-                     </Button>
-                  </div>
-               )}
+                     return (
+                        <Button
+                           key = { index }
+                           onClick = { () => handlePageClick(index - 1) }
+                           className = {
+                              clsx("rounded-lg w-[3rem] h-[2.2rem]", {
+                                 "font-bold text-primary border-2 border-primary bg-blue-100": isSelected,
+                                 "ml-2": isSelected && index === 1,
+                                 "mr-2": isSelected && index === pages
+                              })
+                           }>
+                           { index }
+                        </Button>
+                     );
+                  })
+               }
+               {
+                  high < pages && (
+                     <div className = "flex flex-row justify-center items-center gap-4 mr-4">
+                        <Button key = "higher">...</Button>
+                        <Button
+                           key = "min"
+                           onClick = { () => handlePageClick(pages - 1) }>
+                           { pages }
+                        </Button>
+                     </div>
+                  )
+               }
                <FontAwesomeIcon
-                  icon = {faCircleChevronRight}
+                  icon = { faCircleChevronRight }
                   className = "cursor-pointer text-primary text-xl"
-                  onClick = {handleRightClick}
+                  onClick = { handleRightClick }
                />
             </div>
             <div className = "relative">
@@ -132,13 +140,13 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   id = "page"
                   type = "select"
                   label = "Page"
-                  icon = {faFileLines}
-                  input = {globalState.page}
-                  value = {page + 1}
-                  values = {pagination}
-                  dispatch = {globalDispatch}
+                  icon = { faFileLines }
+                  input = { globalState.page }
+                  value = { page + 1 }
+                  values = { pagination }
+                  dispatch = { globalDispatch }
                   className = "min-w-[10rem] max-h-[5rem] mt-4"
-                  onChange = {(event) => handlePageClick(event.target.value - 1)}
+                  onChange = { (event) => handlePageClick(event.target.value - 1) }
                />
             </div>
             <div className = "relative">
@@ -146,12 +154,12 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   id = "paging"
                   type = "select"
                   label = "Entries"
-                  icon = {faTabletScreenButton}
-                  input = {globalState.paging}
-                  values = {[5, 10, 25, 50, 100, 500, 1000]}
-                  dispatch = {globalDispatch}
+                  icon = { faTabletScreenButton }
+                  input = { globalState.paging }
+                  values = { [5, 10, 25, 50, 100, 500, 1000] }
+                  dispatch = { globalDispatch }
                   className = "min-w-[10rem] max-h-[5rem] mt-2"
-                  onChange = {(event) => handleEntriesOnChange(event)}
+                  onChange = { (event) => handleEntriesOnChange(event) }
                />
             </div>
          </div>

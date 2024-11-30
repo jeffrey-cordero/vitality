@@ -13,11 +13,11 @@ export default function Heading(props: HeadingProps): JSX.Element {
                <div className = "max-w-2xl text-center mx-auto">
                   <div className = "mt-5 max-w-2xl">
                      <h1 className = "block font-semibold text-primary text-4xl sm:text-5xl">
-                        {title}
+                        { title }
                      </h1>
                   </div>
                   <div className = "max-w-[50rem] mt-5 mx-auto px-2 text-center">
-                     <p className = "text-md sm:text-lg text-gray-500">{description}</p>
+                     <p className = "text-md sm:text-lg text-gray-500">{ description }</p>
                   </div>
                </div>
             </div>

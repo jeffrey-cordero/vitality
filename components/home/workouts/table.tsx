@@ -64,12 +64,14 @@ function Row(props: RowProps) {
             // Undefined in case of removal
             tag !== undefined && (
                <div
-                  className = {clsx("max-w-full px-4 py-2 m-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-xs font-bold text-white")}
-                  style = {{
-                     backgroundColor: tag.color
-                  }}
-                  key = {tag.id}>
-                  {tag.title}
+                  className = { clsx("max-w-full px-4 py-2 m-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-xs font-bold text-white") }
+                  style = {
+                     {
+                        backgroundColor: tag.color
+                     }
+                  }
+                  key = { tag.id }>
+                  { tag.title }
                </div>
             )
          );
@@ -99,52 +101,54 @@ function Row(props: RowProps) {
 
    return (
       <div
-         id = {workout.id}
+         id = { workout.id }
          className = "flex flex-col lg:flex-row justify-between items-center text-center w-full mx-auto bg-white lg:p-4 rounded-md lg:rounded-none hover:bg-gray-50 cursor-pointer"
-         {...doubleTap}>
+         { ...doubleTap }>
          <div className = "w-full lg:w-[1rem] flex justify-center items-center text-base uppercase px-3 pt-6 py-4 lg:pt-4 whitespace-normal font-medium text-black">
             <input
-               id = {`workout-select-${workout.id}`}
+               id = { `workout-select-${workout.id}` }
                type = "checkbox"
                className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-               checked = {globalState.workouts.data.selected.has(workout)}
-               onChange = {() => handleWorkoutToggle()}
+               checked = { globalState.workouts.data.selected.has(workout) }
+               onChange = { () => handleWorkoutToggle() }
             />
          </div>
          <div className = "w-full lg:w-[10rem] text-xl lg:text-base px-2 lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
-            {workout.title}
+            { workout.title }
          </div>
          <div className = "w-full lg:w-[10rem] text-xl lg:text-base px-2 pt-2 lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
-            {formattedDate}
+            { formattedDate }
          </div>
          <div className = "w-full lg:w-[12rem] lg:max-h-[12rem] overflow-auto scrollbar-hide text-xl lg:text-base px-12 lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
             <div
-               className = {clsx("w-full max-h-[14rem] flex flex-row flex-wrap justify-center items-center gap-2 p-2 overflow-auto scrollbar-hide", {
-                  "cursor-all-scroll": workoutTags.length > 0
-               })}>
-               {workoutTags}
+               className = {
+                  clsx("w-full max-h-[14rem] flex flex-row flex-wrap justify-center items-center gap-2 p-2 overflow-auto scrollbar-hide", {
+                     "cursor-all-scroll": workoutTags.length > 0
+                  })
+               }>
+               { workoutTags }
             </div>
          </div>
          <div
-            className = {clsx("relative order-first lg:order-none mt-8 lg:mt-0 text-xl lg:text-base  whitespace-pre-wrap break-all text-black")}>
+            className = { clsx("relative order-first lg:order-none mt-8 lg:mt-0 text-xl lg:text-base  whitespace-pre-wrap break-all text-black") }>
             {
                workout.image ? (
                   <div className = "relative w-[14rem] h-[14rem] lg:w-[7rem] lg:h-[7rem] flex justify-center items-center">
                      <Image
                         fill
                         priority
-                        quality = {100}
+                        quality = { 100 }
                         sizes = "100%"
-                        src = {workout.image}
+                        src = { workout.image }
                         alt = "workout-image"
-                        className = {clsx("w-full h-full mx-auto object-cover object-center rounded-full overflow-hidden shadow-sm")}
+                        className = { clsx("w-full h-full mx-auto object-cover object-center rounded-full overflow-hidden shadow-sm") }
                      />
                   </div>
                ) : (
                   <div className = "w-[14rem] h-[14rem] lg:w-[7rem] lg:h-[7rem] flex justify-center items-center rounded-full overflow-hidden text-primary">
                      <FontAwesomeIcon
                         className = "text-4xl"
-                        icon = {faImage}
+                        icon = { faImage }
                      />
                   </div>
                )
@@ -154,10 +158,10 @@ function Row(props: RowProps) {
             <div className = "flex justify-center items-center gap-4">
                <div
                   className = "flex justify-center items-center"
-                  onClick = {handleEditWorkout}>
+                  onClick = { handleEditWorkout }>
                   <div className = "hidden lg:block px-8">
                      <FontAwesomeIcon
-                        icon = {faPencil}
+                        icon = { faPencil }
                         className = " text-primary cursor-pointer text-md hover:scale-125 transition duration-300 ease-in-out"
                      />
                   </div>
@@ -165,7 +169,7 @@ function Row(props: RowProps) {
                      <Button
                         type = "button"
                         className = "block lg:hidden bg-primary text-white w-[10rem] mt-2 mb-6 h-[2.4rem] p-4 text-sm"
-                        icon = {faPencil}>
+                        icon = { faPencil }>
                         Edit Workout
                      </Button>
                   </div>
@@ -301,9 +305,9 @@ export default function Table(props: TableProps): JSX.Element {
                <input
                   id = "workout-select-all-mobile"
                   type = "checkbox"
-                  checked = {allVisibleSelected}
+                  checked = { allVisibleSelected }
                   className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 `border-`gray-300 rounded focus:ring-blue-500"
-                  onChange = {() => handleWorkoutToggle()}
+                  onChange = { () => handleWorkoutToggle() }
                />
             </div>
             <div className = "hidden lg:flex justify-between items-center w-full mx-auto bg-white p-4 hover:bg-gray-100 cursor-pointer">
@@ -311,9 +315,9 @@ export default function Table(props: TableProps): JSX.Element {
                   <input
                      id = "workout-select-all-desktop"
                      type = "checkbox"
-                     checked = {allVisibleSelected}
+                     checked = { allVisibleSelected }
                      className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 `border-`gray-300 rounded focus:ring-blue-500"
-                     onChange = {() => handleWorkoutToggle()}
+                     onChange = { () => handleWorkoutToggle() }
                   />
                </div>
                <div className = "w-[10rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
@@ -332,23 +336,26 @@ export default function Table(props: TableProps): JSX.Element {
                </div>
             </div>
             <div className = "flex flex-col gap-2 lg:gap-0 w-full mx-auto bg-white">
-               {workouts.map((workout: Workout, index: number) => (
-                  <Row
-                     workout = {workout}
-                     index = {index}
-                     globalState = {globalState}
-                     globalDispatch = {globalDispatch}
-                     key = {workout.id}
-                  />
-               ))}
+               {
+                  workouts.map((workout: Workout, index: number) => (
+                     <Row
+                        workout = { workout }
+                        index = { index }
+                        globalState = { globalState }
+                        globalDispatch = { globalDispatch }
+                        key = { workout.id }
+                     />
+                  ))
+               }
             </div>
-            {visibleSelectedWorkouts.size > 0 && (
-               <Conformation
-                  message = {`Delete ${visibleSelectedWorkouts.size} workout${visibleSelectedWorkouts.size === 1 ? "" : "s"}?`}
-                  onConformation = {() => handleWorkoutDelete()}
-                  icon
-               />
-            )
+            {
+               visibleSelectedWorkouts.size > 0 && (
+                  <Conformation
+                     message = { `Delete ${visibleSelectedWorkouts.size} workout${visibleSelectedWorkouts.size === 1 ? "" : "s"}?` }
+                     onConformation = { () => handleWorkoutDelete() }
+                     icon
+                  />
+               )
             }
          </div>
       </div >

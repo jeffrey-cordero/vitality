@@ -25,35 +25,35 @@ function PricingCard(props: PricingCardProps): JSX.Element {
 
    return (
       <Tilt
-         tiltMaxAngleX = {5}
-         tiltMaxAngleY = {5}
-         perspective = {1000}
-         scale = {1.05}
-         transitionSpeed = {300}
+         tiltMaxAngleX = { 5 }
+         tiltMaxAngleY = { 5 }
+         perspective = { 1000 }
+         scale = { 1.05 }
+         transitionSpeed = { 300 }
          className = "relative cursor-move flex justify-center items-center w-[20.5rem] h-[33.5rem] mx-2 xsm:mx-0">
          <div
             className = "w-full h-full flex justify-center text-center rounded-2xl border-[1.5px] border-gray-200 bg-white shadow-md"
-            {...doubleTap}>
+            { ...doubleTap }>
             <div className = "relative flex flex-col justify-center align-center">
                <span className = "mb-3 block text-3xl font-extrabold text-primary">
-                  {type}
+                  { type }
                </span>
                <h2 className = "w-11/12 mx-auto text-4xl font-bold text-dark pb-6 border-b-[2px] border-b-slate-400">
-                  {price}
+                  { price }
                   <span className = "text-base font-medium text-body-color">
-                  / {subscription}
+                     / { subscription }
                   </span>
                </h2>
                <div className = "my-6 flex flex-col justify-center gap-6 h-[14rem] font-semibold text-slate-500 px-2">
-                  {children}
+                  { children }
                </div>
                <Link
-                  ref = {linkRef}
+                  ref = { linkRef }
                   href = "/signup">
                   <Button
-                     icon = {faWandMagicSparkles}
+                     icon = { faWandMagicSparkles }
                      className = "max-w-[90%] w-[12rem] mx-auto rounded-md border border-primary bg-primary p-3 text-center text-white cursor-pointer">
-                     {text}
+                     { text }
                   </Button>
                </Link>
             </div>

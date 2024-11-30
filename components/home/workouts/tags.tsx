@@ -1,8 +1,9 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
-import Input from "@/components/global/input";
 import Loading from "@/components/global/loading";
 import Conformation from "@/components/global/confirmation";
+import Modal from "@/components/global/modal";
+import { Input } from "@/components/global/input";
 import { faGear, faXmark,   faCloudArrowUp,   faTag, faArrowRotateLeft, faGears, faTags } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { addWorkoutTag, updateWorkoutTag, Tag } from "@/lib/home/workouts/tags";
@@ -10,7 +11,6 @@ import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
 import { VitalityChildProps, VitalityProps,   VitalityState,   formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { Modal } from "@/components/global/modal";
 
 const form: VitalityState = {
    tagTitle: {
@@ -58,21 +58,25 @@ function CreateTagContainer(props: CreateTagContainerProps) {
 
    return (
       <div
-         tabIndex = {0}
-         className = {clsx(
-            "cursor-pointer text-sm font-bold focus:scale-[1.05] hover:scale-[1.05] transition duration-300 ease-in-out rounded-full mb-2 mt-4 focus:outline-blue-500",
-         )}
-         onClick = {onSubmit}
-         onKeyDown = {(event: React.KeyboardEvent) => {
-            if (event.key === "Enter") {
-               onSubmit();
+         tabIndex = { 0 }
+         className = {
+            clsx(
+               "cursor-pointer text-sm font-bold focus:scale-[1.05] hover:scale-[1.05] transition duration-300 ease-in-out rounded-full mb-2 mt-4 focus:outline-blue-500",
+            )
+         }
+         onClick = { onSubmit }
+         onKeyDown = {
+            (event: React.KeyboardEvent) => {
+               if (event.key === "Enter") {
+                  onSubmit();
+               }
             }
-         }}>
+         }>
          <div
             className = "relative flex justify-center items-center gap-2 px-4 py-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-white"
-            style = {{ backgroundColor: randomColor }}>
-            <FontAwesomeIcon icon = {faTags} />
-            {search}
+            style = { { backgroundColor: randomColor } }>
+            <FontAwesomeIcon icon = { faTags } />
+            { search }
          </div>
       </div>
    );
@@ -105,29 +109,35 @@ function TagColorInput(props: VitalityChildProps) {
 
    return (
       <div className = "relative w-full mx-auto">
-         {names.map((name: string) => {
-            const color = colors[name];
+         {
+            names.map((name: string) => {
+               const color = colors[name];
 
-            return (
-               <div
-                  style = {{ backgroundColor: color }}
-                  className = {clsx(
-                     "flex justify-center items-center text-sm cursor-pointer w-full h-[2.6rem] border-[2px] rounded-sm p-3 text-white text-center",
-                     {
-                        "border-primary border-[4px] shadow-2xl":
+               return (
+                  <div
+                     style = { { backgroundColor: color } }
+                     className = {
+                        clsx(
+                           "flex justify-center items-center text-sm cursor-pointer w-full h-[2.6rem] border-[2px] rounded-sm p-3 text-white text-center",
+                           {
+                              "border-primary border-[4px] shadow-2xl":
                            localState.tagColor.value === color,
-                        "border-white": localState.tagColor.value !== color
-                     },
-                  )}
-                  onClick = {(event) => {
-                     event.stopPropagation();
-                     handleColorChange(color);
-                  }}
-                  key = {name}>
-                  {name}
-               </div>
-            );
-         })}
+                              "border-white": localState.tagColor.value !== color
+                           },
+                        )
+                     }
+                     onClick = {
+                        (event) => {
+                           event.stopPropagation();
+                           handleColorChange(color);
+                        }
+                     }
+                     key = { name }>
+                     { name }
+                  </div>
+               );
+            })
+         }
       </div>
    );
 }
@@ -253,7 +263,7 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
       <div className = "flex flex-col justify-center align-center text-center gap-3 text-black">
          <div className = "flex flex-col justify-center align-center text-center gap-3">
             <FontAwesomeIcon
-               icon = {faGear}
+               icon = { faGear }
                className = "text-4xl text-primary mt-6"
             />
             <h1 className = "text-2xl font-bold text-black mb-2 px-2">
@@ -264,34 +274,36 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
             id = "tagTitle"
             type = "text"
             label = "Title"
-            icon = {faTag}
-            input = {localState.tagTitle}
-            dispatch = {localDispatch}
-            onSubmit = {() => handleTagUpdates("update")}
+            icon = { faTag }
+            input = { localState.tagTitle }
+            dispatch = { localDispatch }
+            onSubmit = { () => handleTagUpdates("update") }
             autoFocus
             required
          />
          <div className = "flex flex-col justify-center items-center gap-1">
-            <TagColorInput {...props} />
-            {localState.tagColor.error !== null && (
-               <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                  <p className = "text-red-500 font-bold input-error">
-                     {" "}
-                     {localState.tagColor.error}{" "}
-                  </p>
-               </div>
-            )}
+            <TagColorInput { ...props } />
+            {
+               localState.tagColor.error !== null && (
+                  <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
+                     <p className = "text-red-500 font-bold input-error">
+                        { " " }
+                        { localState.tagColor.error }{ " " }
+                     </p>
+                  </div>
+               )
+            }
          </div>
          <div className = "flex flex-col gap-2">
             <Conformation
                message = "Delete this tag?"
-               onConformation = {() => handleTagUpdates("delete")}
+               onConformation = { () => handleTagUpdates("delete") }
             />
             <Button
                type = "submit"
                className = "bg-primary text-white w-full  h-[2.4rem]"
-               icon = {faCloudArrowUp}
-               onClick = {() => handleTagUpdates("update")}>
+               icon = { faCloudArrowUp }
+               onClick = { () => handleTagUpdates("update") }>
                Save
             </Button>
          </div>
@@ -373,51 +385,59 @@ function TagContainer(props: TagContainerProps): JSX.Element {
 
    return (
       <li
-         className = {clsx(
-            "relative px-4 py-2 m-2 rounded-full text-sm font-bold text-white",
-         )}
-         style = {{
-            backgroundColor: tag.color
-         }}
-         ref = {tagRef}
-         key = {tag.id}>
+         className = {
+            clsx(
+               "relative px-4 py-2 m-2 rounded-full text-sm font-bold text-white",
+            )
+         }
+         style = {
+            {
+               backgroundColor: tag.color
+            }
+         }
+         ref = { tagRef }
+         key = { tag.id }>
          <div className = "max-w-full mx-auto flex flex-row justify-center items-center">
             <div
-               onClick = {(event) => {
-                  event.stopPropagation();
+               onClick = {
+                  (event) => {
+                     event.stopPropagation();
 
-                  if (!selected) {
-                     handleTagSelect(true);
+                     if (!selected) {
+                        handleTagSelect(true);
+                     }
                   }
-               }}
+               }
                className = "cursor-pointer max-w-full pr-3 mx-auto line-clamp-1 break-all text-center text-ellipsis">
-               {tag.title}
+               { tag.title }
             </div>
             <div className = "flex flex-row justify-center items-center gap-2 pr-2">
                {
                   <Modal
-                     ref = {editTagModalRef}
+                     ref = { editTagModalRef }
                      display = {
                         <FontAwesomeIcon
-                           icon = {faGears}
-                           onClick = {handleTagEdits}
+                           icon = { faGears }
+                           onClick = { handleTagEdits }
                            className = "cursor-pointer text-md pt-1"
                         />
                      }
                      className = "max-w-[90%] sm:max-w-xl max-h-[90%] mt-12">
                      <EditTagContainer
-                        {...props}
-                        onSave = {handleTagSave}
+                        { ...props }
+                        onSave = { handleTagSave }
                      />
                   </Modal>
                }
-               {selected && (
-                  <FontAwesomeIcon
-                     onMouseDown = {() => handleTagSelect(false)}
-                     icon = {faXmark}
-                     className = "cursor-pointer text-lg"
-                  />
-               )}
+               {
+                  selected && (
+                     <FontAwesomeIcon
+                        onMouseDown = { () => handleTagSelect(false) }
+                        icon = { faXmark }
+                        className = "cursor-pointer text-lg"
+                     />
+                  )
+               }
             </div>
          </div>
       </li>
@@ -428,7 +448,7 @@ interface TagsProps extends VitalityProps {
    onReset?: () => void;
 }
 
-export function Tags(props: TagsProps): JSX.Element {
+export default function Tags(props: TagsProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const { globalState, globalDispatch, onReset } = props;
@@ -553,83 +573,99 @@ export function Tags(props: TagsProps): JSX.Element {
 
    return (
       <div>
-         {fetched ? (
-            <div className = "w-full mx-auto flex flex-col flex-wrap justify-center items-center">
-               {globalState.tags.data.selected?.length > 0 && (
-                  <ul className = "flex flex-col sm:flex-row flex-wrap justify-center items-center pb-2">
-                     {globalState.tags.data.selected.map((selected: Tag) => {
-                        return (
-                           selected !== undefined && (
-                              <TagContainer
-                                 {...props}
-                                 localState = {localState}
-                                 localDispatch = {localDispatch}
-                                 tag = {selected}
-                                 selected = {true}
-                                 key = {selected.id}
+         {
+            fetched ? (
+               <div className = "w-full mx-auto flex flex-col flex-wrap justify-center items-center">
+                  {
+                     globalState.tags.data.selected?.length > 0 && (
+                        <ul className = "flex flex-col sm:flex-row flex-wrap justify-center items-center pb-2">
+                           {
+                              globalState.tags.data.selected.map((selected: Tag) => {
+                                 return (
+                                    selected !== undefined && (
+                                       <TagContainer
+                                          { ...props }
+                                          localState = { localState }
+                                          localDispatch = { localDispatch }
+                                          tag = { selected }
+                                          selected = { true }
+                                          key = { selected.id }
+                                       />
+                                    )
+                                 );
+                              })
+                           }
+                        </ul>
+                     )
+                  }
+                  <div className = "relative w-full mx-auto">
+                     {
+                        onReset && (
+                           <div className = "relative mt-4">
+                              <FontAwesomeIcon
+                                 icon = { faArrowRotateLeft }
+                                 onClick = { onReset }
+                                 className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
                               />
-                           )
-                        );
-                     })}
-                  </ul>
-               )}
-               <div className = "relative w-full mx-auto">
-                  {onReset && (
-                     <div className = "relative mt-4">
-                        <FontAwesomeIcon
-                           icon = {faArrowRotateLeft}
-                           onClick = {onReset}
-                           className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
-                        />
-                     </div>
-                  )}
-                  <Input
-                     id = "tagSearch"
-                     type = "text"
-                     input = {localState.tagSearch}
-                     label = "Tags"
-                     icon = {faTag}
-                     dispatch = {localDispatch}
-                     onSubmit = {() => {
-                        if (!tagsByTitle[search]) {
-                           handleTagCreation();
+                           </div>
+                        )
+                     }
+                     <Input
+                        id = "tagSearch"
+                        type = "text"
+                        input = { localState.tagSearch }
+                        label = "Tags"
+                        icon = { faTag }
+                        dispatch = { localDispatch }
+                        onSubmit = {
+                           () => {
+                              if (!tagsByTitle[search]) {
+                                 handleTagCreation();
+                              }
+                           }
                         }
-                     }}
-                     autoFocus = {onReset !== undefined}
-                  />
+                        autoFocus = { onReset !== undefined }
+                     />
+                  </div>
+                  {
+                     searchResults.length > 0 && (
+                        <ul className = "flex flex-row flex-wrap justify-center items-center pt-2">
+                           {
+                              searchResults.map((tag: Tag) => {
+                                 return (
+                                    <TagContainer
+                                       { ...props }
+                                       localState = { localState }
+                                       localDispatch = { localDispatch }
+                                       globalState = { globalState }
+                                       globalDispatch = { globalDispatch }
+                                       tag = { tag }
+                                       selected = { false }
+                                       key = { tag.id }
+                                    />
+                                 );
+                              })
+                           }
+                        </ul>
+                     )
+                  }
+                  {
+                     search.trim().length > 0 && !tagsByTitle[search] && (
+                        <CreateTagContainer
+                           { ...props }
+                           localState = { localState }
+                           localDispatch = { localDispatch }
+                           onSubmit = { () => handleTagCreation() }
+                        />
+                     )
+                  }
                </div>
-               {searchResults.length > 0 && (
-                  <ul className = "flex flex-row flex-wrap justify-center items-center pt-2">
-                     {searchResults.map((tag: Tag) => {
-                        return (
-                           <TagContainer
-                              {...props}
-                              localState = {localState}
-                              localDispatch = {localDispatch}
-                              globalState = {globalState}
-                              globalDispatch = {globalDispatch}
-                              tag = {tag}
-                              selected = {false}
-                              key = {tag.id}
-                           />
-                        );
-                     })}
-                  </ul>
-               )}
-               {search.trim().length > 0 && !tagsByTitle[search] && (
-                  <CreateTagContainer
-                     {...props}
-                     localState = {localState}
-                     localDispatch = {localDispatch}
-                     onSubmit = {() => handleTagCreation()}
-                  />
-               )}
-            </div>
-         ) : (
-            <div className = "w-full h-full justify-center items-center py-12">
-               <Loading />
-            </div>
-         )}
+            ) : (
+               <div className = "w-full h-full justify-center items-center py-12">
+                  <Loading />
+               </div>
+            )
+         }
       </div>
    );
 }
