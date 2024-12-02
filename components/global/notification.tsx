@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { useRef, useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NotificationContext } from "@/app/layout";
-import { faCircleCheck, faTriangleExclamation, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCircleExclamation, faXmark, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 
 export interface NotificationProps extends React.HTMLAttributes<any> {
   status: "Initial" | "Success" | "Error" | "Failure";
@@ -15,7 +15,7 @@ export interface NotificationProps extends React.HTMLAttributes<any> {
 export default function Notification(props: NotificationProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
    const { status, message, children, timer } = props;
-   const icon = status === "Success" ? faCircleCheck : faTriangleExclamation;
+   const icon = status === "Success" ? faCircleCheck : faCircleExclamation;
    const notificationRef = useRef<HTMLDivElement>(null);
 
    const removeNotification = () => {
@@ -48,7 +48,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
                   <div
                      className = {
                         clsx(
-                           "w-full border-stroke flex items-center rounded-lg border border-l-[8px] bg-white pl-4",
+                           "w-full border-stroke flex items-center rounded-lg border-l-[8px] bg-white dark:bg-slate-800 pl-4",
                            {
                               "border-l-green-600": status === "Success",
                               "border-l-red-600": status !== "Success"
@@ -66,9 +66,9 @@ export default function Notification(props: NotificationProps): JSX.Element {
                            }
                         />
                      </div>
-                     <div className = "flex w-full items-center justify-between px-4 py-3">
+                     <div className = "flex w-full items-center justify-between px-4 pt-[16px] pb-3">
                         <div>
-                           <div className = "my-2 flex flex-col gap-2 font-bold pr-1">
+                           <div className = "my-2 flex flex-col gap-2 font-bold pr-3 whitespace-pre-wrap break-all">
                               <p>{ message }</p>
                               { children }
                            </div>
@@ -76,10 +76,10 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      </div>
                   </div>
                </div>
-               <div className = "absolute top-[-8px] right-[-3px] z-50 p-3.5 rounded-e-md">
+               <div className = "absolute top-[-5px] right-[-5px] z-50 p-3.5 rounded-e-md">
                   <FontAwesomeIcon
                      icon = { faXmark }
-                     className = "cursor-pointer flex-shrink-0 size-4.5 text-[18px] text-red-500 text-md font-extrabold"
+                     className = "cursor-pointer flex-shrink-0 size-4.5 text-[19px] text-red-500 text-md font-extrabold"
                      fill = "black"
                      onClick = {
                         (event) => {

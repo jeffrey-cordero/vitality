@@ -20,7 +20,7 @@ export default function Conformation(props: ConformationProps): JSX.Element {
          ref = { deleteModalRef }
          display = {
             icon ? (
-               <div className = "bg-white">
+               <div className = "bg-white dark:bg-slate-800">
                   <FontAwesomeIcon
                      icon = { faTrashCan }
                      className = "cursor-pointer  text-red-500 text-xl my-4"

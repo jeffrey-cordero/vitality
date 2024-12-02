@@ -83,7 +83,7 @@ export async function signup(
          "Invalid user registration fields",
          fields.error.flatten().fieldErrors
       );
-   } else if (!(registration.password === registration.confirmPassword)) {
+   } else if (registration.password !== registration.confirmPassword) {
       return sendErrorMessage("Invalid user registration fields", {
          password: ["Passwords do not match"],
          confirmPassword: ["Passwords do not match"]
@@ -120,7 +120,7 @@ export async function signup(
 
          return sendSuccessMessage("Successfully registered", null);
       } else {
-         // Handle taken username, email, and/or phone errors
+         // Handle taken username, email, and/or phone constraints
          const errors = {};
 
          for (const user of existingUsers) {

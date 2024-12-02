@@ -64,9 +64,9 @@ function SideBarLinks(): JSX.Element {
                      href = { link.href }
                      className = {
                         clsx(
-                           "flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-black bg-gray-50 text-sm font-medium hover:text-primary z-40",
+                           "flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-sm font-medium z-40 hover:text-primary",
                            {
-                              "bg-sky-100 text-primary": pathname === link.href
+                              "bg-sky-100 dark:bg-slate-700 text-primary": pathname === link.href
                            },
                         )
                      }>
@@ -95,7 +95,7 @@ export function SideBar(): JSX.Element {
                <FontAwesomeIcon
                   id = "sideBarButton"
                   icon = { visibleSideBar ? faAnglesRight : faBarsStaggered }
-                  className = "text-3xl text-black font-extrabold hover:cursor-pointer"
+                  className = "text-3xl text-black dark:text-white font-extrabold hover:cursor-pointer"
                   onClick = {
                      () => {
                         setVisibleSideBar(!visibleSideBar);
@@ -117,7 +117,7 @@ export function SideBar(): JSX.Element {
                   )
                }>
                <div
-                  className = "flex h-auto mt-20 flex-col px-3 py-4 bg-gray-50 shadow-md rounded-2xl overflow-hidden"
+                  className = "flex h-auto mt-20 flex-col px-3 py-4 bg-gray-50 dark:bg-slate-800  shadow-md rounded-2xl overflow-hidden"
                   onMouseEnter = {
                      () => {
                         setVisibleSideBar(true);

@@ -13,7 +13,7 @@ function Card(props: CardProps): JSX.Element {
    const { icon, title, description } = props;
 
    return (
-      <div className = "flex justify-center items-center w-[17rem] h-[24rem] mx-2 sm:mx-8 text-center rounded-2xl border border-gray-200 bg-white shadow-md hover:scale-[1.05] transition duration-300 ease-in-out">
+      <div className = "flex justify-center items-center w-[22rem] md:w-[18rem] h-[22rem] mx-2 xsm:mx-0 text-center rounded-2xl bg-white shadow-md dark:bg-slate-800 ">
          <div className = "w-full mx-auto flex flex-col text-center justify-center items-center gap-4 px-6 text-black">
             <div>
                <FontAwesomeIcon
@@ -25,7 +25,7 @@ function Card(props: CardProps): JSX.Element {
                </h1>
             </div>
             <div>
-               <p className = "text-md font-medium text-slate-500 px-1">
+               <p className = "text-md font-medium text-gray-500 dark:text-gray-400 px-1">
                   { description }
                </p>
             </div>
@@ -41,7 +41,7 @@ export default function Highlights(): JSX.Element {
             title = "Optimized Fitness Tracking"
             description = "Our cutting-edge fitness tracker empowers you to effortlessly track progress, set goals, and reach peak fitness"
          />
-         <div className = "relative container mx-auto flex flex-row flex-wrap justify-center align-center gap-8 p-2 py-6">
+         <div className = "relative container mx-auto flex flex-row flex-wrap justify-center align-center gap-8 p-2 my-8">
             <Card
                icon = { faPalette }
                title = "Modern Design"

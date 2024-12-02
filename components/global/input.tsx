@@ -109,10 +109,10 @@ export function Input(props: VitalityInputProps): JSX.Element {
             ref = { inputRef }
             placeholder = { placeholder ?? "" }
             className = {
-               clsx("peer p-4 block w-full rounded-lg text-sm font-semibold border-1 placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2",
+               clsx("peer p-4 block w-full rounded-lg text-sm font-semibold border-1 dark:border-0 placeholder:text-transparent bg-white dark:bg-gray-700/50 focus:border-blue-500 focus:border-[1.5px] focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-7 focus:pb-2 [&:not(:placeholder-shown)]:pt-7 [&:not(:placeholder-shown)]:pb-2 autofill:pt-7 autofill:pb-2 dark:[color-scheme:dark]",
                   {
                      "border-gray-200 border-[1.5px]": input.error === null,
-                     "border-red-500 border-[1.5px] focus:border-red-500 focus:ring-red-500 error": input.error !== null
+                     "border-red-500 border-[2px] focus:border-red-500 focus:ring-red-500 error": input.error !== null
                   }, className)
             }
             onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event) }
@@ -123,10 +123,10 @@ export function Input(props: VitalityInputProps): JSX.Element {
                <Button
                   tabIndex = { -1 }
                   type = "button"
-                  className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
+                  className = "absolute top-[8px] end-0 p-3.5 rounded-e-md">
                   <FontAwesomeIcon
                      icon = { inputType == "password" ? faEye : faEyeSlash }
-                     className = "flex-shrink-0 size-3.5 password-icon"
+                     className = "flex-shrink-0 size-4.5 password-icon"
                      ref = { passwordButton }
                      onClick = { handlePasswordIconClick }
                   />
@@ -138,11 +138,11 @@ export function Input(props: VitalityInputProps): JSX.Element {
                <Button
                   tabIndex = { -1 }
                   type = "button"
-                  className = "absolute top-[4.5px] end-0 p-3.5 rounded-e-md">
+                  className = "absolute top-[8px] end-0 p-3.5 rounded-e-md">
                   <FontAwesomeIcon
                      icon = { input.data.valid ? faCircleCheck : faCircleXmark }
                      className = {
-                        clsx("flex-shrink-0 size-3.5", {
+                        clsx("flex-shrink-0 size-4", {
                            "text-green-500": input.data.valid,
                            "text-red-500": !(input.data.valid)
                         })
@@ -155,13 +155,23 @@ export function Input(props: VitalityInputProps): JSX.Element {
             htmlFor = { id }
             className = {
                clsx(
-                  "absolute top-0 start-0 p-4 h-full text-sm text-black truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-gray-500 peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-black peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500",
+                  "absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-black peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-black dark:peer-placeholder-shown:text-white peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-gray-400",
                   {
-                     "font-bold": required
+                     "font-bold": required,
+                     "dark:peer-[:not(:placeholder-shown)]:text-white" : type === "date" && input.value === "",
+                     "dark:peer-[:not(:placeholder-shown)]:text-gray-400" : type === "date" && input.value !== ""
                   }
                )
             }>
-            { icon && <FontAwesomeIcon icon = { icon } /> } { label }
+            { 
+            icon && (
+               <FontAwesomeIcon 
+                  icon = { icon }
+                  className="mr-[4px]" 
+               />
+               ) 
+            } 
+            { label }
          </label>
          {
             input.error !== null && (

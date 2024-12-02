@@ -7,7 +7,7 @@ import Notification from "@/components/global/notification";
 import { sfPro, inter } from "@/app/fonts";
 import { SideBar } from "@/components/global/sidebar";
 import { createContext, SetStateAction, useCallback, useEffect, useState } from "react";
-import { getServerSession } from "@/lib/authentication/session";
+import { getSession } from "@/lib/authentication/session";
 import { NotificationProps } from "@/components/global/notification";
 import { User as NextAuthUser } from "next-auth";
 
@@ -41,6 +41,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
    // Layouts holds context for both user and potential notifications
    const [user, setUser] = useState<NextAuthUser | undefined>(undefined);
    const [fetched, setFetched] = useState<boolean>(false);
+   const [theme, setTheme] = useState<"light" | "dark">("light");
    const [notification, setNotification] = useState<
       NotificationProps | undefined
    >(undefined);
@@ -51,8 +52,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
    const handleAuthentication = useCallback(async() => {
       try {
-         const user = await getServerSession();
-         setUser(user);
+         setUser(await getSession());
       } catch (error) {
          updateNotification({
             status: "Failure",
@@ -150,7 +150,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                cx(
                   sfPro.variable,
                   inter.variable,
-                  "box-border m-0 p-0 overflow-x-hidden max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black",
+                  "box-border m-0 p-0 overflow-x-hidden max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-900 text-black dark:text-white",
                )
             }
             suppressHydrationWarning = { true }>

@@ -56,10 +56,10 @@ export function sendFailureMessage<T>(error: Error): VitalityResponse<T> {
 }
 
 export function handleResponse(
-   dispatch: Dispatch<VitalityAction<any>>,
    response: VitalityResponse<any>,
-   successMethod: () => void,
+   dispatch: Dispatch<VitalityAction<any>>,
    updateNotification: (_notification: NotificationProps) => void,
+   successMethod: () => void
 ): void {
    if (response.status === "Success") {
       // Remove any existing notifications

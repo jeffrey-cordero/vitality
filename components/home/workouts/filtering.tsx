@@ -279,9 +279,9 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          <div className = "flex flex-col justify-center align-center text-center gap-2">
             <FontAwesomeIcon
                icon = { faCalendar }
-               className = "text-3xl text-primary mt-6"
+               className = "text-4xl text-primary mt-6"
             />
-            <h1 className = "text-2xl font-bold text-black mb-2">Filter by Date</h1>
+            <h1 className = "text-2xl font-bold mb-2">Filter by Date</h1>
             <div className = "relative mt-8">
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
@@ -300,7 +300,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                />
                {
                   input !== undefined ? (
-                  // Min or max
+                     // Min or max
                      <div>
                         <DateInput
                            { ...props }
@@ -479,9 +479,9 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          <div className = "flex flex-col justify-center align-center text-center gap-2">
             <FontAwesomeIcon
                icon = { faTag }
-               className = "text-3xl text-primary mt-6"
+               className = "text-4xl text-primary mt-6"
             />
-            <h1 className = "text-2xl font-bold text-black mb-2">Filter by Tags</h1>
+            <h1 className = "text-2xl font-bold mb-2">Filter by Tags</h1>
             <div className = "relative">
                <div className = "w-full mx-auto my-2">
                   <Tags

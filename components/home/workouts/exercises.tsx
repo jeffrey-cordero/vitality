@@ -79,7 +79,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
 
       const response: VitalityResponse<Exercise> = await addExercise(payload);
 
-      const successMethod = () => {
+      handleResponse(response, localDispatch, updateNotification, () => {
          // Add the new exercise to editing workout array of exercises
          const newExercises: Exercise[] = [
             ...workout.exercises,
@@ -87,9 +87,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          ];
          saveExercises(newExercises);
          onBlur();
-      };
-
-      handleResponse(localDispatch, response, successMethod, updateNotification);
+      });
    }, [
       localDispatch,
       localState.name.value,
@@ -117,7 +115,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          />
          <Button
             type = "button"
-            className = "w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
+            className = "w-full px-4 py-2 font-bold border-0 h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-white bg-red-500"
             icon = { faRotateLeft }
             onClick = {
                () => {
@@ -128,7 +126,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          </Button>
          <Button
             type = "button"
-            className = "w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+            className = "w-full bg-green-600 text-white px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
             icon = { faPenRuler }
             onClick = { handleCreateNewExercise }>
             Add Exercise
@@ -239,7 +237,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
             response = await updateExercise(newExercise, "sets");
          }
 
-         const successMethod = () => {
+         handleResponse(response, localDispatch, updateNotification, () => {
             // Update editing exercise
             const newExercises: Exercise[] = [...workout.exercises].map((e) =>
                e.id === exercise.id ? response.body.data as Exercise : e,
@@ -254,14 +252,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                message: `${set === undefined ? "Added" : method === "update" ? "Updated" : "Deleted"} exercise set`,
                timer: 1000
             });
-         };
-
-         handleResponse(
-            localDispatch,
-            response,
-            successMethod,
-            updateNotification,
-         );
+         });
       },
       [
          set,
@@ -425,7 +416,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                   />
                   <Button
                      type = "button"
-                     className = "w-full px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
+                     className = "w-full px-4 py-2 font-bold border-0 h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-white bg-red-500"
                      icon = { faRotateLeft }
                      onClick = {
                         () => {
@@ -441,7 +432,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                   </Button>
                   <Button
                      type = "button"
-                     className = "w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                     className = "w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 dark:border-0 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
                      icon = { faCloudArrowUp }
                      onClick = { () => handleExerciseSetUpdates("update") }>
                      { set !== undefined ? "Update" : "Create" }
@@ -622,21 +613,14 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                "sets",
             );
 
-            const successMethod = () => {
+            handleResponse(response, localDispatch, updateNotification, () => {
                // Submit changes to global state from response data
                const newExercises: Exercise[] = [...workout.exercises].map((e) =>
                   e.id !== exercise.id ? e : response.body.data as Exercise,
                );
 
                saveExercises(newExercises);
-            };
-
-            handleResponse(
-               localDispatch,
-               response,
-               successMethod,
-               updateNotification,
-            );
+            });
          }
       }
    };
@@ -645,12 +629,8 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       // Construct new exercise for update method
       const newName: string = localState.name.value.trim();
       const newExercise: Exercise = { ...exercise, name: newName };
-      const response: VitalityResponse<Exercise> = await updateExercise(
-         newExercise,
-         "name",
-      );
 
-      const successMethod = () => {
+      handleResponse(await updateExercise(newExercise, "name"), localDispatch, updateNotification, () => {
          // Update the overall workout exercises
          const newExercises: Exercise[] = [...workout.exercises].map((e) =>
             e.id !== exercise.id ? e : newExercise,
@@ -664,9 +644,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
             message: "Updated exercise name",
             timer: 1000
          });
-      };
-
-      handleResponse(localDispatch, response, successMethod, updateNotification);
+      });
    }, [
       exercise,
       localDispatch,
@@ -687,17 +665,15 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          }
       );
 
-      const successMethod = () => {
+      handleResponse(response, localDispatch, updateNotification, () => {
          // Update the overall workout exercises with new exercises from backend response
          saveExercises(response.body.data as Exercise[]);
-      };
 
-      if (window.localStorage.getItem(collapsedId)) {
-         // Remove from localStorage as the exercise no longer exists
-         window.localStorage.removeItem(collapsedId);
-      }
-
-      handleResponse(localDispatch, response, successMethod, updateNotification);
+         if (window.localStorage.getItem(collapsedId)) {
+            // Remove from localStorage as the exercise no longer exists
+            window.localStorage.removeItem(collapsedId);
+         }
+      });
    }, [
       workout,
       exercise.id,
@@ -821,7 +797,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   />
                   <Button
                      type = "button"
-                     className = "w-full bg-grey-200 px-4 py-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
+                     className = "w-full px-4 py-2 font-bold border-0 h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-white bg-red-500"
                      icon = { faRotateLeft }
                      onClick = {
                         () => {
@@ -832,10 +808,10 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   </Button>
                   <Button
                      type = "button"
-                     className = "w-full bg-green-600 text-white text-md my-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                     className = "w-full bg-green-600 text-white text-md my-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] dark:border-0 h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
                      icon = { faPenRuler }
                      onClick = { handleExerciseNameUpdates }>
-                  Update
+                     Update
                   </Button>
                   <Conformation
                      message = "Delete this exercise?"
@@ -903,7 +879,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                         <div className = "w-full mx-auto px-4 sm:px-8">
                            <Button
                               type = "button"
-                              className = "w-full bg-white text-black text-md px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                              className = "w-full border-[1.5px] border-gray-100 dark:border-0 dark:bg-gray-700/50 text-md px-4 py-2 font-bold h-[2.6rem] focus:border-blue-500 focus:ring-blue-500"
                               icon = { faPersonRunning }
                               onClick = {
                                  () => {
@@ -911,7 +887,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                                     setAddSet(true);
                                  }
                               }>
-                           New Entry
+                              New Entry
                            </Button>
                         </div>
                      )
@@ -1055,16 +1031,9 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                }
             );
 
-            const successMethod = () => {
+            handleResponse(response, localDispatch, updateNotification, () => {
                handleSaveExercises(newExercises);
-            };
-
-            handleResponse(
-               localDispatch,
-               response,
-               successMethod,
-               updateNotification,
-            );
+            });
          }
       }
    };
@@ -1116,10 +1085,10 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                   <div className = "w-full mx-auto">
                      <Button
                         type = "button"
-                        className = "w-full bg-white text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                        className = "w-full border-[1.5px] border-gray-100 dark:border-0 dark:bg-gray-700/50 px-4 py-2 font-bold h-[2.6rem] focus:border-blue-500 focus:ring-blue-500"
                         icon = { faPlus }
                         onClick = { handleInitializeNewExerciseInput }>
-                     New Exercise
+                           New Exercise
                      </Button>
                   </div>
                )

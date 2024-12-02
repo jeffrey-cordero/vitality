@@ -150,7 +150,7 @@ export default function Form(props: VitalityProps): JSX.Element {
             ? await updateWorkout(payload)
             : await deleteWorkouts([payload], user.id);
 
-      const successMethod = () => {
+      handleResponse(response, localDispatch, updateNotification,  () => {
          const returnedWorkout: Workout | null =
             method === "delete" ? payload : (response.body.data as Workout);
 
@@ -219,9 +219,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                timer: 1000
             });
          }
-      };
-
-      handleResponse(localDispatch, response, successMethod, updateNotification);
+      });
    };
 
    const handleInitializeWorkoutState = useCallback(() => {
@@ -384,7 +382,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      icon = { faPersonRunning }
                      className = "text-5xl sm:text-6xl text-primary mt-6"
                   />
-                  <h1 className = "text-2xl sm:text-3xl font-bold text-black mb-2">
+                  <h1 className = "text-2xl sm:text-3xl font-bold mb-2">
                      { isNewWorkout ? "New" : "Edit" } Workout
                   </h1>
                </div>
@@ -467,7 +465,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          </Modal>
          <Button
             type = "button"
-            className = "bg-primary text-white w-[10.5rem] h-[2.8rem] text-md p-3"
+            className = "bg-primary text-white w-[10rem] h-[2.8rem] text-md p-3"
             icon = { faPersonRunning }
             onClick = {
                () => {

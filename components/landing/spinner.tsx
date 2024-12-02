@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 
 interface CounterProps {
   value: number;
-  className: string;
   start: number;
   duration: number;
+  className: string;
 }
 
 function Counter(props: CounterProps): JSX.Element {
+   // https://github.com/steven-tey/precedent/blob/main/components/shared/counting-numbers.tsx
    const { value, className, start, duration } = props;
    const [count, setCount] = useState<number>(start);
    const easeOutQuad = (t: number, b: number, c: number, d: number) => {
@@ -37,14 +38,16 @@ function Counter(props: CounterProps): JSX.Element {
       duration
    ]);
 
-   return <p className = { className }>{ Intl.NumberFormat().format(count) }</p>;
+   return <p className = { className }>
+      { Intl.NumberFormat().format(count) }
+   </p>;
 }
 
-export default function Ring(): JSX.Element {
+export default function Spinner(): JSX.Element {
    return (
       <div className = "relative h-full w-full my-10">
          <motion.svg
-            className = "absolute inset-0 m-auto w-[80px] xsm:w-[85px] h-[80px] xsm:h-[85px] "
+            className = "absolute inset-0 m-auto w-[80px] h-[80px]"
             viewBox = "0 0 100 100">
             <motion.circle
                initial = { { pathLength: 0 } }

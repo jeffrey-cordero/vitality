@@ -6,6 +6,7 @@ const config: Config = {
       "./app/**/*.{js,ts,jsx,tsx,mdx}"
    ],
    theme: {
+      darkMode: 'selector',
       extend: {
          colors: {
             primary: "#2563EB"
@@ -39,4 +40,5 @@ const config: Config = {
    },
    plugins: [require("@tailwindcss/forms")]
 };
+
 export default config;

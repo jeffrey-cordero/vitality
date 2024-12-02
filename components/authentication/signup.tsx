@@ -11,7 +11,7 @@ import { signup, Registration } from "@/lib/authentication/signup";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { NotificationContext } from "@/app/layout";
 import { faArrowRotateLeft, faDoorOpen, faFeather, faKey, faEnvelope, faPhone,
-   faUserSecret, faCalendar, faUserCheck } from "@fortawesome/free-solid-svg-icons";
+   faUserSecret, faCalendar, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 
 const registration: VitalityState = {
    username: {
@@ -55,7 +55,7 @@ export default function SignUp(): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, registration);
 
-   const handleSubmit = async(event: FormEvent) => {
+   const handleRegistration = async(event: FormEvent) => {
       event.preventDefault();
 
       const registration: Registration = {
@@ -67,9 +67,10 @@ export default function SignUp(): JSX.Element {
          birthday: new Date(state.birthday.value),
          phone: state.phone.value.trim()
       };
+
       const response: VitalityResponse<null> = await signup(registration);
 
-      const successMethod = () => {
+      handleResponse(response, dispatch, updateNotification, () => {
          // Display login notification
          updateNotification({
             status: response.status,
@@ -95,21 +96,19 @@ export default function SignUp(): JSX.Element {
                </Link>
             )
          });
-      };
-
-      handleResponse(dispatch, response, successMethod, updateNotification);
+      });
    };
 
    return (
-      <div className = "w-full mx-auto mt-6 flex flex-col items-center justify-center text-center">
+      <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
          <Heading
             title = "Sign Up"
             description = "Create an account to get started"
          />
-         <div className = "w-10/12 lg:w-1/2 mx-auto mt-6">
+         <div className = "w-10/12 lg:w-1/2 mx-auto mt-8">
             <form
                className = "relative w-full mx-auto flex flex-col justify-center align-center gap-3"
-               onSubmit = { handleSubmit }>
+               onSubmit = { handleRegistration }>
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
                   onClick = {
@@ -195,16 +194,16 @@ export default function SignUp(): JSX.Element {
                <Button
                   type = "submit"
                   className = "bg-primary text-white h-[2.6rem]"
-                  icon = { faUserCheck }>
-                  Register
+                  icon = { faUserPlus }>
+                  Sign Up
                </Button>
             </form>
-            <p className = "mt-4">
+            <p className = "mt-4 px-2">
                Already have an account?{ " " }
                <Link
                   href = "/login"
-                  className = "text-primary font-bold">
-                  Log In
+                  className = "text-primary font-bold break-words">
+                  Log&nbsp;In
                </Link>
             </p>
          </div>

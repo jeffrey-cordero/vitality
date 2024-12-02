@@ -20,7 +20,7 @@ describe("Backend Response Tests", () => {
             Number.MAX_VALUE
          );
 
-         handleResponse(dispatch, response, successMethod, updateNotification);
+         handleResponse(response, dispatch, updateNotification, successMethod);
 
          expect(response).toEqual({
             status: "Success",
@@ -56,7 +56,7 @@ describe("Backend Response Tests", () => {
             name: ["Name must be at least 2 characters"]
          });
 
-         handleResponse(dispatch, response, successMethod, updateNotification);
+         handleResponse(response, dispatch, updateNotification, successMethod);
 
          expect(response).toEqual({
             status: "Error",
@@ -90,7 +90,7 @@ describe("Backend Response Tests", () => {
 
          response = sendFailureMessage(new Error("Database connection error"));
 
-         handleResponse(dispatch, response, successMethod, updateNotification);
+         handleResponse(response, dispatch, updateNotification, successMethod);
 
          expect(response).toEqual({
             status: "Failure",

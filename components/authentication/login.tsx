@@ -5,9 +5,9 @@ import Button from "@/components/global/button";
 import { Input } from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormEvent, useContext, useReducer } from "react";
-import { VitalityState, formReducer } from "@/lib/global/state";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { login, Credentials } from "@/lib/authentication/login";
+import { VitalityState, formReducer } from "@/lib/global/state";
+import { handleResponse } from "@/lib/global/response";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { faArrowRotateLeft, faKey, faUnlockKeyhole, faUserSecret } from "@fortawesome/free-solid-svg-icons";
 
@@ -34,7 +34,7 @@ export default function Login(): JSX.Element {
       window.location.reload();
    }
 
-   const handleSubmit = async(event: FormEvent) => {
+   const handleAuthenticate = async(event: FormEvent) => {
       event.preventDefault();
 
       const credentials: Credentials = {
@@ -42,25 +42,21 @@ export default function Login(): JSX.Element {
          password: state.password.value.trim()
       };
 
-      const response: VitalityResponse<null> = await login(credentials);
-
-      const successMethod = () => {
+      handleResponse(await login(credentials), dispatch, updateNotification, () => {
          window.location.reload();
-      };
-
-      handleResponse(dispatch, response, successMethod, updateNotification);
+      });
    };
 
    return (
-      <div className = "w-full mx-auto mt-8 flex flex-col items-center justify-center text-center">
+      <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
          <Heading
             title = "Log In"
             description = "Enter valid credentials to enter"
          />
-         <div className = "w-10/12 lg:w-1/2 mx-auto mt-4">
+         <div className = "w-10/12 lg:w-1/2 mx-auto mt-8">
             <form
                className = "relative w-full flex flex-col justify-center align-center gap-3"
-               onSubmit = { handleSubmit }>
+               onSubmit = { handleAuthenticate }>
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
                   onClick = {
@@ -100,12 +96,12 @@ export default function Login(): JSX.Element {
                   Log In
                </Button>
             </form>
-            <p className = "mt-4">
+            <p className = "mt-4 px-2">
                Don&apos;t have an account? { " " }
                <Link
                   href = "/signup"
                   className = "text-primary font-bold">
-                  Register
+                  Sign&nbsp;Up
                </Link>
             </p>
          </div>

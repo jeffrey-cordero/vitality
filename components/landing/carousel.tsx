@@ -25,7 +25,7 @@ export default function Carousel(props: CarouselProps): JSX.Element {
    };
 
    return (
-      <div className = "relative w-full mx-auto bg-white rounded-2xl p-2 sm:p-0  shadow-md">
+      <div className = "relative w-full mx-auto bg-white dark:bg-slate-800 rounded-2xl p-2 sm:p-0 shadow-md">
          <div
             className = "carousel-inner flex transition-[opacity,transform] ease-in-out duration-500"
             style = {
@@ -57,7 +57,7 @@ export default function Carousel(props: CarouselProps): JSX.Element {
                type = "button"
                className = "absolute top-0 -translate-x-1/2 start-0 z-10 flex items-center justify-center h-full px-2 cursor-pointer group focus:outline-none overflow-visible"
                onClick = { prevSlide }>
-               <span className = "inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 group-hover:bg-gray-400 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+               <span className = "inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-400 dark:bg-gray-300 group-hover:bg-gray-500 dark:group-hover:bg-gray-400 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
                   <svg
                      className = "w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
                      aria-hidden = "true"
@@ -79,7 +79,7 @@ export default function Carousel(props: CarouselProps): JSX.Element {
                type = "button"
                className = "absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 z-30 flex items-center justify-center h-full px-2 cursor-pointer group focus:outline-none overflow-visible"
                onClick = { nextSlide }>
-               <span className = "inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 group-hover:bg-gray-400 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+               <span className = "inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-400 dark:bg-gray-300 group-hover:bg-gray-500 dark:group-hover:bg-gray-400 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
                   <svg
                      className = "w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
                      aria-hidden = "true"

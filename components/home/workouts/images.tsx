@@ -4,7 +4,7 @@ import Button from "@/components/global/button";
 import Modal from "@/components/global/modal";
 import { Input, VitalityInputProps } from "@/components/global/input";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { faCameraRetro, faGlobe, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faCameraRetro, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
 
@@ -114,16 +114,9 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
       input
    ]);
 
-   useEffect(() => {
-      if (isDefaultImage) {
-         document.getElementById(input.value)
-            ?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-   });
-
    return (
-      <div className = "flex flex-col">
-         <div className = "flex justify-start items-center text-left gap-4 mt-2 mb-4 text-sm">
+      <div className = "flex flex-col py-2">
+         <div className = "flex justify-center items-center flex-wrap text-center gap-3 mt-2 mb-4 text-md">
             <Button
                icon = { faCameraRetro }
                onClick = {
@@ -138,10 +131,10 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                      isDefaultImage
                   })
                }>
-               Defaults
+               Default
             </Button>
             <Button
-               icon = { faGlobe }
+               icon = { faPaperclip }
                onClick = {
                   (event: React.MouseEvent) => {
                      event.stopPropagation();
@@ -299,9 +292,9 @@ export default function Images(props: VitalityInputProps): JSX.Element {
                   <Button
                      className = {
                         clsx(
-                           "w-full text-black font-semibold border-[1.5px] px-4 py-2 h-[2.4rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500",
+                           "w-full font-semibold border-[1.5px] dark:border-0 dark:bg-gray-700/50 px-4 py-2 h-[2.6rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500",
                            {
-                              "border-[1.5px] border-red-500": input.error
+                              "border-[2px] dark:border-[2px] border-red-500 text-red-500": input.error
                            },
                         )
                      }>

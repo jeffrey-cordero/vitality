@@ -78,7 +78,7 @@ function Card(props: CardProps): JSX.Element {
                      sizes = "100%"
                      src = { workout.image }
                      alt = "workout-image"
-                     className = "opacity-30 object-center object-cover"
+                     className = "opacity-50 object-center object-cover"
                   />
                ) : (
                   <div className = "absolute w-full h-full bg-white opacity-20 flex justify-center items-center">
@@ -89,11 +89,11 @@ function Card(props: CardProps): JSX.Element {
                   </div>
                )
             }
-            <div className = "relative w-full h-full flex flex-col justify-start items-center overflow-hidden text-center pt-5">
-               <h2 className = "font-bold text-2xl px-6 py-4 overflow-clip max-w-[90%] text-ellipsis whitespace-nowrap leading-none tracking-tight">
+            <div className = "relative w-full h-full flex flex-col justify-start items-center overflow-hidden text-center pt-5 text-black">
+               <h2 className = "font-extrabold text-2xl px-6 py-4 overflow-clip max-w-[90%] text-ellipsis whitespace-nowrap leading-none tracking-tight">
                   { workout.title }
                </h2>
-               <p className = "font-bold text-sm">{ formattedDate }</p>
+               <p className = "font-extrabold text-sm">{ formattedDate }</p>
                <div
                   className = {
                      clsx(

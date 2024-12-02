@@ -171,64 +171,57 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
             method,
          );
 
-         const successMethod = () => {
-            const { options, selected } = globalState.tags.data;
-            const returnedTag: Tag = response.body.data as Tag;
-
-            const mapOrFilter =
-               method === "update"
-                  ? (tag: Tag) =>
-                     tag && tag.id === returnedTag.id ? returnedTag : tag
-                  : (tag: Tag) => tag !== undefined && tag.id !== returnedTag.id;
-
-            const newTags: Tag[] =
-               method === "update"
-                  ? [...options.map(mapOrFilter)]
-                  : [...options.filter(mapOrFilter)];
-            const newSelected: Tag[] =
-               method === "update"
-                  ? [...selected.map(mapOrFilter)]
-                  : [...selected.filter(mapOrFilter)];
-
-            // Holds valid existing workout tags to account for removals in other tag view containers
-            const newDictionary: Record<string, Tag> = Object.fromEntries(
-               newTags.map((tag) => [tag.id, tag]),
-            );
-
-            if (method === "update") {
-               newDictionary[returnedTag.id] = returnedTag;
-            } else {
-               delete newDictionary[returnedTag.id];
-            }
-
-            globalDispatch({
-               type: "updateState",
-               value: {
-                  id: "tags",
-                  input: {
-                     ...globalState.tags,
-                     data: {
-                        ...globalState.tags.data,
-                        options: newTags,
-                        selected: newSelected,
-                        dictionary: newDictionary
-                     }
-                  }
-               }
-            });
-
-            // Close the modal form element and scroll into editing tag element
-            onSave();
-         };
-
          if (response.status !== "Error") {
             // Handle success or failure responses
-            handleResponse(
-               localDispatch,
-               response,
-               successMethod,
-               updateNotification,
-            );
+            handleResponse(response, localDispatch, updateNotification, () => {
+               const { options, selected } = globalState.tags.data;
+               const returnedTag: Tag = response.body.data as Tag;
+
+               const mapOrFilter =
+                  method === "update"
+                     ? (tag: Tag) =>
+                        tag && tag.id === returnedTag.id ? returnedTag : tag
+                     : (tag: Tag) => tag !== undefined && tag.id !== returnedTag.id;
+
+               const newTags: Tag[] =
+                  method === "update"
+                     ? [...options.map(mapOrFilter)]
+                     : [...options.filter(mapOrFilter)];
+               const newSelected: Tag[] =
+                  method === "update"
+                     ? [...selected.map(mapOrFilter)]
+                     : [...selected.filter(mapOrFilter)];
+
+               // Holds valid existing workout tags to account for removals in other tag view containers
+               const newDictionary: Record<string, Tag> = Object.fromEntries(
+                  newTags.map((tag) => [tag.id, tag]),
+               );
+
+               if (method === "update") {
+                  newDictionary[returnedTag.id] = returnedTag;
+               } else {
+                  delete newDictionary[returnedTag.id];
+               }
+
+               globalDispatch({
+                  type: "updateState",
+                  value: {
+                     id: "tags",
+                     input: {
+                        ...globalState.tags,
+                        data: {
+                           ...globalState.tags.data,
+                           options: newTags,
+                           selected: newSelected,
+                           dictionary: newDictionary
+                        }
+                     }
+                  }
+               });
+
+               // Close the modal form element and scroll into editing tag element
+               onSave();
+            });
          } else {
             // Handle error response uniquely by mapping response identifiers to local state identifiers
             localDispatch({
@@ -510,46 +503,39 @@ export default function Tags(props: TagsProps): JSX.Element {
 
       const response: VitalityResponse<Tag> = await addWorkoutTag(tag);
 
-      const successMethod = () => {
-         // Add the new tag to the overall user tag options
-         const newOption: Tag = response.body.data as Tag;
-
-         const newOptions: Tag[] = [...globalState.tags.data.options, newOption];
-         const newSelected: Tag[] = [...globalState.tags.data.selected, newOption];
-
-         // Dictionary of tags are essential to ignore deleted tags applied to existing workouts
-         const newDictionary: Record<string, Tag> = Object.fromEntries(
-            newOptions.map((tag) => [tag.id, tag]),
-         );
-
-         globalDispatch({
-            type: "updateState",
-            value: {
-               id: "tags",
-               input: {
-                  ...globalState.tags,
-                  data: {
-                     ...globalState.tags.data,
-                     options: newOptions,
-                     selected: newSelected,
-                     dictionary: newDictionary
-                  }
-               }
-            }
-         });
-
-         // Fetch a new random color
-         randomColor = colorValues[Math.floor(Math.random() * colorValues.length)];
-      };
-
       if (response.status !== "Error") {
          // Handle success or failure responses
-         handleResponse(
-            localDispatch,
-            response,
-            successMethod,
-            updateNotification,
-         );
+         handleResponse(response, localDispatch, updateNotification, () => {
+            // Add the new tag to the overall user tag options
+            const newOption: Tag = response.body.data as Tag;
+
+            const newOptions: Tag[] = [...globalState.tags.data.options, newOption];
+            const newSelected: Tag[] = [...globalState.tags.data.selected, newOption];
+
+            // Dictionary of tags are essential to ignore deleted tags applied to existing workouts
+            const newDictionary: Record<string, Tag> = Object.fromEntries(
+               newOptions.map((tag) => [tag.id, tag]),
+            );
+
+            globalDispatch({
+               type: "updateState",
+               value: {
+                  id: "tags",
+                  input: {
+                     ...globalState.tags,
+                     data: {
+                        ...globalState.tags.data,
+                        options: newOptions,
+                        selected: newSelected,
+                        dictionary: newDictionary
+                     }
+                  }
+               }
+            });
+
+            // Fetch a new random color
+            randomColor = colorValues[Math.floor(Math.random() * colorValues.length)];
+         });
       } else {
          // Handle error response uniquely by mapping response identifiers to local state identifiers
          localDispatch({

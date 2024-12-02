@@ -2,7 +2,6 @@
 import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 import Link from "next/link";
-import Tilt from "react-parallax-tilt";
 import { useDoubleTap } from "use-double-tap";
 import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 import { useRef } from "react";
@@ -24,27 +23,22 @@ function PricingCard(props: PricingCardProps): JSX.Element {
    });
 
    return (
-      <Tilt
-         tiltMaxAngleX = { 5 }
-         tiltMaxAngleY = { 5 }
-         perspective = { 1000 }
-         scale = { 1.05 }
-         transitionSpeed = { 300 }
-         className = "relative cursor-move flex justify-center items-center w-[20.5rem] h-[33.5rem] mx-2 xsm:mx-0">
+      <div
+         className = "relative flex justify-center items-center w-[22rem] md:w-[20.5rem] h-[33.5rem] mx-2 xsm:mx-0 container">
          <div
-            className = "w-full h-full flex justify-center text-center rounded-2xl border-[1.5px] border-gray-200 bg-white shadow-md"
+            className = "w-full h-full flex justify-center text-center rounded-2xl bg-white dark:bg-slate-800 shadow-md"
             { ...doubleTap }>
             <div className = "relative flex flex-col justify-center align-center">
                <span className = "mb-3 block text-3xl font-extrabold text-primary">
                   { type }
                </span>
-               <h2 className = "w-11/12 mx-auto text-4xl font-bold text-dark pb-6 border-b-[2px] border-b-slate-400">
+               <h2 className = "w-11/12 mx-auto text-4xl font-bold text-dark pb-6 border-b-[3px] border-b-slate-400">
                   { price }
                   <span className = "text-base font-medium text-body-color">
                      / { subscription }
                   </span>
                </h2>
-               <div className = "my-6 flex flex-col justify-center gap-6 h-[14rem] font-semibold text-slate-500 px-2">
+               <div className = "my-6 flex flex-col justify-center gap-6 h-[14rem] font-semibold px-2">
                   { children }
                </div>
                <Link
@@ -58,7 +52,7 @@ function PricingCard(props: PricingCardProps): JSX.Element {
                </Link>
             </div>
          </div>
-      </Tilt>
+      </div>
    );
 }
 
@@ -70,7 +64,7 @@ export default function Pricing(): JSX.Element {
             description = "Select a plan that best suits your needs and goals"
          />
          <div className = "w-full mx-auto">
-            <div className = "relative container mx-auto flex flex-row flex-wrap justify-center align-center gap-8 p-2 py-6">
+            <div className = "relative container mx-auto flex flex-row flex-wrap justify-center align-center gap-8 p-2 my-8">
                <PricingCard
                   type = "Regular"
                   price = "$0"

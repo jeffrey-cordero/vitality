@@ -5,9 +5,7 @@ import { z } from "zod";
 import { users as User } from "@prisma/client";
 import { Credentials } from "@/lib/authentication/login";
 
-export async function fetchUser(
-   username: string
-): Promise<User | null> {
+export async function fetchUser(username: string): Promise<User | null> {
    try {
       return await prisma.users.findFirst({
          where: {

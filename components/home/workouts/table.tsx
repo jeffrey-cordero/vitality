@@ -102,9 +102,9 @@ function Row(props: RowProps) {
    return (
       <div
          id = { workout.id }
-         className = "flex flex-col lg:flex-row justify-between items-center text-center w-full mx-auto bg-white lg:p-4 rounded-md lg:rounded-none hover:bg-gray-50 cursor-pointer"
+         className = "flex flex-col lg:flex-row justify-between items-center text-center w-full mx-auto bg-white dark:bg-slate-800 lg:p-4 rounded-md lg:rounded-none hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
          { ...doubleTap }>
-         <div className = "w-full lg:w-[1rem] flex justify-center items-center text-base uppercase px-3 pt-6 py-4 lg:pt-4 whitespace-normal font-medium text-black">
+         <div className = "w-full lg:w-[1rem] flex justify-center items-center text-base uppercase px-3 pt-6 py-4 lg:pt-4 whitespace-normal">
             <input
                id = { `workout-select-${workout.id}` }
                type = "checkbox"
@@ -113,13 +113,13 @@ function Row(props: RowProps) {
                onChange = { () => handleWorkoutToggle() }
             />
          </div>
-         <div className = "w-full lg:w-[10rem] text-xl lg:text-base px-2 lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
+         <div className = "w-full lg:w-[10rem] text-xl lg:text-base px-2 lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
             { workout.title }
          </div>
-         <div className = "w-full lg:w-[10rem] text-xl lg:text-base px-2 pt-2 lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
+         <div className = "w-full lg:w-[10rem] text-xl lg:text-base px-2 pt-2 lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
             { formattedDate }
          </div>
-         <div className = "w-full lg:w-[12rem] lg:max-h-[12rem] overflow-auto scrollbar-hide text-xl lg:text-base px-12 lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
+         <div className = "w-full lg:w-[12rem] lg:max-h-[12rem] overflow-auto scrollbar-hide text-xl lg:text-base px-12 lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
             <div
                className = {
                   clsx("w-full max-h-[14rem] flex flex-row flex-wrap justify-center items-center gap-2 p-2 overflow-auto scrollbar-hide", {
@@ -130,7 +130,7 @@ function Row(props: RowProps) {
             </div>
          </div>
          <div
-            className = { clsx("relative order-first lg:order-none mt-8 lg:mt-0 text-xl lg:text-base  whitespace-pre-wrap break-all text-black") }>
+            className = { clsx("relative order-first lg:order-none mt-8 lg:mt-0 text-xl lg:text-base  whitespace-pre-wrap break-all") }>
             {
                workout.image ? (
                   <div className = "relative w-[14rem] h-[14rem] lg:w-[7rem] lg:h-[7rem] flex justify-center items-center">
@@ -301,7 +301,7 @@ export default function Table(props: TableProps): JSX.Element {
    return (
       <div className = "relative w-full mx-auto">
          <div className = "container mx-auto my-6 overflow-hidden rounded-xl shadow-md">
-            <div className = "block lg:hidden bg-white p-4">
+            <div className = "block lg:hidden bg-white dark:bg-slate-800 p-4">
                <input
                   id = "workout-select-all-mobile"
                   type = "checkbox"
@@ -310,8 +310,8 @@ export default function Table(props: TableProps): JSX.Element {
                   onChange = { () => handleWorkoutToggle() }
                />
             </div>
-            <div className = "hidden lg:flex justify-between items-center w-full mx-auto bg-white p-4 hover:bg-gray-100 cursor-pointer">
-               <div className = "w-[1rem] flex justify-center items-center text-base uppercase px-3 py-4 whitespace-normal font-bold text-black">
+            <div className = "hidden lg:flex justify-between items-center w-full mx-auto bg-white dark:bg-slate-800 p-4">
+               <div className = "w-[1rem] flex justify-center items-center text-base uppercase px-3 py-4 whitespace-normal font-bold">
                   <input
                      id = "workout-select-all-desktop"
                      type = "checkbox"
@@ -320,19 +320,19 @@ export default function Table(props: TableProps): JSX.Element {
                      onChange = { () => handleWorkoutToggle() }
                   />
                </div>
-               <div className = "w-[10rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
+               <div className = "w-[10rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
                   Title
                </div>
-               <div className = "w-[10rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
+               <div className = "w-[10rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
                   Date
                </div>
-               <div className = "w-[12rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
+               <div className = "w-[12rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
                   Tags
                </div>
-               <div className = "w-[7rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
+               <div className = "w-[7rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
                   Image
                </div>
-               <div className = "w-[3rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
+               <div className = "w-[3rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
                </div>
             </div>
             <div className = "flex flex-col gap-2 lg:gap-0 w-full mx-auto bg-white">

@@ -85,8 +85,8 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                            }
                         }
                      }
-                     className = "relative bg-white rounded-lg shadow-lg p-6 md:py-6 md:px-8 w-full max-h-[90%] overflow-y-auto focus:outline-none modal scrollbar-hide">
-                     <div className = "absolute top-[2px] right-[5px] z-50 p-3.5 rounded-e-md">
+                     className = "relative bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 md:py-6 md:px-8 w-full max-h-[90%] overflow-y-auto focus:outline-none modal scrollbar-hide">
+                     <div className = "absolute top-[-1px] right-[3px] z-50 p-3.5 rounded-e-md">
                         <FontAwesomeIcon
                            onClick = {
                               (event) => {
@@ -95,7 +95,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                               }
                            }
                            icon = { faXmark }
-                           className = "cursor-pointer flex-shrink-0 size-4.5 text-2xl text-red-500 text-md font-extrabold modal-close"
+                           className = "cursor-pointer flex-shrink-0 size-4.5 text-[24px] text-red-500 text-md font-extrabold modal-close"
                            fill = "black"
                         />
                      </div>

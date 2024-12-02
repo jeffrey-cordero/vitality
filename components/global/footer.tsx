@@ -42,7 +42,7 @@ export default function Footer(): JSX.Element {
                      <Link
                         href = "https://github.com/jeffrey-asm/vitality"
                         target = "_blank"
-                        className = "text-black hover:text-slate-500">
+                        className = "hover:text-slate-500">
                         <FontAwesomeIcon
                            icon = { faGithub }
                            className = "text-2xl"
@@ -53,7 +53,7 @@ export default function Footer(): JSX.Element {
                      <Link
                         href = "https://twitter.com/"
                         target = "_blank"
-                        className = "text-black hover:text-slate-500">
+                        className = "hover:text-slate-500">
                         <FontAwesomeIcon
                            icon = { faXTwitter }
                            className = "text-2xl"
@@ -64,7 +64,7 @@ export default function Footer(): JSX.Element {
                      <Link
                         href = "https://meta.com/"
                         target = "_blank"
-                        className = "text-black hover:text-slate-500">
+                        className = "hover:text-slate-500">
                         <FontAwesomeIcon
                            icon = { faMeta }
                            className = "text-2xl"
@@ -75,7 +75,7 @@ export default function Footer(): JSX.Element {
                      <Link
                         href = "https://youtube.com/"
                         target = "_blank"
-                        className = "text-black hover:text-slate-500">
+                        className = "hover:text-slate-500">
                         <FontAwesomeIcon
                            icon = { faYoutube }
                            className = "text-2xl"
@@ -85,7 +85,7 @@ export default function Footer(): JSX.Element {
                </ul>
             </div>
             <div className = "text-center m-4">
-               <span className = "text-sm text-black sm:text-center font-bold">
+               <span className = "text-sm sm:text-center font-bold">
                   © { new Date().getFullYear() } <Link href = "http://localhost">Vitality™</Link>. All Rights Reserved.
                </span>
             </div>
