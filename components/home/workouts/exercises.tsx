@@ -6,7 +6,7 @@ import { Input } from "@/components/global/input";
 import { VitalityChildProps, VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCloudArrowUp, faDumbbell, faPenRuler, faPlus, faRotateLeft, faStopwatch, faCaretRight, faCaretDown, faCircleNotch,   faPersonRunning } from "@fortawesome/free-solid-svg-icons";
+import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCloudArrowUp, faDumbbell, faPenRuler, faPlus, faStopwatch, faCaretRight, faCaretDown, faCircleNotch, faPersonRunning, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useContext, useEffect, useReducer, useState } from "react";
 import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises } from "@/lib/home/workouts/exercises";
 import { NotificationContext } from "@/app/layout";
@@ -99,7 +99,35 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
    ]);
 
    return (
-      <div className = "w-full flex flex-col justify-center align-center text-left gap-2">
+      <div className = "relative mt-8 flex w-full flex-col items-stretch justify-center gap-2 text-left">
+         <FontAwesomeIcon
+            icon = { faArrowRotateLeft }
+            onClick = {
+               () => {
+                  localDispatch({
+                     type: "updateState",
+                     value: {
+                        input: {
+                           ...localState.name,
+                           value: "",
+                           error: null
+                        },
+                        id: "name"
+                     }
+                  });
+               }
+            }
+            className = "absolute right-[35px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
+         />
+         <FontAwesomeIcon
+            icon = { faXmark }
+            className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer text-xl text-red-500"
+            onClick = {
+               () => {
+                  onBlur();
+               }
+            }
+         />
          <Input
             id = "name"
             type = "text"
@@ -115,20 +143,10 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          />
          <Button
             type = "button"
-            className = "w-full px-4 py-2 font-bold border-0 h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-white bg-red-500"
-            icon = { faRotateLeft }
-            onClick = {
-               () => {
-                  onBlur();
-               }
-            }>
-            Cancel
-         </Button>
-         <Button
-            type = "button"
-            className = "w-full bg-green-600 text-white px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+            className = "focus:ring-green-500/focus:border-green-500/30 h-[2.4rem] w-full border-[1.5px] border-gray-100 bg-green-600 px-4 py-2 font-bold text-white focus:border-green-500/30 dark:border-0"
             icon = { faPenRuler }
-            onClick = { handleCreateNewExercise }>
+            onClick = { handleCreateNewExercise }
+         >
             Add Exercise
          </Button>
       </div>
@@ -338,14 +356,29 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
       <div
          ref = { setNodeRef }
          style = { style }
-         className = "w-full mx-auto px-4 sm:px-8">
+         className = "mx-auto w-full px-4 sm:px-8"
+      >
          {
             displayEditInputs ? (
-               <li className = "relative flex flex-col justify-start items-stretch gap-2 w-full mx-auto mt-6 text-center font-medium">
+               <li className = "relative mx-auto mt-8 flex w-full flex-col items-stretch justify-start gap-2 text-center font-medium">
                   <FontAwesomeIcon
                      icon = { faArrowRotateLeft }
                      onClick = { reset }
-                     className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                     className = "absolute right-[35px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
+                  />
+                  <FontAwesomeIcon
+                     icon = { faXmark }
+                     className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer text-xl text-red-500"
+                     onClick = {
+                        () => {
+                           if (set === undefined) {
+                              // Remove from DOM for new exercise set inputs
+                              onBlur();
+                           }
+
+                           setEditSet(false);
+                        }
+                     }
                   />
                   <Input
                      id = "weight"
@@ -367,8 +400,8 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                      dispatch = { localDispatch }
                      onSubmit = { () => handleExerciseSetUpdates("update") }
                   />
-                  <div className = "flex flex-col sm:flex-row justify-between items-start gap-2">
-                     <div className = "w-full mx-auto">
+                  <div className = "flex flex-col items-start justify-between gap-2 sm:flex-row">
+                     <div className = "mx-auto w-full">
                         <Input
                            id = "hours"
                            type = "number"
@@ -380,7 +413,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                            onSubmit = { () => handleExerciseSetUpdates("update") }
                         />
                      </div>
-                     <div className = "w-full mx-auto">
+                     <div className = "mx-auto w-full">
                         <Input
                            id = "minutes"
                            type = "number"
@@ -392,7 +425,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                            onSubmit = { () => handleExerciseSetUpdates("update") }
                         />
                      </div>
-                     <div className = "w-full mx-auto">
+                     <div className = "mx-auto w-full">
                         <Input
                            id = "seconds"
                            type = "number"
@@ -416,25 +449,10 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                   />
                   <Button
                      type = "button"
-                     className = "w-full px-4 py-2 font-bold border-0 h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-white bg-red-500"
-                     icon = { faRotateLeft }
-                     onClick = {
-                        () => {
-                           if (set === undefined) {
-                              // Remove from DOM for new exercise set inputs
-                              onBlur();
-                           }
-
-                           setEditSet(false);
-                        }
-                     }>
-                  Cancel
-                  </Button>
-                  <Button
-                     type = "button"
-                     className = "w-full bg-green-600 text-white px-4 py-2 font-semibold border-gray-100 dark:border-0 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                     className = "h-[2.4rem] w-full border-[1.5px] border-gray-100 bg-green-600 px-4 py-2 font-semibold text-white focus:border-blue-500 focus:ring-blue-500 dark:border-0"
                      icon = { faCloudArrowUp }
-                     onClick = { () => handleExerciseSetUpdates("update") }>
+                     onClick = { () => handleExerciseSetUpdates("update") }
+                  >
                      { set !== undefined ? "Update" : "Create" }
                   </Button>
                   {
@@ -448,16 +466,18 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                </li>
             ) : (
                set !== undefined && (
-                  <li className = "flex flex-row justify-start items-start font-semibold gap-2 w-full mx-auto pt-2 text-left text-md cursor-move whitespace-pre-wrap break-all">
+                  <li className = "mx-auto flex w-full cursor-move flex-row items-start justify-start gap-2 whitespace-pre-wrap break-all pt-2 text-left text-base font-semibold">
                      <div
-                        className = "cursor-ns-resize text-sm pt-1"
+                        className = "cursor-ns-resize pt-1 text-sm"
                         { ...attributes }
-                        { ...listeners }>
+                        { ...listeners }
+                     >
                         <FontAwesomeIcon icon = { faCircleNotch } />
                      </div>
                      <div
-                        className = "flex flex-col gap-2 pl-6 cursor-pointer"
-                        { ...doubleTap }>
+                        className = "flex cursor-pointer flex-col gap-2 pl-6"
+                        { ...doubleTap }
+                     >
                         {
                            set.weight !== null && (
                               <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
@@ -497,7 +517,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                         }
                         {
                            set.text && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold text-md">
+                              <div className = "flex flex-row items-center justify-start gap-2 text-base font-semibold">
                                  <FontAwesomeIcon
                                     className = "self-start pt-1 text-primary"
                                     icon = { faAlignJustify }
@@ -774,12 +794,42 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
    return (
       <li
-         className = "w-full mx-auto p-2 sm:p-4 text-left"
+         className = "mx-auto w-full p-2 text-left sm:p-4"
          style = { style }
-         ref = { setNodeRef }>
+         ref = { setNodeRef }
+      >
          {
             displayEditName ? (
-               <div>
+               <div className = "relative mt-6">
+                  <FontAwesomeIcon
+                     icon = { faArrowRotateLeft }
+                     onClick = {
+                        () => {
+                           localDispatch({
+                              type: "updateState",
+                              value: {
+                                 input: {
+                                    ...localState.name,
+                                    value: "",
+                                    error: null
+                                 },
+                                 id: "name"
+                              }
+                           });
+                        }
+                     }
+                     className = "absolute right-[35px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
+                  />
+                  <FontAwesomeIcon
+                     icon = { faXmark }
+                     className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer text-xl text-red-500"
+                     onClick = {
+                        () => {
+
+                           setEditName(false);
+                        }
+                     }
+                  />
                   <Input
                      id = "name"
                      type = "text"
@@ -797,20 +847,10 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   />
                   <Button
                      type = "button"
-                     className = "w-full px-4 py-2 font-bold border-0 h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-white bg-red-500"
-                     icon = { faRotateLeft }
-                     onClick = {
-                        () => {
-                           setEditName(false);
-                        }
-                     }>
-                  Cancel
-                  </Button>
-                  <Button
-                     type = "button"
-                     className = "w-full bg-green-600 text-white text-md my-2 px-4 py-2 font-bold border-gray-100 border-[1.5px] dark:border-0 h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                     className = "my-2 h-[2.4rem] w-full border-[1.5px] border-gray-100 bg-green-600 px-4 py-2 text-base font-bold text-white focus:border-blue-500 focus:ring-blue-500 dark:border-0"
                      icon = { faPenRuler }
-                     onClick = { handleExerciseNameUpdates }>
+                     onClick = { handleExerciseNameUpdates }
+                  >
                      Update
                   </Button>
                   <Conformation
@@ -819,10 +859,10 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   />
                </div>
             ) : (
-               <h1 className = "cursor-default text-xl flex justify-start items-center">
+               <h1 className = "flex cursor-default items-center justify-start text-xl">
                   <span>
                      <FontAwesomeIcon
-                        className = "cursor-ns-resize hover:text-primary text-2xl pt-1"
+                        className = "cursor-ns-resize pt-1 text-2xl hover:text-primary"
                         icon = { isCollapsed ? faCaretRight : faCaretDown }
                         onClick = { () => setIsCollapsed(!isCollapsed) }
                         { ...attributes }
@@ -831,7 +871,8 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   </span>
                   <span
                      className = "cursor-pointer pl-4"
-                     { ...doubleTap }>
+                     { ...doubleTap }
+                  >
                      { exercise.name }
                   </span>
                </h1>
@@ -839,15 +880,17 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          }
          {
             !isCollapsed && (
-               <div className = "flex flex-col justify-start items-start gap-4">
+               <div className = "flex flex-col items-start justify-start gap-4">
                   <DndContext
                      sensors = { sensors }
                      collisionDetection = { closestCenter }
-                     onDragEnd = { handleDragEnd }>
+                     onDragEnd = { handleDragEnd }
+                  >
                      <SortableContext
                         items = { exercise.sets.map((set) => set.id) }
-                        strategy = { verticalListSortingStrategy }>
-                        <ul className = "w-full mx-auto list-disc text-black flex flex-col gap-6 pt-2">
+                        strategy = { verticalListSortingStrategy }
+                     >
+                        <ul className = "mx-auto flex w-full list-disc flex-col gap-6 pt-2">
                            {
                               exercise.sets.map((set: ExerciseSet) => {
                                  return (
@@ -876,17 +919,18 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   </DndContext>
                   {
                      !hideNewEntryButton && (
-                        <div className = "w-full mx-auto px-4 sm:px-8">
+                        <div className = "mx-auto w-full px-4 sm:px-8">
                            <Button
                               type = "button"
-                              className = "w-full border-[1.5px] border-gray-100 dark:border-0 dark:bg-gray-700/50 text-md px-4 py-2 font-bold h-[2.6rem] focus:border-blue-500 focus:ring-blue-500"
+                              className = "h-[2.6rem] w-full border-[1.5px] border-gray-100 px-4 py-2 text-base font-bold focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50"
                               icon = { faPersonRunning }
                               onClick = {
                                  () => {
                                     handleReset("");
                                     setAddSet(true);
                                  }
-                              }>
+                              }
+                           >
                               New Entry
                            </Button>
                         </div>
@@ -1039,16 +1083,18 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
    };
 
    return (
-      <div className = "w-full mx-auto text-center font-bold flex flex-col justify-center items-center">
-         <hr className = "text-black w-full my-2" />
+      <div className = "mx-auto flex w-full flex-col items-center justify-center text-center font-bold">
+         <hr className = "my-2 w-full text-black" />
          <DndContext
             sensors = { sensors }
             collisionDetection = { closestCenter }
-            onDragEnd = { handleDragEnd }>
+            onDragEnd = { handleDragEnd }
+         >
             <SortableContext
                items = { exercises.map((exercise) => exercise.id) }
-               strategy = { verticalListSortingStrategy }>
-               <ol className = "w-full mx-auto">
+               strategy = { verticalListSortingStrategy }
+            >
+               <ol className = "mx-auto w-full">
                   {
                      exercises.map((exercise: Exercise) => {
                         return (
@@ -1066,7 +1112,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                </ol>
             </SortableContext>
          </DndContext>
-         <div className = "w-full mx-auto my-2">
+         <div className = "mx-auto my-2 w-full">
             {
                displayNewExerciseInput ? (
                   <CreateExercise
@@ -1082,13 +1128,14 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                      }
                   />
                ) : (
-                  <div className = "w-full mx-auto">
+                  <div className = "mx-auto w-full">
                      <Button
                         type = "button"
-                        className = "w-full border-[1.5px] border-gray-100 dark:border-0 dark:bg-gray-700/50 px-4 py-2 font-bold h-[2.6rem] focus:border-blue-500 focus:ring-blue-500"
+                        className = "h-[2.6rem] w-full border-[1.5px] border-gray-100 px-4 py-2 font-bold focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50"
                         icon = { faPlus }
-                        onClick = { handleInitializeNewExerciseInput }>
-                           New Exercise
+                        onClick = { handleInitializeNewExerciseInput }
+                     >
+                        New Exercise
                      </Button>
                   </div>
                )

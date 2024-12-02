@@ -45,10 +45,11 @@ function Counter(props: CounterProps): JSX.Element {
 
 export default function Spinner(): JSX.Element {
    return (
-      <div className = "relative h-full w-full my-10">
+      <div className = "relative my-10 size-full">
          <motion.svg
-            className = "absolute inset-0 m-auto w-[80px] h-[80px]"
-            viewBox = "0 0 100 100">
+            className = "absolute inset-0 m-auto size-[80px]"
+            viewBox = "0 0 100 100"
+         >
             <motion.circle
                initial = { { pathLength: 0 } }
                animate = { { pathLength: 1 } }
@@ -70,7 +71,7 @@ export default function Spinner(): JSX.Element {
             value = { 100 }
             start = { 0 }
             duration = { 3500 }
-            className = "relative inset-0 mx-auto flex items-center justify-center font-display text-2xl text-green-500"
+            className = "relative inset-0 mx-auto flex items-center justify-center text-2xl text-green-500"
          />
       </div>
    );

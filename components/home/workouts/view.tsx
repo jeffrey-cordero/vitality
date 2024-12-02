@@ -20,8 +20,8 @@ export default function View(props: ViewProps): JSX.Element {
    const fetched: boolean = globalState.workouts.data.fetched;
 
    return (
-      <div className = "relative w-full mx-auto flex flex-col justify-center items-center">
-         <div className = "flex justify-start items-center text-left gap-4 text-md">
+      <div className = "relative mx-auto flex w-full flex-col items-center justify-center">
+         <div className = "flex items-center justify-start gap-4 text-left text-base">
             <Button
                icon = { faTable }
                onClick = {
@@ -34,7 +34,8 @@ export default function View(props: ViewProps): JSX.Element {
                   clsx("transition duration-300 ease-in-out", {
                      "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
                   })
-               }>
+               }
+            >
                Table
             </Button>
             <Button
@@ -49,24 +50,26 @@ export default function View(props: ViewProps): JSX.Element {
                   clsx("transition duration-300 ease-in-out", {
                      "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
                   })
-               }>
+               }
+            >
                Cards
             </Button>
          </div>
          <div
             id = "workoutsView"
-            className = "w-full xl:w-9/12 flex-grow flex flex-col justify-start items-center">
+            className = "flex w-full grow flex-col items-center justify-start xl:w-9/12"
+         >
             {
                workouts.length === 0 ? (
-                  <div className = "w-full h-[40vh] mx-auto text-center flex justify-center items-center">
+                  <div className = "mx-auto flex h-[40vh] w-full items-center justify-center text-center">
                      {
                         fetched ? (
                            <div className = "flex flex-col gap-2">
                               <FontAwesomeIcon
                                  icon = { faPersonRunning }
-                                 className = "text-primary text-5xl"
+                                 className = "text-5xl text-primary"
                               />
-                              <h1 className = "font-bold text-lg">No available workouts</h1>
+                              <h1 className = "text-lg font-bold">No available workouts</h1>
                            </div>
                         ) : (
                            <Loading />

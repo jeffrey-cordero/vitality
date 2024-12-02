@@ -79,7 +79,7 @@ export default function SignUp(): JSX.Element {
                <Link href = "/home">
                   <Button
                      type = "button"
-                     className = "bg-green-600 text-white p-4 text-sm h-[2rem]"
+                     className = "h-8 bg-green-600 p-4 text-sm text-white"
                      icon = { faDoorOpen }
                      onClick = {
                         async() => {
@@ -90,7 +90,8 @@ export default function SignUp(): JSX.Element {
 
                            window.location.reload();
                         }
-                     }>
+                     }
+                  >
                      Log In
                   </Button>
                </Link>
@@ -100,15 +101,16 @@ export default function SignUp(): JSX.Element {
    };
 
    return (
-      <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
+      <div className = "mx-auto flex w-full flex-col items-center justify-center text-center">
          <Heading
             title = "Sign Up"
             description = "Create an account to get started"
          />
-         <div className = "w-10/12 lg:w-1/2 mx-auto mt-8">
+         <div className = "mx-auto mt-8 w-10/12 lg:w-1/2">
             <form
-               className = "relative w-full mx-auto flex flex-col justify-center align-center gap-3"
-               onSubmit = { handleRegistration }>
+               className = "relative mx-auto flex w-full flex-col items-stretch justify-center gap-3"
+               onSubmit = { handleRegistration }
+            >
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
                   onClick = {
@@ -118,7 +120,7 @@ export default function SignUp(): JSX.Element {
                            value: {}
                         })
                   }
-                  className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                  className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                />
                <Input
                   id = "username"
@@ -193,8 +195,9 @@ export default function SignUp(): JSX.Element {
                />
                <Button
                   type = "submit"
-                  className = "bg-primary text-white h-[2.6rem]"
-                  icon = { faUserPlus }>
+                  className = "h-[2.6rem] bg-primary text-white"
+                  icon = { faUserPlus }
+               >
                   Sign Up
                </Button>
             </form>
@@ -202,7 +205,8 @@ export default function SignUp(): JSX.Element {
                Already have an account?{ " " }
                <Link
                   href = "/login"
-                  className = "text-primary font-bold break-words">
+                  className = "break-words font-bold text-primary"
+               >
                   Log&nbsp;In
                </Link>
             </p>

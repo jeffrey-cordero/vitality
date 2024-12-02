@@ -6,7 +6,7 @@ export default function Main(props: MainProps): JSX.Element {
    const { children } = props;
 
    return (
-      <main className = "w-full min-h-screen m-auto flex flex-col items-center justify-start px-2 md:px-4 text-center overflow-hidden mt-10 mb-20">
+      <main className = "m-auto mb-20 mt-10 flex min-h-screen w-full flex-col items-center justify-start overflow-hidden px-2 text-center md:px-4">
          { children }
       </main>
    );

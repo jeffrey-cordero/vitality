@@ -25,45 +25,49 @@ export default function Carousel(props: CarouselProps): JSX.Element {
    };
 
    return (
-      <div className = "relative w-full mx-auto bg-white dark:bg-slate-800 rounded-2xl p-2 sm:p-0 shadow-md">
+      <div className = "relative mx-auto w-full rounded-2xl bg-white p-2 shadow-md sm:p-0 dark:bg-slate-800">
          <div
-            className = "carousel-inner flex transition-[opacity,transform] ease-in-out duration-500"
+            className = "flex transition-[opacity,transform] duration-500 ease-in-out"
             style = {
                {
                   transform: `translateX(-${currentIndex * columnWidth}%)`
                }
-            }>
+            }
+         >
             {
                items.map((slide, index) => (
                   <div
                      key = { index }
                      className = {
                         clsx(
-                           "flex justify-center items-center p-2 md:p-4 flex-shrink-0 rounded-2xl",
+                           "flex shrink-0 items-center justify-center rounded-2xl p-2 md:p-4",
                            {
                               "opacity-100": index === currentIndex,
                               "opacity-30": index !== currentIndex
                            },
                         )
                      }
-                     style = { { width: `${columnWidth}%` } }>
+                     style = { { width: `${columnWidth}%` } }
+                  >
                      { slide }
                   </div>
                ))
             }
          </div>
-         <div className = "carousel-buttons">
+         <div>
             <button
                type = "button"
-               className = "absolute top-0 -translate-x-1/2 start-0 z-10 flex items-center justify-center h-full px-2 cursor-pointer group focus:outline-none overflow-visible"
-               onClick = { prevSlide }>
-               <span className = "inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-400 dark:bg-gray-300 group-hover:bg-gray-500 dark:group-hover:bg-gray-400 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+               className = "group absolute start-0 top-0 z-10 flex h-full -translate-x-1/2 cursor-pointer items-center justify-center overflow-visible px-2 focus:outline-none"
+               onClick = { prevSlide }
+            >
+               <span className = "inline-flex size-10 items-center justify-center rounded-full bg-gray-400 group-hover:bg-gray-500 group-focus:outline-none group-focus:ring-4 group-focus:ring-white dark:bg-gray-300 dark:group-hover:bg-gray-400 dark:group-focus:ring-gray-800/70">
                   <svg
-                     className = "w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
+                     className = "size-4 text-white rtl:rotate-180 dark:text-gray-800"
                      aria-hidden = "true"
                      xmlns = "http://www.w3.org/2000/svg"
                      fill = "none"
-                     viewBox = "0 0 6 10">
+                     viewBox = "0 0 6 10"
+                  >
                      <path
                         stroke = "currentColor"
                         strokeLinecap = "round"
@@ -77,15 +81,17 @@ export default function Carousel(props: CarouselProps): JSX.Element {
             </button>
             <button
                type = "button"
-               className = "absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 z-30 flex items-center justify-center h-full px-2 cursor-pointer group focus:outline-none overflow-visible"
-               onClick = { nextSlide }>
-               <span className = "inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-400 dark:bg-gray-300 group-hover:bg-gray-500 dark:group-hover:bg-gray-400 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+               className = "group absolute right-0 top-1/2 z-30 flex h-full -translate-y-1/2 translate-x-1/2 cursor-pointer items-center justify-center overflow-visible px-2 focus:outline-none"
+               onClick = { nextSlide }
+            >
+               <span className = "inline-flex size-10 items-center justify-center rounded-full bg-gray-400 group-hover:bg-gray-500 group-focus:outline-none group-focus:ring-4 group-focus:ring-white dark:bg-gray-300 dark:group-hover:bg-gray-400 dark:group-focus:ring-gray-800/70">
                   <svg
-                     className = "w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
+                     className = "size-4 text-white rtl:rotate-180 dark:text-gray-800"
                      aria-hidden = "true"
                      xmlns = "http://www.w3.org/2000/svg"
                      fill = "none"
-                     viewBox = "0 0 6 10">
+                     viewBox = "0 0 6 10"
+                  >
                      <path
                         stroke = "currentColor"
                         strokeLinecap = "round"

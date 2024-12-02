@@ -19,26 +19,27 @@ function Service(props: ServiceProps): JSX.Element {
             cx(
                background,
                color,
-               "flex flex-col align-center justify-center gap-2 w-[22rem] max-w-[90%] xsm:max-w-none mx-auto xsm:w-[10rem] h-[11rem] xsm:h-[10rem] text-center rounded-2xl shadow-md",
+               "flex flex-col items-center justify-center gap-2 w-[22rem] max-w-[90%] xsm:max-w-none mx-auto xsm:w-[10rem] h-[11rem] xsm:h-[10rem] text-center rounded-2xl shadow-md",
             )
-         }>
+         }
+      >
          <FontAwesomeIcon
             icon = { icon }
             className = { cx(color, "text-5xl xsm:text-4xl") }
          />
-         <h1 className = "font-bold text-2xl xsm:text-xl">{ title }</h1>
+         <h1 className = "text-2xl font-bold xsm:text-xl">{ title }</h1>
       </div>
    );
 }
 
 export default function Services(): JSX.Element {
    return (
-      <div className = "w-full lg:w-8/12 mx-auto">
+      <div className = "mx-auto w-full lg:w-8/12">
          <Heading
             title = "Our Services"
             description = "Driven by innovation, we continually explore new ways to elevate your wellness journey"
          />
-         <div className = "relative grid grid-cols-1 xsm:grid-cols-2 lg:grid-cols-3 gap-y-[20px] xsm:gap-y-[40px] justify-center content-center container mx-auto my-8">
+         <div className = "container relative mx-auto my-8 grid grid-cols-1 content-center justify-center gap-y-[20px] xsm:grid-cols-2 xsm:gap-y-[40px] lg:grid-cols-3">
             <Service
                background = "bg-white dark:bg-slate-800"
                color = "text-primary"

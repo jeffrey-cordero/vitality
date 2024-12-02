@@ -13,12 +13,15 @@ export default function Button(props: ButtonProps): JSX.Element {
    return (
       <button
          { ...props }
+         tabIndex = { 0 }
+         disabled = { false }
          className = {
             clsx(
-               "flex gap-2 items-center justify-center focus:ring-slate-200 font-bold rounded-lg text-md outline-none hover:cursor-pointer",
-               className,
+               "flex items-center justify-center gap-2 rounded-lg text-base font-bold outline-none hover:cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500",
+               className
             )
-         }>
+         }
+      >
          {
             icon && (
                <FontAwesomeIcon icon = { icon } />

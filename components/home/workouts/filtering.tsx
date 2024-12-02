@@ -78,14 +78,14 @@ function DateInput(props: DateInputProps) {
    const icon = isMinDate ? faArrowRight : faArrowLeft;
 
    return (
-      <div className = "flex flex-col justify-center items-center mt-2">
+      <div className = "mt-2 flex flex-col items-center justify-center">
          <div className = "text-primary">
             <FontAwesomeIcon
                icon = { icon }
-               className = "text-lg text-primary my-2"
+               className = "my-2 text-lg text-primary"
             />
          </div>
-         <div className = "w-full mx-auto">
+         <div className = "mx-auto w-full">
             <Input
                id = { isMinDate ? "minDate" : "maxDate" }
                type = "date"
@@ -267,7 +267,8 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "bg-gray-200 text-black font-semibold w-full h-[2.5rem] text-sm">
+               className = "h-10 w-full bg-gray-200 text-sm font-semibold text-black dark:bg-gray-300"
+            >
                <FontAwesomeIcon
                   icon = { faCalendar }
                   className = "text-sm"
@@ -275,18 +276,19 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                Filter by Date
             </Button>
          }
-         className = "max-w-xl">
-         <div className = "flex flex-col justify-center align-center text-center gap-2">
+         className = "max-w-xl"
+      >
+         <div className = "flex flex-col items-center justify-center gap-2 text-center">
             <FontAwesomeIcon
                icon = { faCalendar }
-               className = "text-4xl text-primary mt-6"
+               className = "mt-6 text-4xl text-primary"
             />
-            <h1 className = "text-2xl font-bold mb-2">Filter by Date</h1>
+            <h1 className = "mb-2 text-2xl font-bold">Filter by Date</h1>
             <div className = "relative mt-8">
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
                   onClick = { handleReset }
-                  className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                  className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                />
                <Select
                   id = "dateFilter"
@@ -320,7 +322,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                         />
                         <FontAwesomeIcon
                            icon = { faArrowsUpDown }
-                           className = "text-lg text-primary my-2"
+                           className = "my-2 text-lg text-primary"
                         />
                         <Input
                            id = "maxDate"
@@ -336,9 +338,10 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                }
                <Button
                   type = "button"
-                  className = "bg-primary text-white font-bold w-full h-[2.5rem] text-sm mt-3"
+                  className = "mt-3 h-10 w-full bg-primary text-sm font-bold text-white"
                   icon = { faMagnifyingGlass }
-                  onClick = { handleApplyFilterClick }>
+                  onClick = { handleApplyFilterClick }
+               >
                   Apply
                </Button>
             </div>
@@ -466,8 +469,9 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "bg-gray-200 text-black font-semibold w-full h-[2.4rem] text-sm"
-               onClick = { handleInitializeFilteredTags }>
+               className = "h-[2.4rem] w-full bg-gray-200 text-sm font-semibold text-black dark:bg-gray-300"
+               onClick = { handleInitializeFilteredTags }
+            >
                <FontAwesomeIcon
                   icon = { faTag }
                   className = "text-sm"
@@ -475,24 +479,26 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                Filter by Tags
             </Button>
          }
-         className = "max-w-xl">
-         <div className = "flex flex-col justify-center align-center text-center gap-2">
+         className = "max-w-xl"
+      >
+         <div className = "flex flex-col items-center justify-center gap-2 text-center">
             <FontAwesomeIcon
                icon = { faTag }
-               className = "text-4xl text-primary mt-6"
+               className = "mt-6 text-4xl text-primary"
             />
-            <h1 className = "text-2xl font-bold mb-2">Filter by Tags</h1>
+            <h1 className = "mb-2 text-2xl font-bold">Filter by Tags</h1>
             <div className = "relative">
-               <div className = "w-full mx-auto my-2">
+               <div className = "mx-auto my-2 w-full">
                   <Tags
                      { ...props }
                      onReset = { handleReset }
                   />
                   <Button
                      type = "button"
-                     className = "bg-primary text-white font-bold w-full h-[2.4rem] text-sm mt-3"
+                     className = "mt-3 h-[2.4rem] w-full bg-primary text-sm font-bold text-white"
                      icon = { faMagnifyingGlass }
-                     onClick = { handleApplyFilterClick }>
+                     onClick = { handleApplyFilterClick }
+                  >
                      Apply
                   </Button>
                </div>
@@ -511,7 +517,7 @@ export default function Filtering(props: VitalityProps): JSX.Element {
             title = "Workouts"
             description = "Ready to crush your goals? Create a new workout and let's make today count!"
          />
-         <div className = "w-full mx-auto flex flex-col gap-2 px-4 my-4">
+         <div className = "mx-auto my-4 flex w-full flex-col gap-2 px-4">
             <Input
                id = "search"
                type = "text"
@@ -521,7 +527,7 @@ export default function Filtering(props: VitalityProps): JSX.Element {
                dispatch = { globalDispatch }
                autoFocus
             />
-            <div className = "w-full mx-auto grid grid-cols-1 xsm:grid-cols-2 gap-2">
+            <div className = "mx-auto grid w-full grid-cols-1 gap-2 xsm:grid-cols-2">
                <FilterByDate { ...props } />
                <FilterByTags { ...props } />
             </div>

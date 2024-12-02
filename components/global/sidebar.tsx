@@ -64,12 +64,13 @@ function SideBarLinks(): JSX.Element {
                      href = { link.href }
                      className = {
                         clsx(
-                           "flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-sm font-medium z-40 hover:text-primary",
+                           "z-40 flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-sm font-medium hover:text-primary",
                            {
                               "bg-sky-100 dark:bg-slate-700 text-primary": pathname === link.href
                            },
                         )
-                     }>
+                     }
+                  >
                      <div className = "w-[30px] pl-[10px]">
                         <FontAwesomeIcon
                            icon = { link.icon }
@@ -90,12 +91,12 @@ export function SideBar(): JSX.Element {
 
    return (
       <div>
-         <div className = "absolute top-0 left-0 z-30">
-            <div className = "relative top-0 left-0 transform translate-x-[10px] translate-y-[15px] z-30">
+         <div className = "absolute left-0 top-0 z-30">
+            <div className = "relative left-0 top-0 z-30 translate-x-[10px] translate-y-[15px]">
                <FontAwesomeIcon
                   id = "sideBarButton"
                   icon = { visibleSideBar ? faAnglesRight : faBarsStaggered }
-                  className = "text-3xl text-black dark:text-white font-extrabold hover:cursor-pointer"
+                  className = "text-3xl font-extrabold text-black hover:cursor-pointer dark:text-white"
                   onClick = {
                      () => {
                         setVisibleSideBar(!visibleSideBar);
@@ -109,22 +110,24 @@ export function SideBar(): JSX.Element {
                id = "sideBarLinks"
                className = {
                   clsx(
-                     "relative m-0 top-[10px] w-[4.5rem] hover:w-64 focus:w-64 transition-all duration-1000 ease-in-out",
+                     "relative top-[10px] m-0 w-[4.5rem] transition-all duration-1000 ease-in-out hover:w-64 focus:w-64",
                      {
                         "left-[-5rem]": !visibleSideBar,
                         "left-[10px]": visibleSideBar
                      },
                   )
-               }>
+               }
+            >
                <div
-                  className = "flex h-auto mt-20 flex-col px-3 py-4 bg-gray-50 dark:bg-slate-800  shadow-md rounded-2xl overflow-hidden"
+                  className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-3  py-4 shadow-md dark:bg-slate-800"
                   onMouseEnter = {
                      () => {
                         setVisibleSideBar(true);
                      }
-                  }>
-                  <div className = "flex flex-col space-x-2 space-y-2 justify-center text-center">
-                     <div className = "flex flex-col w-full h-full items-center justify-between text-center">
+                  }
+               >
+                  <div className = "flex flex-col justify-center space-x-2 space-y-2 text-center">
+                     <div className = "flex size-full flex-col items-center justify-between text-center">
                         <SideBarLinks />
                      </div>
                   </div>

@@ -28,7 +28,7 @@ function Card(props: CardProps): JSX.Element {
                <div
                   className = {
                      clsx(
-                        "max-w-full px-4 py-2 m-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-xs font-bold text-white",
+                        "m-2 max-w-full truncate rounded-full px-4 py-2 text-xs font-bold text-white",
                      )
                   }
                   style = {
@@ -36,7 +36,8 @@ function Card(props: CardProps): JSX.Element {
                         backgroundColor: tag.color
                      }
                   }
-                  key = { tag.id }>
+                  key = { tag.id }
+               >
                   { tag.title }
                </div>
             )
@@ -67,8 +68,9 @@ function Card(props: CardProps): JSX.Element {
                });
             }
          }
-         className = "relative cursor-pointer flex flex-col justify-center items-center gap-2 w-full sm:w-[16rem] h-[26rem] sm:h-[22rem] mx-auto sm:m-2 rounded-2xl overflow-hidden shadow-md bg-white hover:scale-[1.05] transition duration-300 ease-in-out">
-         <div className = "relative w-full h-full mx-auto">
+         className = "relative mx-auto flex h-[26rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-105 sm:m-2 sm:h-[22rem] sm:w-64"
+      >
+         <div className = "relative mx-auto size-full">
             {
                workout.image ? (
                   <Image
@@ -78,10 +80,10 @@ function Card(props: CardProps): JSX.Element {
                      sizes = "100%"
                      src = { workout.image }
                      alt = "workout-image"
-                     className = "opacity-50 object-center object-cover"
+                     className = "object-cover object-center opacity-50"
                   />
                ) : (
-                  <div className = "absolute w-full h-full bg-white opacity-20 flex justify-center items-center">
+                  <div className = "absolute flex size-full items-center justify-center bg-white opacity-20">
                      <FontAwesomeIcon
                         className = "text-7xl text-primary"
                         icon = { faImage }
@@ -89,20 +91,21 @@ function Card(props: CardProps): JSX.Element {
                   </div>
                )
             }
-            <div className = "relative w-full h-full flex flex-col justify-start items-center overflow-hidden text-center pt-5 text-black">
-               <h2 className = "font-extrabold text-2xl px-6 py-4 overflow-clip max-w-[90%] text-ellipsis whitespace-nowrap leading-none tracking-tight">
+            <div className = "relative flex size-full flex-col items-center justify-start overflow-hidden pt-5 text-center text-black">
+               <h2 className = "max-w-[90%] text-ellipsis whitespace-nowrap px-6 py-4 text-2xl font-extrabold leading-none tracking-tight">
                   { workout.title }
                </h2>
-               <p className = "font-extrabold text-sm">{ formattedDate }</p>
+               <p className = "text-sm font-extrabold">{ formattedDate }</p>
                <div
                   className = {
                      clsx(
-                        "w-full max-h-[15rem] flex flex-row flex-wrap justify-center items-center gap-2 py-2 px-4 overflow-auto scrollbar-hide",
+                        "scrollbar-hide flex max-h-60 w-full flex-row flex-wrap items-center justify-center gap-2 overflow-auto px-4 py-2",
                         {
                            "cursor-all-scroll": workoutTags.length > 0
                         },
                      )
-                  }>
+                  }
+               >
                   { workoutTags }
                </div>
             </div>
@@ -119,8 +122,8 @@ export default function Cards(props: CardsProps): JSX.Element {
    const { workouts } = props;
 
    return (
-      <div className = "relative w-full mx-auto">
-         <div className = "container mx-auto flex flex-row flex-wrap justify-center items-center gap-6 my-6">
+      <div className = "relative mx-auto w-full">
+         <div className = "container mx-auto my-6 flex flex-row flex-wrap items-center justify-center gap-6">
             {
                workouts.map((workout: Workout) => (
                   <Card

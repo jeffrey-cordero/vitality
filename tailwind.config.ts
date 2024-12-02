@@ -6,7 +6,7 @@ const config: Config = {
       "./app/**/*.{js,ts,jsx,tsx,mdx}"
    ],
    theme: {
-      darkMode: 'selector',
+      darkMode: "selector",
       extend: {
          colors: {
             primary: "#2563EB"

@@ -84,7 +84,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
             placeholder = { placeholder ?? "" }
             className = {
                clsx(
-                  "peer p-4 block w-full rounded-lg text-sm font-semibold border-1 dark:border-0 placeholder:text-transparent bg-white dark:bg-gray-700/50 focus:border-blue-500 focus:border-[1.5px] focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-7 focus:pb-2 [&:not(:placeholder-shown)]:pt-7 [&:not(:placeholder-shown)]:pb-2 autofill:pt-7 autofill:pb-2 dark:[color-scheme:dark] min-h-[15rem] h-auto bg-transparent resize-none overflow-hidden",
+                  "peer block h-auto min-h-60 w-full resize-none overflow-hidden rounded-lg border bg-white p-4 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-blue-500 focus:pb-2 focus:pt-7 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
                   {
                      "border-gray-200": input.error === null,
                      "border-red-500 ": input.error !== null
@@ -105,26 +105,27 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
             htmlFor = { id }
             className = {
                clsx(
-                  "absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-black peer-placeholder-shown:text-sm peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-black dark:peer-placeholder-shown:text-white peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-gray-400",
+                  "pointer-events-none absolute start-0 top-0 h-full truncate border border-transparent p-4 text-sm transition duration-200 ease-in-out peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-sm peer-placeholder-shown:text-black peer-focus:-translate-y-2 peer-focus:text-xs peer-focus:text-black peer-disabled:pointer-events-none peer-disabled:opacity-50 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-placeholder-shown:text-white dark:peer-[:not(:placeholder-shown)]:text-gray-400",
                   {
                      "font-bold": required
                   },
                )
-            }>
-            { 
-            icon && (
-               <FontAwesomeIcon 
-                  icon = { icon }
-                  className="mr-[4px]" 
-               />
-               ) 
-            } 
+            }
+         >
+            {
+               icon && (
+                  <FontAwesomeIcon
+                     icon = { icon }
+                     className = "mr-[4px]"
+                  />
+               )
+            }
             { label }
          </label>
          {
             input.error !== null && (
-               <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                  <p className = "text-red-500 font-bold input-error"> { input.error } </p>
+               <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 opacity-0">
+                  <p className = "input-error font-bold text-red-500"> { input.error } </p>
                </div>
             )
          }

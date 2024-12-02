@@ -192,7 +192,7 @@ export default function Page(): JSX.Element {
    ]);
 
    return (
-      <main className = "relative w-full lg:w-11/12 mx-auto flex flex-col justify-start items-center text-center mt-10 mb-20">
+      <main className = "relative mx-auto mb-20 mt-10 flex w-full flex-col items-center justify-start text-center lg:w-11/12">
          <Filtering
             globalState = { globalState }
             globalDispatch = { globalDispatch }

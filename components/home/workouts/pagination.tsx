@@ -78,20 +78,21 @@ export default function Pagination(props: PaginationProps): JSX.Element {
 
    return (
       workouts.length > 0 && (
-         <div className = "max-w-sm my-6 justify-self-end text-lg">
-            <div className = "max-w-xs relative flex flex-row justify-center items-center mx-4">
+         <div className = "my-6 max-w-sm justify-self-end text-lg">
+            <div className = "relative mx-4 flex max-w-xs flex-row items-center justify-center">
                <FontAwesomeIcon
                   icon = { faCircleChevronLeft }
-                  className = "cursor-pointer text-primary text-xl"
+                  className = "cursor-pointer text-xl text-primary"
                   onClick = { handleLeftClick }
                />
                {
                   low > 0 && (
-                     <div className = "flex flex-row justify-center items-center gap-4 ml-4">
+                     <div className = "ml-4 flex flex-row items-center justify-center gap-4">
                         <Button
                            key = "min"
-                           onClick = { () => handlePageClick(0) }>
-                        1
+                           onClick = { () => handlePageClick(0) }
+                        >
+                           1
                         </Button>
                         <Button key = "low">...</Button>
                      </div>
@@ -106,12 +107,13 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                            key = { index }
                            onClick = { () => handlePageClick(index - 1) }
                            className = {
-                              clsx("rounded-lg w-[3rem] h-[2.2rem]", {
+                              clsx("h-[2.2rem] w-12 rounded-lg", {
                                  "font-bold text-primary border-2 border-primary bg-blue-100": isSelected,
                                  "ml-2": isSelected && index === 1,
                                  "mr-2": isSelected && index === pages
                               })
-                           }>
+                           }
+                        >
                            { index }
                         </Button>
                      );
@@ -119,11 +121,12 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                }
                {
                   high < pages && (
-                     <div className = "flex flex-row justify-center items-center gap-4 mr-4">
+                     <div className = "mr-4 flex flex-row items-center justify-center gap-4">
                         <Button key = "higher">...</Button>
                         <Button
                            key = "min"
-                           onClick = { () => handlePageClick(pages - 1) }>
+                           onClick = { () => handlePageClick(pages - 1) }
+                        >
                            { pages }
                         </Button>
                      </div>
@@ -131,7 +134,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                }
                <FontAwesomeIcon
                   icon = { faCircleChevronRight }
-                  className = "cursor-pointer text-primary text-xl"
+                  className = "cursor-pointer text-xl text-primary"
                   onClick = { handleRightClick }
                />
             </div>
@@ -145,7 +148,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   value = { page + 1 }
                   values = { pagination }
                   dispatch = { globalDispatch }
-                  className = "min-w-[10rem] max-h-[5rem] mt-4"
+                  className = "mt-4 max-h-20 min-w-40"
                   onChange = { (event) => handlePageClick(event.target.value - 1) }
                />
             </div>
@@ -158,7 +161,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   input = { globalState.paging }
                   values = { [5, 10, 25, 50, 100, 500, 1000] }
                   dispatch = { globalDispatch }
-                  className = "min-w-[10rem] max-h-[5rem] mt-2"
+                  className = "mt-2 max-h-20 min-w-40"
                   onChange = { (event) => handleEntriesOnChange(event) }
                />
             </div>

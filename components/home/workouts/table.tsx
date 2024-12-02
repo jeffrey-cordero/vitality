@@ -64,13 +64,14 @@ function Row(props: RowProps) {
             // Undefined in case of removal
             tag !== undefined && (
                <div
-                  className = { clsx("max-w-full px-4 py-2 m-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-xs font-bold text-white") }
+                  className = { clsx("m-2 max-w-full truncate rounded-full px-4 py-2 text-xs font-bold text-white") }
                   style = {
                      {
                         backgroundColor: tag.color
                      }
                   }
-                  key = { tag.id }>
+                  key = { tag.id }
+               >
                   { tag.title }
                </div>
             )
@@ -102,38 +103,41 @@ function Row(props: RowProps) {
    return (
       <div
          id = { workout.id }
-         className = "flex flex-col lg:flex-row justify-between items-center text-center w-full mx-auto bg-white dark:bg-slate-800 lg:p-4 rounded-md lg:rounded-none hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
-         { ...doubleTap }>
-         <div className = "w-full lg:w-[1rem] flex justify-center items-center text-base uppercase px-3 pt-6 py-4 lg:pt-4 whitespace-normal">
+         className = "mx-auto flex w-full cursor-pointer flex-col items-center justify-between rounded-md bg-white text-center hover:bg-gray-50 lg:flex-row lg:rounded-none lg:p-4 dark:bg-slate-800 dark:hover:bg-gray-700"
+         { ...doubleTap }
+      >
+         <div className = "flex w-full items-center justify-center whitespace-normal px-3 py-4 pt-6 text-base uppercase lg:w-4 lg:pt-4">
             <input
                id = { `workout-select-${workout.id}` }
                type = "checkbox"
-               className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+               className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
                checked = { globalState.workouts.data.selected.has(workout) }
                onChange = { () => handleWorkoutToggle() }
             />
          </div>
-         <div className = "w-full lg:w-[10rem] text-xl lg:text-base px-2 lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
+         <div className = "w-full whitespace-pre-wrap break-all px-2 text-xl lg:w-40 lg:px-6 lg:py-4 lg:text-base">
             { workout.title }
          </div>
-         <div className = "w-full lg:w-[10rem] text-xl lg:text-base px-2 pt-2 lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
+         <div className = "w-full whitespace-pre-wrap break-all px-2 pt-2 text-xl lg:w-40 lg:px-6 lg:py-4 lg:text-base">
             { formattedDate }
          </div>
-         <div className = "w-full lg:w-[12rem] lg:max-h-[12rem] overflow-auto scrollbar-hide text-xl lg:text-base px-12 lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
+         <div className = "scrollbar-hide w-full overflow-auto whitespace-pre-wrap break-all px-12 text-xl lg:max-h-48 lg:w-48 lg:px-6 lg:py-4 lg:text-base">
             <div
                className = {
-                  clsx("w-full max-h-[14rem] flex flex-row flex-wrap justify-center items-center gap-2 p-2 overflow-auto scrollbar-hide", {
+                  clsx("scrollbar-hide flex max-h-56 w-full flex-row flex-wrap items-center justify-center gap-2 overflow-auto p-2", {
                      "cursor-all-scroll": workoutTags.length > 0
                   })
-               }>
+               }
+            >
                { workoutTags }
             </div>
          </div>
          <div
-            className = { clsx("relative order-first lg:order-none mt-8 lg:mt-0 text-xl lg:text-base  whitespace-pre-wrap break-all") }>
+            className = { clsx("relative order-first mt-8 whitespace-pre-wrap break-all text-xl lg:order-none  lg:mt-0 lg:text-base") }
+         >
             {
                workout.image ? (
-                  <div className = "relative w-[14rem] h-[14rem] lg:w-[7rem] lg:h-[7rem] flex justify-center items-center">
+                  <div className = "relative flex size-56 items-center justify-center lg:size-28">
                      <Image
                         fill
                         priority
@@ -141,11 +145,11 @@ function Row(props: RowProps) {
                         sizes = "100%"
                         src = { workout.image }
                         alt = "workout-image"
-                        className = { clsx("w-full h-full mx-auto object-cover object-center rounded-full overflow-hidden shadow-sm") }
+                        className = { clsx("mx-auto size-full overflow-hidden rounded-full object-cover object-center shadow-sm") }
                      />
                   </div>
                ) : (
-                  <div className = "w-[14rem] h-[14rem] lg:w-[7rem] lg:h-[7rem] flex justify-center items-center rounded-full overflow-hidden text-primary">
+                  <div className = "flex size-56 items-center justify-center overflow-hidden rounded-full text-primary lg:size-28">
                      <FontAwesomeIcon
                         className = "text-4xl"
                         icon = { faImage }
@@ -154,22 +158,24 @@ function Row(props: RowProps) {
                )
             }
          </div>
-         <div className = "w-full lg:w-[3rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all text-black">
-            <div className = "flex justify-center items-center gap-4">
+         <div className = "w-full whitespace-pre-wrap break-all text-xl font-bold uppercase text-black lg:w-12 lg:px-6 lg:py-4 lg:text-base">
+            <div className = "flex items-center justify-center gap-4">
                <div
-                  className = "flex justify-center items-center"
-                  onClick = { handleEditWorkout }>
-                  <div className = "hidden lg:block px-8">
+                  className = "flex items-center justify-center"
+                  onClick = { handleEditWorkout }
+               >
+                  <div className = "hidden px-8 lg:block">
                      <FontAwesomeIcon
                         icon = { faPencil }
-                        className = " text-primary cursor-pointer text-md hover:scale-125 transition duration-300 ease-in-out"
+                        className = " cursor-pointer text-base text-primary transition duration-300 ease-in-out hover:scale-125"
                      />
                   </div>
                   <div className = "block lg:hidden">
                      <Button
                         type = "button"
-                        className = "block lg:hidden bg-primary text-white w-[10rem] mt-2 mb-6 h-[2.4rem] p-4 text-sm"
-                        icon = { faPencil }>
+                        className = "mb-6 mt-2 block h-[2.4rem] w-40 bg-primary p-4 text-sm text-white lg:hidden"
+                        icon = { faPencil }
+                     >
                         Edit Workout
                      </Button>
                   </div>
@@ -299,43 +305,43 @@ export default function Table(props: TableProps): JSX.Element {
    ]);
 
    return (
-      <div className = "relative w-full mx-auto">
+      <div className = "relative mx-auto w-full">
          <div className = "container mx-auto my-6 overflow-hidden rounded-xl shadow-md">
-            <div className = "block lg:hidden bg-white dark:bg-slate-800 p-4">
+            <div className = "block bg-white p-4 lg:hidden dark:bg-slate-800">
                <input
                   id = "workout-select-all-mobile"
                   type = "checkbox"
                   checked = { allVisibleSelected }
-                  className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 `border-`gray-300 rounded focus:ring-blue-500"
+                  className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
                   onChange = { () => handleWorkoutToggle() }
                />
             </div>
-            <div className = "hidden lg:flex justify-between items-center w-full mx-auto bg-white dark:bg-slate-800 p-4">
-               <div className = "w-[1rem] flex justify-center items-center text-base uppercase px-3 py-4 whitespace-normal font-bold">
+            <div className = "mx-auto hidden w-full items-center justify-between bg-white p-4 lg:flex dark:bg-slate-800">
+               <div className = "flex w-4 items-center justify-center whitespace-normal px-3 py-4 text-base font-bold uppercase">
                   <input
                      id = "workout-select-all-desktop"
                      type = "checkbox"
                      checked = { allVisibleSelected }
-                     className = "cursor-pointer w-4 h-4 text-blue-600 bg-gray-100 `border-`gray-300 rounded focus:ring-blue-500"
+                     className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
                      onChange = { () => handleWorkoutToggle() }
                   />
                </div>
-               <div className = "w-[10rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
+               <div className = "w-40 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-base">
                   Title
                </div>
-               <div className = "w-[10rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
+               <div className = "w-40 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-base">
                   Date
                </div>
-               <div className = "w-[12rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
+               <div className = "w-48 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-base">
                   Tags
                </div>
-               <div className = "w-[7rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
+               <div className = "w-28 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-base">
                   Image
                </div>
-               <div className = "w-[3rem] text-xl lg:text-base font-bold uppercase lg:px-6 lg:py-4 whitespace-pre-wrap break-all">
+               <div className = "w-12 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-base">
                </div>
             </div>
-            <div className = "flex flex-col gap-2 lg:gap-0 w-full mx-auto bg-white">
+            <div className = "mx-auto flex w-full flex-col gap-2 bg-white lg:gap-0">
                {
                   workouts.map((workout: Workout, index: number) => (
                      <Row

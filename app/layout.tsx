@@ -38,10 +38,8 @@ export const NotificationContext = createContext<NotificationContextType>({
 });
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-   // Layouts holds context for both user and potential notifications
    const [user, setUser] = useState<NextAuthUser | undefined>(undefined);
    const [fetched, setFetched] = useState<boolean>(false);
-   const [theme, setTheme] = useState<"light" | "dark">("light");
    const [notification, setNotification] = useState<
       NotificationProps | undefined
    >(undefined);
@@ -113,13 +111,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
    return (
       <html
          lang = "en"
-         className = "m-0 p-0 overflow-x-hidden w-full">
+         className = "m-0 w-full overflow-x-hidden p-0"
+      >
          <head>
             <title>Vitality</title>
             <link
                rel = "icon"
                type = "image/x-icon"
-               href = "favicon.ico"></link>
+               href = "favicon.ico"
+            ></link>
             <meta
                name = "description"
                content = "A modern fitness tracker to fuel your fitness goals"
@@ -153,11 +153,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   "box-border m-0 p-0 overflow-x-hidden max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-900 text-black dark:text-white",
                )
             }
-            suppressHydrationWarning = { true }>
+            suppressHydrationWarning = { true }
+         >
             <AuthenticationContext.Provider value = { { user, fetched, updateUser } }>
                <SideBar />
                <NotificationContext.Provider
-                  value = { { notification, updateNotification } }>
+                  value = { { notification, updateNotification } }
+               >
                   <div>{ children }</div>
                   <div>
                      {

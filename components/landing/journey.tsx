@@ -8,16 +8,16 @@ import { faBullseye } from "@fortawesome/free-solid-svg-icons";
 
 export default function Journey(): JSX.Element {
    return (
-      <div className = "w-full mx-auto">
+      <div className = "mx-auto w-full">
          <Heading
             title = "Your Fitness Journey Starts Here"
             description = "Your ultimate companion for achieving optimal health and fitness"
          />
-         <div className = "relative md:container mx-auto overflow-hidden my-8">
-            <div className = "w-full mx-auto sm:px-4">
-               <div className = "flex flex-col lg:flex-row items-center justify-center">
-                  <div className = "w-full lg:w-5/12 mt-2 lg:mt-0">
-                     <div className = "flex items-center mx-2">
+         <div className = "relative mx-auto my-8 overflow-hidden md:container">
+            <div className = "mx-auto w-full sm:px-4">
+               <div className = "flex flex-col items-center justify-center lg:flex-row">
+                  <div className = "mt-2 w-full lg:mt-0 lg:w-5/12">
+                     <div className = "mx-2 flex items-center">
                         <div className = "w-full xl:w-1/2">
                            <div className = "pb-3 sm:pb-4">
                               <div className = "relative my-4">
@@ -39,7 +39,7 @@ export default function Journey(): JSX.Element {
                                     quality = { 100 }
                                     src = "/landing/food.jpg"
                                     alt = ""
-                                    className = "w-full h-full rounded-2xl shadow-sm"
+                                    className = "size-full rounded-2xl shadow-sm"
                                  />
                               </div>
                            </div>
@@ -53,7 +53,7 @@ export default function Journey(): JSX.Element {
                                  quality = { 100 }
                                  src = "/landing/mountains.jpg"
                                  alt = ""
-                                 className = "w-full h-full rounded-2xl shadow-sm"
+                                 className = "size-full rounded-2xl shadow-sm"
                               />
                            </div>
                         </div>
@@ -62,17 +62,18 @@ export default function Journey(): JSX.Element {
                   <div className = "w-full lg:w-5/12">
                      <div className = "flex flex-col items-center justify-center text-center">
                         <Spinner />
-                        <span className = "block mb-4 mx-2 w-10/12 sm:w-4/5 text-3xl font-bold text-primary">
+                        <span className = "mx-2 mb-4 block w-10/12 text-3xl font-bold text-primary sm:w-4/5">
                            Level Up Your Fitness
                         </span>
-                        <p className = "w-10/12 sm:w-2/3 mx-auto mb-4 font-normal text-md text-gray-500 dark:text-gray-400">
+                        <p className = "mx-auto mb-4 w-10/12 text-base font-normal text-gray-500 sm:w-2/3 dark:text-gray-400">
                            Track your fitness journey to gain insights, stay accountable, and boost motivation
                            as you work toward your goals.
                         </p>
                         <Link href = "/signup">
                            <Button
                               icon = { faBullseye }
-                              className = "text-white text-md bg-primary whitespace-nowrap w-[10rem] h-[2.8rem] text-md p-3">
+                              className = "h-[2.8rem] w-40 whitespace-nowrap bg-primary p-3 text-base text-white"
+                           >
                               Start Today
                            </Button>
                         </Link>

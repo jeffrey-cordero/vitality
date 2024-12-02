@@ -48,15 +48,16 @@ export default function Login(): JSX.Element {
    };
 
    return (
-      <div className = "w-full mx-auto flex flex-col items-center justify-center text-center">
+      <div className = "mx-auto flex w-full flex-col items-center justify-center text-center">
          <Heading
             title = "Log In"
             description = "Enter valid credentials to enter"
          />
-         <div className = "w-10/12 lg:w-1/2 mx-auto mt-8">
+         <div className = "mx-auto mt-8 w-10/12 lg:w-1/2">
             <form
-               className = "relative w-full flex flex-col justify-center align-center gap-3"
-               onSubmit = { handleAuthenticate }>
+               className = "relative flex w-full flex-col items-stretch justify-center gap-3"
+               onSubmit = { handleAuthenticate }
+            >
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
                   onClick = {
@@ -66,7 +67,7 @@ export default function Login(): JSX.Element {
                            value: {}
                         })
                   }
-                  className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                  className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                />
                <Input
                   id = "username"
@@ -91,8 +92,9 @@ export default function Login(): JSX.Element {
                />
                <Button
                   type = "submit"
-                  className = "bg-primary text-white h-[2.6rem]"
-                  icon = { faUnlockKeyhole }>
+                  className = "h-[2.6rem] bg-primary text-white"
+                  icon = { faUnlockKeyhole }
+               >
                   Log In
                </Button>
             </form>
@@ -100,7 +102,8 @@ export default function Login(): JSX.Element {
                Don&apos;t have an account? { " " }
                <Link
                   href = "/signup"
-                  className = "text-primary font-bold">
+                  className = "font-bold text-primary"
+               >
                   Sign&nbsp;Up
                </Link>
             </p>

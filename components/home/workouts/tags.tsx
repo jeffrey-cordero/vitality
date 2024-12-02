@@ -61,7 +61,7 @@ function CreateTagContainer(props: CreateTagContainerProps) {
          tabIndex = { 0 }
          className = {
             clsx(
-               "cursor-pointer text-sm font-bold focus:scale-[1.05] hover:scale-[1.05] transition duration-300 ease-in-out rounded-full mb-2 mt-4 focus:outline-blue-500",
+               "mb-2 mt-4 cursor-pointer rounded-full text-sm font-bold transition duration-300 ease-in-out hover:scale-105 focus:scale-105 focus:outline-blue-500",
             )
          }
          onClick = { onSubmit }
@@ -71,10 +71,12 @@ function CreateTagContainer(props: CreateTagContainerProps) {
                   onSubmit();
                }
             }
-         }>
+         }
+      >
          <div
-            className = "relative flex justify-center items-center gap-2 px-4 py-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-white"
-            style = { { backgroundColor: randomColor } }>
+            className = "relative flex items-center justify-center gap-2 truncate rounded-full px-4 py-2 text-white"
+            style = { { backgroundColor: randomColor } }
+         >
             <FontAwesomeIcon icon = { faTags } />
             { search }
          </div>
@@ -108,7 +110,7 @@ function TagColorInput(props: VitalityChildProps) {
       ]);
 
    return (
-      <div className = "relative w-full mx-auto">
+      <div className = "relative mx-auto w-full">
          {
             names.map((name: string) => {
                const color = colors[name];
@@ -118,7 +120,7 @@ function TagColorInput(props: VitalityChildProps) {
                      style = { { backgroundColor: color } }
                      className = {
                         clsx(
-                           "flex justify-center items-center text-sm cursor-pointer w-full h-[2.6rem] border-[2px] rounded-sm p-3 text-white text-center",
+                           "flex h-[2.6rem] w-full cursor-pointer items-center justify-center rounded-sm border-2 p-3 text-center text-sm text-white",
                            {
                               "border-primary border-[4px] shadow-2xl":
                            localState.tagColor.value === color,
@@ -132,7 +134,8 @@ function TagColorInput(props: VitalityChildProps) {
                            handleColorChange(color);
                         }
                      }
-                     key = { name }>
+                     key = { name }
+                  >
                      { name }
                   </div>
                );
@@ -253,13 +256,13 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
    );
 
    return (
-      <div className = "flex flex-col justify-center align-center text-center gap-3 text-black">
-         <div className = "flex flex-col justify-center align-center text-center gap-3">
+      <div className = "flex flex-col items-center justify-center gap-3 text-center text-black">
+         <div className = "flex flex-col items-center justify-center gap-3 text-center">
             <FontAwesomeIcon
                icon = { faGear }
-               className = "text-4xl text-primary mt-6"
+               className = "mt-6 text-4xl text-primary"
             />
-            <h1 className = "text-2xl font-bold text-black mb-2 px-2">
+            <h1 className = "mb-2 px-2 text-2xl font-bold text-black">
                Edit Tag
             </h1>
          </div>
@@ -274,12 +277,12 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
             autoFocus
             required
          />
-         <div className = "flex flex-col justify-center items-center gap-1">
+         <div className = "flex flex-col items-center justify-center gap-1">
             <TagColorInput { ...props } />
             {
                localState.tagColor.error !== null && (
-                  <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                     <p className = "text-red-500 font-bold input-error">
+                  <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 opacity-0">
+                     <p className = "input-error font-bold text-red-500">
                         { " " }
                         { localState.tagColor.error }{ " " }
                      </p>
@@ -294,9 +297,10 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
             />
             <Button
                type = "submit"
-               className = "bg-primary text-white w-full  h-[2.4rem]"
+               className = "h-[2.4rem] w-full bg-primary  text-white"
                icon = { faCloudArrowUp }
-               onClick = { () => handleTagUpdates("update") }>
+               onClick = { () => handleTagUpdates("update") }
+            >
                Save
             </Button>
          </div>
@@ -380,7 +384,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
       <li
          className = {
             clsx(
-               "relative px-4 py-2 m-2 rounded-full text-sm font-bold text-white",
+               "relative m-2 rounded-full px-4 py-2 text-sm font-bold text-white",
             )
          }
          style = {
@@ -389,8 +393,9 @@ function TagContainer(props: TagContainerProps): JSX.Element {
             }
          }
          ref = { tagRef }
-         key = { tag.id }>
-         <div className = "max-w-full mx-auto flex flex-row justify-center items-center">
+         key = { tag.id }
+      >
+         <div className = "mx-auto flex max-w-full flex-row items-center justify-center">
             <div
                onClick = {
                   (event) => {
@@ -401,10 +406,11 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                      }
                   }
                }
-               className = "cursor-pointer max-w-full pr-3 mx-auto line-clamp-1 break-all text-center text-ellipsis">
+               className = "mx-auto line-clamp-1 max-w-full cursor-pointer text-ellipsis break-all pr-3 text-center"
+            >
                { tag.title }
             </div>
-            <div className = "flex flex-row justify-center items-center gap-2 pr-2">
+            <div className = "flex flex-row items-center justify-center gap-2 pr-2">
                {
                   <Modal
                      ref = { editTagModalRef }
@@ -412,10 +418,11 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                         <FontAwesomeIcon
                            icon = { faGears }
                            onClick = { handleTagEdits }
-                           className = "cursor-pointer text-md pt-1"
+                           className = "cursor-pointer pt-1 text-base"
                         />
                      }
-                     className = "max-w-[90%] sm:max-w-xl max-h-[90%] mt-12">
+                     className = "mt-12 max-h-[90%] max-w-[90%] sm:max-w-xl"
+                  >
                      <EditTagContainer
                         { ...props }
                         onSave = { handleTagSave }
@@ -561,10 +568,10 @@ export default function Tags(props: TagsProps): JSX.Element {
       <div>
          {
             fetched ? (
-               <div className = "w-full mx-auto flex flex-col flex-wrap justify-center items-center">
+               <div className = "mx-auto flex w-full flex-col flex-wrap items-center justify-center">
                   {
                      globalState.tags.data.selected?.length > 0 && (
-                        <ul className = "flex flex-col sm:flex-row flex-wrap justify-center items-center pb-2">
+                        <ul className = "flex flex-col flex-wrap items-center justify-center pb-2 sm:flex-row">
                            {
                               globalState.tags.data.selected.map((selected: Tag) => {
                                  return (
@@ -584,14 +591,14 @@ export default function Tags(props: TagsProps): JSX.Element {
                         </ul>
                      )
                   }
-                  <div className = "relative w-full mx-auto">
+                  <div className = "relative mx-auto w-full">
                      {
                         onReset && (
                            <div className = "relative mt-4">
                               <FontAwesomeIcon
                                  icon = { faArrowRotateLeft }
                                  onClick = { onReset }
-                                 className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                                 className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                               />
                            </div>
                         )
@@ -615,7 +622,7 @@ export default function Tags(props: TagsProps): JSX.Element {
                   </div>
                   {
                      searchResults.length > 0 && (
-                        <ul className = "flex flex-row flex-wrap justify-center items-center pt-2">
+                        <ul className = "flex flex-row flex-wrap items-center justify-center pt-2">
                            {
                               searchResults.map((tag: Tag) => {
                                  return (
@@ -647,7 +654,7 @@ export default function Tags(props: TagsProps): JSX.Element {
                   }
                </div>
             ) : (
-               <div className = "w-full h-full justify-center items-center py-12">
+               <div className = "size-full items-center justify-center py-12">
                   <Loading />
                </div>
             )

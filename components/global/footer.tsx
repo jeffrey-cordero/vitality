@@ -5,44 +5,49 @@ import { faGithub, faYoutube, faXTwitter, faMeta } from "@fortawesome/free-brand
 export default function Footer(): JSX.Element {
    return (
       <footer className = "w-full">
-         <div className = "w-full mx-auto max-w-screen-xl">
-            <div className = "flex flex-col sm:flex-row flex-1 justify-center sm:justify-between gap-4 align-middle items-center text-center my-4 mx-8">
-               <ul className = "flex flex-row gap-6 text-sm font-bold order-2 sm:order-1">
+         <div className = "mx-auto w-full max-w-screen-xl">
+            <div className = "mx-8 my-4 flex flex-1 flex-col items-center justify-center gap-4 text-center align-middle sm:flex-row sm:justify-between">
+               <ul className = "order-2 flex flex-row gap-6 text-sm font-bold sm:order-1">
                   <li>
                      <Link
                         className = "hover:text-slate-500"
-                        href = "http://localhost/#">
+                        href = "http://localhost/#"
+                     >
                         About
                      </Link>
                   </li>
                   <li>
                      <Link
                         className = "hover:text-slate-500"
-                        href = "http://localhost/#">
+                        href = "http://localhost/#"
+                     >
                         Privacy
                      </Link>
                   </li>
                   <li>
                      <Link
                         className = "hover:text-slate-500"
-                        href = "http://localhost/#">
+                        href = "http://localhost/#"
+                     >
                         Policy
                      </Link>
                   </li>
                   <li>
                      <Link
                         className = "hover:text-slate-500"
-                        href = "http://localhost/#">
+                        href = "http://localhost/#"
+                     >
                         Contact
                      </Link>
                   </li>
                </ul>
-               <ul className = "flex flex-row gap-6 text-sm font-bold order-1 sm:order-2">
+               <ul className = "order-1 flex flex-row gap-6 text-sm font-bold sm:order-2">
                   <li>
                      <Link
                         href = "https://github.com/jeffrey-asm/vitality"
                         target = "_blank"
-                        className = "hover:text-slate-500">
+                        className = "hover:text-slate-500"
+                     >
                         <FontAwesomeIcon
                            icon = { faGithub }
                            className = "text-2xl"
@@ -53,7 +58,8 @@ export default function Footer(): JSX.Element {
                      <Link
                         href = "https://twitter.com/"
                         target = "_blank"
-                        className = "hover:text-slate-500">
+                        className = "hover:text-slate-500"
+                     >
                         <FontAwesomeIcon
                            icon = { faXTwitter }
                            className = "text-2xl"
@@ -64,7 +70,8 @@ export default function Footer(): JSX.Element {
                      <Link
                         href = "https://meta.com/"
                         target = "_blank"
-                        className = "hover:text-slate-500">
+                        className = "hover:text-slate-500"
+                     >
                         <FontAwesomeIcon
                            icon = { faMeta }
                            className = "text-2xl"
@@ -75,7 +82,8 @@ export default function Footer(): JSX.Element {
                      <Link
                         href = "https://youtube.com/"
                         target = "_blank"
-                        className = "hover:text-slate-500">
+                        className = "hover:text-slate-500"
+                     >
                         <FontAwesomeIcon
                            icon = { faYoutube }
                            className = "text-2xl"
@@ -84,8 +92,8 @@ export default function Footer(): JSX.Element {
                   </li>
                </ul>
             </div>
-            <div className = "text-center m-4">
-               <span className = "text-sm sm:text-center font-bold">
+            <div className = "m-4 text-center">
+               <span className = "text-sm font-bold sm:text-center">
                   © { new Date().getFullYear() } <Link href = "http://localhost">Vitality™</Link>. All Rights Reserved.
                </span>
             </div>

@@ -188,7 +188,8 @@ function Component(): JSX.Element {
             dispatch = { dispatch }
             autoFocus
             scrollIntoView
-            required>
+            required
+         >
             { state.name.value }
          </Input>
          <Input
@@ -196,7 +197,8 @@ function Component(): JSX.Element {
             type = "password"
             label = "Password"
             input = { state.password }
-            dispatch = { dispatch }>
+            dispatch = { dispatch }
+         >
             { state.name.value }
          </Input>
          <Input
@@ -204,7 +206,8 @@ function Component(): JSX.Element {
             type = "email"
             label = "Email"
             input = { state.email }
-            dispatch = { dispatch }>
+            dispatch = { dispatch }
+         >
             { state.email.value }
          </Input>
          <TextArea
@@ -226,32 +229,38 @@ function Component(): JSX.Element {
          />
          <div
             id = "tags"
-            onClick = { handleUpdateTags }>
+            onClick = { handleUpdateTags }
+         >
             { state.tags.value.toString() }
          </div>
          <Button
             id = "initialize"
-            onClick = { handleInitializeState }>
+            onClick = { handleInitializeState }
+         >
             Initialize State
          </Button>
          <Button
             id = "updates"
-            onClick = { handleUpdateStates }>
+            onClick = { handleUpdateStates }
+         >
             Update States
          </Button>
          <Button
             id = "reset"
-            onClick = { handleResetState }>
+            onClick = { handleResetState }
+         >
             Reset State
          </Button>
          <Button
             id = "errors"
-            onClick = { handleUpdateErrors }>
+            onClick = { handleUpdateErrors }
+         >
             Update Errors
          </Button>
          <Button
             id = "handles"
-            onClick = { handleUpdateHandlesChanges }>
+            onClick = { handleUpdateHandlesChanges }
+         >
             Handle Changes
          </Button>
       </div>

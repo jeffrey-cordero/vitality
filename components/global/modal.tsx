@@ -57,7 +57,8 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                      setOpen(true);
                   }
                }
-            }>
+            }
+         >
             { display }
          </div>
          {
@@ -65,11 +66,12 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                <div
                   className = {
                      clsx(
-                        "fixed w-full mx-auto p-4 inset-0 flex items-center justify-center align-center z-50",
+                        "fixed inset-0 z-50 mx-auto flex w-full items-center justify-center p-4",
                         className,
                      )
-                  }>
-                  <div className = "fixed inset-0 bg-gray-600 bg-opacity-50"></div>
+                  }
+               >
+                  <div className = "fixed inset-0 bg-gray-600/60"></div>
                   <div
                      ref = { modalRef }
                      tabIndex = { 0 }
@@ -85,8 +87,9 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                            }
                         }
                      }
-                     className = "relative bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 md:py-6 md:px-8 w-full max-h-[90%] overflow-y-auto focus:outline-none modal scrollbar-hide">
-                     <div className = "absolute top-[-1px] right-[3px] z-50 p-3.5 rounded-e-md">
+                     className = "modal scrollbar-hide relative max-h-[90%] w-full overflow-y-auto rounded-lg bg-white p-6 shadow-lg focus:outline-none md:px-8 md:py-6 dark:bg-slate-800"
+                  >
+                     <div className = "absolute -top-px right-[3px] z-50 rounded-e-md p-3.5">
                         <FontAwesomeIcon
                            onClick = {
                               (event) => {
@@ -95,7 +98,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                               }
                            }
                            icon = { faXmark }
-                           className = "cursor-pointer flex-shrink-0 size-4.5 text-[24px] text-red-500 text-md font-extrabold modal-close"
+                           className = "modal-close size-4 shrink-0 cursor-pointer text-base font-extrabold text-red-500"
                            fill = "black"
                         />
                      </div>

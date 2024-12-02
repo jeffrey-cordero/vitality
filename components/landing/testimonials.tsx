@@ -17,22 +17,22 @@ function Testimonial(props: TestimonialProps): JSX.Element {
    const { testimonial, name, stars, image } = props;
 
    return (
-      <div className = "relative flex flex-col box-border gap-1 justify-center align-center w-full min-h-[22rem] sm:min-h-[20rem] max-h-full mx-auto py-4">
+      <div className = "relative mx-auto box-border flex max-h-full min-h-[22rem] w-full flex-col justify-center gap-1 py-4 sm:min-h-80">
          <FontAwesomeIcon
             icon = { faQuoteLeft }
             className = "text-3xl text-primary"
          />
-         <p className = "font-medium text-md w-10/12 sm:w-3/4 px-2 mx-auto mt-3">
+         <p className = "mx-auto mt-3 w-10/12 px-2 text-base font-medium sm:w-3/4">
             { testimonial }
          </p>
          <div>
-            <div className = "flex flex-col sm:flex-row gap-3 justify-center items-center w-full mx-auto px-4 pt-4">
+            <div className = "mx-auto flex w-full flex-col items-center justify-center gap-3 px-4 pt-4 sm:flex-row">
                <Image
                   priority
                   width = { 200 }
                   height = { 200 }
                   quality = { 100 }
-                  className = "rounded-full w-[4.5rem] h-[4.5rem] object-cover object-center shadow-inner"
+                  className = "size-[4.5rem] rounded-full object-cover object-center shadow-inner"
                   src = { image }
                   alt = "Rounded avatar"
                />
@@ -45,7 +45,7 @@ function Testimonial(props: TestimonialProps): JSX.Element {
                               key = { index }
                               icon = { faStar }
                               className = {
-                                 clsx("text-md sm:text-sm my-2", {
+                                 clsx("my-2 text-base sm:text-sm", {
                                     "text-yellow-500": rating,
                                     "text-slate-500": !rating
                                  })
@@ -72,12 +72,12 @@ export default function Testimonials(): JSX.Element {
    });
 
    return (
-      <div className = "w-full mx-auto">
+      <div className = "mx-auto w-full">
          <Heading
             title = "Testimonials"
             description = "Explore firsthand stories from our users, sharing their fitness journeys with our app"
          />
-         <div className = "w-10/12 sm:w-7/12 mx-auto my-8">
+         <div className = "mx-auto my-8 w-10/12 sm:w-7/12">
             <Carousel
                items = { elements }
                columns = { 1 }

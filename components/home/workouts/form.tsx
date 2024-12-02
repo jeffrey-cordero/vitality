@@ -369,28 +369,29 @@ export default function Form(props: VitalityProps): JSX.Element {
    ]);
 
    return (
-      <div className = "flex justify-center w-full mx-auto my-4">
+      <div className = "mx-auto my-4 flex w-full justify-center">
          <Modal
             display = { null }
             className = "max-w-3xl"
             ref = { formModalRef }
             onClose = { handleFormModalClose }
-            onClick = { handleInitializeWorkoutState }>
+            onClick = { handleInitializeWorkoutState }
+         >
             <div className = "relative">
-               <div className = "flex flex-col justify-center align-center text-center gap-2">
+               <div className = "flex flex-col items-center justify-center gap-2 text-center">
                   <FontAwesomeIcon
                      icon = { faPersonRunning }
-                     className = "text-5xl sm:text-6xl text-primary mt-6"
+                     className = "mt-6 text-5xl text-primary sm:text-6xl"
                   />
-                  <h1 className = "text-2xl sm:text-3xl font-bold mb-2">
+                  <h1 className = "mb-2 text-2xl font-bold sm:text-3xl">
                      { isNewWorkout ? "New" : "Edit" } Workout
                   </h1>
                </div>
-               <div className = "relative mt-8 w-full flex flex-col justify-center align-center text-left gap-2">
+               <div className = "relative mt-8 flex w-full flex-col items-stretch justify-center gap-2 text-left">
                   <FontAwesomeIcon
                      icon = { faArrowRotateLeft }
                      onClick = { handleReset }
-                     className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                     className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                   />
                   <Input
                      id = "title"
@@ -435,12 +436,13 @@ export default function Form(props: VitalityProps): JSX.Element {
                   />
                   <Button
                      type = "button"
-                     className = "bg-primary text-white h-[2.4rem]"
+                     className = "h-[2.4rem] bg-primary text-white"
                      icon = { props !== undefined ? faCloudArrowUp : faSquarePlus }
                      onClick = {
                         () =>
                            handleUpdateWorkout(isNewWorkout ? "add" : "update")
-                     }>
+                     }
+                  >
                      { isNewWorkout ? "Create" : "Update" }
                   </Button>
                   {
@@ -465,7 +467,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          </Modal>
          <Button
             type = "button"
-            className = "bg-primary text-white w-[10rem] h-[2.8rem] text-md p-3"
+            className = "h-[2.8rem] w-40 bg-primary p-3 text-base text-white"
             icon = { faPersonRunning }
             onClick = {
                () => {
@@ -492,7 +494,8 @@ export default function Form(props: VitalityProps): JSX.Element {
                      }
                   });
                }
-            }>
+            }
+         >
             New Workout
          </Button>
       </div>

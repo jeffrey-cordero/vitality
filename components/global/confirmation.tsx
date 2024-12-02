@@ -16,52 +16,56 @@ export default function Conformation(props: ConformationProps): JSX.Element {
 
    return (
       <Modal
-         className = "max-w-[80%] sm:max-w-md max-h-[90%] mt-12 text-center"
+         className = "mt-12 max-h-[90%] max-w-[80%] text-center sm:max-w-md"
          ref = { deleteModalRef }
          display = {
             icon ? (
                <div className = "bg-white dark:bg-slate-800">
                   <FontAwesomeIcon
                      icon = { faTrashCan }
-                     className = "cursor-pointer  text-red-500 text-xl my-4"
+                     className = "my-4  cursor-pointer text-xl text-red-500"
                   />
                </div>
             ) : (
                <Button
                   type = "button"
-                  className = "w-full bg-red-500 text-white h-[2.4rem]"
-                  icon = { faTrash }>
+                  className = "h-[2.4rem] w-full bg-red-500 text-white"
+                  icon = { faTrash }
+               >
                   Delete
                </Button>
             )
-         }>
-         <div className = "relative flex flex-col justify-between items-center gap-4 p-2">
+         }
+      >
+         <div className = "relative flex flex-col items-center justify-between gap-4 p-2">
             <FontAwesomeIcon
                icon = { faTrashCan }
-               className = "text-red-500 text-3xl"
+               className = "text-3xl text-red-500"
             />
             <p className = "font-bold">
                { message }
             </p>
-            <div className = "flex flex-row flex-wrap justify-center items-center gap-2">
+            <div className = "flex flex-row flex-wrap items-center justify-center gap-2">
                <Button
                   type = "button"
                   icon = { faArrowRotateBack }
-                  className = "w-[10rem] bg-gray-100 text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
+                  className = "h-[2.4rem] w-40 border-[1.5px] border-gray-100 bg-gray-100 px-4 py-2 font-bold text-black focus:border-blue-500 focus:ring-blue-500"
                   onClick = {
                      () => {
                         if (deleteModalRef.current) {
                            deleteModalRef.current.close();
                         }
                      }
-                  }>
+                  }
+               >
                   No, cancel
                </Button>
                <Button
                   type = "button"
                   icon = { faSquareCheck }
-                  className = "w-[10rem] bg-red-500 text-white px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-red-300 focus:ring-red-300"
-                  onClick = { async() => onConformation() }>
+                  className = "h-[2.4rem] w-40 border-[1.5px] border-gray-100 bg-red-500 px-4 py-2 font-bold text-white focus:border-red-300 focus:ring-red-300 dark:border-0"
+                  onClick = { async() => onConformation() }
+               >
                   Yes, I&apos;m sure
                </Button>
             </div>

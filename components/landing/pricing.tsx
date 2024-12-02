@@ -24,29 +24,33 @@ function PricingCard(props: PricingCardProps): JSX.Element {
 
    return (
       <div
-         className = "relative flex justify-center items-center w-[22rem] md:w-[20.5rem] h-[33.5rem] mx-2 xsm:mx-0 container">
+         className = "container relative mx-2 flex h-[33.5rem] w-[22rem] items-center justify-center xsm:mx-0 md:w-[20.5rem]"
+      >
          <div
-            className = "w-full h-full flex justify-center text-center rounded-2xl bg-white dark:bg-slate-800 shadow-md"
-            { ...doubleTap }>
-            <div className = "relative flex flex-col justify-center align-center">
+            className = "flex size-full justify-center rounded-2xl bg-white text-center shadow-md dark:bg-slate-800"
+            { ...doubleTap }
+         >
+            <div className = "relative flex flex-col items-center justify-center">
                <span className = "mb-3 block text-3xl font-extrabold text-primary">
                   { type }
                </span>
-               <h2 className = "w-11/12 mx-auto text-4xl font-bold text-dark pb-6 border-b-[3px] border-b-slate-400">
+               <h2 className = "mx-auto w-11/12 border-b-[3px] border-b-slate-400 pb-6 text-4xl font-bold">
                   { price }
-                  <span className = "text-base font-medium text-body-color">
+                  <span className = "text-base font-medium">
                      / { subscription }
                   </span>
                </h2>
-               <div className = "my-6 flex flex-col justify-center gap-6 h-[14rem] font-semibold px-2">
+               <div className = "my-6 flex h-56 flex-col justify-center gap-6 px-2 font-semibold">
                   { children }
                </div>
                <Link
                   ref = { linkRef }
-                  href = "/signup">
+                  href = "/signup"
+               >
                   <Button
                      icon = { faWandMagicSparkles }
-                     className = "max-w-[90%] w-[12rem] mx-auto rounded-md border border-primary bg-primary p-3 text-center text-white cursor-pointer">
+                     className = "mx-auto w-48 max-w-[90%] cursor-pointer rounded-md border border-primary bg-primary p-3 text-center text-white"
+                  >
                      { text }
                   </Button>
                </Link>
@@ -58,18 +62,19 @@ function PricingCard(props: PricingCardProps): JSX.Element {
 
 export default function Pricing(): JSX.Element {
    return (
-      <div className = "w-full mx-auto">
+      <div className = "mx-auto w-full">
          <Heading
             title = "Choose Your Plan"
             description = "Select a plan that best suits your needs and goals"
          />
-         <div className = "w-full mx-auto">
-            <div className = "relative container mx-auto flex flex-row flex-wrap justify-center align-center gap-8 p-2 my-8">
+         <div className = "mx-auto w-full">
+            <div className = "container relative mx-auto my-8 flex flex-row flex-wrap items-center justify-center gap-8 p-2">
                <PricingCard
                   type = "Regular"
                   price = "$0"
                   subscription = "year"
-                  text = "Select Regular">
+                  text = "Select Regular"
+               >
                   <>
                      <p>Basic features</p>
                      <p>Workout tracking</p>
@@ -82,7 +87,8 @@ export default function Pricing(): JSX.Element {
                   type = "Member"
                   price = "$99"
                   subscription = "year"
-                  text = "Select Member">
+                  text = "Select Member"
+               >
                   <>
                      <p>All Regular features</p>
                      <p>Advanced tracking</p>
@@ -95,7 +101,8 @@ export default function Pricing(): JSX.Element {
                   type = "Veteran"
                   price = "$199"
                   subscription = "year"
-                  text = "Select Veteran">
+                  text = "Select Veteran"
+               >
                   <>
                      <p>All Member features</p>
                      <p>Exclusive workouts</p>

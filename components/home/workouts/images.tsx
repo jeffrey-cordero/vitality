@@ -3,7 +3,7 @@ import clsx from "clsx";
 import Button from "@/components/global/button";
 import Modal from "@/components/global/modal";
 import { Input, VitalityInputProps } from "@/components/global/input";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { faCameraRetro, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
@@ -116,7 +116,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
 
    return (
       <div className = "flex flex-col py-2">
-         <div className = "flex justify-center items-center flex-wrap text-center gap-3 mt-2 mb-4 text-md">
+         <div className = "mb-4 mt-2 flex flex-wrap items-center justify-center gap-3 text-center text-base">
             <Button
                icon = { faCameraRetro }
                onClick = {
@@ -130,7 +130,8 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                      "scale-105 border-b-4 border-b-primary rounded-none":
                      isDefaultImage
                   })
-               }>
+               }
+            >
                Default
             </Button>
             <Button
@@ -142,11 +143,12 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                   }
                }
                className = {
-                  clsx("transition duration-300 ease-in-out", {
-                     "scale-105  border-b-4 border-b-primary rounded-none":
+                  clsx("transition duration-300 ease-in-out focus:text-red-500", {
+                     "scale-105    border-b-4 border-b-primary rounded-none":
                      !isDefaultImage
                   })
-               }>
+               }
+            >
                URL
             </Button>
          </div>
@@ -154,7 +156,8 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
             isDefaultImage ? (
                <div
                   tabIndex = { 0 }
-                  className = "relative flex flex-wrap gap-6 justify-center items-center px-2 py-4">
+                  className = "relative flex flex-wrap items-center justify-center gap-6 px-2 py-4"
+               >
                   {
                      images.map((image) => {
                         const source: string = `/workouts/${image}`;
@@ -171,8 +174,9 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                     }
                                  }
                               }
-                              className = "relative w-[12rem] h-[12rem]"
-                              key = { source }>
+                              className = "relative size-48"
+                              key = { source }
+                           >
                               <Image
                                  fill
                                  priority
@@ -183,7 +187,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  alt = "workout-image"
                                  className = {
                                     clsx(
-                                       "object-cover object-center shadow-inner rounded-xl cursor-pointer", {
+                                       "cursor-pointer rounded-xl object-cover object-center shadow-inner", {
                                           "border-primary border-[4px] shadow-2xl scale-[1.05] transition duration-300 ease-in-out": isSelected
                                        }
                                     )
@@ -204,11 +208,12 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                         }
                      }
                   }
-                  className = "relative w-full h-full mx-auto">
+                  className = "relative mx-auto size-full"
+               >
                   {
                      isValidResource && isValidURL && (
-                        <div className = "flex justify-center items-center my-6">
-                           <div className = "relative w-[12rem] h-[12rem]">
+                        <div className = "my-6 flex items-center justify-center">
+                           <div className = "relative size-48">
                               <Image
                                  fill
                                  priority
@@ -219,7 +224,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  alt = "workout-image"
                                  className = {
                                     clsx(
-                                       "object-cover object-center rounded-xl cursor-default border-[4px] border-primary shadow-md scale-[1.05] transition duration-300 ease-in-out",
+                                       "scale-105 cursor-default rounded-xl border-4 border-primary object-cover object-center shadow-md transition duration-300 ease-in-out",
                                     )
                                  }
                               />
@@ -253,16 +258,18 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                   <Button
                      type = "button"
                      onClick = { handleImageURLReset }
-                     className = "w-full px-4 py-2 mt-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
-                     icon = { faTrashCan }>
-                  Remove
+                     className = "mt-2 h-[2.4rem] w-full bg-red-500 px-4 py-2 font-semibold text-white focus:ring-slate-500"
+                     icon = { faTrashCan }
+                  >
+                     Remove
                   </Button>
                   <Button
                      type = "button"
                      onClick = { handleImageURLUpdates }
-                     className = "w-full bg-primary text-white mt-2 font-semibold h-[2.4rem] placeholder:text-transparent"
-                     icon = { faPaperclip }>
-                  Add
+                     className = "mt-2 h-[2.4rem] w-full bg-primary font-semibold text-white placeholder:text-transparent"
+                     icon = { faPaperclip }
+                  >
+                     Add
                   </Button>
                </div>
             )
@@ -292,12 +299,13 @@ export default function Images(props: VitalityInputProps): JSX.Element {
                   <Button
                      className = {
                         clsx(
-                           "w-full font-semibold border-[1.5px] dark:border-0 dark:bg-gray-700/50 px-4 py-2 h-[2.6rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500",
+                           "h-[2.6rem] w-full border-[1.5px] px-4 py-2 font-semibold placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50",
                            {
                               "border-[2px] dark:border-[2px] border-red-500 text-red-500": input.error
                            },
                         )
-                     }>
+                     }
+                  >
                      <FontAwesomeIcon
                         icon = { addedImage ? faPenToSquare : faPaperclip }
                      />
@@ -305,8 +313,8 @@ export default function Images(props: VitalityInputProps): JSX.Element {
                   </Button>
                   {
                      input.error !== null && (
-                        <div className = "flex justify-center align-center text-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                           <p className = "text-red-500 font-bold input-error">
+                        <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 text-center opacity-0">
+                           <p className = "input-error font-bold text-red-500">
                               { " " }
                               { input.error }{ " " }
                            </p>
@@ -315,7 +323,8 @@ export default function Images(props: VitalityInputProps): JSX.Element {
                   }
                </div>
             }
-            className = "max-w-[90%] sm:max-w-xl max-h-[90%] mt-12">
+            className = "mt-12 max-h-[90%] max-w-[90%] sm:max-w-xl"
+         >
             <ImagesForm
                { ...props }
                isValidResource = { isValidResource }
