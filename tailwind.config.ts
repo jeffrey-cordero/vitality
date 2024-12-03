@@ -1,12 +1,13 @@
+/** @type {import('tailwindcss').Config} */
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+   darkMode: "selector",
    content: [
       "./components/**/*.{js,ts,jsx,tsx,mdx}",
       "./app/**/*.{js,ts,jsx,tsx,mdx}"
    ],
    theme: {
-      darkMode: "selector",
       extend: {
          colors: {
             primary: "#2563EB"

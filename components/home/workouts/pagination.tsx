@@ -3,7 +3,7 @@ import Button from "@/components/global/button";
 import Select from "@/components/global/select";
 import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { faCircleChevronLeft, faCircleChevronRight, faFileLines,   faTabletScreenButton } from "@fortawesome/free-solid-svg-icons";
+import { faCircleChevronLeft, faCircleChevronRight, faFileLines, faTabletScreenButton } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ChangeEvent, useCallback } from "react";
 

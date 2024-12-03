@@ -36,6 +36,7 @@
     "tailwindcss/classnames-order": ["error", { "when": "always" }],
     "tailwindcss/no-custom-classname": ["error", {
       "whitelist": [
+        "dark",
         "modal",
         "notification",
         "modal-close",

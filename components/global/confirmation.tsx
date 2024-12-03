@@ -11,7 +11,7 @@ interface ConformationProps {
 }
 
 export default function Conformation(props: ConformationProps): JSX.Element {
-   const { message, onConformation, icon } = props;
+   const { message, icon, onConformation } = props;
    const deleteModalRef = useRef<{ open: () => void; close: () => void }>(null);
 
    return (
@@ -23,7 +23,7 @@ export default function Conformation(props: ConformationProps): JSX.Element {
                <div className = "bg-white dark:bg-slate-800">
                   <FontAwesomeIcon
                      icon = { faTrashCan }
-                     className = "my-4  cursor-pointer text-xl text-red-500"
+                     className = "my-4 cursor-pointer text-xl text-red-500"
                   />
                </div>
             ) : (

@@ -123,7 +123,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                <Button
                   tabIndex = { -1 }
                   type = "button"
-                  className = "absolute end-0 top-[5px]   rounded-e-md p-3.5"
+                  className = "absolute end-0 top-[5px] rounded-e-md p-3.5"
                >
                   <FontAwesomeIcon
                      icon = { inputType == "password" ? faEye : faEyeSlash }

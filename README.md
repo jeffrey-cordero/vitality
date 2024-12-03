@@ -57,7 +57,7 @@ Access database through the docker container
 docker exec -it vitality_postgres psql -U postgres -d vitality
 ```
 
-Access database  through the Prisma ORM
+Access database through the Prisma ORM
 
 ``` bash
 docker exec -it vitality_app npx prisma studio

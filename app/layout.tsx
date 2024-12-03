@@ -6,15 +6,21 @@ import Footer from "@/components/global/footer";
 import Notification from "@/components/global/notification";
 import { sfPro, inter } from "@/app/fonts";
 import { SideBar } from "@/components/global/sidebar";
-import { createContext, SetStateAction, useCallback, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { getSession } from "@/lib/authentication/session";
 import { NotificationProps } from "@/components/global/notification";
 import { User as NextAuthUser } from "next-auth";
 
+const defaultTheme =
+   localStorage.theme === "dark" ||
+      (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ? "dark" : "light";
+
 interface AuthenticationContextType {
    user: NextAuthUser | undefined;
+   theme: "dark" | "light";
+   updateTheme: (_theme: "dark" | "light") => void;
    fetched: boolean;
-   updateUser: (_user: SetStateAction<NextAuthUser | undefined>) => void;
 }
 
 interface NotificationContextType {
@@ -24,8 +30,9 @@ interface NotificationContextType {
 
 export const AuthenticationContext = createContext<AuthenticationContextType>({
    user: undefined,
-   fetched: false,
-   updateUser: () => { }
+   theme: defaultTheme,
+   updateTheme: () => {},
+   fetched: false
 });
 
 export const NotificationContext = createContext<NotificationContextType>({
@@ -39,14 +46,11 @@ export const NotificationContext = createContext<NotificationContextType>({
 
 export default function Layout({ children }: { children: React.ReactNode }) {
    const [user, setUser] = useState<NextAuthUser | undefined>(undefined);
+   const [theme, setTheme] = useState<"light" | "dark">(defaultTheme);
    const [fetched, setFetched] = useState<boolean>(false);
    const [notification, setNotification] = useState<
       NotificationProps | undefined
    >(undefined);
-
-   const updateUser = (user: SetStateAction<NextAuthUser | undefined>) => {
-      setUser(user);
-   };
 
    const handleAuthentication = useCallback(async() => {
       try {
@@ -65,6 +69,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
    const updateNotification = (notification: NotificationProps) => {
       setNotification(notification);
+   };
+
+   const updateTheme = (theme: "dark" | "light") => {
+      localStorage.setItem("theme", theme);
+      setTheme(theme);
    };
 
    useEffect(() => {
@@ -111,7 +120,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
    return (
       <html
          lang = "en"
-         className = "m-0 w-full overflow-x-hidden p-0"
+         className = { `m-0 w-full overflow-x-hidden p-0 ${theme === "dark" && "dark"}` }
+         data-theme = { theme }
       >
          <head>
             <title>Vitality</title>
@@ -155,7 +165,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             }
             suppressHydrationWarning = { true }
          >
-            <AuthenticationContext.Provider value = { { user, fetched, updateUser } }>
+            <AuthenticationContext.Provider value = { { user, theme, updateTheme, fetched } }>
                <SideBar />
                <NotificationContext.Provider
                   value = { { notification, updateNotification } }

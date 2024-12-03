@@ -555,7 +555,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    const editingExerciseId: string = localState.exerciseId.value;
    const editingExerciseSetId: string = localState.exerciseId.data.setId;
    const displayEditName = editName && editing && id === exercise.id;
-   const hideNewEntryButton = addSet && editingExerciseSetId === "" &&  editingExerciseId === exercise.id;
+   const hideNewEntryButton = addSet && editingExerciseSetId === "" && editingExerciseId === exercise.id;
 
    useEffect(() => {
       // Save the collapsed state of a given exercise to localStorage

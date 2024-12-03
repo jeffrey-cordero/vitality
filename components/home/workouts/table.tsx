@@ -133,7 +133,7 @@ function Row(props: RowProps) {
             </div>
          </div>
          <div
-            className = { clsx("relative order-first mt-8 whitespace-pre-wrap break-all text-xl lg:order-none  lg:mt-0 lg:text-base") }
+            className = { clsx("relative order-first mt-8 whitespace-pre-wrap break-all text-xl lg:order-none lg:mt-0 lg:text-base") }
          >
             {
                workout.image ? (

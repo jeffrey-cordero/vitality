@@ -11,9 +11,9 @@ import { VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { addWorkout, deleteWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
 import { Tag } from "@/lib/home/workouts/tags";
-import { faArrowRotateLeft, faPersonRunning, faSquarePlus,   faCloudArrowUp, faSignature, faCalendar,   faBook, faLink } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faSignature, faCalendar, faBook, faLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useCallback, useContext, useEffect, useMemo, useReducer,   useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { filterWorkout } from "@/components/home/workouts/filtering";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
 
@@ -150,7 +150,7 @@ export default function Form(props: VitalityProps): JSX.Element {
             ? await updateWorkout(payload)
             : await deleteWorkouts([payload], user.id);
 
-      handleResponse(response, localDispatch, updateNotification,  () => {
+      handleResponse(response, localDispatch, updateNotification, () => {
          const returnedWorkout: Workout | null =
             method === "delete" ? payload : (response.body.data as Workout);
 

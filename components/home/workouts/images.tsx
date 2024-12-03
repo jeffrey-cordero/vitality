@@ -144,7 +144,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                }
                className = {
                   clsx("transition duration-300 ease-in-out focus:text-red-500", {
-                     "scale-105    border-b-4 border-b-primary rounded-none":
+                     "scale-105 border-b-4 border-b-primary rounded-none":
                      !isDefaultImage
                   })
                }

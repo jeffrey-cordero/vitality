@@ -5,10 +5,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
   icon?: IconProp;
+  iconClassName?: string
 }
 
 export default function Button(props: ButtonProps): JSX.Element {
-   const { children, className, icon } = props;
+   const { children, className, icon, iconClassName } = props;
 
    return (
       <button
@@ -24,7 +25,11 @@ export default function Button(props: ButtonProps): JSX.Element {
       >
          {
             icon && (
-               <FontAwesomeIcon icon = { icon } />
+               <FontAwesomeIcon
+                  className = { iconClassName }
+                  icon = { icon }
+
+               />
             )
          }
          { children }

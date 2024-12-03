@@ -48,7 +48,7 @@ export default function View(props: ViewProps): JSX.Element {
                }
                className = {
                   clsx("transition duration-300 ease-in-out", {
-                     "scale-105  border-b-4 border-b-primary rounded-none": view === "cards"
+                     "scale-105 border-b-4 border-b-primary rounded-none": view === "cards"
                   })
                }
             >

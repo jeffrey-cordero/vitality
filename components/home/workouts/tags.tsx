@@ -4,12 +4,12 @@ import Loading from "@/components/global/loading";
 import Conformation from "@/components/global/confirmation";
 import Modal from "@/components/global/modal";
 import { Input } from "@/components/global/input";
-import { faGear, faXmark,   faCloudArrowUp,   faTag, faArrowRotateLeft, faGears, faTags } from "@fortawesome/free-solid-svg-icons";
+import { faGear, faXmark, faCloudArrowUp, faTag, faArrowRotateLeft, faGears, faTags } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { addWorkoutTag, updateWorkoutTag, Tag } from "@/lib/home/workouts/tags";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
-import { VitalityChildProps, VitalityProps,   VitalityState,   formReducer } from "@/lib/global/state";
+import { VitalityChildProps, VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 
 const form: VitalityState = {
@@ -297,7 +297,7 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
             />
             <Button
                type = "submit"
-               className = "h-[2.4rem] w-full bg-primary  text-white"
+               className = "h-[2.4rem] w-full bg-primary text-white"
                icon = { faCloudArrowUp }
                onClick = { () => handleTagUpdates("update") }
             >
