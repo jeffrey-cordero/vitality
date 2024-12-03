@@ -51,7 +51,7 @@ export default function Select(props: SelectProps): JSX.Element {
             value = { value ?? input.value }
             placeholder = { placeholder ?? "" }
             className = {
-               clsx("peer block w-full rounded-lg border bg-white p-4 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-blue-500 focus:pb-2 focus:pt-7 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
+               clsx("peer block w-full rounded-lg border bg-white p-4 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-primary focus:pb-2 focus:pt-7 focus:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
                   className,
                )
             }

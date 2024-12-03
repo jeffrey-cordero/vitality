@@ -6,7 +6,7 @@ export async function getSession(): Promise<NextAuthUser | undefined> {
    return (await auth())?.user ?? undefined;
 }
 
-export async function signOut(): Promise<void> {
+export async function endSession(): Promise<void> {
    await NextAuthSignOut({
       redirect: true
    });

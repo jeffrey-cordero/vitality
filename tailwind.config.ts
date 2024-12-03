@@ -10,7 +10,7 @@ const config: Config = {
    theme: {
       extend: {
          colors: {
-            primary: "#2563EB"
+            primary: "#007FFF"
          },
          screens: {
             xsm: "400px"

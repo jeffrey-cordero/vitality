@@ -267,7 +267,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "h-10 w-full bg-gray-200 text-sm font-semibold text-black dark:bg-gray-300"
+               className = "h-10 w-full bg-primary text-sm font-semibold text-white"
             >
                <FontAwesomeIcon
                   icon = { faCalendar }
@@ -278,7 +278,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          }
          className = "max-w-xl"
       >
-         <div className = "flex flex-col items-center justify-center gap-2 text-center">
+         <div className = "flex flex-col items-stretch justify-center gap-2 text-center">
             <FontAwesomeIcon
                icon = { faCalendar }
                className = "mt-6 text-4xl text-primary"
@@ -469,19 +469,19 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "h-[2.4rem] w-full bg-gray-200 text-sm font-semibold text-black dark:bg-gray-300"
+               className = "h-10 w-full bg-primary text-sm font-semibold text-white"
                onClick = { handleInitializeFilteredTags }
             >
                <FontAwesomeIcon
                   icon = { faTag }
-                  className = "text-sm"
+                  className = "text-sm text-white"
                />
                Filter by Tags
             </Button>
          }
          className = "max-w-xl"
       >
-         <div className = "flex flex-col items-center justify-center gap-2 text-center">
+         <div className = "flex flex-col items-stretch justify-center gap-2 text-center">
             <FontAwesomeIcon
                icon = { faTag }
                className = "mt-6 text-4xl text-primary"

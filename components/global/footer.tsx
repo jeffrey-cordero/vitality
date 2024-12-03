@@ -92,11 +92,6 @@ export default function Footer(): JSX.Element {
                   </li>
                </ul>
             </div>
-            <div className = "m-4 text-center">
-               <span className = "text-sm font-bold sm:text-center">
-                  © { new Date().getFullYear() } <Link href = "http://localhost">Vitality™</Link>. All Rights Reserved.
-               </span>
-            </div>
          </div>
       </footer>
    );

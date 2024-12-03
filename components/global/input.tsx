@@ -109,7 +109,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
             ref = { inputRef }
             placeholder = { placeholder ?? "" }
             className = {
-               clsx("peer block w-full rounded-lg border bg-white p-4 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-blue-500 focus:pb-2 focus:pt-7 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
+               clsx("peer block w-full rounded-lg border bg-white p-4 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-primary focus:pb-2 focus:pt-7 focus:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
                   {
                      "border-gray-200 border-[1.5px]": input.error === null,
                      "border-red-500 border-2 dark:border-2 focus:border-red-500 focus:ring-red-500 error": input.error !== null
@@ -123,7 +123,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                <Button
                   tabIndex = { -1 }
                   type = "button"
-                  className = "absolute end-0 top-[5px] rounded-e-md p-3.5"
+                  className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
                >
                   <FontAwesomeIcon
                      icon = { inputType == "password" ? faEye : faEyeSlash }
@@ -139,7 +139,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                <Button
                   tabIndex = { -1 }
                   type = "button"
-                  className = "absolute end-0 top-[5px] rounded-e-md p-3.5"
+                  className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
                >
                   <FontAwesomeIcon
                      icon = { input.data.valid ? faCircleCheck : faCircleXmark }
@@ -160,8 +160,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                   "pointer-events-none absolute start-0 top-0 h-full truncate border border-transparent p-4 text-sm transition duration-200 ease-in-out peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-sm peer-placeholder-shown:text-black peer-focus:-translate-y-2 peer-focus:text-xs peer-focus:text-black peer-disabled:pointer-events-none peer-disabled:opacity-50 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-placeholder-shown:text-white dark:peer-[:not(:placeholder-shown)]:text-gray-400",
                   {
                      "font-bold": required,
-                     "dark:peer-[:not(:placeholder-shown)]:text-white" : type === "date" && input.value === "",
-                     "dark:peer-[:not(:placeholder-shown)]:text-gray-400" : type === "date" && input.value !== ""
+                     "peer-[:not(:placeholder-shown)]:text-[color:black] dark:peer-[:not(:placeholder-shown)]:text-white" : type === "date" && input.value === ""
                   }
                )
             }
@@ -179,7 +178,9 @@ export function Input(props: VitalityInputProps): JSX.Element {
          {
             input.error !== null && (
                <div className = "mx-auto my-3 flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 text-center text-sm opacity-0">
-                  <p className = "input-error font-bold text-red-500"> { input.error.trim() } </p>
+                  <p className = "input-error font-bold text-red-500">
+                     { input.error.trim() }
+                  </p>
                </div>
             )
          }

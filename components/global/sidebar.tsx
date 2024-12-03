@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faUtensils, faBrain, faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears, faBarsStaggered, faDumbbell, faRightFromBracket, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { AuthenticationContext } from "@/app/layout";
-import { signOut } from "@/lib/authentication/session";
+import { endSession } from "@/lib/authentication/session";
 
 interface SideBarProps {
   name: string;
@@ -74,8 +74,7 @@ function SideBarLinks(): JSX.Element {
                            "z-40 flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-sm font-semibold hover:text-primary",
                            {
                               "bg-sky-100 dark:bg-slate-700 text-primary": pathname === link.href,
-                              "hover:text-yellow-400": isTheme && theme === "light",
-                              "hover:text-sky-400": isTheme && theme === "dark",
+                              "hover:text-yellow-400": isTheme,
                               "hover:text-red-500": isSignOut
                            },
                         )
@@ -85,7 +84,7 @@ function SideBarLinks(): JSX.Element {
                            switch (link.name) {
                               case "Sign Out":
                                  event.preventDefault();
-                                 await signOut();
+                                 await endSession();
                                  break;
                               case "Theme":
                                  event.preventDefault();
@@ -100,11 +99,15 @@ function SideBarLinks(): JSX.Element {
                      <div className = "w-[30px] pl-[10px]">
                         <FontAwesomeIcon
                            icon = { isTheme ? theme === "dark" ? faMoon : faSun : link.icon }
-                           className = "text-2xl"
+                           className = {
+                              clsx("text-2xl", {
+                                 "text-yellow-400": isTheme
+                              })
+                           }
                         />
                      </div>
                      <p className = "whitespace-nowrap capitalize">
-                        { link.name }
+                        { isTheme ? theme : link.name }
                      </p>
                   </Link>
                );

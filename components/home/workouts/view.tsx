@@ -5,7 +5,7 @@ import Cards from "@/components/home/workouts/cards";
 import Loading from "@/components/global/loading";
 import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { faPersonRunning, faPhotoFilm, faTable } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass, faPhotoFilm, faTable } from "@fortawesome/free-solid-svg-icons";
 import { Dispatch } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -31,7 +31,7 @@ export default function View(props: ViewProps): JSX.Element {
                   }
                }
                className = {
-                  clsx("transition duration-300 ease-in-out", {
+                  clsx("transition duration-300 ease-in-out focus:outline-0 focus:ring-0", {
                      "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
                   })
                }
@@ -47,7 +47,7 @@ export default function View(props: ViewProps): JSX.Element {
                   }
                }
                className = {
-                  clsx("transition duration-300 ease-in-out", {
+                  clsx("transition duration-300 ease-in-out focus:outline-0 focus:ring-0", {
                      "scale-105 border-b-4 border-b-primary rounded-none": view === "cards"
                   })
                }
@@ -61,15 +61,15 @@ export default function View(props: ViewProps): JSX.Element {
          >
             {
                workouts.length === 0 ? (
-                  <div className = "mx-auto flex h-[40vh] w-full items-center justify-center text-center">
+                  <div className = "mx-auto flex h-[50vh] w-full items-center justify-center text-center">
                      {
                         fetched ? (
-                           <div className = "flex flex-col gap-2">
+                           <div className = "flex flex-col gap-6">
                               <FontAwesomeIcon
-                                 icon = { faPersonRunning }
-                                 className = "text-5xl text-primary"
+                                 icon = { faMagnifyingGlass }
+                                 className = "text-4xl text-primary"
                               />
-                              <h1 className = "text-lg font-bold">No available workouts</h1>
+                              <h1 className = "text-base font-bold">No available workouts</h1>
                            </div>
                         ) : (
                            <Loading />

@@ -110,7 +110,7 @@ function Row(props: RowProps) {
             <input
                id = { `workout-select-${workout.id}` }
                type = "checkbox"
-               className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+               className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-primary focus:ring-blue-500"
                checked = { globalState.workouts.data.selected.has(workout) }
                onChange = { () => handleWorkoutToggle() }
             />
@@ -305,14 +305,14 @@ export default function Table(props: TableProps): JSX.Element {
    ]);
 
    return (
-      <div className = "relative mx-auto w-full">
+      <div className = "relative mx-4 w-full">
          <div className = "container mx-auto my-6 overflow-hidden rounded-xl shadow-md">
             <div className = "block bg-white p-4 lg:hidden dark:bg-slate-800">
                <input
                   id = "workout-select-all-mobile"
                   type = "checkbox"
                   checked = { allVisibleSelected }
-                  className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+                  className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-primary accent-red-300 focus:ring-blue-500"
                   onChange = { () => handleWorkoutToggle() }
                />
             </div>
@@ -322,7 +322,7 @@ export default function Table(props: TableProps): JSX.Element {
                      id = "workout-select-all-desktop"
                      type = "checkbox"
                      checked = { allVisibleSelected }
-                     className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+                     className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-primary accent-red-300 focus:ring-blue-500"
                      onChange = { () => handleWorkoutToggle() }
                   />
                </div>

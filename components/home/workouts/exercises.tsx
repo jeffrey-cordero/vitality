@@ -890,7 +890,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                         items = { exercise.sets.map((set) => set.id) }
                         strategy = { verticalListSortingStrategy }
                      >
-                        <ul className = "mx-auto flex w-full list-disc flex-col gap-6 pt-2">
+                        <ul className = "mx-auto flex w-full list-disc flex-col gap-6 pt-2 my-2">
                            {
                               exercise.sets.map((set: ExerciseSet) => {
                                  return (

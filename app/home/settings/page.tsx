@@ -1,6 +1,6 @@
 "use client";
 import Button from "@/components/global/button";
-import { signOut } from "@/lib/authentication/session";
+import { endSession } from "@/lib/authentication/session";
 import { faMoon, faRightFromBracket, faSun } from "@fortawesome/free-solid-svg-icons";
 import { useContext } from "react";
 import { AuthenticationContext } from "@/app/layout";
@@ -37,7 +37,7 @@ export default function Page() {
                icon = { faRightFromBracket }
                onClick = {
                   async() => {
-                     await signOut();
+                     await endSession();
                   }
                }
             >

@@ -92,7 +92,7 @@ function Card(props: CardProps): JSX.Element {
                )
             }
             <div className = "relative flex size-full flex-col items-center justify-start overflow-hidden pt-5 text-center text-black">
-               <h2 className = "max-w-[90%] text-ellipsis whitespace-nowrap px-6 py-4 text-2xl font-extrabold leading-none tracking-tight">
+               <h2 className = "px-6 py-4 text-2xl font-extrabold">
                   { workout.title }
                </h2>
                <p className = "text-sm font-extrabold">{ formattedDate }</p>

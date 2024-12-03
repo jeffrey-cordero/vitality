@@ -126,7 +126,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                   }
                }
                className = {
-                  clsx("transition duration-300 ease-in-out", {
+                  clsx("transition duration-300 ease-in-out focus:outline-0 focus:ring-0", {
                      "scale-105 border-b-4 border-b-primary rounded-none":
                      isDefaultImage
                   })
@@ -143,7 +143,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                   }
                }
                className = {
-                  clsx("transition duration-300 ease-in-out focus:text-red-500", {
+                  clsx("transition duration-300 ease-in-out focus:outline-0 focus:ring-0", {
                      "scale-105 border-b-4 border-b-primary rounded-none":
                      !isDefaultImage
                   })
@@ -165,21 +165,14 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
 
                         return (
                            <div
-                              tabIndex = { 0 }
                               id = { source }
-                              onKeyDown = {
-                                 (event) => {
-                                    if (event.key === "Enter" || event.key === " ") {
-                                       handleDefaultImageSelection(source);
-                                    }
-                                 }
-                              }
                               className = "relative size-48"
                               key = { source }
                            >
                               <Image
                                  fill
                                  priority
+                                 tabIndex = { 0 }
                                  quality = { 100 }
                                  sizes = "100%"
                                  src = { source }
@@ -187,10 +180,17 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  alt = "workout-image"
                                  className = {
                                     clsx(
-                                       "cursor-pointer rounded-xl object-cover object-center shadow-inner", {
+                                    "cursor-pointer rounded-xl object-cover object-center shadow-inner focus:ring-0 focus:outline-8", {
                                           "border-primary border-[4px] shadow-2xl scale-[1.05] transition duration-300 ease-in-out": isSelected
                                        }
                                     )
+                                 }
+                                 onKeyDown = {
+                                    (event) => {
+                                       if (event.key === "Enter" || event.key === " ") {
+                                          !isSelected ? handleDefaultImageSelection(source) : handleImageURLReset();
+                                       }
+                                    }
                                  }
                                  onClick = { () => !isSelected ? handleDefaultImageSelection(source) : handleImageURLReset() }
                               />
