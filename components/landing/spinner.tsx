@@ -47,7 +47,7 @@ export default function Spinner(): JSX.Element {
    return (
       <div className = "relative my-10 size-full">
          <motion.svg
-            className = "absolute inset-0 m-auto size-[80px]"
+            className = "absolute inset-0 m-auto size-[75px] xl:size-[80px]"
             viewBox = "0 0 100 100"
          >
             <motion.circle
@@ -71,7 +71,7 @@ export default function Spinner(): JSX.Element {
             value = { 100 }
             start = { 0 }
             duration = { 3500 }
-            className = "relative inset-0 mx-auto flex items-center justify-center text-2xl text-green-500"
+            className = "relative inset-0 mx-auto flex items-center justify-center text-[1.4rem] text-green-500 xl:text-2xl"
          />
       </div>
    );

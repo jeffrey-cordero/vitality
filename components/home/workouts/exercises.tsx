@@ -550,7 +550,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
    const collapsedId: string = `collapsed-${exercise.id}`;
    const [isCollapsed, setIsCollapsed] = useState(() => {
-      return !!localStorage.getItem(collapsedId);
+      return !!window.localStorage.getItem(collapsedId);
    });
    const editingExerciseId: string = localState.exerciseId.value;
    const editingExerciseSetId: string = localState.exerciseId.data.setId;
@@ -560,9 +560,9 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    useEffect(() => {
       // Save the collapsed state of a given exercise to localStorage
       if (isCollapsed) {
-         localStorage.setItem(collapsedId, "true");
+         window.localStorage.setItem(collapsedId, "true");
       } else {
-         localStorage.removeItem(collapsedId);
+         window.localStorage.removeItem(collapsedId);
       }
    }, [
       isCollapsed,
@@ -890,7 +890,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                         items = { exercise.sets.map((set) => set.id) }
                         strategy = { verticalListSortingStrategy }
                      >
-                        <ul className = "mx-auto flex w-full list-disc flex-col gap-6 pt-2 my-2">
+                        <ul className = "mx-auto my-2 flex w-full list-disc flex-col gap-6 pt-2">
                            {
                               exercise.sets.map((set: ExerciseSet) => {
                                  return (

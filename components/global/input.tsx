@@ -100,84 +100,86 @@ export function Input(props: VitalityInputProps): JSX.Element {
 
    return (
       <div className = "relative">
-         <input
-            id = { id }
-            type = { inputType }
-            value = { input.value }
-            autoComplete = { autoComplete ?? undefined }
-            min = { min ?? undefined }
-            ref = { inputRef }
-            placeholder = { placeholder ?? "" }
-            className = {
-               clsx("peer block w-full rounded-lg border bg-white p-4 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-primary focus:pb-2 focus:pt-7 focus:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
-                  {
-                     "border-gray-200 border-[1.5px]": input.error === null,
-                     "border-red-500 border-2 dark:border-2 focus:border-red-500 focus:ring-red-500 error": input.error !== null
-                  }, className)
-            }
-            onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event) }
-            onChange = { (event: ChangeEvent<HTMLInputElement>) => handleInputChange(event) }
-         />
-         {
-            (inputType === "password" || passwordButton.current !== null) && (
-               <Button
-                  tabIndex = { -1 }
-                  type = "button"
-                  className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
-               >
-                  <FontAwesomeIcon
-                     icon = { inputType == "password" ? faEye : faEyeSlash }
-                     className = "password-icon size-4 shrink-0"
-                     ref = { passwordButton }
-                     onClick = { handlePasswordIconClick }
-                  />
-               </Button>
-            )
-         }
-         {
-            input.data.valid !== undefined && (
-               <Button
-                  tabIndex = { -1 }
-                  type = "button"
-                  className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
-               >
-                  <FontAwesomeIcon
-                     icon = { input.data.valid ? faCircleCheck : faCircleXmark }
-                     className = {
-                        clsx("size-4 shrink-0", {
-                           "text-green-500": input.data.valid,
-                           "text-red-500": !(input.data.valid)
-                        })
-                     }
-                  />
-               </Button>
-            )
-         }
-         <label
-            htmlFor = { id }
-            className = {
-               clsx(
-                  "pointer-events-none absolute start-0 top-0 h-full truncate border border-transparent p-4 text-sm transition duration-200 ease-in-out peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-sm peer-placeholder-shown:text-black peer-focus:-translate-y-2 peer-focus:text-xs peer-focus:text-black peer-disabled:pointer-events-none peer-disabled:opacity-50 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-placeholder-shown:text-white dark:peer-[:not(:placeholder-shown)]:text-gray-400",
-                  {
-                     "font-bold": required,
-                     "peer-[:not(:placeholder-shown)]:text-[color:black] dark:peer-[:not(:placeholder-shown)]:text-white" : type === "date" && input.value === ""
-                  }
-               )
-            }
-         >
+         <div className = "relative">
+            <input
+               id = { id }
+               type = { inputType }
+               value = { input.value }
+               autoComplete = { autoComplete ?? undefined }
+               min = { min ?? undefined }
+               ref = { inputRef }
+               placeholder = { placeholder ?? "" }
+               className = {
+                  clsx("peer block w-full rounded-lg border bg-white p-4 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-primary focus:pb-2 focus:pt-7 focus:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
+                     {
+                        "border-gray-200 border-[1.5px]": input.error === null,
+                        "border-red-500 border-2 dark:border-2 focus:border-red-500 focus:ring-red-500 error": input.error !== null
+                     }, className)
+               }
+               onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event) }
+               onChange = { (event: ChangeEvent<HTMLInputElement>) => handleInputChange(event) }
+            />
             {
-               icon && (
-                  <FontAwesomeIcon
-                     icon = { icon }
-                     className = "mr-[4px]"
-                  />
+               (inputType === "password" || passwordButton.current !== null) && (
+                  <Button
+                     tabIndex = { -1 }
+                     type = "button"
+                     className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
+                  >
+                     <FontAwesomeIcon
+                        icon = { inputType == "password" ? faEye : faEyeSlash }
+                        className = "password-icon size-4 shrink-0"
+                        ref = { passwordButton }
+                        onClick = { handlePasswordIconClick }
+                     />
+                  </Button>
                )
             }
-            { label }
-         </label>
+            {
+               input.data.valid !== undefined && (
+                  <Button
+                     tabIndex = { -1 }
+                     type = "button"
+                     className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
+                  >
+                     <FontAwesomeIcon
+                        icon = { input.data.valid ? faCircleCheck : faCircleXmark }
+                        className = {
+                           clsx("size-4 shrink-0", {
+                              "text-green-500": input.data.valid,
+                              "text-red-500": !(input.data.valid)
+                           })
+                        }
+                     />
+                  </Button>
+               )
+            }
+            <label
+               htmlFor = { id }
+               className = {
+                  clsx(
+                     "pointer-events-none absolute start-0 top-0 h-full truncate border border-transparent p-4 text-sm transition duration-200 ease-in-out peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-sm peer-placeholder-shown:text-black peer-focus:-translate-y-2 peer-focus:text-xs peer-focus:text-black peer-disabled:pointer-events-none peer-disabled:opacity-50 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-placeholder-shown:text-white dark:peer-[:not(:placeholder-shown)]:text-gray-400",
+                     {
+                        "font-bold": required,
+                        "peer-[:not(:placeholder-shown)]:text-[color:black] dark:peer-[:not(:placeholder-shown)]:text-white" : type === "date" && input.value === ""
+                     }
+                  )
+               }
+            >
+               {
+                  icon && (
+                     <FontAwesomeIcon
+                        icon = { icon }
+                        className = "mr-[5px]"
+                     />
+                  )
+               }
+               { label }
+            </label>
+         </div>
          {
             input.error !== null && (
-               <div className = "mx-auto my-3 flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 text-center text-sm opacity-0">
+               <div className = "relative mx-auto my-3 flex animate-fadeIn items-center justify-center gap-2 px-2 text-center text-base opacity-0">
                   <p className = "input-error font-bold text-red-500">
                      { input.error.trim() }
                   </p>

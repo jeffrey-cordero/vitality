@@ -40,6 +40,12 @@ const testimonials = [
       name: "Daniel",
       stars: [1, 1, 1, 1, 1],
       image: "/landing/testimonial-six.jpg"
+   },
+   {
+      "testimonial": "Using this app has completely transformed the way I approach fitness. The personalized workout plans and progress tracking keep me motivated every day!",
+      "name": "Rachel",
+      "stars": [1, 1, 1, 1, 1],
+      "image": "/landing/testimonial-seven.jpg"
    }
 ];
 

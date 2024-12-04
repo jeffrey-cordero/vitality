@@ -11,11 +11,6 @@ import { getSession } from "@/lib/authentication/session";
 import { NotificationProps } from "@/components/global/notification";
 import { User as NextAuthUser } from "next-auth";
 
-const defaultTheme =
-   localStorage.theme === "dark" ||
-      (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
-      ? "dark" : "light";
-
 interface AuthenticationContextType {
    user: NextAuthUser | undefined;
    theme: "dark" | "light";
@@ -30,7 +25,7 @@ interface NotificationContextType {
 
 export const AuthenticationContext = createContext<AuthenticationContextType>({
    user: undefined,
-   theme: defaultTheme,
+   theme: null,
    updateTheme: () => {},
    fetched: false
 });
@@ -46,7 +41,7 @@ export const NotificationContext = createContext<NotificationContextType>({
 
 export default function Layout({ children }: { children: React.ReactNode }) {
    const [user, setUser] = useState<NextAuthUser | undefined>(undefined);
-   const [theme, setTheme] = useState<"light" | "dark">(defaultTheme);
+   const [theme, setTheme] = useState<"light" | "dark">(null);
    const [fetched, setFetched] = useState<boolean>(false);
    const [notification, setNotification] = useState<
       NotificationProps | undefined
@@ -72,12 +67,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
    };
 
    const updateTheme = (theme: "dark" | "light") => {
-      localStorage.setItem("theme", theme);
+      window.localStorage.setItem("theme", theme);
       setTheme(theme);
    };
 
    useEffect(() => {
       if (!fetched) {
+         setTheme(window.localStorage.theme === "dark" ||
+            (!("theme" in window.localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
+            ? "dark" : "light");
          handleAuthentication();
       }
 
@@ -121,7 +119,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <html
          lang = "en"
          className = { `m-0 w-full overflow-x-hidden p-0 ${theme === "dark" && "dark"}` }
-         data-theme = { theme }
+         suppressHydrationWarning = { true }
       >
          <head>
             <title>Vitality</title>
@@ -163,24 +161,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   "box-border m-0 p-0 overflow-x-hidden max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-900 text-black dark:text-white",
                )
             }
-            suppressHydrationWarning = { true }
          >
-            <AuthenticationContext.Provider value = { { user, theme, updateTheme, fetched } }>
-               <SideBar />
-               <NotificationContext.Provider
-                  value = { { notification, updateNotification } }
-               >
-                  <div>{ children }</div>
-                  <div>
-                     {
-                        notification !== undefined && notification.status !== "Initial" && (
-                           <Notification { ...notification } />
-                        )
-                     }
-                  </div>
-               </NotificationContext.Provider>
-               <Footer />
-            </AuthenticationContext.Provider>
+            {
+               fetched && (
+                  <AuthenticationContext.Provider value = { { user, theme, updateTheme, fetched } }>
+                     <SideBar />
+                     <NotificationContext.Provider
+                        value = { { notification, updateNotification } }
+                     >
+                        <div>{ children }</div>
+                        <div>
+                           {
+                              notification !== undefined && notification.status !== "Initial" && (
+                                 <Notification { ...notification } />
+                              )
+                           }
+                        </div>
+                     </NotificationContext.Provider>
+                     <Footer />
+                  </AuthenticationContext.Provider>
+               )
+            }
          </body>
       </html>
    );

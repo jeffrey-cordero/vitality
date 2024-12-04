@@ -180,7 +180,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  alt = "workout-image"
                                  className = {
                                     clsx(
-                                    "cursor-pointer rounded-xl object-cover object-center shadow-inner focus:ring-0 focus:outline-8", {
+                                       "cursor-pointer rounded-xl object-cover object-center shadow-inner focus:outline-8 focus:ring-0", {
                                           "border-primary border-[4px] shadow-2xl scale-[1.05] transition duration-300 ease-in-out": isSelected
                                        }
                                     )

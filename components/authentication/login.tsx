@@ -53,7 +53,7 @@ export default function Login(): JSX.Element {
             title = "Log In"
             description = "Enter valid credentials to enter"
          />
-         <div className = "mx-auto mt-8 w-10/12 lg:w-1/2">
+         <div className = "mx-auto mt-8 w-11/12 sm:w-3/4 xl:w-5/12">
             <form
                className = "relative flex w-full flex-col items-stretch justify-center gap-3"
                onSubmit = { handleAuthenticate }

@@ -17,12 +17,12 @@ function Testimonial(props: TestimonialProps): JSX.Element {
    const { testimonial, name, stars, image } = props;
 
    return (
-      <div className = "relative mx-auto box-border flex max-h-full min-h-[22rem] w-full flex-col justify-center gap-1 py-4 sm:min-h-80">
+      <div className = "relative mx-auto box-border flex max-h-full min-h-[22rem] w-full flex-col justify-center gap-1 py-4 md:min-h-80">
          <FontAwesomeIcon
             icon = { faQuoteLeft }
-            className = "text-3xl text-primary"
+            className = "text-[1.6rem] sm:text-3xl text-primary"
          />
-         <p className = "mx-auto mt-3 w-10/12 px-2 text-base font-medium sm:w-3/4">
+         <p className = "mx-auto mt-3 w-11/12 px-2 text-[0.95rem] sm:text-base font-medium sm:w-3/4">
             { testimonial }
          </p>
          <div>
@@ -37,7 +37,9 @@ function Testimonial(props: TestimonialProps): JSX.Element {
                   alt = "Rounded avatar"
                />
                <div>
-                  <p className = "font-semibold">{ name }</p>
+                  <p className = "font-semibold text-base">
+                     { name }
+                  </p>
                   {
                      stars.map((rating, index) => {
                         return (
@@ -45,7 +47,7 @@ function Testimonial(props: TestimonialProps): JSX.Element {
                               key = { index }
                               icon = { faStar }
                               className = {
-                                 clsx("my-2 text-base sm:text-sm", {
+                                 clsx("my-2 text-sm", {
                                     "text-yellow-500": rating,
                                     "text-slate-500": !rating
                                  })
@@ -77,7 +79,7 @@ export default function Testimonials(): JSX.Element {
             title = "Testimonials"
             description = "Explore firsthand stories from our users, sharing their fitness journeys with our app"
          />
-         <div className = "mx-auto my-8 w-10/12 sm:w-7/12">
+         <div className = "mx-auto my-8 w-10/12 lg:w-7/12">
             <Carousel
                items = { elements }
                columns = { 1 }
