@@ -356,7 +356,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
       <div
          ref = { setNodeRef }
          style = { style }
-         className = "mx-auto w-full px-4 sm:px-8"
+         className = "mx-auto w-full pl-4 sm:pl-8"
       >
          {
             displayEditInputs ? (
@@ -522,7 +522,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                                     className = "self-start pt-1 text-primary"
                                     icon = { faAlignJustify }
                                  />
-                                 <p className = "line-clamp-2">{ set.text }</p>
+                                 <p className = "line-clamp-4">{ set.text }</p>
                               </div>
                            )
                         }
@@ -794,7 +794,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
    return (
       <li
-         className = "mx-auto w-full p-2 text-left sm:p-4"
+         className = "mx-auto w-full p-2 text-left"
          style = { style }
          ref = { setNodeRef }
       >
@@ -886,6 +886,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      collisionDetection = { closestCenter }
                      onDragEnd = { handleDragEnd }
                   >
+
                      <SortableContext
                         items = { exercise.sets.map((set) => set.id) }
                         strategy = { verticalListSortingStrategy }
@@ -919,7 +920,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   </DndContext>
                   {
                      !hideNewEntryButton && (
-                        <div className = "mx-auto w-full px-4 sm:px-8">
+                        <div className = "mx-auto mt-4 w-full px-4 sm:px-8">
                            <Button
                               type = "button"
                               className = "h-[2.6rem] w-full border-[1.5px] border-gray-100 px-4 py-2 text-base font-bold focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50"

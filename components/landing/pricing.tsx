@@ -20,7 +20,7 @@ function PricingCard(props: PricingCardProps): JSX.Element {
 
    return (
       <div
-         className = "relative mx-3 flex h-[32rem] xsm:h-[33rem] w-[29rem] max-w-full items-center justify-center rounded-2xl bg-white text-center shadow-md xsm:mx-0 md:w-80 dark:bg-slate-800"
+         className = "relative mx-3 flex h-[32rem] w-[29rem] max-w-full items-center justify-center rounded-2xl bg-white text-center shadow-md xsm:mx-0 xsm:h-[33rem] md:w-80 dark:bg-slate-800"
       >
          <div
             className = "flex size-full justify-center rounded-2xl bg-white text-center shadow-md dark:bg-slate-800"

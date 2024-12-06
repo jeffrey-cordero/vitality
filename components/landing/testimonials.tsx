@@ -17,12 +17,12 @@ function Testimonial(props: TestimonialProps): JSX.Element {
    const { testimonial, name, stars, image } = props;
 
    return (
-      <div className = "relative mx-auto box-border flex max-h-full min-h-[22rem] w-full flex-col justify-center gap-1 py-4 md:min-h-80">
+      <div className = "relative mx-auto box-border flex max-h-full min-h-[22rem] w-full flex-col justify-center gap-1 py-2 sm:py-0 md:min-h-80">
          <FontAwesomeIcon
             icon = { faQuoteLeft }
-            className = "text-[1.6rem] sm:text-3xl text-primary"
+            className = "text-[1.6rem] text-primary sm:text-3xl"
          />
-         <p className = "mx-auto mt-3 w-11/12 px-2 text-[0.95rem] sm:text-base font-medium sm:w-3/4">
+         <p className = "mx-auto mt-3 w-11/12 px-2 text-[0.95rem] font-medium sm:w-3/4 sm:text-base">
             { testimonial }
          </p>
          <div>
@@ -37,7 +37,7 @@ function Testimonial(props: TestimonialProps): JSX.Element {
                   alt = "Rounded avatar"
                />
                <div>
-                  <p className = "font-semibold text-base">
+                  <p className = "text-base font-semibold">
                      { name }
                   </p>
                   {

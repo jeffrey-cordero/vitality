@@ -1,6 +1,7 @@
 "use client";
-import Filtering from "@/components/home/workouts/filtering";
+import Main from "@/components/global/main";
 import View from "@/components/home/workouts/view";
+import Filtering from "@/components/home/workouts/filtering";
 import Form from "@/components/home/workouts/form";
 import Pagination from "@/components/home/workouts/pagination";
 import { AuthenticationContext } from "@/app/layout";
@@ -192,7 +193,7 @@ export default function Page(): JSX.Element {
    ]);
 
    return (
-      <main className = "relative mx-auto mb-20 mt-10 flex w-full flex-col items-center justify-start text-center lg:w-11/12">
+      <Main>
          <Filtering
             globalState = { globalState }
             globalDispatch = { globalDispatch }
@@ -213,6 +214,6 @@ export default function Page(): JSX.Element {
             globalState = { globalState }
             globalDispatch = { globalDispatch }
          />
-      </main>
+      </Main>
    );
 }

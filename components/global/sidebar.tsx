@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname } from "next/navigation";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faUtensils, faBrain, faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears, faBarsStaggered, faDumbbell, faRightFromBracket, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faUtensils, faBrain, faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears, faBars, faDumbbell, faRightFromBracket, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { AuthenticationContext } from "@/app/layout";
 import { endSession } from "@/lib/authentication/session";
 
@@ -126,7 +126,7 @@ export function SideBar(): JSX.Element {
             <div className = "relative left-0 top-0 z-30 translate-x-[10px] translate-y-[15px]">
                <FontAwesomeIcon
                   id = "sideBarButton"
-                  icon = { visibleSideBar ? faAnglesRight : faBarsStaggered }
+                  icon = { visibleSideBar ? faAnglesRight : faBars }
                   className = "text-3xl font-extrabold text-black hover:cursor-pointer dark:text-white"
                   onClick = {
                      () => {
@@ -141,7 +141,7 @@ export function SideBar(): JSX.Element {
                id = "sideBarLinks"
                className = {
                   clsx(
-                     "relative top-[10px] m-0 w-[4.5rem] transition-all duration-1000 ease-in-out hover:w-64 focus:w-64",
+                     "relative top-[-15px] m-0 w-[4.5rem] transition-all duration-1000 ease-in-out xsm:hover:w-60 xsm:focus:w-60",
                      {
                         "left-[-5rem]": !visibleSideBar,
                         "left-[10px]": visibleSideBar

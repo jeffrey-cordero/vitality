@@ -110,34 +110,28 @@ function TagColorInput(props: VitalityChildProps) {
       ]);
 
    return (
-      <div className = "relative mx-auto w-full">
+      <div className = "relative mx-auto flex w-full flex-col gap-1">
          {
             names.map((name: string) => {
                const color = colors[name];
 
                return (
-                  <div
+                  <Button
                      style = { { backgroundColor: color } }
                      className = {
                         clsx(
-                           "flex h-[2.6rem] w-full cursor-pointer items-center justify-center rounded-sm border-2 p-3 text-center text-sm text-white",
+                           "flex h-[2.6rem] w-full cursor-pointer items-center justify-center rounded-sm border-2 p-3 text-center text-sm text-white focus:border-0",
                            {
-                              "border-primary border-[4px] shadow-2xl":
-                           localState.tagColor.value === color,
-                              "border-white": localState.tagColor.value !== color
+                              "border-primary border-[3px] shadow-2xl": localState.tagColor.value === color,
+                              "border-white dark:border-slate-800": localState.tagColor.value !== color
                            },
                         )
                      }
-                     onClick = {
-                        (event) => {
-                           event.stopPropagation();
-                           handleColorChange(color);
-                        }
-                     }
+                     onClick = { () => handleColorChange(color) }
                      key = { name }
                   >
                      { name }
-                  </div>
+                  </Button>
                );
             })
          }
@@ -222,6 +216,12 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
                   }
                });
 
+               updateNotification({
+                  status: "Success",
+                  message: "Updated workout tag",
+                  timer: 1000
+               });
+
                // Close the modal form element and scroll into editing tag element
                onSave();
             });
@@ -256,13 +256,13 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
    );
 
    return (
-      <div className = "flex flex-col items-center justify-center gap-3 text-center text-black">
+      <div className = "flex flex-col items-stretch justify-center gap-3 text-center">
          <div className = "flex flex-col items-center justify-center gap-3 text-center">
             <FontAwesomeIcon
                icon = { faGear }
                className = "mt-6 text-4xl text-primary"
             />
-            <h1 className = "mb-2 px-2 text-2xl font-bold text-black">
+            <h1 className = "mb-2 px-2 text-2xl font-bold">
                Edit Tag
             </h1>
          </div>
@@ -538,6 +538,12 @@ export default function Tags(props: TagsProps): JSX.Element {
                      }
                   }
                }
+            });
+
+            updateNotification({
+               status: "Success",
+               message: "Added workout tag",
+               timer: 1000
             });
 
             // Fetch a new random color

@@ -13,7 +13,8 @@ const config: Config = {
             primary: "#007FFF"
          },
          screens: {
-            xsm: "400px"
+            xsm: "400px",
+            xxsm: "300px"
          },
          keyframes: {
             fadeIn: {

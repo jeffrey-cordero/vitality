@@ -10,7 +10,6 @@ import { deleteWorkouts, Workout } from "@/lib/home/workouts/workouts";
 import { Tag } from "@/lib/home/workouts/tags";
 import { useCallback, useContext, useMemo } from "react";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { useDoubleTap } from "use-double-tap";
 
 interface RowProps extends VitalityProps {
    workout: Workout;
@@ -20,6 +19,7 @@ interface RowProps extends VitalityProps {
 function Row(props: RowProps) {
    const { workout, globalState, globalDispatch } = props;
    const selected: Set<Workout> = globalState.workouts.data.selected;
+   const isSelected = selected.has(workout);
 
    const formattedDate = useMemo(() => {
       return workout.date.toISOString().slice(0, 10);
@@ -64,7 +64,7 @@ function Row(props: RowProps) {
             // Undefined in case of removal
             tag !== undefined && (
                <div
-                  className = { clsx("m-2 max-w-full truncate rounded-full px-4 py-2 text-xs font-bold text-white") }
+                  className = { clsx("m-1 max-w-full truncate rounded-full px-4 py-2 text-xs font-bold text-white") }
                   style = {
                      {
                         backgroundColor: tag.color
@@ -98,33 +98,27 @@ function Row(props: RowProps) {
       });
    }, [globalDispatch, globalState.workout, workout]);
 
-   const doubleTap = useDoubleTap(handleEditWorkout);
-
    return (
       <div
          id = { workout.id }
-         className = "mx-auto flex w-full cursor-pointer flex-col items-center justify-between rounded-md bg-white text-center hover:bg-gray-50 lg:flex-row lg:rounded-none lg:p-4 dark:bg-slate-800 dark:hover:bg-gray-700"
-         { ...doubleTap }
+         className = {
+            clsx("mx-auto flex w-full cursor-pointer flex-col items-center justify-between p-2 text-center text-lg font-medium lg:flex-row lg:rounded-none lg:p-8 lg:text-base", {
+               "bg-gray-50 dark:bg-gray-600": isSelected,
+               "bg-white dark:bg-slate-800": !isSelected
+            })
+         }
+         onClick = { handleWorkoutToggle }
       >
-         <div className = "flex w-full items-center justify-center whitespace-normal px-3 py-4 pt-6 text-base uppercase lg:w-4 lg:pt-4">
-            <input
-               id = { `workout-select-${workout.id}` }
-               type = "checkbox"
-               className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-primary focus:ring-blue-500"
-               checked = { globalState.workouts.data.selected.has(workout) }
-               onChange = { () => handleWorkoutToggle() }
-            />
-         </div>
-         <div className = "w-full whitespace-pre-wrap break-all px-2 text-xl lg:w-40 lg:px-6 lg:py-4 lg:text-base">
+         <div className = "w-full whitespace-pre-wrap break-words px-2 lg:w-40 lg:px-6 lg:py-4">
             { workout.title }
          </div>
-         <div className = "w-full whitespace-pre-wrap break-all px-2 pt-2 text-xl lg:w-40 lg:px-6 lg:py-4 lg:text-base">
+         <div className = "w-full whitespace-pre-wrap break-all px-2 pt-2 lg:w-40 lg:px-6 lg:py-4">
             { formattedDate }
          </div>
-         <div className = "scrollbar-hide w-full overflow-auto whitespace-pre-wrap break-all px-12 text-xl lg:max-h-48 lg:w-48 lg:px-6 lg:py-4 lg:text-base">
+         <div className = "scrollbar-hide w-full overflow-auto whitespace-pre-wrap break-all px-12 lg:max-h-48 lg:w-48 lg:px-6 lg:py-4">
             <div
                className = {
-                  clsx("scrollbar-hide flex max-h-56 w-full flex-row flex-wrap items-center justify-center gap-2 overflow-auto p-2", {
+                  clsx("scrollbar-hide mx-auto my-4 flex max-h-56 w-full max-w-[30rem] flex-row flex-wrap items-center justify-center gap-1 overflow-auto", {
                      "cursor-all-scroll": workoutTags.length > 0
                   })
                }
@@ -133,11 +127,11 @@ function Row(props: RowProps) {
             </div>
          </div>
          <div
-            className = { clsx("relative order-first mt-8 whitespace-pre-wrap break-all text-xl lg:order-none lg:mt-0 lg:text-base") }
+            className = { clsx("relative order-first my-4 whitespace-pre-wrap break-all lg:order-none lg:my-0") }
          >
             {
                workout.image ? (
-                  <div className = "relative flex size-56 items-center justify-center lg:size-28">
+                  <div className = "relative flex size-40 items-center justify-center xxsm:size-52 xsm:size-56 sm:size-64 lg:size-32">
                      <Image
                         fill
                         priority
@@ -149,7 +143,7 @@ function Row(props: RowProps) {
                      />
                   </div>
                ) : (
-                  <div className = "flex size-56 items-center justify-center overflow-hidden rounded-full text-primary lg:size-28">
+                  <div className = "flex size-40 items-center justify-center overflow-hidden rounded-full text-primary xxsm:size-52 xsm:size-56 sm:size-64 lg:size-32">
                      <FontAwesomeIcon
                         className = "text-4xl"
                         icon = { faImage }
@@ -173,7 +167,7 @@ function Row(props: RowProps) {
                   <div className = "block lg:hidden">
                      <Button
                         type = "button"
-                        className = "mb-6 mt-2 block h-[2.4rem] w-40 bg-primary p-4 text-sm text-white lg:hidden"
+                        className = "mb-6 mt-2 block h-[2.6rem] whitespace-nowrap bg-primary px-5 py-4 text-sm text-white lg:hidden"
                         icon = { faPencil }
                      >
                         Edit Workout
@@ -305,43 +299,41 @@ export default function Table(props: TableProps): JSX.Element {
    ]);
 
    return (
-      <div className = "relative mx-4 w-full">
-         <div className = "container mx-auto my-6 overflow-hidden rounded-xl shadow-md">
+      <div className = "relative mx-auto w-full">
+         <div className = "mx-auto my-6 overflow-hidden rounded-2xl shadow-md">
             <div className = "block bg-white p-4 lg:hidden dark:bg-slate-800">
                <input
                   id = "workout-select-all-mobile"
                   type = "checkbox"
                   checked = { allVisibleSelected }
-                  className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-primary accent-red-300 focus:ring-blue-500"
+                  className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
                   onChange = { () => handleWorkoutToggle() }
                />
             </div>
-            <div className = "mx-auto hidden w-full items-center justify-between bg-white p-4 lg:flex dark:bg-slate-800">
-               <div className = "flex w-4 items-center justify-center whitespace-normal px-3 py-4 text-base font-bold uppercase">
+            <div className = "mx-auto hidden w-full items-center justify-between bg-white lg:flex lg:p-8 dark:bg-slate-800">
+               <div className = "w-40 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
+                  Title
+               </div>
+               <div className = "w-40 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
+                  Date
+               </div>
+               <div className = "w-48 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
+                  Tags
+               </div>
+               <div className = "w-32 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
+                  Image
+               </div>
+               <div className = "flex w-12 items-center justify-center whitespace-normal py-4 text-base font-bold uppercase text-black">
                   <input
                      id = "workout-select-all-desktop"
                      type = "checkbox"
                      checked = { allVisibleSelected }
-                     className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-primary accent-red-300 focus:ring-blue-500"
+                     className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
                      onChange = { () => handleWorkoutToggle() }
                   />
                </div>
-               <div className = "w-40 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-base">
-                  Title
-               </div>
-               <div className = "w-40 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-base">
-                  Date
-               </div>
-               <div className = "w-48 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-base">
-                  Tags
-               </div>
-               <div className = "w-28 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-base">
-                  Image
-               </div>
-               <div className = "w-12 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-base">
-               </div>
             </div>
-            <div className = "mx-auto flex w-full flex-col gap-2 bg-white lg:gap-0">
+            <div className = "mx-auto flex w-full flex-col bg-white dark:bg-slate-800">
                {
                   workouts.map((workout: Workout, index: number) => (
                      <Row

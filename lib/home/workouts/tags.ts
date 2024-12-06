@@ -88,7 +88,7 @@ export async function addWorkoutTag(tag: Tag): Promise<VitalityResponse<Tag>> {
          }
       });
 
-      return sendSuccessMessage("Successfully added new workout tag", newTag);
+      return sendSuccessMessage("Successfully created workout tag", newTag);
    } catch (error) {
       return sendFailureMessage(error);
    }

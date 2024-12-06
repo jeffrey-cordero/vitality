@@ -237,7 +237,7 @@ describe("Workout Tags Tests", () => {
                   id: MOCK_ID,
                   title: "New Workout Tag Title"
                },
-               message: "Successfully added new workout tag",
+               message: "Successfully created workout tag",
                errors: {}
             }
          });

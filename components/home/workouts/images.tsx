@@ -126,7 +126,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                   }
                }
                className = {
-                  clsx("transition duration-300 ease-in-out focus:outline-0 focus:ring-0", {
+                  clsx("transition duration-300 ease-in-out focus:text-primary focus:ring-transparent", {
                      "scale-105 border-b-4 border-b-primary rounded-none":
                      isDefaultImage
                   })
@@ -143,7 +143,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                   }
                }
                className = {
-                  clsx("transition duration-300 ease-in-out focus:outline-0 focus:ring-0", {
+                  clsx("transition duration-300 ease-in-out focus:text-primary focus:ring-transparent", {
                      "scale-105 border-b-4 border-b-primary rounded-none":
                      !isDefaultImage
                   })

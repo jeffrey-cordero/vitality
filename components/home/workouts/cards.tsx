@@ -28,7 +28,7 @@ function Card(props: CardProps): JSX.Element {
                <div
                   className = {
                      clsx(
-                        "m-2 max-w-full truncate rounded-full px-4 py-2 text-xs font-bold text-white",
+                        "m-1 max-w-full truncate rounded-full px-4 py-2 text-xs font-bold text-white",
                      )
                   }
                   style = {
@@ -68,7 +68,7 @@ function Card(props: CardProps): JSX.Element {
                });
             }
          }
-         className = "relative mx-auto flex h-[26rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-105 sm:m-2 sm:h-[22rem] sm:w-64"
+         className = "relative mx-auto flex h-[26rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-105 sm:h-[22rem] sm:w-64"
       >
          <div className = "relative mx-auto size-full">
             {
@@ -80,7 +80,7 @@ function Card(props: CardProps): JSX.Element {
                      sizes = "100%"
                      src = { workout.image }
                      alt = "workout-image"
-                     className = "object-cover object-center opacity-50"
+                     className = "object-cover object-center opacity-45"
                   />
                ) : (
                   <div className = "absolute flex size-full items-center justify-center bg-white opacity-20">
@@ -92,14 +92,14 @@ function Card(props: CardProps): JSX.Element {
                )
             }
             <div className = "relative flex size-full flex-col items-center justify-start overflow-hidden pt-5 text-center text-black">
-               <h2 className = "px-6 py-4 text-2xl font-extrabold">
+               <h2 className = "max-w-full truncate break-words px-6 pt-2 text-2xl font-extrabold sm:text-[1.3rem]">
                   { workout.title }
                </h2>
-               <p className = "text-sm font-extrabold">{ formattedDate }</p>
+               <p className = "text-sm font-extrabold sm:text-[0.8rem]">{ formattedDate }</p>
                <div
                   className = {
                      clsx(
-                        "scrollbar-hide flex max-h-60 w-full flex-row flex-wrap items-center justify-center gap-2 overflow-auto px-4 py-2",
+                        "scrollbar-hide flex max-h-60 w-full flex-row flex-wrap items-center justify-center overflow-auto px-4 py-2",
                         {
                            "cursor-all-scroll": workoutTags.length > 0
                         },
@@ -123,7 +123,7 @@ export default function Cards(props: CardsProps): JSX.Element {
 
    return (
       <div className = "relative mx-auto w-full">
-         <div className = "container mx-auto my-6 flex flex-row flex-wrap items-center justify-center gap-6">
+         <div className = "mx-auto my-6 flex flex-row flex-wrap content-center items-center justify-center gap-6">
             {
                workouts.map((workout: Workout) => (
                   <Card

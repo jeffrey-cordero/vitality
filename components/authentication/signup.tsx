@@ -73,13 +73,13 @@ export default function SignUp(): JSX.Element {
       handleResponse(response, dispatch, updateNotification, () => {
          // Display login notification
          updateNotification({
-            status: response.status,
-            message: response.body.message,
+            status: "Success",
+            message: "Successfully registered",
             children: (
                <Link href = "/home">
                   <Button
                      type = "button"
-                     className = "h-8 bg-green-600 p-4 text-sm text-white"
+                     className = "h-8 bg-green-600 px-4 py-3 text-sm text-white xsm:px-6"
                      icon = { faDoorOpen }
                      onClick = {
                         async() => {

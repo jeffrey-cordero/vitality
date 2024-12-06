@@ -41,7 +41,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
       <>
          {
             <div
-               className = "notification fixed left-1/2 top-0 z-50 mx-auto mt-4 min-h-[4.5rem] w-[30rem] max-w-[90%] -translate-x-1/2 animate-fadeIn opacity-0"
+               className = "notification fixed left-1/2 top-0 z-50 mx-auto mt-4 min-h-[4.5rem] w-[30rem] max-w-[95%] -translate-x-1/2 animate-fadeIn opacity-0"
                { ...props }
                ref = { notificationRef }
             >
@@ -61,7 +61,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
                         <FontAwesomeIcon
                            icon = { icon }
                            className = {
-                              clsx("text-3xl", {
+                              clsx("text-4xl", {
                                  "text-green-600": status === "Success",
                                  "text-red-600": status !== "Success"
                               })
@@ -70,7 +70,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      </div>
                      <div className = "flex w-full items-center justify-between px-4 pb-3 pt-[16px]">
                         <div>
-                           <div className = "my-2 flex flex-col gap-2 whitespace-pre-wrap break-all pr-3 font-bold">
+                           <div className = "my-2 flex flex-col gap-2 whitespace-pre-wrap break-words pl-1 pr-6 text-[0.95rem] font-bold xsm:text-base">
                               <p>{ message }</p>
                               { children }
                            </div>
@@ -78,10 +78,10 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      </div>
                   </div>
                </div>
-               <div className = "absolute right-[-5px] top-[-5px] z-50 rounded-e-md p-3.5">
+               <div className = "absolute right-[-2px] top-[-5px] z-50 rounded-e-md p-3.5">
                   <FontAwesomeIcon
                      icon = { faXmark }
-                     className = "size-4 shrink-0 cursor-pointer text-base font-extrabold text-red-500"
+                     className = "size-4 shrink-0 cursor-pointer text-xl font-bold text-red-500"
                      fill = "black"
                      onClick = {
                         (event) => {

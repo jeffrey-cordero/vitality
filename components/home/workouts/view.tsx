@@ -31,8 +31,8 @@ export default function View(props: ViewProps): JSX.Element {
                   }
                }
                className = {
-                  clsx("transition duration-300 ease-in-out focus:outline-0 focus:ring-0", {
-                     "scale-105 border-b-4 border-b-primary rounded-none": view === "table"
+                  clsx("transition duration-300 ease-in-out focus:text-primary focus:ring-transparent", {
+                     "scale-105 border-b-4 border-primary rounded-none": view === "table"
                   })
                }
             >
@@ -47,7 +47,7 @@ export default function View(props: ViewProps): JSX.Element {
                   }
                }
                className = {
-                  clsx("transition duration-300 ease-in-out focus:outline-0 focus:ring-0", {
+                  clsx("transition duration-300 ease-in-out focus:text-primary focus:ring-transparent", {
                      "scale-105 border-b-4 border-b-primary rounded-none": view === "cards"
                   })
                }
@@ -57,7 +57,7 @@ export default function View(props: ViewProps): JSX.Element {
          </div>
          <div
             id = "workoutsView"
-            className = "flex w-full grow flex-col items-center justify-start xl:w-9/12"
+            className = "flex w-full max-w-[95%] flex-col items-center justify-start xl:w-9/12"
          >
             {
                workouts.length === 0 ? (

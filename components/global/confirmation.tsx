@@ -2,7 +2,7 @@ import Button from "@/components/global/button";
 import Modal from "@/components/global/modal";
 import { useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateBack, faSquareCheck, faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faSquareCheck, faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 interface ConformationProps {
   message: string;
@@ -45,30 +45,14 @@ export default function Conformation(props: ConformationProps): JSX.Element {
             <p className = "font-bold">
                { message }
             </p>
-            <div className = "flex flex-row flex-wrap items-center justify-center gap-2">
-               <Button
-                  type = "button"
-                  icon = { faArrowRotateBack }
-                  className = "h-[2.4rem] w-40 border-[1.5px] border-gray-100 bg-gray-100 px-4 py-2 font-bold text-black focus:border-blue-500 focus:ring-blue-500"
-                  onClick = {
-                     () => {
-                        if (deleteModalRef.current) {
-                           deleteModalRef.current.close();
-                        }
-                     }
-                  }
-               >
-                  No, cancel
-               </Button>
-               <Button
-                  type = "button"
-                  icon = { faSquareCheck }
-                  className = "h-[2.4rem] w-40 border-[1.5px] border-gray-100 bg-red-500 px-4 py-2 font-bold text-white focus:border-red-300 focus:ring-red-300 dark:border-0"
-                  onClick = { async() => onConformation() }
-               >
-                  Yes, I&apos;m sure
-               </Button>
-            </div>
+            <Button
+               type = "button"
+               icon = { faSquareCheck }
+               className = "h-10 border-[1.5px] border-gray-100 bg-red-500 px-5 py-2 font-bold text-white focus:border-red-300 focus:ring-red-300 dark:border-0"
+               onClick = { async() => onConformation() }
+            >
+               Yes
+            </Button>
          </div>
       </Modal>
    );
