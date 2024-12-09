@@ -10,6 +10,7 @@ import { createContext, useCallback, useEffect, useState } from "react";
 import { getSession } from "@/lib/authentication/session";
 import { NotificationProps } from "@/components/global/notification";
 import { User as NextAuthUser } from "next-auth";
+import { usePathname } from "next/navigation";
 
 interface AuthenticationContextType {
    user: NextAuthUser | undefined;
@@ -46,6 +47,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
    const [notification, setNotification] = useState<
       NotificationProps | undefined
    >(undefined);
+   const pathname = usePathname();
 
    const handleAuthentication = useCallback(async() => {
       try {
@@ -169,16 +171,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                      <NotificationContext.Provider
                         value = { { notification, updateNotification } }
                      >
-                        <div>{ children }</div>
-                        <div>
+                        <div className = "flex min-h-screen flex-col items-center justify-start gap-12">
+                           { children }
+                           {
+                              pathname === "/" && (
+                                 <Footer />
+                              )
+                           }
+                        </div>
+                        <>
                            {
                               notification !== undefined && notification.status !== "Initial" && (
                                  <Notification { ...notification } />
                               )
                            }
-                        </div>
+                        </>
                      </NotificationContext.Provider>
-                     <Footer />
                   </AuthenticationContext.Provider>
                )
             }

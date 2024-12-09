@@ -230,8 +230,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
             // Reset date filtering inputs
             dateFilter: {
                ...globalState.dateFilter,
-               error: null,
-               value: "Is on or after"
+               error: null
             },
             minDate: {
                ...globalState.minDate,

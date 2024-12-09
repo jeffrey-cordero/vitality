@@ -102,7 +102,9 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                            fill = "black"
                         />
                      </div>
-                     <div>{ children }</div>
+                     <>
+                        { children }
+                     </>
                   </div>
                </div>
             )

@@ -44,7 +44,7 @@ export interface VitalityAction<T> {
 
 export function formReducer(
    state: VitalityState,
-   action: VitalityAction<any>,
+   action: VitalityAction<any>
 ): VitalityState {
    return produce(state, (draft) => {
       switch (action.type) {

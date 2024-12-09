@@ -323,7 +323,7 @@ export default function Images(props: VitalityInputProps): JSX.Element {
                   }
                </div>
             }
-            className = "mt-12 max-h-[90%] max-w-[90%] sm:max-w-xl"
+            className = "mt-12 max-h-[90%] max-w-[95%] sm:max-w-xl"
          >
             <ImagesForm
                { ...props }

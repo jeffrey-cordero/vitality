@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { useRef, useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NotificationContext } from "@/app/layout";
-import { faCircleExclamation, faXmark, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faCircleCheck, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 
 export interface NotificationProps extends React.HTMLAttributes<any> {
   status: "Initial" | "Success" | "Error" | "Failure";
@@ -15,7 +15,7 @@ export interface NotificationProps extends React.HTMLAttributes<any> {
 export default function Notification(props: NotificationProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
    const { status, message, children, timer } = props;
-   const icon = status === "Success" ? faCircleCheck : faCircleExclamation;
+   const icon = status === "Success" ? faCircleCheck : faTriangleExclamation;
    const notificationRef = useRef<HTMLDivElement>(null);
 
    const removeNotification = () => {
@@ -61,7 +61,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
                         <FontAwesomeIcon
                            icon = { icon }
                            className = {
-                              clsx("text-4xl", {
+                              clsx("text-3xl", {
                                  "text-green-600": status === "Success",
                                  "text-red-600": status !== "Success"
                               })

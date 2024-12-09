@@ -19,7 +19,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
    const { user } = useContext(AuthenticationContext);
 
-   return <div className = "m-auto min-h-screen w-full">
-      { user && children }
-   </div>;
+   return (
+      <>
+         { user && children }
+      </>
+   );
 }

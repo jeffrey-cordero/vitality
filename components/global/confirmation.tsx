@@ -2,7 +2,7 @@ import Button from "@/components/global/button";
 import Modal from "@/components/global/modal";
 import { useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSquareCheck, faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 interface ConformationProps {
   message: string;
@@ -16,14 +16,14 @@ export default function Conformation(props: ConformationProps): JSX.Element {
 
    return (
       <Modal
-         className = "mt-12 max-h-[90%] max-w-[80%] text-center sm:max-w-md"
+         className = "py-3 max-h-[90%] max-w-[80%] text-center xsm:max-w-xs"
          ref = { deleteModalRef }
          display = {
             icon ? (
                <div className = "bg-white dark:bg-slate-800">
                   <FontAwesomeIcon
                      icon = { faTrashCan }
-                     className = "my-4 cursor-pointer text-xl text-red-500"
+                     className = "my-[0.83rem] cursor-pointer text-lg text-red-500"
                   />
                </div>
             ) : (
@@ -37,18 +37,14 @@ export default function Conformation(props: ConformationProps): JSX.Element {
             )
          }
       >
-         <div className = "relative flex flex-col items-center justify-between gap-4 p-2">
-            <FontAwesomeIcon
-               icon = { faTrashCan }
-               className = "text-3xl text-red-500"
-            />
+         <div className = "relative flex flex-col items-center justify-between gap-4 pt-4  text-[0.95rem] xsm:text-base">
             <p className = "font-bold">
                { message }
             </p>
             <Button
                type = "button"
-               icon = { faSquareCheck }
-               className = "h-10 border-[1.5px] border-gray-100 bg-red-500 px-5 py-2 font-bold text-white focus:border-red-300 focus:ring-red-300 dark:border-0"
+               icon = { faTrashCan }
+               className = "h-[2.1rem] border-[1.5px] border-gray-100 bg-red-500 px-5 py-2 text-[0.9rem] font-bold text-white focus:border-red-300 focus:ring-red-300 xsm:h-[2.3rem] xsm:text-base dark:border-0"
                onClick = { async() => onConformation() }
             >
                Yes

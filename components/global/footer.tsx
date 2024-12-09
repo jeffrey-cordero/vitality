@@ -4,7 +4,7 @@ import { faGithub, faYoutube, faXTwitter, faMeta } from "@fortawesome/free-brand
 
 export default function Footer(): JSX.Element {
    return (
-      <footer className = "w-full">
+      <footer className = "relative bottom-0 left-0 w-full">
          <div className = "mx-auto w-full max-w-screen-xl">
             <div className = "mx-8 my-4 flex flex-1 flex-col items-center justify-center gap-4 text-center align-middle sm:flex-row sm:justify-between">
                <ul className = "order-2 flex flex-row gap-6 text-sm font-bold sm:order-1">

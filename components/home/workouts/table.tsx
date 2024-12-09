@@ -64,7 +64,7 @@ function Row(props: RowProps) {
             // Undefined in case of removal
             tag !== undefined && (
                <div
-                  className = { clsx("m-1 max-w-full truncate rounded-full px-4 py-2 text-xs font-bold text-white") }
+                  className = { clsx("m-1 max-w-full truncate rounded-full px-4 py-2 text-sm lg:text-xs font-bold text-white") }
                   style = {
                      {
                         backgroundColor: tag.color
@@ -102,23 +102,23 @@ function Row(props: RowProps) {
       <div
          id = { workout.id }
          className = {
-            clsx("mx-auto flex w-full cursor-pointer flex-col items-center justify-between p-2 text-center text-lg font-medium lg:flex-row lg:rounded-none lg:p-8 lg:text-base", {
-               "bg-gray-50 dark:bg-gray-600": isSelected,
+            clsx("mx-auto flex w-full cursor-pointer flex-col items-center justify-between px-2 py-6 text-center text-lg font-medium lg:flex-row lg:rounded-none lg:p-6 lg:text-base", {
+               "bg-gray-100 dark:bg-gray-700": isSelected,
                "bg-white dark:bg-slate-800": !isSelected
             })
          }
          onClick = { handleWorkoutToggle }
       >
-         <div className = "w-full whitespace-pre-wrap break-words px-2 lg:w-40 lg:px-6 lg:py-4">
+         <div className = "w-full whitespace-pre-wrap break-words px-2 text-xl lg:w-40 lg:px-6 lg:py-4 lg:text-base">
             { workout.title }
          </div>
          <div className = "w-full whitespace-pre-wrap break-all px-2 pt-2 lg:w-40 lg:px-6 lg:py-4">
             { formattedDate }
          </div>
-         <div className = "scrollbar-hide w-full overflow-auto whitespace-pre-wrap break-all px-12 lg:max-h-48 lg:w-48 lg:px-6 lg:py-4">
+         <div className = "scrollbar-hide w-full overflow-auto whitespace-pre-wrap break-all px-2 sm:px-12 lg:max-h-48 lg:w-48 lg:p-4">
             <div
                className = {
-                  clsx("scrollbar-hide mx-auto my-4 flex max-h-56 w-full max-w-[30rem] flex-row flex-wrap items-center justify-center gap-1 overflow-auto", {
+                  clsx("scrollbar-hide mx-auto my-1 flex max-h-56 w-full max-w-[30rem] flex-row flex-wrap items-center justify-center gap-1 overflow-auto", {
                      "cursor-all-scroll": workoutTags.length > 0
                   })
                }
@@ -131,7 +131,7 @@ function Row(props: RowProps) {
          >
             {
                workout.image ? (
-                  <div className = "relative flex size-40 items-center justify-center xxsm:size-52 xsm:size-56 sm:size-64 lg:size-32">
+                  <div className = "relative flex size-36 items-center justify-center min-[275px]:size-44 min-[375px]:size-52 sm:size-64 lg:size-32">
                      <Image
                         fill
                         priority
@@ -143,7 +143,7 @@ function Row(props: RowProps) {
                      />
                   </div>
                ) : (
-                  <div className = "flex size-40 items-center justify-center overflow-hidden rounded-full text-primary xxsm:size-52 xsm:size-56 sm:size-64 lg:size-32">
+                  <div className = "flex size-44 items-center justify-center overflow-hidden rounded-full text-primary min-[375px]:size-52 sm:size-64 lg:size-3">
                      <FontAwesomeIcon
                         className = "text-4xl"
                         icon = { faImage }
@@ -156,22 +156,16 @@ function Row(props: RowProps) {
             <div className = "flex items-center justify-center gap-4">
                <div
                   className = "flex items-center justify-center"
-                  onClick = { handleEditWorkout }
+                  onClick = { (event) => {
+                     event.stopPropagation();
+                     handleEditWorkout();
+                  } }
                >
-                  <div className = "hidden px-8 lg:block">
+                  <div className = "px-8 pt-2 block lg:pt-0">
                      <FontAwesomeIcon
                         icon = { faPencil }
-                        className = " cursor-pointer text-base text-primary transition duration-300 ease-in-out hover:scale-125"
+                        className = " cursor-pointer text-lg text-primary transition duration-300 ease-in-out hover:scale-125 lg:text-base"
                      />
-                  </div>
-                  <div className = "block lg:hidden">
-                     <Button
-                        type = "button"
-                        className = "mb-6 mt-2 block h-[2.6rem] whitespace-nowrap bg-primary px-5 py-4 text-sm text-white lg:hidden"
-                        icon = { faPencil }
-                     >
-                        Edit Workout
-                     </Button>
                   </div>
                </div>
             </div>
@@ -301,7 +295,7 @@ export default function Table(props: TableProps): JSX.Element {
    return (
       <div className = "relative mx-auto w-full">
          <div className = "mx-auto my-6 overflow-hidden rounded-2xl shadow-md">
-            <div className = "block bg-white p-4 lg:hidden dark:bg-slate-800">
+            <div className = "block bg-white py-3 lg:hidden dark:bg-slate-800">
                <input
                   id = "workout-select-all-mobile"
                   type = "checkbox"
@@ -310,7 +304,7 @@ export default function Table(props: TableProps): JSX.Element {
                   onChange = { () => handleWorkoutToggle() }
                />
             </div>
-            <div className = "mx-auto hidden w-full items-center justify-between bg-white lg:flex lg:p-8 dark:bg-slate-800">
+            <div className = "mx-auto hidden w-full items-center justify-between bg-white lg:flex lg:p-6 dark:bg-slate-800">
                <div className = "w-40 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
                   Title
                </div>
@@ -333,7 +327,7 @@ export default function Table(props: TableProps): JSX.Element {
                   />
                </div>
             </div>
-            <div className = "mx-auto flex w-full flex-col bg-white dark:bg-slate-800">
+            <div className = "mx-auto flex w-full flex-col bg-white lg:p-0 dark:bg-slate-800">
                {
                   workouts.map((workout: Workout, index: number) => (
                      <Row

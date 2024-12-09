@@ -6,7 +6,7 @@ import { Input } from "@/components/global/input";
 import { VitalityChildProps, VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCloudArrowUp, faDumbbell, faPenRuler, faPlus, faStopwatch, faCaretRight, faCaretDown, faCircleNotch, faPersonRunning, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCloudArrowUp, faDumbbell, faPenRuler, faPlus, faStopwatch, faCaretRight, faCaretDown, faCircleNotch, faPersonRunning, faXmark, faFeather, faPenToSquare, faRectangleList, faWeight } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useContext, useEffect, useReducer, useState } from "react";
 import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises } from "@/lib/home/workouts/exercises";
 import { NotificationContext } from "@/app/layout";
@@ -15,6 +15,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
 
 const form: VitalityState = {
    name: {
@@ -87,6 +88,12 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          ];
          saveExercises(newExercises);
          onBlur();
+
+         updateNotification({
+            status: "Success",
+            message: "Added exercise",
+            timer: 1000
+         });
       });
    }, [
       localDispatch,
@@ -147,7 +154,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
             icon = { faPenRuler }
             onClick = { handleCreateNewExercise }
          >
-            Add Exercise
+            Create
          </Button>
       </div>
    );
@@ -356,7 +363,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
       <div
          ref = { setNodeRef }
          style = { style }
-         className = "mx-auto w-full pl-4 sm:pl-8"
+         className = "mx-auto w-full xxsm:pl-8"
       >
          {
             displayEditInputs ? (
@@ -450,7 +457,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                   <Button
                      type = "button"
                      className = "h-[2.4rem] w-full border-[1.5px] border-gray-100 bg-green-600 px-4 py-2 font-semibold text-white focus:border-blue-500 focus:ring-blue-500 dark:border-0"
-                     icon = { faCloudArrowUp }
+                     icon = { faDumbbell }
                      onClick = { () => handleExerciseSetUpdates("update") }
                   >
                      { set !== undefined ? "Update" : "Create" }
@@ -466,16 +473,16 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                </li>
             ) : (
                set !== undefined && (
-                  <li className = "mx-auto flex w-full cursor-move flex-row items-start justify-start gap-2 whitespace-pre-wrap break-all pt-2 text-left text-base font-semibold">
+                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 whitespace-pre-wrap break-all pt-2 text-left text-base font-semibold">
                      <div
-                        className = "cursor-ns-resize pt-1 text-sm"
+                        className = "cursor-grab pt-1 text-sm"
                         { ...attributes }
                         { ...listeners }
                      >
                         <FontAwesomeIcon icon = { faCircleNotch } />
                      </div>
                      <div
-                        className = "flex cursor-pointer flex-col gap-2 pl-6"
+                        className = "flex cursor-pointer flex-col gap-2 pl-2"
                         { ...doubleTap }
                      >
                         {
@@ -522,7 +529,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                                     className = "self-start pt-1 text-primary"
                                     icon = { faAlignJustify }
                                  />
-                                 <p className = "line-clamp-4">{ set.text }</p>
+                                 <p className = "line-clamp-3">{ set.text }</p>
                               </div>
                            )
                         }
@@ -825,7 +832,6 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer text-xl text-red-500"
                      onClick = {
                         () => {
-
                            setEditName(false);
                         }
                      }
@@ -862,7 +868,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                <h1 className = "flex cursor-default items-center justify-start text-xl">
                   <span>
                      <FontAwesomeIcon
-                        className = "cursor-ns-resize pt-1 text-2xl hover:text-primary"
+                        className = "cursor-grab pt-1 text-2xl focus:outline-none"
                         icon = { isCollapsed ? faCaretRight : faCaretDown }
                         onClick = { () => setIsCollapsed(!isCollapsed) }
                         { ...attributes }
@@ -870,7 +876,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      />
                   </span>
                   <span
-                     className = "cursor-pointer pl-4"
+                     className = "cursor-pointer pl-4 break-all"
                      { ...doubleTap }
                   >
                      { exercise.name }
@@ -880,7 +886,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          }
          {
             !isCollapsed && (
-               <div className = "flex flex-col items-start justify-start gap-4">
+               <div className = "flex flex-col items-start justify-start">
                   <DndContext
                      sensors = { sensors }
                      collisionDetection = { closestCenter }
@@ -891,7 +897,14 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                         items = { exercise.sets.map((set) => set.id) }
                         strategy = { verticalListSortingStrategy }
                      >
-                        <ul className = "mx-auto my-2 flex w-full list-disc flex-col gap-6 pt-2">
+
+                        <ul
+                           className = {
+                              clsx("mx-auto my-1 flex w-full list-disc flex-col gap-2", {
+                                 "hidden" : exercise.sets.length === 0 && !addSet
+                              })
+                           }
+                        >
                            {
                               exercise.sets.map((set: ExerciseSet) => {
                                  return (
@@ -916,6 +929,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                               )
                            }
                         </ul>
+
                      </SortableContext>
                   </DndContext>
                   {
@@ -924,7 +938,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                            <Button
                               type = "button"
                               className = "h-[2.6rem] w-full border-[1.5px] border-gray-100 px-4 py-2 text-base font-bold focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50"
-                              icon = { faPersonRunning }
+                              icon = { faDumbbell }
                               onClick = {
                                  () => {
                                     handleReset("");
@@ -932,7 +946,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                                  }
                               }
                            >
-                              New Entry
+                              Entry
                            </Button>
                         </div>
                      )
@@ -1133,10 +1147,10 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                      <Button
                         type = "button"
                         className = "h-[2.6rem] w-full border-[1.5px] border-gray-100 px-4 py-2 font-bold focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50"
-                        icon = { faPlus }
+                        icon = { faPenRuler }
                         onClick = { handleInitializeNewExerciseInput }
                      >
-                        New Exercise
+                        Exercise
                      </Button>
                   </div>
                )

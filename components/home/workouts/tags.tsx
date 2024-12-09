@@ -256,7 +256,7 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
    );
 
    return (
-      <div className = "flex flex-col items-stretch justify-center gap-3 text-center">
+      <div className = "flex flex-col items-stretch justify-center gap-3 text-center text-black dark:text-white">
          <div className = "flex flex-col items-center justify-center gap-3 text-center">
             <FontAwesomeIcon
                icon = { faGear }
@@ -421,7 +421,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                            className = "cursor-pointer pt-1 text-base"
                         />
                      }
-                     className = "mt-12 max-h-[90%] max-w-[90%] sm:max-w-xl"
+                     className = "mt-12 max-h-[90%] max-w-[95%] sm:max-w-xl"
                   >
                      <EditTagContainer
                         { ...props }
@@ -600,7 +600,7 @@ export default function Tags(props: TagsProps): JSX.Element {
                   <div className = "relative mx-auto w-full">
                      {
                         onReset && (
-                           <div className = "relative mt-4">
+                           <div className = "relative mt-6">
                               <FontAwesomeIcon
                                  icon = { faArrowRotateLeft }
                                  onClick = { onReset }

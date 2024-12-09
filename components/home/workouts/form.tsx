@@ -11,7 +11,7 @@ import { VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { addWorkout, deleteWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
 import { Tag } from "@/lib/home/workouts/tags";
-import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faSignature, faCalendar, faBook, faLink } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faSignature, faCalendar, faBook, faLink, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { filterWorkout } from "@/components/home/workouts/filtering";
@@ -369,7 +369,7 @@ export default function Form(props: VitalityProps): JSX.Element {
    ]);
 
    return (
-      <div className = "mx-auto my-4 flex w-full justify-center">
+      <div className = "mx-auto mb-4 flex w-full justify-center">
          <Modal
             display = { null }
             className = "max-w-3xl"
@@ -437,11 +437,8 @@ export default function Form(props: VitalityProps): JSX.Element {
                   <Button
                      type = "button"
                      className = "h-[2.4rem] bg-primary text-white"
-                     icon = { props !== undefined ? faCloudArrowUp : faSquarePlus }
-                     onClick = {
-                        () =>
-                           handleUpdateWorkout(isNewWorkout ? "add" : "update")
-                     }
+                     icon = { props !== undefined ? faPenToSquare : faSquarePlus }
+                     onClick = { () => handleUpdateWorkout(isNewWorkout ? "add" : "update") }
                   >
                      { isNewWorkout ? "Create" : "Update" }
                   </Button>
@@ -467,7 +464,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          </Modal>
          <Button
             type = "button"
-            className = "h-[2.8rem] w-40 bg-primary p-3 text-base text-white"
+            className = "h-12 w-44 bg-primary text-base text-white"
             icon = { faPersonRunning }
             onClick = {
                () => {
