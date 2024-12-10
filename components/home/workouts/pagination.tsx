@@ -6,7 +6,7 @@ import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/home/workouts/workouts";
 import { faAnglesLeft, faAnglesRight, faFileLines, faTabletScreenButton } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ChangeEvent, useCallback, useRef } from "react";
+import { ChangeEvent, useCallback } from "react";
 
 interface PaginationProps extends VitalityProps {
    workouts: Workout[];
@@ -14,7 +14,6 @@ interface PaginationProps extends VitalityProps {
 
 export default function Pagination(props: PaginationProps): JSX.Element {
    const { workouts, globalState, globalDispatch } = props;
-   const paginationRef = useRef<HTMLDivElement>(null);
 
    // Total workout pages and index
    const pages: number = Math.ceil(workouts.length / globalState.paging.value);
@@ -29,14 +28,6 @@ export default function Pagination(props: PaginationProps): JSX.Element {
 
    const handlePageClick = useCallback(
       (page: number) => {
-         const observer = new MutationObserver(() => {
-            // Scroll to the pagination container when changes are detected
-            paginationRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-            observer.disconnect();
-         });
-         
-         observer.observe(document.getElementById("workoutsView"), { childList: true, subtree: true });
-
          globalDispatch({
             type: "updateState",
             value: {
@@ -88,10 +79,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
 
    return (
       workouts.length > 0 && (
-         <div
-            ref = { paginationRef }
-            className = "mx-auto mb-8 w-full max-w-sm items-center justify-center text-center"
-         >
+         <div className = "mx-auto w-full max-w-sm items-center justify-center text-center">
             <div className = "relative mx-auto flex max-w-xs flex-row items-center justify-center">
                <FontAwesomeIcon
                   tabIndex = { 0 }

@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import Image from "next/image";
-import Button from "@/components/global/button";
-import Conformation from "@/components/global/confirmation";
+import Confirmation from "@/components/global/confirmation";
 import { VitalityProps } from "@/lib/global/state";
 import { VitalityResponse } from "@/lib/global/response";
 import { faImage, faPencil } from "@fortawesome/free-solid-svg-icons";
@@ -64,7 +63,7 @@ function Row(props: RowProps) {
             // Undefined in case of removal
             tag !== undefined && (
                <div
-                  className = { clsx("m-1 max-w-full truncate rounded-full px-4 py-2 text-sm lg:text-xs font-bold text-white") }
+                  className = { clsx("m-1 max-w-full truncate rounded-full px-4 py-1 text-[0.8rem] font-bold text-white lg:py-2 lg:text-xs") }
                   style = {
                      {
                         backgroundColor: tag.color
@@ -109,7 +108,7 @@ function Row(props: RowProps) {
          }
          onClick = { handleWorkoutToggle }
       >
-         <div className = "w-full whitespace-pre-wrap break-words px-2 text-xl lg:w-40 lg:px-6 lg:py-4 lg:text-base">
+         <div className = "w-full px-4 text-xl [overflow-wrap:anywhere] lg:w-40 lg:px-6 lg:py-4 lg:text-base">
             { workout.title }
          </div>
          <div className = "w-full whitespace-pre-wrap break-all px-2 pt-2 lg:w-40 lg:px-6 lg:py-4">
@@ -118,7 +117,7 @@ function Row(props: RowProps) {
          <div className = "scrollbar-hide w-full overflow-auto whitespace-pre-wrap break-all px-2 sm:px-12 lg:max-h-48 lg:w-48 lg:p-4">
             <div
                className = {
-                  clsx("scrollbar-hide mx-auto my-1 flex max-h-56 w-full max-w-[30rem] flex-row flex-wrap items-center justify-center gap-1 overflow-auto", {
+                  clsx("scrollbar-hide mx-auto my-1 flex w-full max-w-80 flex-row flex-wrap items-center justify-center gap-1 overflow-auto lg:max-h-56", {
                      "cursor-all-scroll": workoutTags.length > 0
                   })
                }
@@ -143,7 +142,7 @@ function Row(props: RowProps) {
                      />
                   </div>
                ) : (
-                  <div className = "flex size-44 items-center justify-center overflow-hidden rounded-full text-primary min-[375px]:size-52 sm:size-64 lg:size-3">
+                  <div className = "flex size-44 items-center justify-center overflow-hidden rounded-full text-primary min-[375px]:size-52 sm:size-64 lg:size-32">
                      <FontAwesomeIcon
                         className = "text-4xl"
                         icon = { faImage }
@@ -156,12 +155,14 @@ function Row(props: RowProps) {
             <div className = "flex items-center justify-center gap-4">
                <div
                   className = "flex items-center justify-center"
-                  onClick = { (event) => {
-                     event.stopPropagation();
-                     handleEditWorkout();
-                  } }
+                  onClick = {
+                     (event) => {
+                        event.stopPropagation();
+                        handleEditWorkout();
+                     }
+                  }
                >
-                  <div className = "px-8 pt-2 block lg:pt-0">
+                  <div className = "block px-8 pt-2 lg:pt-0">
                      <FontAwesomeIcon
                         icon = { faPencil }
                         className = " cursor-pointer text-lg text-primary transition duration-300 ease-in-out hover:scale-125 lg:text-base"
@@ -295,7 +296,7 @@ export default function Table(props: TableProps): JSX.Element {
    return (
       <div className = "relative mx-auto w-full">
          <div className = "mx-auto my-6 overflow-hidden rounded-2xl shadow-md">
-            <div className = "block bg-white py-3 lg:hidden dark:bg-slate-800">
+            <div className = "block bg-white py-4 lg:hidden dark:bg-slate-800">
                <input
                   id = "workout-select-all-mobile"
                   type = "checkbox"
@@ -342,9 +343,9 @@ export default function Table(props: TableProps): JSX.Element {
             </div>
             {
                visibleSelectedWorkouts.size > 0 && (
-                  <Conformation
+                  <Confirmation
                      message = { `Delete ${visibleSelectedWorkouts.size} workout${visibleSelectedWorkouts.size === 1 ? "" : "s"}?` }
-                     onConformation = { () => handleWorkoutDelete() }
+                     onConfirmation = { () => handleWorkoutDelete() }
                      icon
                   />
                )

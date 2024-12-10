@@ -511,7 +511,7 @@ export default function Filtering(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
 
    return (
-      <div className = "relative">
+      <div className = "relative w-full sm:w-auto">
          <Heading
             title = "Workouts"
             description = "Ready to crush your goals? Create a new workout and let's make today count!"

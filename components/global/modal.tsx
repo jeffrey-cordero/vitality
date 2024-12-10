@@ -87,7 +87,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                            }
                         }
                      }
-                     className = "modal scrollbar-hide relative max-h-[90%] w-full overflow-y-auto rounded-lg bg-white p-6 shadow-lg focus:outline-none md:px-8 md:py-6 dark:bg-slate-800"
+                     className = "modal scrollbar-hide relative max-h-[95%] w-full overflow-y-auto overflow-x-hidden rounded-2xl bg-white p-6 shadow-lg focus:outline-none md:px-8 md:py-6 dark:bg-slate-800"
                   >
                      <div className = "absolute -top-px right-[3px] z-50 rounded-e-md p-3.5">
                         <FontAwesomeIcon

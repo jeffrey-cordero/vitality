@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
 import Loading from "@/components/global/loading";
-import Conformation from "@/components/global/confirmation";
+import Confirmation from "@/components/global/confirmation";
 import Modal from "@/components/global/modal";
 import { Input } from "@/components/global/input";
 import { faGear, faXmark, faCloudArrowUp, faTag, faArrowRotateLeft, faGears, faTags } from "@fortawesome/free-solid-svg-icons";
@@ -110,7 +110,7 @@ function TagColorInput(props: VitalityChildProps) {
       ]);
 
    return (
-      <div className = "relative mx-auto flex w-full flex-col gap-1">
+      <div className = "relative mx-auto flex w-full flex-col">
          {
             names.map((name: string) => {
                const color = colors[name];
@@ -291,9 +291,9 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
             }
          </div>
          <div className = "flex flex-col gap-2">
-            <Conformation
+            <Confirmation
                message = "Delete this tag?"
-               onConformation = { () => handleTagUpdates("delete") }
+               onConfirmation = { () => handleTagUpdates("delete") }
             />
             <Button
                type = "submit"
@@ -384,7 +384,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
       <li
          className = {
             clsx(
-               "relative m-2 rounded-full px-4 py-2 text-sm font-bold text-white",
+               "relative m-2 rounded-full px-4 py-2 text-[0.8rem] font-bold text-white",
             )
          }
          style = {
@@ -395,7 +395,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
          ref = { tagRef }
          key = { tag.id }
       >
-         <div className = "mx-auto flex max-w-full flex-row items-center justify-center">
+         <div className = "mx-auto flex max-w-full flex-row flex-wrap items-center justify-center gap-x-2">
             <div
                onClick = {
                   (event) => {
@@ -406,11 +406,11 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                      }
                   }
                }
-               className = "mx-auto line-clamp-1 max-w-full cursor-pointer text-ellipsis break-all pr-3 text-center"
+               className = "mx-auto line-clamp-1 max-w-full cursor-pointer text-ellipsis break-all text-center"
             >
                { tag.title }
             </div>
-            <div className = "flex flex-row items-center justify-center gap-2 pr-2">
+            <div className = "flex flex-row items-center justify-center gap-1">
                {
                   <Modal
                      ref = { editTagModalRef }
@@ -418,7 +418,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                         <FontAwesomeIcon
                            icon = { faGears }
                            onClick = { handleTagEdits }
-                           className = "cursor-pointer pt-1 text-base"
+                           className = "cursor-pointer pt-1 text-sm hover:text-primary"
                         />
                      }
                      className = "mt-12 max-h-[90%] max-w-[95%] sm:max-w-xl"
@@ -434,7 +434,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                      <FontAwesomeIcon
                         onMouseDown = { () => handleTagSelect(false) }
                         icon = { faXmark }
-                        className = "cursor-pointer text-lg"
+                        className = "cursor-pointer text-base hover:text-red-500"
                      />
                   )
                }
@@ -577,7 +577,7 @@ export default function Tags(props: TagsProps): JSX.Element {
                <div className = "mx-auto flex w-full flex-col flex-wrap items-center justify-center">
                   {
                      globalState.tags.data.selected?.length > 0 && (
-                        <ul className = "flex flex-col flex-wrap items-center justify-center pb-2 sm:flex-row">
+                        <ul className = "flex flex-row flex-wrap items-center justify-center pb-2">
                            {
                               globalState.tags.data.selected.map((selected: Tag) => {
                                  return (
@@ -649,7 +649,7 @@ export default function Tags(props: TagsProps): JSX.Element {
                      )
                   }
                   {
-                     search.trim().length > 0 && !tagsByTitle[search] && (
+                     search.length >= 3 && !tagsByTitle[search] && (
                         <CreateTagContainer
                            { ...props }
                            localState = { localState }

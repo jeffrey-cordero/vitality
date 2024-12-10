@@ -193,7 +193,7 @@ export default function Page(): JSX.Element {
    ]);
 
    return (
-      <Main className = "mb-0">
+      <Main className = "mb-12">
          <Filtering
             globalState = { globalState }
             globalDispatch = { globalDispatch }

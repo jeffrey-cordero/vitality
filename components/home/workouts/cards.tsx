@@ -28,7 +28,7 @@ function Card(props: CardProps): JSX.Element {
                <div
                   className = {
                      clsx(
-                        "m-1 max-w-full truncate rounded-full px-4 py-2 text-xs font-bold text-white",
+                        "m-1 max-w-full truncate rounded-full px-4 py-2 text-[0.8rem] font-bold text-white",
                      )
                   }
                   style = {
@@ -68,7 +68,7 @@ function Card(props: CardProps): JSX.Element {
                });
             }
          }
-         className = "relative mx-auto flex h-[26rem] w-full min-w-full flex-1 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-[1.03] xsm:min-w-72 sm:h-[22rem] sm:min-w-64"
+         className = "relative mx-0 flex h-[26rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-[1.03] sm:h-96 sm:w-72"
       >
          <div className = "relative mx-auto size-full">
             {
@@ -92,7 +92,7 @@ function Card(props: CardProps): JSX.Element {
                )
             }
             <div className = "relative flex size-full flex-col items-center justify-start overflow-hidden pt-5 text-center text-black">
-               <h2 className = "max-w-full truncate break-words px-6 pt-2 text-[1.5rem] font-extrabold sm:text-[1.3rem]">
+               <h2 className = "max-w-full truncate break-words px-6 pt-2 text-[1.4rem] font-extrabold sm:text-[1.3rem]">
                   { workout.title }
                </h2>
                <p className = "text-sm font-extrabold sm:text-[0.8rem]">{ formattedDate }</p>
@@ -123,7 +123,7 @@ export default function Cards(props: CardsProps): JSX.Element {
 
    return (
       <div className = "relative mx-auto w-full">
-         <div className = "mx-auto my-6 flex flex-row flex-wrap items-center justify-items-center gap-8">
+         <div className = "mx-auto my-6 flex flex-row flex-wrap items-center justify-center gap-8">
             {
                workouts.map((workout: Workout) => (
                   <Card

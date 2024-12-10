@@ -22,12 +22,13 @@ const images = [
 ];
 
 interface ImagesFormProps extends VitalityInputProps {
+   url: string;
    isValidResource: boolean;
    isValidURL: boolean;
 }
 
 function ImagesForm(props: ImagesFormProps): JSX.Element {
-   const { isValidURL, isValidResource, input, dispatch } = props;
+   const { url, isValidURL, isValidResource, input, dispatch } = props;
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(true);
 
    const handleImageURLUpdates = useCallback(() => {
@@ -104,7 +105,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                error: null,
                value: "",
                data: {
-                  valid: undefined
+                  valid: true
                }
             }
          }
@@ -156,17 +157,17 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
             isDefaultImage ? (
                <div
                   tabIndex = { 0 }
-                  className = "relative flex flex-wrap items-center justify-center gap-6 px-2 py-4"
+                  className = "relative flex flex-wrap items-center justify-center gap-6 py-4"
                >
                   {
                      images.map((image) => {
                         const source: string = `/workouts/${image}`;
-                        const isSelected: boolean = input.value === source;
+                        const isSelected: boolean = url === source;
 
                         return (
                            <div
                               id = { source }
-                              className = "relative size-48"
+                              className = "relative size-64 sm:size-48"
                               key = { source }
                            >
                               <Image
@@ -180,8 +181,8 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  alt = "workout-image"
                                  className = {
                                     clsx(
-                                       "cursor-pointer rounded-xl object-cover object-center shadow-inner focus:outline-8 focus:ring-0", {
-                                          "border-primary border-[4px] shadow-2xl scale-[1.05] transition duration-300 ease-in-out": isSelected
+                                       "cursor-pointer rounded-xl object-cover object-center shadow-inner", {
+                                          "border-primary border-[4px] shadow-2xl scale-[1.03] transition duration-300 ease-in-out": isSelected
                                        }
                                     )
                                  }
@@ -203,7 +204,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                <div
                   onKeyDown = {
                      (event: React.KeyboardEvent) => {
-                        if (event.key === "Enter") {
+                        if (event.key === "Enter" && url.length > 0) {
                            handleImageURLUpdates();
                         }
                      }
@@ -213,13 +214,13 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                   {
                      isValidResource && isValidURL && (
                         <div className = "my-6 flex items-center justify-center">
-                           <div className = "relative size-48">
+                           <div className = "relative size-64">
                               <Image
                                  fill
                                  priority
                                  quality = { 100 }
                                  sizes = "100%"
-                                 src = { input.value }
+                                 src = { url }
                                  onError = { handleImageResourceError }
                                  alt = "workout-image"
                                  className = {
@@ -255,22 +256,34 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                         }
                      }
                   />
-                  <Button
-                     type = "button"
-                     onClick = { handleImageURLReset }
-                     className = "mt-2 h-[2.4rem] w-full bg-red-500 px-4 py-2 font-semibold text-white focus:ring-slate-500"
-                     icon = { faTrashCan }
-                  >
-                     Remove
-                  </Button>
-                  <Button
-                     type = "button"
-                     onClick = { handleImageURLUpdates }
-                     className = "mt-2 h-[2.4rem] w-full bg-primary font-semibold text-white placeholder:text-transparent"
-                     icon = { faPaperclip }
-                  >
-                     Add
-                  </Button>
+                  {
+                     url.length > 0 && (
+                        <div>
+                           {
+                              input.data.valid && (
+                                 <Button
+                                    type = "button"
+                                    onClick = { handleImageURLReset }
+                                    className = "mt-2 h-[2.4rem] w-full bg-red-500 px-4 py-2 font-semibold text-white focus:ring-red-700"
+                                    icon = { faTrashCan }
+                                 >
+                                    Remove
+                                 </Button>
+                              )
+                           }
+
+                           <Button
+                              type = "button"
+                              onClick = { handleImageURLUpdates }
+                              className = "mt-2 h-[2.4rem] w-full bg-primary font-semibold text-white placeholder:text-transparent"
+                              icon = { faPaperclip }
+                           >
+                              Add
+                           </Button>
+                        </div>
+                     )
+                  }
+
                </div>
             )
          }
@@ -280,15 +293,16 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
 
 export default function Images(props: VitalityInputProps): JSX.Element {
    const { input } = props;
+   const url: string = input.value.trim();
    const isValidResource: boolean = useMemo(() => {
-      return input.data.valid !== false && input.value.trim().length !== 0;
+      return input.data.valid !== false && url.length !== 0;
    }, [
       input.data.valid,
-      input.value
+      url
    ]);
    const isValidURL: boolean = useMemo(() => {
-      return verifyImageURL(input.value);
-   }, [input.value]);
+      return verifyImageURL(url);
+   }, [url]);
    const addedImage: boolean = isValidResource && isValidURL;
 
    return (
@@ -299,7 +313,7 @@ export default function Images(props: VitalityInputProps): JSX.Element {
                   <Button
                      className = {
                         clsx(
-                           "h-[2.6rem] w-full border-[1.5px] px-4 py-2 font-semibold placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50",
+                           "h-[2.6rem] w-full border-[1.5px] px-4 py-2 text-base font-semibold placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50",
                            {
                               "border-[2px] dark:border-[2px] border-red-500 text-red-500": input.error
                            },
@@ -327,6 +341,7 @@ export default function Images(props: VitalityInputProps): JSX.Element {
          >
             <ImagesForm
                { ...props }
+               url = { url }
                isValidResource = { isValidResource }
                isValidURL = { isValidURL }
             />

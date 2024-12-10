@@ -79,7 +79,7 @@ export default function SignUp(): JSX.Element {
                <Link href = "/home">
                   <Button
                      type = "button"
-                     className = "h-8 bg-green-600 px-4 py-3 text-sm text-white xsm:px-6"
+                     className = "h-8 bg-green-600 px-4 py-3 text-sm text-white focus:border-green-800 focus:ring-2 focus:ring-green-800 xsm:px-6 dark:border-0"
                      icon = { faDoorOpen }
                      onClick = {
                         async() => {
@@ -87,8 +87,6 @@ export default function SignUp(): JSX.Element {
                               username: state.username.value,
                               password: state.password.value
                            });
-
-                           window.location.reload();
                         }
                      }
                   >

@@ -2,7 +2,7 @@ import Button from "@/components/global/button";
 import TextArea from "@/components/global/textarea";
 import Images from "@/components/home/workouts/images";
 import Exercises from "@/components/home/workouts/exercises";
-import Conformation from "@/components/global/confirmation";
+import Confirmation from "@/components/global/confirmation";
 import Modal from "@/components/global/modal";
 import Tags from "@/components/home/workouts/tags";
 import { Input } from "@/components/global/input";
@@ -11,7 +11,7 @@ import { VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { addWorkout, deleteWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
 import { Tag } from "@/lib/home/workouts/tags";
-import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faCloudArrowUp, faSignature, faCalendar, faBook, faLink, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faSignature, faCalendar, faBook, faLink, faPenToSquare, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { filterWorkout } from "@/components/home/workouts/filtering";
@@ -444,9 +444,9 @@ export default function Form(props: VitalityProps): JSX.Element {
                   </Button>
                   {
                      !isNewWorkout && (
-                        <Conformation
+                        <Confirmation
                            message = "Delete this workout?"
-                           onConformation = { () => handleUpdateWorkout("delete") }
+                           onConfirmation = { () => handleUpdateWorkout("delete") }
                         />
                      )
                   }
@@ -464,8 +464,8 @@ export default function Form(props: VitalityProps): JSX.Element {
          </Modal>
          <Button
             type = "button"
-            className = "h-12 w-44 bg-primary text-base text-white"
-            icon = { faPersonRunning }
+            className = "h-[2.9rem] w-40 bg-primary text-base text-white"
+            icon = { faPlus }
             onClick = {
                () => {
                   globalDispatch({
