@@ -84,7 +84,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
             placeholder = { placeholder ?? "" }
             className = {
                clsx(
-                  "peer block h-auto min-h-60 w-full resize-none overflow-hidden rounded-lg border bg-white p-4 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-blue-500 focus:pb-2 focus:pt-7 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
+                  "peer block h-auto min-h-60 w-full resize-none overflow-hidden rounded-lg border bg-white px-4 pb-2 pt-7 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-primary focus:pb-2 focus:pt-7 focus:ring-primary disabled:pointer-events-none disabled:opacity-50 xxsm:p-4 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
                   {
                      "border-gray-200": input.error === null,
                      "border-red-500 ": input.error !== null
@@ -105,7 +105,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
             htmlFor = { id }
             className = {
                clsx(
-                  "pointer-events-none absolute start-0 top-0 h-full truncate border border-transparent p-4 text-sm transition duration-200 ease-in-out peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-sm peer-placeholder-shown:text-black peer-focus:-translate-y-2 peer-focus:text-xs peer-focus:text-black peer-disabled:pointer-events-none peer-disabled:opacity-50 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-placeholder-shown:text-white dark:peer-[:not(:placeholder-shown)]:text-gray-400",
+                  "pointer-events-none absolute start-0 top-0 h-full truncate border border-transparent p-4 text-xs transition duration-200 ease-in-out peer-placeholder-shown:-translate-y-2 peer-placeholder-shown:text-black peer-focus:text-xs peer-focus:text-black peer-disabled:pointer-events-none peer-disabled:opacity-50 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-gray-500 xxsm:text-sm xxsm:peer-placeholder-shown:-translate-y-0 xxsm:peer-focus:-translate-y-2 dark:peer-placeholder-shown:text-white dark:peer-[:not(:placeholder-shown)]:text-gray-400",
                   {
                      "font-bold": required
                   },

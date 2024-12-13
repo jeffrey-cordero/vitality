@@ -3,12 +3,12 @@ import Link from "next/link";
 import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 import { Input } from "@/components/global/input";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormEvent, useContext, useReducer } from "react";
+import { handleResponse } from "@/lib/global/response";
 import { login, Credentials } from "@/lib/authentication/login";
 import { VitalityState, formReducer } from "@/lib/global/state";
-import { handleResponse } from "@/lib/global/response";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { NotificationContext } from "@/app/layout";
 import { faArrowRotateLeft, faKey, faUnlockKeyhole, faUserSecret } from "@fortawesome/free-solid-svg-icons";
 
 const credentials: VitalityState = {
@@ -25,14 +25,8 @@ const credentials: VitalityState = {
 };
 
 export default function Login(): JSX.Element {
-   const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, credentials);
-
-   if (user !== undefined) {
-      // Reload the window to ensure the Next.js routing is updated correctly
-      window.location.reload();
-   }
 
    const handleAuthenticate = async(event: FormEvent) => {
       event.preventDefault();

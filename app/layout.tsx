@@ -5,12 +5,12 @@ import cx from "classnames";
 import Footer from "@/components/global/footer";
 import Notification from "@/components/global/notification";
 import { sfPro, inter } from "@/app/fonts";
-import { SideBar } from "@/components/global/sidebar";
-import { createContext, useCallback, useEffect, useState } from "react";
-import { getSession } from "@/lib/authentication/session";
-import { NotificationProps } from "@/components/global/notification";
 import { User as NextAuthUser } from "next-auth";
 import { usePathname } from "next/navigation";
+import { SideBar } from "@/components/global/sidebar";
+import { getSession } from "@/lib/authentication/session";
+import { NotificationProps } from "@/components/global/notification";
+import { createContext, useCallback, useEffect, useState } from "react";
 
 interface AuthenticationContextType {
    user: NextAuthUser | undefined;
@@ -41,15 +41,13 @@ export const NotificationContext = createContext<NotificationContextType>({
 });
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+   const pathname: string = usePathname();
    const [user, setUser] = useState<NextAuthUser | undefined>(undefined);
    const [theme, setTheme] = useState<"light" | "dark">(null);
    const [fetched, setFetched] = useState<boolean>(false);
-   const [notification, setNotification] = useState<
-      NotificationProps | undefined
-   >(undefined);
-   const pathname = usePathname();
+   const [notification, setNotification] = useState<NotificationProps | undefined>(undefined);
 
-   const handleAuthentication = useCallback(async() => {
+   const authenticateUser = useCallback(async() => {
       try {
          setUser(await getSession());
       } catch (error) {
@@ -75,29 +73,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
    useEffect(() => {
       if (!fetched) {
-         setTheme(window.localStorage.theme === "dark" ||
-            (!("theme" in window.localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
-            ? "dark" : "light");
-         handleAuthentication();
+         const preferredTheme: string | undefined = window.localStorage.theme;
+         const prefersDarkMode: boolean = window.matchMedia("(prefers-color-scheme: dark)").matches;
+         const theme = preferredTheme === "dark" || (!preferredTheme && prefersDarkMode) ? "dark" : "light";
+
+         setTheme(theme);
+         authenticateUser();
       }
 
-      const handleModalClickAway = (event: MouseEvent) => {
+      const handleCloseTopMostModal = (event: MouseEvent) => {
          const modals = document.getElementsByClassName("modal");
-         const notifications = document.getElementsByClassName("notification");
-         const topMostModal =
-            modals.length > 0
-               ? (modals[modals.length - 1] as HTMLDivElement)
-               : null;
+         const notification = document.getElementById("notification");
+         const topMostModal = modals.length > 0 ? (modals[modals.length - 1] as HTMLDivElement) : null;
          const target = event.target as HTMLElement;
 
-         if (
-            topMostModal &&
-            !notifications[0]?.contains(target) &&
-            !topMostModal.contains(target)
-         ) {
-            (
-               topMostModal.getElementsByClassName("modal-close")[0] as SVGElement
-            ).dispatchEvent(
+         if (topMostModal && !topMostModal.contains(target) && !notification?.contains(target)) {
+            // Close top most modal when clicking outside, but only when the target is outside of any notification
+            (topMostModal.getElementsByClassName("modal-close")[0] as SVGElement).dispatchEvent(
                new MouseEvent("click", {
                   bubbles: true,
                   cancelable: true,
@@ -107,14 +99,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
          }
       };
 
-      document.body.addEventListener("mousedown", handleModalClickAway);
+      document.body.addEventListener("mousedown", handleCloseTopMostModal);
 
       return () => {
-         document.body.removeEventListener("mousedown", handleModalClickAway);
+         document.body.removeEventListener("mousedown", handleCloseTopMostModal);
       };
    }, [
       fetched,
-      handleAuthentication
+      authenticateUser
    ]);
 
    return (
@@ -129,7 +121,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                rel = "icon"
                type = "image/x-icon"
                href = "favicon.ico"
-            ></link>
+            />
             <meta
                name = "description"
                content = "A modern fitness tracker to fuel your fitness goals"
@@ -160,7 +152,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                cx(
                   sfPro.variable,
                   inter.variable,
-                  "box-border m-0 p-0 overflow-x-hidden max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-900 text-black dark:text-white",
+                  "box-border m-0 p-0 overflow-x-hidden max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 dark:from-slate-900 dark:via-gray-900 dark:to-slate-900 text-black dark:text-white"
                )
             }
          >
@@ -168,24 +160,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                fetched && (
                   <AuthenticationContext.Provider value = { { user, theme, updateTheme, fetched } }>
                      <SideBar />
-                     <NotificationContext.Provider
-                        value = { { notification, updateNotification } }
-                     >
+                     <NotificationContext.Provider value = { { notification, updateNotification } }>
                         <div className = "flex min-h-screen flex-col items-center justify-start gap-6">
                            { children }
+                           {
+                              notification !== undefined && notification.status !== "Initial" && (
+                                 <Notification { ...notification } />
+                              )
+                           }
                            {
                               pathname === "/" && (
                                  <Footer />
                               )
                            }
                         </div>
-                        <>
-                           {
-                              notification !== undefined && notification.status !== "Initial" && (
-                                 <Notification { ...notification } />
-                              )
-                           }
-                        </>
                      </NotificationContext.Provider>
                   </AuthenticationContext.Provider>
                )

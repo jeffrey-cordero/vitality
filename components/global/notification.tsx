@@ -41,7 +41,8 @@ export default function Notification(props: NotificationProps): JSX.Element {
       <>
          {
             <div
-               className = "notification fixed left-1/2 top-0 z-50 mx-auto mt-4 min-h-[4.5rem] w-[30rem] max-w-[95%] -translate-x-1/2 animate-fadeIn opacity-0"
+               id = "notification"
+               className = "fixed left-1/2 top-0 z-50 mx-auto mt-4 min-h-[4.5rem] w-[30rem] max-w-[95%] -translate-x-1/2 animate-fadeIn opacity-0"
                { ...props }
                ref = { notificationRef }
             >

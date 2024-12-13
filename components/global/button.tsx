@@ -6,11 +6,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
   icon?: IconProp;
-  iconClassName?: string
+  styling?: string
 }
 
 export default function Button(props: ButtonProps): JSX.Element {
-   const { children, className, icon, iconClassName, onClick } = props;
+   const { children, className, icon, styling, onClick } = props;
    const buttonRef = useRef(null);
 
    return (
@@ -19,12 +19,13 @@ export default function Button(props: ButtonProps): JSX.Element {
          ref = { buttonRef }
          className = {
             clsx(
-               "flex items-center justify-center gap-2 rounded-lg text-base font-bold outline-none hover:cursor-pointer focus:border-blue-600 focus:ring-2 focus:ring-blue-600",
+               "flex items-center justify-center gap-2 rounded-lg text-[0.9rem] font-bold outline-none hover:cursor-pointer focus:border-blue-600 focus:ring-2 focus:ring-blue-600 xxsm:text-base",
                className
             )
          }
          onClick = {
-            (event) => {
+            (event: React.MouseEvent<HTMLButtonElement>) => {
+               // Always call the defined onClick method and blur the button element
                onClick?.call(this, event);
                buttonRef.current?.blur();
             }
@@ -33,7 +34,7 @@ export default function Button(props: ButtonProps): JSX.Element {
          {
             icon && (
                <FontAwesomeIcon
-                  className = { iconClassName }
+                  className = { styling }
                   icon = { icon }
 
                />

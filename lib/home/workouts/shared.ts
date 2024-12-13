@@ -9,8 +9,7 @@ export function verifyImageURL(url: string): boolean {
    return url.trim().length === 0 || urlRegex.test(url) || defaultImageRegex.test(url);
 }
 
-export function formatWorkout(workout: any): Workout {
-   // Uniform workout object containing all potential properties, tag ID's, and exercises
+export function formateDatabaseWorkout(workout: any): Workout {
    return {
       id: workout.id,
       user_id: workout.user_id,

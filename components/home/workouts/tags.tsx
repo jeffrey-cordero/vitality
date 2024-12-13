@@ -33,7 +33,7 @@ const form: VitalityState = {
 
 // Default tag colors
 const colors = {
-   "Light gray": "rgb(55, 55, 55)",
+   "Dark gray": "rgb(55, 55, 55)",
    "Gray": "rgb(90, 90, 90)",
    "Brown": "rgb(96, 59, 44)",
    "Orange": "rgb(133, 76, 29)",
@@ -57,13 +57,11 @@ function CreateTagContainer(props: CreateTagContainerProps) {
    const search: string = localState.tagSearch.value;
 
    return (
+
       <div
          tabIndex = { 0 }
-         className = {
-            clsx(
-               "mb-2 mt-4 cursor-pointer rounded-full text-sm font-bold transition duration-300 ease-in-out hover:scale-105 focus:scale-105 focus:outline-blue-500",
-            )
-         }
+         className = "mx-auto mb-2 mt-4 flex max-w-full cursor-pointer flex-row flex-wrap items-center justify-center gap-x-2 rounded-full px-5 py-[0.6rem] text-sm font-bold text-white transition duration-300 ease-in-out hover:scale-[1.03] focus:scale-[1.03] focus:outline-blue-500"
+         style = { { backgroundColor: randomColor } }
          onClick = { onSubmit }
          onKeyDown = {
             (event: React.KeyboardEvent) => {
@@ -73,13 +71,9 @@ function CreateTagContainer(props: CreateTagContainerProps) {
             }
          }
       >
-         <div
-            className = "relative flex items-center justify-center gap-2 truncate rounded-full px-4 py-2 text-white"
-            style = { { backgroundColor: randomColor } }
-         >
-            <FontAwesomeIcon icon = { faTags } />
-            { search }
-         </div>
+         <p className = "mx-auto line-clamp-1 max-w-full cursor-pointer text-ellipsis break-all text-center">{ search }</p>
+         <FontAwesomeIcon icon = { faTags } />
+
       </div>
    );
 }
@@ -110,7 +104,7 @@ function TagColorInput(props: VitalityChildProps) {
       ]);
 
    return (
-      <div className = "relative mx-auto flex w-full flex-col">
+      <div className = "relative mx-auto flex w-full flex-col gap-1">
          {
             names.map((name: string) => {
                const color = colors[name];
@@ -120,7 +114,7 @@ function TagColorInput(props: VitalityChildProps) {
                      style = { { backgroundColor: color } }
                      className = {
                         clsx(
-                           "flex h-[2.6rem] w-full cursor-pointer items-center justify-center rounded-sm border-2 p-3 text-center text-sm text-white focus:border-0",
+                           "flex h-[2.7rem] w-full cursor-pointer items-center justify-center rounded-lg border-2 p-1 text-center text-sm text-white focus:border-0",
                            {
                               "border-primary border-[3px] shadow-2xl": localState.tagColor.value === color,
                               "border-white dark:border-slate-800": localState.tagColor.value !== color
@@ -218,7 +212,7 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
 
                updateNotification({
                   status: "Success",
-                  message: "Updated workout tag",
+                  message: `${method === "delete" ? "Deleted" : "Updated"} workout tag`,
                   timer: 1000
                });
 
@@ -260,7 +254,7 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
          <div className = "flex flex-col items-center justify-center gap-3 text-center">
             <FontAwesomeIcon
                icon = { faGear }
-               className = "mt-6 text-4xl text-primary"
+               className = "mt-6 text-5xl text-primary"
             />
             <h1 className = "mb-2 px-2 text-2xl font-bold">
                Edit Tag
@@ -384,7 +378,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
       <li
          className = {
             clsx(
-               "relative m-2 rounded-full px-4 py-2 text-[0.8rem] font-bold text-white",
+               "relative m-2 rounded-full px-5 py-2 text-[0.8rem] font-bold text-white",
             )
          }
          style = {
@@ -397,6 +391,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
       >
          <div className = "mx-auto flex max-w-full flex-row flex-wrap items-center justify-center gap-x-2">
             <div
+               id = { tag.id }
                onClick = {
                   (event) => {
                      event.stopPropagation();
@@ -570,6 +565,20 @@ export default function Tags(props: TagsProps): JSX.Element {
       updateNotification
    ]);
 
+   const handleCreateOrSelectTag = useCallback(() => {
+      const existingTag: Tag = tagsByTitle[search];
+
+      if (!existingTag) {
+         handleTagCreation();
+      } else {
+         document.getElementById(existingTag.id)?.click();
+      }
+   }, [
+      search,
+      tagsByTitle,
+      handleTagCreation
+   ]);
+
    return (
       <div>
          {
@@ -616,13 +625,7 @@ export default function Tags(props: TagsProps): JSX.Element {
                         label = "Tags"
                         icon = { faTag }
                         dispatch = { localDispatch }
-                        onSubmit = {
-                           () => {
-                              if (!tagsByTitle[search]) {
-                                 handleTagCreation();
-                              }
-                           }
-                        }
+                        onSubmit = { handleCreateOrSelectTag }
                         autoFocus = { onReset !== undefined }
                      />
                   </div>
@@ -649,7 +652,7 @@ export default function Tags(props: TagsProps): JSX.Element {
                      )
                   }
                   {
-                     search.length >= 3 && !tagsByTitle[search] && (
+                     search.length >= 3 && search.length <= 30 && !tagsByTitle[search] && (
                         <CreateTagContainer
                            { ...props }
                            localState = { localState }

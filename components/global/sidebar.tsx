@@ -85,6 +85,7 @@ function SideBarLinks(): JSX.Element {
                               case "Sign Out":
                                  event.preventDefault();
                                  await endSession();
+                                 window.location.reload();
                                  break;
                               case "Theme":
                                  event.preventDefault();

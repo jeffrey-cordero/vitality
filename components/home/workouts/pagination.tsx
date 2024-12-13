@@ -38,6 +38,8 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                }
             }
          });
+
+         window.localStorage.setItem("page", String(page));
       }, [
          globalDispatch,
          globalState.page

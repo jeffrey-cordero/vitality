@@ -9,8 +9,8 @@ interface CounterProps {
   className: string;
 }
 
-function Counter(props: CounterProps): JSX.Element {
-   // https://github.com/steven-tey/precedent/blob/main/components/shared/counting-numbers.tsx
+// https://github.com/steven-tey/precedent/blob/main/components/shared/counting-numbers.tsx
+function Circle(props: CounterProps): JSX.Element {
    const { value, className, start, duration } = props;
    const [count, setCount] = useState<number>(start);
    const easeOutQuad = (t: number, b: number, c: number, d: number) => {
@@ -21,29 +21,37 @@ function Counter(props: CounterProps): JSX.Element {
    useEffect(() => {
       let startTime: number | undefined;
       const animateCount = (timestamp: number) => {
-         if (!startTime) startTime = timestamp;
+         if (!startTime) {
+            startTime = timestamp;
+         }
+
          const timePassed = timestamp - startTime;
          const progress = timePassed / duration;
          const currentCount = easeOutQuad(progress, 0, value, 1);
+
          if (currentCount >= value) {
             setCount(value);
             return;
          }
+
          setCount(currentCount);
          requestAnimationFrame(animateCount);
       };
+
       requestAnimationFrame(animateCount);
    }, [
       value,
       duration
    ]);
 
-   return <p className = { className }>
-      { Intl.NumberFormat().format(count) }
-   </p>;
+   return (
+      <p className = { className }>
+         { Intl.NumberFormat().format(count) }
+      </p>
+   );
 }
 
-export default function Spinner(): JSX.Element {
+export default function Counter(): JSX.Element {
    return (
       <div className = "relative my-10 size-full">
          <motion.svg
@@ -67,7 +75,7 @@ export default function Spinner(): JSX.Element {
                stroke = "#22C55E"
             />
          </motion.svg>
-         <Counter
+         <Circle
             value = { 100 }
             start = { 0 }
             duration = { 3500 }

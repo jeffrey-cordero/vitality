@@ -63,7 +63,7 @@ function Row(props: RowProps) {
             // Undefined in case of removal
             tag !== undefined && (
                <div
-                  className = { clsx("m-1 max-w-full truncate rounded-full px-4 py-1 text-[0.8rem] font-bold text-white lg:py-2 lg:text-xs") }
+                  className = { clsx("m-1 max-w-full truncate rounded-full px-4 py-1 text-[0.8rem] font-bold text-white lg:text-[0.75rem]") }
                   style = {
                      {
                         backgroundColor: tag.color
@@ -101,23 +101,23 @@ function Row(props: RowProps) {
       <div
          id = { workout.id }
          className = {
-            clsx("mx-auto flex w-full cursor-pointer flex-col items-center justify-between px-2 py-6 text-center text-lg font-medium lg:flex-row lg:rounded-none lg:p-6 lg:text-base", {
+            clsx("mx-auto flex w-full cursor-pointer flex-col items-center justify-between p-6 text-center text-lg lg:flex-row lg:rounded-none lg:p-6 lg:text-lg", {
                "bg-gray-100 dark:bg-gray-700": isSelected,
                "bg-white dark:bg-slate-800": !isSelected
             })
          }
          onClick = { handleWorkoutToggle }
       >
-         <div className = "w-full px-4 text-xl [overflow-wrap:anywhere] lg:w-40 lg:px-6 lg:py-4 lg:text-base">
+         <div className = "order-3 w-full max-w-[26rem] items-center justify-center px-4 pb-2 text-[1.25rem] font-medium [overflow-wrap:anywhere] lg:order-none lg:w-40 lg:px-6 lg:py-4 lg:text-lg">
             { workout.title }
          </div>
-         <div className = "w-full whitespace-pre-wrap break-all px-2 pt-2 lg:w-40 lg:px-6 lg:py-4">
+         <div className = "order-1 flex w-full flex-row items-center justify-center gap-3 whitespace-pre-wrap break-all px-4 text-lg font-medium lg:order-none lg:w-40 lg:px-6 lg:py-4 lg:text-lg">
             { formattedDate }
          </div>
-         <div className = "scrollbar-hide w-full overflow-auto whitespace-pre-wrap break-all px-2 sm:px-12 lg:max-h-48 lg:w-48 lg:p-4">
+         <div className = "scrollbar-hide order-4 w-full overflow-auto whitespace-pre-wrap break-all px-2 sm:px-12 lg:order-none lg:max-h-48 lg:w-48 lg:p-1">
             <div
                className = {
-                  clsx("scrollbar-hide mx-auto my-1 flex w-full max-w-80 flex-row flex-wrap items-center justify-center gap-1 overflow-auto lg:max-h-56", {
+                  clsx("mx-auto my-1 flex max-h-full w-full max-w-80 flex-row flex-wrap items-center justify-center gap-1 overflow-auto", {
                      "cursor-all-scroll": workoutTags.length > 0
                   })
                }
@@ -126,11 +126,11 @@ function Row(props: RowProps) {
             </div>
          </div>
          <div
-            className = { clsx("relative order-first my-4 whitespace-pre-wrap break-all lg:order-none lg:my-0") }
+            className = { clsx("relative order-1 my-4 whitespace-pre-wrap break-all lg:order-none lg:my-0") }
          >
             {
                workout.image ? (
-                  <div className = "relative flex size-36 items-center justify-center min-[275px]:size-44 min-[375px]:size-52 sm:size-64 lg:size-32">
+                  <div className = "relative order-2 flex size-36 items-center justify-center min-[275px]:size-44 min-[375px]:size-52 lg:order-none lg:size-36">
                      <Image
                         fill
                         priority
@@ -142,16 +142,16 @@ function Row(props: RowProps) {
                      />
                   </div>
                ) : (
-                  <div className = "flex size-44 items-center justify-center overflow-hidden rounded-full text-primary min-[375px]:size-52 sm:size-64 lg:size-32">
+                  <div className = "order-2 flex size-36 items-center justify-center overflow-hidden rounded-full min-[275px]:size-44 min-[375px]:size-52 lg:order-none lg:size-36">
                      <FontAwesomeIcon
-                        className = "text-4xl"
+                        className = "text-[3.75rem] text-primary min-[275px]:text-[3.8rem] min-[375px]:text-[4.3rem] lg:text-5xl"
                         icon = { faImage }
                      />
                   </div>
                )
             }
          </div>
-         <div className = "w-full whitespace-pre-wrap break-all text-xl font-bold uppercase text-black lg:w-12 lg:px-6 lg:py-4 lg:text-base">
+         <div className = "order-5 w-full whitespace-pre-wrap break-all text-xl font-bold uppercase text-black lg:order-none lg:w-12 lg:px-6 lg:py-4 lg:text-lg">
             <div className = "flex items-center justify-center gap-4">
                <div
                   className = "flex items-center justify-center"
@@ -165,7 +165,7 @@ function Row(props: RowProps) {
                   <div className = "block px-8 pt-2 lg:pt-0">
                      <FontAwesomeIcon
                         icon = { faPencil }
-                        className = " cursor-pointer text-lg text-primary transition duration-300 ease-in-out hover:scale-125 lg:text-base"
+                        className = " cursor-pointer text-xl text-primary transition duration-300 ease-in-out hover:scale-125 lg:text-lg"
                      />
                   </div>
                </div>
@@ -295,7 +295,7 @@ export default function Table(props: TableProps): JSX.Element {
 
    return (
       <div className = "relative mx-auto w-full">
-         <div className = "mx-auto my-6 overflow-hidden rounded-2xl shadow-md">
+         <div className = "mx-auto mb-10 mt-6 overflow-hidden rounded-2xl shadow-md">
             <div className = "block bg-white py-4 lg:hidden dark:bg-slate-800">
                <input
                   id = "workout-select-all-mobile"
@@ -306,16 +306,16 @@ export default function Table(props: TableProps): JSX.Element {
                />
             </div>
             <div className = "mx-auto hidden w-full items-center justify-between bg-white lg:flex lg:p-6 dark:bg-slate-800">
-               <div className = "w-40 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
+               <div className = "flex w-40 items-center justify-center gap-2 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
                   Title
                </div>
-               <div className = "w-40 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
+               <div className = "flex w-40 items-center justify-center gap-2 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
                   Date
                </div>
-               <div className = "w-48 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
+               <div className = "flex w-48 items-center justify-center gap-2 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
                   Tags
                </div>
-               <div className = "w-32 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
+               <div className = "flex w-36 items-center justify-center gap-2 whitespace-pre-wrap break-all text-xl font-bold uppercase lg:px-6 lg:py-4 lg:text-lg">
                   Image
                </div>
                <div className = "flex w-12 items-center justify-center whitespace-normal py-4 text-base font-bold uppercase text-black">

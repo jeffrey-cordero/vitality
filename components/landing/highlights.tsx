@@ -13,19 +13,19 @@ function Card(props: CardProps): JSX.Element {
    const { icon, title, description } = props;
 
    return (
-      <div className = "mx-3 flex h-[26rem] w-[29rem] max-w-full items-center justify-center rounded-2xl bg-white text-center shadow-md xsm:mx-0 md:w-80 dark:bg-slate-800">
+      <div className = "mx-2 flex h-[25rem] w-[29rem] max-w-full items-center justify-center rounded-2xl bg-white text-center shadow-md xsm:mx-0 md:w-80 dark:bg-slate-800">
          <div className = "mx-auto flex w-full flex-col items-center justify-center gap-4 px-4 text-center text-black">
             <div>
                <FontAwesomeIcon
                   icon = { icon }
                   className = "text-[2.9rem] text-primary"
                />
-               <h1 className = "mt-8 whitespace-nowrap text-2xl font-bold text-primary">
+               <h1 className = "mt-8 whitespace-nowrap text-[1.4rem] font-bold text-primary sm:text-2xl">
                   { title }
                </h1>
             </div>
             <div>
-               <p className = "px-2 text-base font-medium text-gray-500 dark:text-gray-400">
+               <p className = "px-1 text-sm font-medium text-gray-500 sm:text-base dark:text-gray-400">
                   { description }
                </p>
             </div>

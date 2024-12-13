@@ -10,17 +10,17 @@ interface CarouselProps {
 export default function Carousel(props: CarouselProps): JSX.Element {
    const { columns, items } = props;
    const [currentIndex, setCurrentIndex] = useState(Math.floor(items.length / 2));
-   const columnWidth = columns * 100;
+   const columnWidth: number = columns * 100;
 
    const nextSlide = () => {
       setCurrentIndex(
-         (prevIndex) => (prevIndex + 1) % items.length
+         (prevIndex: number) => (prevIndex + 1) % items.length
       );
    };
 
    const prevSlide = () => {
       setCurrentIndex(
-         (prevIndex) => (prevIndex - 1 + items.length) % items.length
+         (prevIndex: number) => (prevIndex - 1 + items.length) % items.length
       );
    };
 

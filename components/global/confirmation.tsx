@@ -23,7 +23,7 @@ export default function Confirmation(props: ConfirmationProps): JSX.Element {
                <div className = "bg-white dark:bg-slate-800">
                   <FontAwesomeIcon
                      icon = { faTrashCan }
-                     className = "my-[0.83rem] cursor-pointer text-lg text-red-500"
+                     className = "my-[0.83rem] cursor-pointer text-xl text-red-500"
                   />
                </div>
             ) : (

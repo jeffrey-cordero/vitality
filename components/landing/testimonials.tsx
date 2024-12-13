@@ -22,7 +22,7 @@ function Testimonial(props: TestimonialProps): JSX.Element {
             icon = { faQuoteLeft }
             className = "text-[1.6rem] text-primary sm:text-3xl"
          />
-         <p className = "mx-auto mt-3 w-11/12 px-2 text-[0.95rem] font-medium sm:w-3/4 sm:text-base">
+         <p className = "mx-auto mt-3 w-11/12 px-2 text-[0.9rem] font-medium xxsm:text-[0.95rem] sm:w-3/4 sm:text-base">
             { testimonial }
          </p>
          <div>
@@ -37,7 +37,7 @@ function Testimonial(props: TestimonialProps): JSX.Element {
                   alt = "Rounded avatar"
                />
                <div>
-                  <p className = "text-base font-semibold">
+                  <p className = "text-[0.95rem] font-bold xxsm:text-base">
                      { name }
                   </p>
                   {

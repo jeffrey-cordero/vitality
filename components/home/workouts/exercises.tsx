@@ -474,7 +474,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                </li>
             ) : (
                set !== undefined && (
-                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pt-2 text-left text-[0.95rem] font-semibold [overflow-wrap:anywhere] xsm:pl-8">
+                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pt-2 text-left text-sm font-semibold [overflow-wrap:anywhere] xxsm:text-[0.95rem] xsm:pl-8">
                      <div
                         className = "cursor-grab touch-none pt-1 text-sm"
                         { ...attributes }
@@ -872,7 +872,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   />
                </div>
             ) : (
-               <h1 className = "flex cursor-default items-center justify-start text-xl">
+               <h1 className = "flex cursor-default items-center justify-start text-lg xxsm:text-xl">
                   <span>
                      <FontAwesomeIcon
                         className = "cursor-grab touch-none pt-1 text-2xl focus:outline-none"

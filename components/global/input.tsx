@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { VitalityAction, VitalityInputState } from "@/lib/global/state";
 import { ChangeEvent, Dispatch, useCallback, useEffect, useRef } from "react";
 import { faEye, faEyeSlash, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
@@ -20,7 +20,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
       autoComplete, onChange, onSubmit, required, input, dispatch } = props;
    const inputType = input.data.type ?? type;
    const inputRef = useRef<HTMLInputElement>(null);
-   const passwordButton = useRef<SVGSVGElement | null>(null);
+   const passwordIconRef = useRef<SVGSVGElement | null>(null);
 
    useEffect(() => {
       autoFocus && inputRef.current?.focus();
@@ -32,6 +32,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
    ]);
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+      // handlesOnChange variable implies state management is handled via the parent component
       if (input.handlesOnChange) {
          onChange?.call(null, event);
       } else {
@@ -56,7 +57,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
 
    const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
       if (inputRef.current && event.key === "Escape") {
-         // Focus the top-most modal in the DOM when blurring current input element, if any
+         // Focus the top-most modal in the DOM when blurring input element, if applicable
          inputRef.current?.blur();
 
          const modals: HTMLCollection = document.getElementsByClassName("modal");
@@ -71,12 +72,6 @@ export function Input(props: VitalityInputProps): JSX.Element {
 
    const handlePasswordIconClick = useCallback(() => {
       inputRef.current?.focus();
-
-      if (inputType === "password") {
-         passwordButton.current?.classList.add("text-primary");
-      } else {
-         passwordButton.current?.classList.remove("text-primary");
-      }
 
       dispatch({
          type: "updateState",
@@ -110,7 +105,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                ref = { inputRef }
                placeholder = { placeholder ?? "" }
                className = {
-                  clsx("peer block w-full rounded-lg border bg-white p-4 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-primary focus:pb-2 focus:pt-7 focus:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
+                  clsx("peer block w-full overflow-hidden rounded-lg border bg-white px-4 pb-2 pt-7 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-primary focus:pb-2 focus:pt-7 focus:ring-primary disabled:pointer-events-none disabled:opacity-50 xxsm:p-4 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
                      {
                         "border-gray-200 border-[1.5px]": input.error === null,
                         "border-red-500 border-2 dark:border-2 focus:border-red-500 focus:ring-red-500 error": input.error !== null
@@ -120,16 +115,20 @@ export function Input(props: VitalityInputProps): JSX.Element {
                onChange = { (event: ChangeEvent<HTMLInputElement>) => handleInputChange(event) }
             />
             {
-               (inputType === "password" || passwordButton.current !== null) && (
+               (inputType === "password" || passwordIconRef.current !== null) && (
                   <Button
                      tabIndex = { -1 }
                      type = "button"
                      className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
                   >
                      <FontAwesomeIcon
+                        ref = { passwordIconRef }
                         icon = { inputType == "password" ? faEye : faEyeSlash }
-                        className = "password-icon size-4 shrink-0"
-                        ref = { passwordButton }
+                        className = {
+                           clsx("password-icon size-[0.95rem] shrink-0 xxsm:size-4", {
+                              "text-primary" : input.data.type && input.data.type !== "password"
+                           })
+                        }
                         onClick = { handlePasswordIconClick }
                      />
                   </Button>
@@ -145,7 +144,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                      <FontAwesomeIcon
                         icon = { input.data.valid ? faCircleCheck : faCircleXmark }
                         className = {
-                           clsx("size-4 shrink-0", {
+                           clsx("size-[0.95rem] shrink-0 xxsm:size-4", {
                               "text-green-500": input.data.valid,
                               "text-red-500": !(input.data.valid)
                            })
@@ -158,10 +157,10 @@ export function Input(props: VitalityInputProps): JSX.Element {
                htmlFor = { id }
                className = {
                   clsx(
-                     "pointer-events-none absolute start-0 top-0 h-full truncate border border-transparent p-4 text-sm transition duration-200 ease-in-out peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-sm peer-placeholder-shown:text-black peer-focus:-translate-y-2 peer-focus:text-xs peer-focus:text-black peer-disabled:pointer-events-none peer-disabled:opacity-50 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-placeholder-shown:text-white dark:peer-[:not(:placeholder-shown)]:text-gray-400",
+                     "pointer-events-none absolute start-0 top-0 h-full truncate border border-transparent p-4 text-xs transition duration-200 ease-in-out peer-placeholder-shown:-translate-y-2 peer-placeholder-shown:text-black peer-focus:text-xs peer-focus:text-black peer-disabled:pointer-events-none peer-disabled:opacity-50 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-gray-500 xxsm:text-sm xxsm:peer-placeholder-shown:-translate-y-0 xxsm:peer-focus:-translate-y-2 dark:peer-placeholder-shown:text-white dark:peer-[:not(:placeholder-shown)]:text-gray-400",
                      {
                         "font-bold": required,
-                        "peer-[:not(:placeholder-shown)]:text-black dark:peer-[:not(:placeholder-shown)]:text-white" : type === "date" && input.value === ""
+                        "peer-[:not(:placeholder-shown)]:text-black dark:peer-[:not(:placeholder-shown)]:text-white" : type === "date" && input.value.trim() === ""
                      }
                   )
                }

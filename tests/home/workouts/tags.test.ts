@@ -3,8 +3,9 @@ import { root } from "@/tests/authentication/data";
 import { prismaMock } from "@/tests/singleton";
 import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { getAppliedWorkoutTagUpdates } from "@/lib/home/workouts/workouts";
 import { workout, tags } from "@/tests/home/workouts/data";
-import { addWorkoutTag, fetchWorkoutTags, getAppliedWorkoutTagUpdates, Tag, updateWorkoutTag } from "@/lib/home/workouts/tags";
+import { addWorkoutTag, fetchWorkoutTags, Tag, updateWorkoutTag } from "@/lib/home/workouts/tags";
 
 const MOCK_WORKOUT_TAG: Tag = {
    id: "",

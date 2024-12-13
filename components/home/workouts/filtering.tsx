@@ -266,11 +266,11 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "h-10 w-full bg-primary text-sm font-semibold text-white"
+               className = "h-10 w-full bg-primary text-sm font-semibold text-white xxsm:text-sm"
             >
                <FontAwesomeIcon
                   icon = { faCalendar }
-                  className = "text-sm"
+                  className = "text-base"
                />
                Filter by Date
             </Button>
@@ -280,7 +280,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          <div className = "flex flex-col items-stretch justify-center gap-2 text-center">
             <FontAwesomeIcon
                icon = { faCalendar }
-               className = "mt-6 text-4xl text-primary"
+               className = "mt-6 text-3xl text-primary"
             />
             <h1 className = "mb-2 text-2xl font-bold">Filter by Date</h1>
             <div className = "relative mt-8">
@@ -468,12 +468,12 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "h-10 w-full bg-primary text-sm font-semibold text-white"
+               className = "h-10 w-full bg-primary text-sm font-semibold text-white xxsm:text-sm"
                onClick = { handleInitializeFilteredTags }
             >
                <FontAwesomeIcon
                   icon = { faTag }
-                  className = "text-sm text-white"
+                  className = "text-base text-white"
                />
                Filter by Tags
             </Button>
@@ -494,7 +494,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                   />
                   <Button
                      type = "button"
-                     className = "mt-3 h-[2.4rem] w-full bg-primary text-sm font-bold text-white"
+                     className = "mt-3 h-[2.4rem] w-full bg-primary font-bold text-white"
                      icon = { faMagnifyingGlass }
                      onClick = { handleApplyFilterClick }
                   >

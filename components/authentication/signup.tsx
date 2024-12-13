@@ -4,14 +4,13 @@ import Button from "@/components/global/button";
 import Link from "next/link";
 import { Input } from "@/components/global/input";
 import { login } from "@/lib/authentication/login";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { NotificationContext } from "@/app/layout";
 import { FormEvent, useContext, useReducer } from "react";
 import { VitalityState, formReducer } from "@/lib/global/state";
 import { signup, Registration } from "@/lib/authentication/signup";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { NotificationContext } from "@/app/layout";
-import { faArrowRotateLeft, faDoorOpen, faFeather, faKey, faEnvelope, faPhone,
-   faUserSecret, faCalendar, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRotateLeft, faDoorOpen, faFeather, faKey, faEnvelope, faPhone, faUserSecret, faCalendar, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 
 const registration: VitalityState = {
    username: {
@@ -71,7 +70,7 @@ export default function SignUp(): JSX.Element {
       const response: VitalityResponse<null> = await signup(registration);
 
       handleResponse(response, dispatch, updateNotification, () => {
-         // Display login notification
+         // Display notification with login button for redirection
          updateNotification({
             status: "Success",
             message: "Successfully registered",
@@ -87,6 +86,8 @@ export default function SignUp(): JSX.Element {
                               username: state.username.value,
                               password: state.password.value
                            });
+
+                           window.location.reload();
                         }
                      }
                   >
@@ -104,7 +105,7 @@ export default function SignUp(): JSX.Element {
             title = "Sign Up"
             description = "Create an account to get started"
          />
-         <div className = "mx-auto mt-8 w-10/12 lg:w-1/2">
+         <div className = "mx-auto mt-8 w-11/12 sm:w-3/4 xl:w-5/12">
             <form
                className = "relative mx-auto flex w-full flex-col items-stretch justify-center gap-3"
                onSubmit = { handleRegistration }

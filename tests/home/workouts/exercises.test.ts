@@ -401,8 +401,8 @@ describe("Workout Exercises Tests", () => {
          );
          expect(creating.data).toHaveLength(2);
          expect(updating).toHaveLength(2);
-         expect(error).toBeUndefined();
-         expect(errors).toBeUndefined();
+         expect(error).toBeNull();
+         expect(errors).toBeNull();
 
          const expectedNewExercise = {
             ...exercise,

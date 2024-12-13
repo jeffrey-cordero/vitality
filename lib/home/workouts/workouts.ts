@@ -1,11 +1,11 @@
 "use server";
 import prisma from "@/lib/prisma/client";
 import { z } from "zod";
-import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
-import { formatWorkout } from "@/lib/home/workouts/shared";
-import { Exercise } from "@/lib/home/workouts/exercises";
 import { uuidSchema } from "@/lib/global/zod";
-import { getAppliedWorkoutTagUpdates } from "@/lib/home/workouts/tags";
+import { workout_applied_tags } from "@prisma/client";
+import { Exercise } from "@/lib/home/workouts/exercises";
+import { formateDatabaseWorkout } from "@/lib/home/workouts/shared";
+import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
 
 export type Workout = {
   id: string;
@@ -78,7 +78,9 @@ export async function fetchWorkouts(user_id: string): Promise<Workout[]> {
          }
       });
 
-      return workouts.map((workout) => formatWorkout(workout));
+      return workouts.map(
+         (workout) => formateDatabaseWorkout(workout)
+      );
    } catch (error) {
       return [];
    }
@@ -96,7 +98,7 @@ export async function addWorkout(
          );
       }
 
-      // Create new workout with basic properties and an additional nested create operation for applied workout tags
+      // Create a new workout with basic properties
       const newWorkout = await prisma.workouts.create({
          data: {
             user_id: workout.user_id,
@@ -105,7 +107,9 @@ export async function addWorkout(
             description: workout.description?.trim(),
             image: workout.image?.trim(),
             workout_applied_tags: {
-               create: workout.tagIds.map((tagId: string) => ({ tag_id: tagId }))
+               create: workout.tagIds.map(
+                  (id: string) => ({ tag_id: id })
+               )
             }
          },
          include: {
@@ -126,7 +130,7 @@ export async function addWorkout(
          }
       });
 
-      return sendSuccessMessage("Added new workout", formatWorkout(newWorkout));
+      return sendSuccessMessage("Added new workout", formateDatabaseWorkout(newWorkout));
    } catch (error) {
       return sendFailureMessage(error);
    }
@@ -143,7 +147,7 @@ export async function updateWorkout(
             fields.error.flatten().fieldErrors,
          );
       } else {
-         // Fetch existing tags first for data integrity
+         // Fetch existing tags first for create, update, delete tag arrays
          const existingWorkout = await prisma.workouts.findFirst({
             where: {
                id: workout.id,
@@ -187,15 +191,13 @@ export async function updateWorkout(
                description: workout.description?.trim(),
                image: workout.image?.trim(),
                workout_applied_tags: {
-                  // Disconnect existing applied tags
                   deleteMany: {
                      tag_id: { in: removing }
                   },
-                  // Create new applied tags
                   createMany: {
-                     data: adding.map((tagId: string) => ({
-                        tag_id: tagId
-                     }))
+                     data: adding.map(
+                        (tagId: string) => ({ tag_id: tagId })
+                     )
                   }
                }
             },
@@ -219,7 +221,7 @@ export async function updateWorkout(
 
          return sendSuccessMessage(
             "Successfully updated workout",
-            formatWorkout(updatedWorkout),
+            formateDatabaseWorkout(updatedWorkout),
          );
       }
    } catch (error) {
@@ -227,10 +229,48 @@ export async function updateWorkout(
    }
 }
 
+export async function getAppliedWorkoutTagUpdates(
+   existingWorkout: any,
+   newWorkout: Workout
+): Promise<{
+   existing: string[],
+   adding: string[];
+   removing: string[]
+}> {
+   // Extract existing applied tag IDs
+   const existing: Set<string> = new Set(
+      existingWorkout.workout_applied_tags.map(
+         (tag: workout_applied_tags) => tag.tag_id
+      )
+   );
+
+   // Determine tags ID's to add and remove from existing workout
+   const adding: Set<string> = new Set(newWorkout.tagIds);
+
+   const addingTags: string[] = Array.from(adding).filter(
+      (id: string) => !existing.has(id)
+   );
+
+   const removingTags: string[] = Array.from(existing).filter(
+      (id: string)  => !adding.has(id)
+   );
+
+   const existingTags: string[] = Array.from(existing).filter(
+      (id: string)  => existing.has(id) && adding.has(id)
+   );
+
+   return {
+      existing: existingTags,
+      adding: addingTags,
+      removing: removingTags
+   };
+}
+
 export async function deleteWorkouts(
    workouts: Workout[],
    user_id: string,
 ): Promise<VitalityResponse<number>> {
+   // Validate user and workout(s) ID's prior to a potential delete operation
    const errors = {};
 
    if (!uuidSchema("user", "required").safeParse(user_id).success) {

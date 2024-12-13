@@ -3,7 +3,7 @@ import Login from "@/components/authentication/login";
 
 export default function Page() {
    return (
-      <Main>
+      <Main className = "px-0">
          <Login />
       </Main>
    );

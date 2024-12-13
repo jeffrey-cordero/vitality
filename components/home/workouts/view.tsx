@@ -21,7 +21,7 @@ export default function View(props: ViewProps): JSX.Element {
 
    return (
       <div className = "relative mx-auto flex w-full flex-col items-center justify-center">
-         <div className = "flex items-center justify-start gap-4 text-left text-base">
+         <div className = "flex items-center justify-start gap-4 text-left">
             <Button
                icon = { faTable }
                onClick = {
@@ -31,8 +31,8 @@ export default function View(props: ViewProps): JSX.Element {
                   }
                }
                className = {
-                  clsx("transition duration-300 ease-in-out focus:text-primary focus:ring-transparent", {
-                     "scale-105 border-b-4 border-primary rounded-none": view === "table"
+                  clsx("text-base transition duration-300 ease-in-out focus:text-primary focus:ring-transparent xxsm:text-lg", {
+                     "scale-105 border-b-4 border-primary rounded-none text-primary": view === "table"
                   })
                }
             >
@@ -47,8 +47,8 @@ export default function View(props: ViewProps): JSX.Element {
                   }
                }
                className = {
-                  clsx("transition duration-300 ease-in-out focus:text-primary focus:ring-transparent", {
-                     "scale-105 border-b-4 border-b-primary rounded-none": view === "cards"
+                  clsx("text-base transition duration-300 ease-in-out focus:text-primary focus:ring-transparent xxsm:text-lg", {
+                     "scale-105 border-b-4 border-b-primary rounded-none text-primary": view === "cards"
                   })
                }
             >
@@ -57,7 +57,7 @@ export default function View(props: ViewProps): JSX.Element {
          </div>
          <div
             id = "workoutsView"
-            className = "mx-auto flex w-full max-w-7xl flex-col items-center justify-start px-2 xl:w-9/12"
+            className = "mx-auto flex w-full flex-col items-center justify-start px-2 lg:w-11/12"
          >
             {
                workouts.length === 0 ? (

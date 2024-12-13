@@ -16,13 +16,13 @@ export default function Page() {
             <Button
                type = "button"
                className = {
-                  clsx("flex h-[2.8rem] w-40 grow items-center justify-start gap-2 rounded-md bg-primary p-5 text-sm font-bold text-white md:flex-none", {
+                  clsx("flex h-[2.8rem] w-40 items-center justify-start gap-2 rounded-md bg-primary p-5 text-sm font-bold text-white md:flex-none", {
                      "bg-slate-700": theme === "dark",
                      "bg-primary text-white" : theme === "light"
                   })
                }
                icon = { theme === "dark" ? faMoon : faSun }
-               iconClassName = { theme === "dark" ? "text-sky-400" : "text-yellow-300" }
+               styling = { theme === "dark" ? "text-sky-400" : "text-yellow-300" }
                onClick = {
                   () => {
                      updateTheme(theme === "dark" ? "light" : "dark");
@@ -33,11 +33,12 @@ export default function Page() {
             </Button>
             <Button
                type = "submit"
-               className = "flex h-[2.8rem] w-40 grow items-center justify-start gap-2 rounded-md bg-red-500 p-5 text-sm font-bold text-white md:flex-none"
+               className = "flex h-[2.8rem] w-40 items-center justify-start gap-2 rounded-md bg-red-500 p-5 text-sm font-bold text-white md:flex-none"
                icon = { faRightFromBracket }
                onClick = {
                   async() => {
                      await endSession();
+                     window.location.reload();
                   }
                }
             >

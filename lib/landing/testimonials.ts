@@ -1,3 +1,4 @@
+// Mock user testimonials for the landing page
 const testimonials = [
    {
       testimonial:

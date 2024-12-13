@@ -1,6 +1,6 @@
 import Credentials from "next-auth/providers/credentials";
 import type { NextAuthConfig } from "next-auth";
-import { authorizeServerSession } from "./lib/authentication/authorize";
+import { authorizeServerSession } from "@/lib/authentication/authorize";
 
 export const authConfig = {
    pages: {
