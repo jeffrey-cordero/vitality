@@ -397,6 +397,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                      input = { localState.weight }
                      dispatch = { localDispatch }
                      onSubmit = { () => handleExerciseSetUpdates("update") }
+                     autoFocus
                   />
                   <Input
                      id = "repetitions"

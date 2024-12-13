@@ -21,6 +21,7 @@ interface AuthenticationContextType {
 
 interface NotificationContextType {
    notification: NotificationProps | undefined;
+   notificationQueue: NotificationProps[],
    updateNotification: (_notification: NotificationProps) => void;
 }
 
@@ -37,15 +38,34 @@ export const NotificationContext = createContext<NotificationContextType>({
       status: "Initial",
       message: ""
    },
+   notificationQueue: [],
    updateNotification: (_notification: NotificationProps) => { }
 });
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-   const pathname: string = usePathname();
    const [user, setUser] = useState<NextAuthUser | undefined>(undefined);
    const [theme, setTheme] = useState<"light" | "dark">(null);
    const [fetched, setFetched] = useState<boolean>(false);
-   const [notification, setNotification] = useState<NotificationProps | undefined>(undefined);
+   const [notificationQueue, setNotificationQueue] = useState<NotificationProps[]>([]);
+   const notification: NotificationProps = notificationQueue.length > 0 ? notificationQueue[0] : {
+      children: null,
+      status: "Initial",
+      message: ""
+   };
+   const pathname: string = usePathname();
+
+   const updateNotification = useCallback((notification: NotificationProps) => {
+      // Handle a queue of notifications to ensure all messages are displayed to the user
+      if (notification.status !== "Initial") {
+         setNotificationQueue((previousQueue) => {
+            return [...previousQueue, notification];
+         });
+      } else if (notification.message === "remove") {
+         setTimeout(() => {
+            setNotificationQueue(notificationQueue.slice(1));
+         }, 1250);
+      }
+   }, [notificationQueue]);
 
    const authenticateUser = useCallback(async() => {
       try {
@@ -60,11 +80,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       }
 
       setFetched(true);
-   }, []);
-
-   const updateNotification = (notification: NotificationProps) => {
-      setNotification(notification);
-   };
+   }, [updateNotification]);
 
    const updateTheme = (theme: "dark" | "light") => {
       window.localStorage.setItem("theme", theme);
@@ -160,7 +176,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                fetched && (
                   <AuthenticationContext.Provider value = { { user, theme, updateTheme, fetched } }>
                      <SideBar />
-                     <NotificationContext.Provider value = { { notification, updateNotification } }>
+                     <NotificationContext.Provider value = { { notification, notificationQueue, updateNotification } }>
                         <div className = "flex min-h-screen flex-col items-center justify-start gap-6">
                            { children }
                            {

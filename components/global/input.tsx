@@ -32,7 +32,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
    ]);
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-      // handlesOnChange variable implies state management is handled via the parent component
+      // handlesOnChange defined implies state management is handled via the parent component
       if (input.handlesOnChange) {
          onChange?.call(null, event);
       } else {
@@ -157,10 +157,11 @@ export function Input(props: VitalityInputProps): JSX.Element {
                htmlFor = { id }
                className = {
                   clsx(
-                     "pointer-events-none absolute start-0 top-0 h-full truncate border border-transparent p-4 text-xs transition duration-200 ease-in-out peer-placeholder-shown:-translate-y-2 peer-placeholder-shown:text-black peer-focus:text-xs peer-focus:text-black peer-disabled:pointer-events-none peer-disabled:opacity-50 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-gray-500 xxsm:text-sm xxsm:peer-placeholder-shown:-translate-y-0 xxsm:peer-focus:-translate-y-2 dark:peer-placeholder-shown:text-white dark:peer-[:not(:placeholder-shown)]:text-gray-400",
+                     "pointer-events-none absolute start-0 top-0 h-full truncate border border-transparent p-4 text-xs transition duration-200 ease-in-out peer-placeholder-shown:-translate-y-2 peer-focus:text-xs peer-disabled:pointer-events-none peer-disabled:opacity-50 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-xs xxsm:text-sm xxsm:peer-placeholder-shown:-translate-y-0 xxsm:peer-focus:-translate-y-2 dark:peer-placeholder-shown:text-white",
                      {
                         "font-bold": required,
-                        "peer-[:not(:placeholder-shown)]:text-black dark:peer-[:not(:placeholder-shown)]:text-white" : type === "date" && input.value.trim() === ""
+                        "peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-gray-400": input.value !== "",
+                        "peer-placeholder-shown:text-black dark:peer-placeholder-shown:text-white": input.value === ""
                      }
                   )
                }

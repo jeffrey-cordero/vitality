@@ -1,8 +1,8 @@
 "use client";
 import clsx from "clsx";
 import { useRef, useContext } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NotificationContext } from "@/app/layout";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faCircleCheck, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 
 export interface NotificationProps extends React.HTMLAttributes<any> {
@@ -19,18 +19,21 @@ export default function Notification(props: NotificationProps): JSX.Element {
    const notificationRef = useRef<HTMLDivElement>(null);
 
    const removeNotification = () => {
-      // Add a fading out animation and eventually remove from the DOM
+      // Fade-out animation for removing existing notification
       notificationRef.current?.classList.add("animate-fadeOut");
 
+      // Remove current notification after the provided timer
+      updateNotification({
+         status: "Initial",
+         message: "remove"
+      });
+
+      // Remove fade- out animation for removing future notifications
       setTimeout(() => {
-         updateNotification({
-            status: "Initial",
-            message: ""
-         });
+         notificationRef.current?.classList.remove("animate-fadeOut");
       }, 1250);
    };
 
-   // If timer is provided, remove after the desired time limit
    if (timer !== undefined) {
       setTimeout(() => {
          removeNotification();

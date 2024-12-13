@@ -92,7 +92,7 @@ function Card(props: CardProps): JSX.Element {
                )
             }
             <div className = "relative flex size-full flex-col items-center justify-start overflow-hidden pt-5 text-center text-black">
-               <h2 className = "max-w-full truncate break-words px-6 pt-2 text-[1.5rem] font-extrabold md:text-[1.3rem]">
+               <h2 className = "max-w-full truncate break-words px-6 pt-2 text-[1.5rem] font-extrabold md:text-[1.4rem]">
                   { workout.title }
                </h2>
                <p className = "text-sm font-extrabold md:text-[0.85rem]">{ formattedDate }</p>

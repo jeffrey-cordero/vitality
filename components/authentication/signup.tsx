@@ -74,6 +74,7 @@ export default function SignUp(): JSX.Element {
          updateNotification({
             status: "Success",
             message: "Successfully registered",
+            timer: undefined,
             children: (
                <Link href = "/home">
                   <Button

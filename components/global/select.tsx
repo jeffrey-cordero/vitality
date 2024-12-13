@@ -21,6 +21,7 @@ export default function Select(props: SelectProps): JSX.Element {
    ]);
 
    const handleSelectChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
+      // handlesOnChange defined implies state management is handled via the parent component
       if (input.handlesOnChange) {
          onChange?.call(null, event);
       } else {

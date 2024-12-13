@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -14,15 +14,16 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
    const [open, setOpen] = useState<boolean>(false);
    const modalRef = useRef(null);
 
-   // Allow children components to handle opening/closing the model outside of click events
+   // Allow parent components to handle opening/closing the model
+   const handleOnOpen = (event: any) => {
+      onClick?.call(null, event);
+      setOpen(true);
+   };
+
    const handleOnClose = useCallback(() => {
       onClose?.call(null);
       setOpen(false);
    }, [onClose]);
-
-   const handleOnOpen = () => {
-      setOpen(true);
-   };
 
    useImperativeHandle(ref, () => ({
       close: handleOnClose,
@@ -46,18 +47,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
    return (
       <div className = "relative">
          <div
-            onClick = {
-               (event) => {
-               // Ensure the onClick doesn't propagate to parent components
-                  event.stopPropagation();
-
-                  if (!open) {
-                  // Trigger the defined onClick method for the display container, if any
-                     onClick?.call(null, event);
-                     setOpen(true);
-                  }
-               }
-            }
+            onClick = { handleOnOpen }
          >
             { display }
          </div>

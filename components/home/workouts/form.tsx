@@ -186,7 +186,11 @@ export default function Form(props: VitalityProps): JSX.Element {
             value: {
                workout: {
                   ...globalState.workout,
-                  value: returnedWorkout
+                  value: returnedWorkout,
+                  data: {
+                     ...globalState.workout.data,
+                     display: method === "delete" ? false : true
+                  }
                },
                workouts: {
                   ...globalState.workouts,
@@ -204,15 +208,12 @@ export default function Form(props: VitalityProps): JSX.Element {
          });
 
          if (method === "delete") {
-            // Close the form modal after a successful deletion
+            formModalRef.current?.close();
+
             updateNotification({
                status: "Success",
                message: "Deleted workout",
                timer: 1000
-            });
-
-            setTimeout(() => {
-               formModalRef.current?.close();
             });
          } else {
             updateNotification({
@@ -409,7 +410,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                   <Input
                      id = "date"
                      type = "date"
-                     label = "Title"
+                     label = "Date"
                      icon = { faCalendar }
                      input = { localState.date }
                      dispatch = { localDispatch }

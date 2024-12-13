@@ -89,7 +89,7 @@ function DateInput(props: DateInputProps) {
             <Input
                id = { isMinDate ? "minDate" : "maxDate" }
                type = "date"
-               label = "Title"
+               label = "Date"
                icon = { faCalendar }
                input = { input }
                dispatch = { globalDispatch }
