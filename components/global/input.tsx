@@ -65,7 +65,8 @@ export function Input(props: VitalityInputProps): JSX.Element {
          if (modals.length > 0) {
             (modals.item(modals.length - 1) as HTMLDivElement).focus();
          }
-      } else if (event.key === "Enter") {
+      } else if (inputRef.current && event.key === "Enter") {
+         // Call the relative form submission method, if any
          onSubmit?.call(null);
       }
    }, [onSubmit]);

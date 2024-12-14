@@ -123,7 +123,7 @@ export default function Cards(props: CardsProps): JSX.Element {
 
    return (
       <div className = "relative mx-auto w-full">
-         <div className = "mx-auto mb-10 mt-6 flex flex-row flex-wrap items-center justify-center gap-8">
+         <div className = "mx-auto my-6 flex flex-row flex-wrap items-center justify-center gap-8">
             {
                workouts.map((workout: Workout) => (
                   <Card

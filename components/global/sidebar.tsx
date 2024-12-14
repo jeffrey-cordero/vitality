@@ -7,7 +7,9 @@ import { useContext, useEffect, useState } from "react";
 import { endSession } from "@/lib/authentication/session";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faUtensils, faBrain, faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears, faBars, faDumbbell, faRightFromBracket, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faUtensils, faBrain,
+   faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears, faBars,
+   faDumbbell, faRightFromBracket, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 
 interface SideBarProps {
   name: string;
@@ -39,18 +41,12 @@ const homeLinks: SideBarProps[] = [
 
 function SideBarLinks(): JSX.Element {
    const { user, theme, updateTheme, fetched } = useContext(AuthenticationContext);
-   // Initialize links based on localStorage or pathname
    const [links, setLinks] = useState<SideBarProps[]>(homeLinks);
    const pathname = usePathname();
 
-   // Update links based on user state and store in localStorage on unmount
+   // Update sidebar links based on current user and localStorage state
    useEffect(() => {
-      // Determine the new links based on user presence
-      const newLinks = user === undefined ? landingLinks : homeLinks;
-
-      if (fetched) {
-         setLinks(newLinks);
-      }
+      fetched && setLinks(user === undefined ? landingLinks : homeLinks);
    }, [
       user,
       fetched,
@@ -70,7 +66,7 @@ function SideBarLinks(): JSX.Element {
                      href = { link.href }
                      className = {
                         clsx(
-                           "z-40 flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-sm font-semibold hover:text-primary",
+                           "z-40 flex h-[50px] w-full items-center justify-center rounded-md text-sm font-semibold hover:text-primary",
                            {
                               "bg-sky-100 dark:bg-slate-700 text-primary": pathname === link.href,
                               "hover:text-yellow-400": isTheme,
@@ -96,19 +92,14 @@ function SideBarLinks(): JSX.Element {
                         }
                      }
                   >
-                     <div className = "w-[30px] pl-[10px]">
-                        <FontAwesomeIcon
-                           icon = { isTheme ? theme === "dark" ? faMoon : faSun : link.icon }
-                           className = {
-                              clsx("text-2xl", {
-                                 "text-yellow-400": isTheme
-                              })
-                           }
-                        />
-                     </div>
-                     <p className = "whitespace-nowrap capitalize">
-                        { isTheme ? theme : link.name }
-                     </p>
+                     <FontAwesomeIcon
+                        icon = { isTheme ? theme === "dark" ? faMoon : faSun : link.icon }
+                        className = {
+                           clsx("text-[1.4rem] xxsm:text-[1.6rem]", {
+                              "text-yellow-400 hover:text-yellow-500": isTheme
+                           })
+                        }
+                     />
                   </Link>
                );
             })
@@ -121,7 +112,7 @@ export function SideBar(): JSX.Element {
    const [visibleSideBar, setVisibleSideBar] = useState<boolean>(false);
 
    return (
-      <div>
+      <div className = "relative">
          <div className = "absolute left-0 top-0 z-30">
             <div className = "relative left-0 top-0 z-30 translate-x-[10px] translate-y-[15px]">
                <FontAwesomeIcon
@@ -141,7 +132,7 @@ export function SideBar(): JSX.Element {
                id = "sideBarLinks"
                className = {
                   clsx(
-                     "relative top-[-15px] m-0 w-[4.5rem] transition-all duration-1000 ease-in-out xsm:hover:w-60 xsm:focus:w-60",
+                     "group relative top-[-15px] m-0 w-[4.3rem] transition-all duration-1000 ease-in-out xxsm:w-20",
                      {
                         "left-[-5rem]": !visibleSideBar,
                         "left-[10px]": visibleSideBar
@@ -150,7 +141,7 @@ export function SideBar(): JSX.Element {
                }
             >
                <div
-                  className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-3 py-4 shadow-md dark:bg-slate-800"
+                  className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-[0.6rem] py-4 shadow-md xxsm:px-3 dark:bg-slate-800"
                   onMouseEnter = {
                      () => {
                         setVisibleSideBar(true);

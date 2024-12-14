@@ -136,7 +136,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <link
                rel = "icon"
                type = "image/x-icon"
-               href = "favicon.ico"
+               href = "/favicon.ico"
             />
             <meta
                name = "description"
@@ -153,10 +153,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <meta
                name = "robots"
                content = "index, follow"
-            />
-            <link
-               rel = "icon"
-               href = "favcon.ico"
             />
             <meta
                name = "viewport"

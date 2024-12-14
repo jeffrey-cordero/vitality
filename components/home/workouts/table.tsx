@@ -295,7 +295,7 @@ export default function Table(props: TableProps): JSX.Element {
 
    return (
       <div className = "relative mx-auto w-full">
-         <div className = "mx-auto mb-10 mt-6 overflow-hidden rounded-2xl shadow-md">
+         <div className = "mx-auto my-6 overflow-hidden rounded-2xl shadow-md">
             <div className = "block bg-white py-4 lg:hidden dark:bg-slate-800">
                <input
                   id = "workout-select-all-mobile"

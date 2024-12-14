@@ -1,14 +1,13 @@
 "use client";
 import clsx from "clsx";
-import { ChangeEvent, useEffect, useRef, useState, useCallback } from "react";
 import { VitalityInputProps } from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ChangeEvent, useEffect, useRef, useCallback } from "react";
 
 export default function TextArea(props: VitalityInputProps): JSX.Element {
-   const { id, label, icon, onChange, placeholder, required, autoFocus, input, dispatch } =
-    props;
+   const { id, label, icon, onChange, placeholder, required, autoFocus,
+      input, dispatch } = props;
    const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
-   const [visible, setVisible] = useState<boolean>(false);
 
    useEffect(() => {
       autoFocus && textAreaRef.current?.focus();
@@ -17,47 +16,45 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
       input.error
    ]);
 
-   const handleTextAreaChange = useCallback(
-      (event: ChangeEvent<HTMLTextAreaElement>) => {
-         if (input.handlesOnChange) {
-            // Call the user-defined event handler (complex state)
-            onChange?.call(null, event);
-         } else {
-            // Simple state
-            dispatch({
-               type: "updateState",
-               value: {
-                  id: id,
-                  input: {
-                     ...input,
-                     value: event.target.value,
-                     error: null
-                  }
+   const handleTextAreaChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
+      // handlesOnChange defined implies state management is handled via the parent component
+      if (input.handlesOnChange) {
+         onChange?.call(null, event);
+      } else {
+         dispatch({
+            type: "updateState",
+            value: {
+               id: id,
+               input: {
+                  ...input,
+                  value: event.target.value,
+                  error: null
                }
-            });
-         }
-
-         handleTextAreaOverflow();
-      }, [
-         dispatch,
-         input,
-         id,
-         onChange
-      ]);
-
-   const handleKeyDown = useCallback(
-      (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-         if (textAreaRef.current && event.key === "Escape") {
-            textAreaRef.current.blur();
-
-            const modals: HTMLCollection = document.getElementsByClassName("modal");
-
-            if (modals.length > 0) {
-               // Focus the most inner modal, if any
-               (modals.item(modals.length - 1) as HTMLDivElement).focus();
             }
+         });
+      }
+
+      handleTextAreaOverflow();
+   }, [
+      dispatch,
+      input,
+      id,
+      onChange
+   ]);
+
+   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (textAreaRef.current && event.key === "Escape") {
+         // Focus the top-most modal in the DOM when blurring input element, if applicable
+         textAreaRef.current.blur();
+
+         const modals: HTMLCollection = document.getElementsByClassName("modal");
+
+         if (modals.length > 0) {
+            // Focus the most inner modal, if any
+            (modals.item(modals.length - 1) as HTMLDivElement).focus();
          }
-      }, []);
+      }
+   }, []);
 
    const handleTextAreaOverflow = () => {
       const textarea = textAreaRef.current;
@@ -69,12 +66,9 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
    };
 
    useEffect(() => {
-      // On mounting, handle overflow for large input values
-      if (!visible) {
-         handleTextAreaOverflow();
-         setVisible(true);
-      }
-   }, [visible]);
+      // Handle overflow for large values during the initial render
+      handleTextAreaOverflow();
+   }, []);
 
    return (
       <div className = "relative">
@@ -91,14 +85,8 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
                   },
                )
             }
-            onKeyDown = {
-               (event: React.KeyboardEvent<HTMLTextAreaElement>) =>
-                  handleKeyDown(event)
-            }
-            onChange = {
-               (event: ChangeEvent<HTMLTextAreaElement>) =>
-                  handleTextAreaChange(event)
-            }
+            onKeyDown = { (event: React.KeyboardEvent<HTMLTextAreaElement>) => handleKeyDown(event) }
+            onChange = { (event: ChangeEvent<HTMLTextAreaElement>) => handleTextAreaChange(event) }
             ref = { textAreaRef }
          />
          <label
