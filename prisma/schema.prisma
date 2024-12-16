@@ -44,6 +44,7 @@ model users {
   email_verified Boolean        @default(false)
   phone          String?        @unique @db.VarChar(22)
   phone_verified Boolean?       @default(false)
+  image          String?        @default("")
   workout_tags   workout_tags[]
   workouts       workouts[]
 
@@ -68,13 +69,6 @@ model workouts {
   users                users                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id], map: "workouts_user_index")
-}
-
-model feedback {
-  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name    String @db.VarChar(255)
-  email   String
-  message String
 }
 
 model workout_applied_tags {

@@ -33,7 +33,12 @@ export async function authorizeServerSession(credentials: Credentials): Promise<
       const validCredentials = await bcrypt.compare(password, user.password);
 
       if (validCredentials) {
-         return { id: user.id, name: user.name, email: user.email };
+         return { 
+            id: user.id, 
+            name: user.name, 
+            email: user.email,
+            image: user.image
+         };
       }
    }
 

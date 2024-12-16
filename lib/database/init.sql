@@ -7,7 +7,8 @@ CREATE TABLE "users" (
       email TEXT UNIQUE NOT NULL,
       email_verified BOOLEAN NOT NULL DEFAULT FALSE,
       phone VARCHAR(22) UNIQUE,
-      phone_verified BOOLEAN DEFAULT FALSE
+      phone_verified BOOLEAN DEFAULT FALSE,
+      image TEXT DEFAULT ''
 );
 
 CREATE index "users_email_index" ON "users" (email);

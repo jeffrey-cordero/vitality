@@ -1,14 +1,18 @@
 "use client";
-import Button from "@/components/global/button";
-import { endSession } from "@/lib/authentication/session";
-import { faMoon, faRightFromBracket, faSun } from "@fortawesome/free-solid-svg-icons";
-import { useContext } from "react";
-import { AuthenticationContext } from "@/app/layout";
 import clsx from "clsx";
 import Main from "@/components/global/main";
+import Form from "@/components/home/settings/form";
+import Button from "@/components/global/button";
+import { useContext } from "react";
+import { endSession } from "@/lib/authentication/session";
+import { AuthenticationContext } from "@/app/layout";
+import { faMoon, faRightFromBracket, faSun } from "@fortawesome/free-solid-svg-icons";
 
 export default function Page() {
+   const { user } = useContext(AuthenticationContext);
    const { theme, updateTheme } = useContext(AuthenticationContext);
+
+   console.log(user);
 
    return (
       <Main>
@@ -44,6 +48,7 @@ export default function Page() {
             >
                <p>Sign Out</p>
             </Button>
+            <Form />
          </div>
       </Main>
    );

@@ -133,7 +133,7 @@ function Row(props: RowProps) {
                   <div className = "relative order-2 flex size-36 items-center justify-center min-[275px]:size-44 min-[375px]:size-52 lg:order-none lg:size-36">
                      <Image
                         fill
-                        loading = "eager"
+                        priority
                         quality = { 100 }
                         sizes = "100%"
                         src = { workout.image }
