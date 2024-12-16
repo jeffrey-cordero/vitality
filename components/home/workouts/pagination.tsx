@@ -2,11 +2,11 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
 import Select from "@/components/global/select";
+import { ChangeEvent, useCallback } from "react";
 import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { faAnglesLeft, faAnglesRight, faFileLines, faTabletScreenButton } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ChangeEvent, useCallback } from "react";
+import { faAnglesLeft, faAnglesRight, faFileLines, faTabletScreenButton } from "@fortawesome/free-solid-svg-icons";
 
 interface PaginationProps extends VitalityProps {
    workouts: Workout[];
@@ -14,17 +14,13 @@ interface PaginationProps extends VitalityProps {
 
 export default function Pagination(props: PaginationProps): JSX.Element {
    const { workouts, globalState, globalDispatch } = props;
-
-   // Total workout pages and index
+   // Total workout pages and current page index
    const pages: number = Math.ceil(workouts.length / globalState.paging.value);
    const page: number = globalState.page.value;
 
-   const pagination: number[] = Array.from(
-      { length: pages },
-      (_, index) => index + 1,
-   );
-   const low: number = Math.max(0, page === pages - 1 ? page - 2 : page - 1);
-   const high: number = Math.min(pages, page === 0 ? page + 3 : page + 2);
+   const pagination: number[] = Array.from({ length: pages }, (_, index) => index + 1);
+   const lowIndex: number = Math.max(0, page === pages - 1 ? page - 2 : page - 1);
+   const highIndex: number = Math.min(pages, page === 0 ? page + 3 : page + 2);
 
    const handlePageClick = useCallback(
       (page: number) => {
@@ -53,31 +49,29 @@ export default function Pagination(props: PaginationProps): JSX.Element {
       handlePageClick(Math.min(pages - 1, page + 1));
    };
 
-   const handleEntriesOnChange = useCallback(
-      (event: ChangeEvent<HTMLSelectElement>) => {
-         globalDispatch({
-            type: "updateStates",
-            value: {
-               paging: {
-                  ...globalState.paging,
-                  value: Number.parseInt(event.target.value)
-               },
-               page: {
-                  ...globalState.page,
-                  // When visible entries per page are changed, reset page index
-                  value: 0
-               }
+   const handleEntriesOnChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
+      globalDispatch({
+         type: "updateStates",
+         value: {
+            paging: {
+               ...globalState.paging,
+               value: Number.parseInt(event.target.value)
+            },
+            page: {
+               ...globalState.page,
+               // Reset to initial page index
+               value: 0
             }
-         });
+         }
+      });
 
-         document.getElementById("workoutsView")
-            ?.scrollIntoView({ behavior: "smooth", block: "start" });
-         window.localStorage.setItem("paging", event.target.value);
-      }, [
-         globalDispatch,
-         globalState.paging,
-         globalState.page
-      ]);
+      window.localStorage.setItem("paging", String(event.target.value));
+      document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "start" });
+   }, [
+      globalDispatch,
+      globalState.paging,
+      globalState.page
+   ]);
 
    return (
       workouts.length > 0 && (
@@ -97,7 +91,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   onClick = { handleLeftClick }
                />
                {
-                  low > 0 && (
+                  lowIndex > 0 && (
                      <div className = "hidden flex-row items-center justify-center xsm:flex">
                         <Button
                            tabIndex = { 0 }
@@ -112,7 +106,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   )
                }
                {
-                  pagination.slice(low, high).map((index) => {
+                  pagination.slice(lowIndex, highIndex).map((index) => {
                      const isSelected: boolean = index === page + 1;
 
                      return (
@@ -134,7 +128,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   })
                }
                {
-                  high < pages && (
+                  highIndex < pages && (
                      <div className = "hidden flex-row items-center justify-center xsm:flex">
                         <div key = "higher">...</div>
                         <Button

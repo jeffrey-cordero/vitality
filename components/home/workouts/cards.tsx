@@ -1,11 +1,12 @@
 import clsx from "clsx";
 import Image from "next/image";
-import { VitalityProps } from "@/lib/global/state";
-import { Workout } from "@/lib/home/workouts/workouts";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faImage } from "@fortawesome/free-solid-svg-icons";
-import { useMemo } from "react";
 import { Tag } from "@/lib/home/workouts/tags";
+import { VitalityProps } from "@/lib/global/state";
+import { useEffect, useMemo, useState } from "react";
+import { Workout } from "@/lib/home/workouts/workouts";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { faImage, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface CardProps extends CardsProps {
   workout: Workout;
@@ -13,6 +14,11 @@ interface CardProps extends CardsProps {
 
 function Card(props: CardProps): JSX.Element {
    const { workout, globalState, globalDispatch } = props;
+   const [isValidImage, setIsValidImage] = useState<boolean>(true);
+
+   useEffect(() => {
+      setIsValidImage(verifyImageURL(workout.image));
+   }, [workout.image]);
 
    const formattedDate = useMemo(() => {
       return workout.date.toISOString().slice(0, 10);
@@ -20,15 +26,16 @@ function Card(props: CardProps): JSX.Element {
 
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
-         // Fetch workout tag, which may be missing in up-to-date dictionary due to a removal
+
          const tag: Tag | undefined = globalState.tags.data.dictionary[tagId];
 
          return (
-            tag && (
+            // Workout tag may be undefined in global state dictionary due to a potential removal or error
+            tag !== undefined && (
                <div
                   className = {
                      clsx(
-                        "m-1 max-w-full truncate rounded-full px-4 py-2 text-[0.8rem] font-bold text-white md:text-[0.75rem]",
+                        "m-1 max-w-full truncate rounded-full px-4 py-[0.45rem] text-[0.8rem] font-bold text-white md:text-[0.73rem]",
                      )
                   }
                   style = {
@@ -68,11 +75,11 @@ function Card(props: CardProps): JSX.Element {
                });
             }
          }
-         className = "relative mx-0 flex h-[26rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-[1.03] md:h-96 md:w-72"
+         className = "relative mx-0 flex h-[27rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-[1.03] md:h-[23rem] md:w-72"
       >
          <div className = "relative mx-auto size-full">
             {
-               workout.image ? (
+               workout.image && isValidImage ? (
                   <Image
                      fill
                      priority
@@ -81,12 +88,19 @@ function Card(props: CardProps): JSX.Element {
                      src = { workout.image }
                      alt = "workout-image"
                      className = "object-cover object-center opacity-40"
+                     onLoad = { () => !isValidImage && setIsValidImage(true) }
+                     onErrorCapture = { () => isValidImage && setIsValidImage(false) }
                   />
                ) : (
                   <div className = "absolute flex size-full items-center justify-center bg-white opacity-40">
                      <FontAwesomeIcon
-                        className = "text-7xl text-primary"
-                        icon = { faImage }
+                        className = {
+                           clsx("text-7xl", {
+                              "text-primary" : isValidImage,
+                              "text-red-500" : !isValidImage
+                           })
+                        }
+                        icon = { !isValidImage ? faTriangleExclamation : faImage }
                      />
                   </div>
                )
@@ -99,7 +113,7 @@ function Card(props: CardProps): JSX.Element {
                <div
                   className = {
                      clsx(
-                        "scrollbar-hide flex max-h-56 w-full max-w-[25rem] flex-row flex-wrap items-center justify-center overflow-auto px-4 py-2 md:max-h-[13.5rem]",
+                        "scrollbar-hide flex max-h-[18.5rem] w-full max-w-[25rem] flex-row flex-wrap items-center justify-center overflow-auto px-4 py-2 md:max-h-[15.5rem]",
                         {
                            "cursor-all-scroll": workoutTags.length > 0
                         },

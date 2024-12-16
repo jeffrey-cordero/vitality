@@ -55,7 +55,7 @@ export default function Counter(): JSX.Element {
    return (
       <div className = "relative my-10 size-full">
          <motion.svg
-            className = "absolute inset-0 m-auto size-[75px] xl:size-[80px]"
+            className = "absolute inset-0 m-auto size-[70px] xxsm:size-[75px] xl:size-[80px]"
             viewBox = "0 0 100 100"
          >
             <motion.circle

@@ -25,7 +25,7 @@ function Testimonial(props: TestimonialProps): JSX.Element {
          <p className = "mx-auto mt-3 w-11/12 px-2 text-[0.9rem] font-medium xxsm:text-[0.95rem] sm:w-3/4 sm:text-base">
             { testimonial }
          </p>
-         <div>
+         <div className = "relative">
             <div className = "mx-auto flex w-full flex-col items-center justify-center gap-3 px-4 pt-4 sm:flex-row">
                <Image
                   priority
@@ -36,7 +36,7 @@ function Testimonial(props: TestimonialProps): JSX.Element {
                   src = { image }
                   alt = "Rounded avatar"
                />
-               <div>
+               <div className = "relative">
                   <p className = "text-[0.95rem] font-bold xxsm:text-base">
                      { name }
                   </p>

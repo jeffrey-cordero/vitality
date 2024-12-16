@@ -2,11 +2,11 @@ import Image from "next/image";
 import clsx from "clsx";
 import Button from "@/components/global/button";
 import Modal from "@/components/global/modal";
-import { Input, VitalityInputProps } from "@/components/global/input";
 import { useCallback, useMemo, useState } from "react";
-import { faCameraRetro, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Input, VitalityInputProps } from "@/components/global/input";
+import { faCameraRetro, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 const images = [
    "bike.png",
@@ -21,6 +21,9 @@ const images = [
    "weights.png"
 ];
 
+const nextMediaRegex =
+  /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
+
 interface ImagesFormProps extends VitalityInputProps {
    url: string;
    isValidResource: boolean;
@@ -29,7 +32,7 @@ interface ImagesFormProps extends VitalityInputProps {
 
 function ImagesForm(props: ImagesFormProps): JSX.Element {
    const { url, isValidURL, isValidResource, input, dispatch } = props;
-   const [isDefaultImage, setIsDefaultImage] = useState<boolean>(true);
+   const [isDefaultImage, setIsDefaultImage] = useState<boolean>(url === "" || nextMediaRegex.test(url));
 
    const handleImageURLUpdates = useCallback(() => {
       dispatch({
@@ -54,7 +57,6 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
 
    const handleDefaultImageSelection = useCallback(
       (source: string) => {
-         // All default images are valid image URL's
          dispatch({
             type: "updateState",
             value: {
@@ -82,7 +84,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
             id: "image",
             input: {
                ...input,
-               error: "Failed to fetch your desired image resource. Please ensure the link is valid.",
+               error: "Failed to fetch your desired image resource.",
                data: {
                   ...input.data,
                   valid: false
@@ -95,7 +97,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
       input
    ]);
 
-   const handleImageURLReset = useCallback(() => {
+   const handleResetImageURL = useCallback(() => {
       dispatch({
          type: "updateState",
          value: {
@@ -115,6 +117,28 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
       input
    ]);
 
+   const handleImageURLChanges = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+      // Ensure any changes to URL are verified on a new submission
+      dispatch({
+         type: "updateState",
+         value: {
+            id: "image",
+            input: {
+               ...input,
+               value: event.target.value,
+               error: null,
+               data: {
+                  ...input.data,
+                  valid: undefined
+               }
+            }
+         }
+      });
+   }, [
+      input,
+      dispatch
+   ]);
+
    return (
       <div className = "flex flex-col py-2">
          <div className = "mb-4 mt-2 flex flex-wrap items-center justify-center gap-3 text-center text-base">
@@ -128,8 +152,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                }
                className = {
                   clsx("transition duration-300 ease-in-out focus:text-primary focus:ring-transparent", {
-                     "scale-105 border-b-4 border-b-primary rounded-none":
-                     isDefaultImage
+                     "scale-105 border-b-4 border-b-primary rounded-none": isDefaultImage
                   })
                }
             >
@@ -145,8 +168,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                }
                className = {
                   clsx("transition duration-300 ease-in-out focus:text-primary focus:ring-transparent", {
-                     "scale-105 border-b-4 border-b-primary rounded-none":
-                     !isDefaultImage
+                     "scale-105 border-b-4 border-b-primary rounded-none": !isDefaultImage
                   })
                }
             >
@@ -189,11 +211,11 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  onKeyDown = {
                                     (event) => {
                                        if (event.key === "Enter" || event.key === " ") {
-                                          !isSelected ? handleDefaultImageSelection(source) : handleImageURLReset();
+                                          !isSelected ? handleDefaultImageSelection(source) : handleResetImageURL();
                                        }
                                     }
                                  }
-                                 onClick = { () => !isSelected ? handleDefaultImageSelection(source) : handleImageURLReset() }
+                                 onClick = { () => !isSelected ? handleDefaultImageSelection(source) : handleResetImageURL() }
                               />
                            </div>
                         );
@@ -235,35 +257,16 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                   }
                   <Input
                      { ...props }
-                     onChange = {
-                        (event: React.ChangeEvent<HTMLInputElement>) => {
-                           // Ensure any changes to URL are verified on a new submission
-                           dispatch({
-                              type: "updateState",
-                              value: {
-                                 id: "image",
-                                 input: {
-                                    ...input,
-                                    value: event.target.value,
-                                    error: null,
-                                    data: {
-                                       ...input.data,
-                                       valid: undefined
-                                    }
-                                 }
-                              }
-                           });
-                        }
-                     }
+                     onChange = { handleImageURLChanges }
                   />
                   {
                      url.length > 0 && (
-                        <div>
+                        <div className = "relative">
                            {
                               input.data.valid && (
                                  <Button
                                     type = "button"
-                                    onClick = { handleImageURLReset }
+                                    onClick = { handleResetImageURL }
                                     className = "mt-2 h-[2.4rem] w-full bg-red-500 px-4 py-2 font-semibold text-white focus:ring-red-700"
                                     icon = { faTrashCan }
                                  >
@@ -271,19 +274,22 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  </Button>
                               )
                            }
+                           {
+                              input.data.valid !== true && (
+                                 <Button
+                                    type = "button"
+                                    onClick = { handleImageURLUpdates }
+                                    className = "mt-2 h-[2.4rem] w-full bg-primary font-semibold text-white placeholder:text-transparent"
+                                    icon = { faPaperclip }
+                                 >
+                                    Add
+                                 </Button>
+                              )
+                           }
 
-                           <Button
-                              type = "button"
-                              onClick = { handleImageURLUpdates }
-                              className = "mt-2 h-[2.4rem] w-full bg-primary font-semibold text-white placeholder:text-transparent"
-                              icon = { faPaperclip }
-                           >
-                              Add
-                           </Button>
                         </div>
                      )
                   }
-
                </div>
             )
          }
@@ -295,21 +301,20 @@ export default function Images(props: VitalityInputProps): JSX.Element {
    const { input } = props;
    const url: string = input.value.trim();
    const isValidResource: boolean = useMemo(() => {
-      return input.data.valid !== false && url.length !== 0;
+      return input.data.valid === true && url.length !== 0;
    }, [
-      input.data.valid,
-      url
+      url,
+      input.data.valid
    ]);
    const isValidURL: boolean = useMemo(() => {
       return verifyImageURL(url);
    }, [url]);
-   const addedImage: boolean = isValidResource && isValidURL;
 
    return (
-      <div>
+      <div className = "relative">
          <Modal
             display = {
-               <div>
+               <div className = "relative">
                   <Button
                      className = {
                         clsx(
@@ -321,16 +326,15 @@ export default function Images(props: VitalityInputProps): JSX.Element {
                      }
                   >
                      <FontAwesomeIcon
-                        icon = { addedImage ? faPenToSquare : faPaperclip }
+                        icon = { isValidURL ? faPenToSquare : faPaperclip }
                      />
-                     { addedImage ? "Edit Image" : "Add Image" }
+                     { isValidURL ? "Edit Image" : "Add Image" }
                   </Button>
                   {
                      input.error !== null && (
                         <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 text-center opacity-0">
                            <p className = "input-error font-bold text-red-500">
-                              { " " }
-                              { input.error }{ " " }
+                              { input.error }
                            </p>
                         </div>
                      )

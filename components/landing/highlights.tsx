@@ -15,7 +15,7 @@ function Card(props: CardProps): JSX.Element {
    return (
       <div className = "mx-2 flex h-[25rem] w-[29rem] max-w-full items-center justify-center rounded-2xl bg-white text-center shadow-md xsm:mx-0 md:w-80 dark:bg-slate-800">
          <div className = "mx-auto flex w-full flex-col items-center justify-center gap-4 px-4 text-center text-black">
-            <div>
+            <div className = "relative">
                <FontAwesomeIcon
                   icon = { icon }
                   className = "text-[2.9rem] text-primary"
@@ -24,7 +24,7 @@ function Card(props: CardProps): JSX.Element {
                   { title }
                </h1>
             </div>
-            <div>
+            <div className = "relative">
                <p className = "px-1 text-sm font-medium text-gray-500 sm:text-base dark:text-gray-400">
                   { description }
                </p>

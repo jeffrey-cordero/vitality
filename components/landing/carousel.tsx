@@ -9,7 +9,7 @@ interface CarouselProps {
 
 export default function Carousel(props: CarouselProps): JSX.Element {
    const { columns, items } = props;
-   const [currentIndex, setCurrentIndex] = useState(Math.floor(items.length / 2));
+   const [currentIndex, setCurrentIndex] = useState<number>(Math.floor(items.length / 2));
    const columnWidth: number = columns * 100;
 
    const nextSlide = () => {
@@ -54,7 +54,7 @@ export default function Carousel(props: CarouselProps): JSX.Element {
                ))
             }
          </div>
-         <div>
+         <>
             <button
                type = "button"
                className = "group absolute start-0 top-0 z-10 flex h-full -translate-x-1/2 cursor-pointer items-center justify-center overflow-visible px-2 focus:outline-none"
@@ -103,7 +103,7 @@ export default function Carousel(props: CarouselProps): JSX.Element {
                   <span className = "sr-only">Next</span>
                </span>
             </button>
-         </div>
+         </>
       </div>
    );
 }

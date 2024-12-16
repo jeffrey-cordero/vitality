@@ -21,6 +21,7 @@ export type Workout = {
 const urlRegex = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg))$/i;
 const nextMediaRegex =
   /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
+const base64ImageRegex = /^data:image\/(jpeg|png|gif|bmp|webp);base64,[A-Za-z0-9+/=]+$/;
 
 const workoutsSchema = z.object({
    user_id: uuidSchema("user", "required"),
@@ -41,7 +42,7 @@ const workoutsSchema = z.object({
    description: z.string().optional().or(z.literal("")),
    image: z
       .string()
-      .refine((value) => urlRegex.test(value) || nextMediaRegex.test(value), {
+      .refine((value) => urlRegex.test(value) || nextMediaRegex.test(value) || base64ImageRegex.test(value), {
          message: "Image URL must be valid"
       }).or(z.literal("")),
    tags: z.array(z.string()).optional()

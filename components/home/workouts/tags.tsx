@@ -277,8 +277,7 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
                localState.tagColor.error !== null && (
                   <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 opacity-0">
                      <p className = "input-error font-bold text-red-500">
-                        { " " }
-                        { localState.tagColor.error }{ " " }
+                        { localState.tagColor.error }
                      </p>
                   </div>
                )
@@ -580,7 +579,7 @@ export default function Tags(props: TagsProps): JSX.Element {
    ]);
 
    return (
-      <div>
+      <div className = "relative">
          {
             fetched ? (
                <div className = "mx-auto flex w-full flex-col flex-wrap items-center justify-center">

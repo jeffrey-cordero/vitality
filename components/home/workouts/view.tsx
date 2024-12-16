@@ -3,14 +3,14 @@ import clsx from "clsx";
 import Table from "@/components/home/workouts/table";
 import Cards from "@/components/home/workouts/cards";
 import Loading from "@/components/global/loading";
+import { Dispatch, useCallback } from "react";
 import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { faMagnifyingGlass, faPhotoFilm, faTable } from "@fortawesome/free-solid-svg-icons";
-import { Dispatch } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass, faPhotoFilm, faTable } from "@fortawesome/free-solid-svg-icons";
 
 interface ViewProps extends VitalityProps {
-  view: "table" | "cards" | "";
+  view: "table" | "cards";
   setView: Dispatch<"table" | "cards">;
   workouts: Workout[];
 }
@@ -19,17 +19,17 @@ export default function View(props: ViewProps): JSX.Element {
    const { view, setView, workouts, globalState, globalDispatch } = props;
    const fetched: boolean = globalState.workouts.data.fetched;
 
+   const toggleView = useCallback((view: "table" | "cards") => {
+      setView(view);
+      window.localStorage.setItem("view", view);
+   }, [setView]);
+
    return (
       <div className = "relative mx-auto flex w-full flex-col items-center justify-center">
          <div className = "flex items-center justify-start gap-4 text-left">
             <Button
                icon = { faTable }
-               onClick = {
-                  () => {
-                     setView("table");
-                     window.localStorage.setItem("view", "table");
-                  }
-               }
+               onClick = { () => toggleView("table") }
                className = {
                   clsx("text-base transition duration-300 ease-in-out focus:text-primary focus:ring-transparent xxsm:text-lg", {
                      "scale-105 border-b-4 border-primary rounded-none text-primary": view === "table"
@@ -40,12 +40,7 @@ export default function View(props: ViewProps): JSX.Element {
             </Button>
             <Button
                icon = { faPhotoFilm }
-               onClick = {
-                  () => {
-                     setView("cards");
-                     window.localStorage.setItem("view", "cards");
-                  }
-               }
+               onClick = { () => toggleView("cards") }
                className = {
                   clsx("text-base transition duration-300 ease-in-out focus:text-primary focus:ring-transparent xxsm:text-lg", {
                      "scale-105 border-b-4 border-b-primary rounded-none text-primary": view === "cards"

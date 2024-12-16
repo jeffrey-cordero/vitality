@@ -10,6 +10,7 @@ import { formReducer, VitalityState } from "@/lib/global/state";
 import { fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 
+const pagingValues = new Set<number>([5, 10, 25, 50, 100, 500, 1000]);
 const workouts: VitalityState = {
    search: {
       value: "",
@@ -121,11 +122,27 @@ export default function Page(): JSX.Element {
    ]);
 
    const fetchWorkoutsData = useCallback(async() => {
-      // Fetch user workouts and workout tags for global state from database and localStorage
+      // Fetch user workouts and workout tags for global state
       const [workoutsData, tagsData] = await Promise.all([
          fetchWorkouts(user.id),
          fetchWorkoutTags(user.id)
       ]);
+
+      // Ensure paging and page localStorage values align with pagination setup
+      let paging: number = Number.parseInt(window.localStorage.getItem("paging") ?? "10");
+
+      if (!(pagingValues.has(paging))) {
+         paging = 10;
+         window.localStorage.setItem("paging", String(paging));
+      }
+
+      const pages: number = Math.ceil(workoutsData.length / paging);
+      let page: number = Number.parseInt(window.localStorage.getItem("page") ?? "0");
+
+      if (page >= pages) {
+         page = Math.min(0, pages - 1);
+         window.localStorage.setItem("page", String(page));
+      }
 
       globalDispatch({
          type: "initializeState",
@@ -163,15 +180,11 @@ export default function Page(): JSX.Element {
             },
             paging: {
                ...globalState.paging,
-               value: Number.parseInt(
-                  window.localStorage.getItem("paging") ?? "10"
-               )
+               value: paging
             },
             page: {
                ...globalState.page,
-               value: Number.parseInt(
-                  window.localStorage.getItem("page") ?? "0"
-               )
+               value: page
             }
          }
       });

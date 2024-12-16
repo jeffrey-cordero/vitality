@@ -73,7 +73,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
                         />
                      </div>
                      <div className = "flex w-full items-center justify-between px-4 pb-3 pt-[16px]">
-                        <div>
+                        <div className = "relative">
                            <div className = "my-2 flex flex-col gap-2 whitespace-pre-wrap break-words pl-1 pr-6 text-[0.95rem] font-bold xsm:text-base">
                               <p>{ message }</p>
                               { children }

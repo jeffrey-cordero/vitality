@@ -1,21 +1,21 @@
+import Modal from "@/components/global/modal";
 import Button from "@/components/global/button";
+import Tags from "@/components/home/workouts/tags";
 import TextArea from "@/components/global/textarea";
 import Images from "@/components/home/workouts/images";
 import Exercises from "@/components/home/workouts/exercises";
 import Confirmation from "@/components/global/confirmation";
-import Modal from "@/components/global/modal";
-import Tags from "@/components/home/workouts/tags";
 import { Input } from "@/components/global/input";
+import { Tag } from "@/lib/home/workouts/tags";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { filterWorkout } from "@/components/home/workouts/filtering";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { addWorkout, deleteWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
-import { Tag } from "@/lib/home/workouts/tags";
-import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faSignature, faCalendar, faBook, faLink, faPenToSquare, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { filterWorkout } from "@/components/home/workouts/filtering";
-import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { addWorkout, deleteWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
+import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faSignature, faCalendar, faBook, faLink, faPenToSquare, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const form: VitalityState = {
    title: {
@@ -48,84 +48,46 @@ export default function Form(props: VitalityProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const [localState, localDispatch] = useReducer(formReducer, form);
-   const [displayingFormModal, setDisplayingFormModal] = useState(false);
+   const [displayingFormModal, setDisplayingFormModal] = useState<boolean>(false);
    const displayFormModal: boolean = globalState.workout.data.display;
    const formModalRef = useRef<{ open: () => void; close: () => void }>(null);
 
-   // Current editing workout
+   // Fetching editing workout from global state
    const workout: Workout = globalState.workout.value;
-
-   // Empty workout ID implies new workout construction
    const isNewWorkout: boolean = workout.id?.trim().length === 0;
 
-   const defaultDate: string = useMemo(() => {
+   const defaultFormDate: string = useMemo(() => {
       return new Date().toISOString().split("T")[0];
    }, []);
 
-   const updateWorkouts = (
-      currentWorkouts: Workout[],
-      returnedWorkout: Workout,
-      method: "add" | "update" | "delete",
-   ) => {
-      let requiresSorting: boolean = method === "add";
-      let newWorkouts: Workout[] = [];
-
-      switch (method) {
-         case "update":
-            newWorkouts = [...currentWorkouts].map((workout) => {
-               if (workout.id === returnedWorkout.id) {
-                  requiresSorting = workout.date.getTime() !== returnedWorkout.date.getTime();
-                  return returnedWorkout;
-               }
-
-               return workout;
-            });
-            break;
-         case "delete":
-            newWorkouts = [...currentWorkouts].filter(
-               (workout) => workout.id !== returnedWorkout.id,
-            );
-            break;
-         default:
-            newWorkouts = [...currentWorkouts, returnedWorkout];
-            break;
-      }
-
-      if (requiresSorting) {
-         return newWorkouts.sort((a, b) => b.date.getTime() - a.date.getTime());
+   const updateWorkouts = (workouts: Workout[], newWorkout: Workout, method: "add" | "update" | "delete") => {
+      if (method === "delete") {
+         // Simple removal
+         return [...workouts].filter(
+            (workout) => workout.id !== newWorkout.id,
+         );
+      } else if (method === "update" && workout.date.getTime() === newWorkout.date.getTime()) {
+         // Simple update in current editing workout without affecting overall workout ordering
+         return [...workouts].map(
+            (workout) => workout.id === newWorkout.id ? newWorkout : workout
+         );
       } else {
-         return newWorkouts;
-      }
-   };
+         // Update or addition requiring changes in workouts ordering
+         const newWorkouts: Workout[] = method === "add" ? [...workouts] : [...workouts].filter(
+            (workout) => workout.id !== newWorkout.id
+         );
 
-   const updateFilteredWorkouts = (
-      globalState: VitalityState,
-      currentFiltered: Workout[],
-      returnedWorkout: Workout,
-      method: "add" | "update" | "delete",
-      selectedTags: Set<string>,
-   ) => {
-      let requiresSorting: boolean = method === "add";
+         for (let i = 0; i < newWorkouts.length; i++) {
+            const workout: Workout = newWorkouts[i];
 
-      const newFiltered: Workout[] = [...currentFiltered].map((workout) => {
-         if (workout.id === returnedWorkout.id) {
-            requiresSorting = workout.date.getTime() !== returnedWorkout.date.getTime();
-            return returnedWorkout;
+            if (workout.date.getTime() <= newWorkout.date.getTime()) {
+               newWorkouts.splice(i, 0, newWorkout);
+               return newWorkouts;
+            }
          }
 
-         return workout;
-      });
-
-      if (method === "add") {
-         newFiltered.push(returnedWorkout);
-      }
-
-      if (method === "delete" || !filterWorkout(globalState, returnedWorkout, selectedTags, "update")) {
-         return newFiltered.filter((workout) => workout.id !== returnedWorkout.id);
-      } else if (requiresSorting) {
-         return newFiltered.sort((a, b) => b.date.getTime() - a.date.getTime());
-      } else {
-         return newFiltered;
+         newWorkouts.push(newWorkout);
+         return newWorkouts;
       }
    };
 
@@ -140,44 +102,36 @@ export default function Form(props: VitalityProps): JSX.Element {
          image: localState.image.value,
          description: localState.description.value.trim(),
          tagIds: selected
-            .map((tag: Tag) => tag?.id)
-            .filter((id: string) => dictionary[id] !== undefined),
+            .map(
+               (tag: Tag) => tag?.id
+            )
+            .filter(
+               (id: string) => dictionary[id] !== undefined
+            ),
          exercises: workout.exercises ?? []
       };
 
-      const response: VitalityResponse<Workout | number> = isNewWorkout
-         ? await addWorkout(payload) : method === "update"
-            ? await updateWorkout(payload)
-            : await deleteWorkouts([payload], user.id);
+      const response: VitalityResponse<Workout | number> = isNewWorkout ? await addWorkout(payload) :
+         method === "update" ? await updateWorkout(payload) : await deleteWorkouts([payload], user.id);
 
       handleResponse(response, localDispatch, updateNotification, () => {
-         const returnedWorkout: Workout | null =
-            method === "delete" ? payload : (response.body.data as Workout);
+         const newWorkout: Workout | null = method === "delete" ? payload : (response.body.data as Workout);
 
          // Fetch selected filtered tags to apply tag filtering
-         const filteredTags: Set<string> = new Set(
-            globalState.tags.data.filtered.map((tag: Tag) => tag.id),
+         const filteredTagIds: Set<string> = new Set(
+            globalState.tags.data.filtered.map(
+               (tag: Tag) => tag.id
+            )
          );
 
-         const newWorkouts: Workout[] = updateWorkouts(
-            globalState.workouts.value,
-            returnedWorkout,
-            method,
+         const newWorkouts: Workout[] = updateWorkouts(globalState.workouts.value, newWorkout, method);
+
+         const newFiltered: Workout[] = [...newWorkouts].filter(
+            (workout) => filterWorkout(globalState, workout, filteredTagIds, "update")
          );
 
-         const newFiltered: Workout[] = updateFilteredWorkouts(
-            globalState,
-            globalState.workouts.data.filtered,
-            returnedWorkout,
-            method,
-            filteredTags,
-         );
-
-         // Account for current page in workouts view being removed
-         const pages: number = Math.ceil(
-            newWorkouts.length / globalState.paging.value,
-         );
-
+         // Account for current visible workouts page being discarded
+         const pages: number = Math.ceil(newWorkouts.length / globalState.paging.value);
          const page: number = globalState.page.value;
 
          // Update editing workout and overall workouts global state
@@ -186,7 +140,7 @@ export default function Form(props: VitalityProps): JSX.Element {
             value: {
                workout: {
                   ...globalState.workout,
-                  value: returnedWorkout,
+                  value: newWorkout,
                   data: {
                      ...globalState.workout.data,
                      display: method === "delete" ? false : true
@@ -225,8 +179,8 @@ export default function Form(props: VitalityProps): JSX.Element {
       });
    };
 
-   const handleInitializeWorkoutState = useCallback(() => {
-      // Update input states based on existing or new workout
+   const handleDisplayWorkoutForm = useCallback(() => {
+      // Update workout tag selection form inputs
       globalDispatch({
          type: "initializeState",
          value: {
@@ -248,6 +202,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          }
       });
 
+      // Update workout property inputs
       localDispatch({
          type: "initializeState",
          value: {
@@ -259,9 +214,7 @@ export default function Form(props: VitalityProps): JSX.Element {
             date: {
                ...localState.date,
                error: null,
-               value: isNewWorkout
-                  ? defaultDate
-                  : workout.date.toISOString().split("T")[0]
+               value: isNewWorkout ? defaultFormDate : workout.date.toISOString().split("T")[0]
             },
             image: {
                ...localState.image,
@@ -269,11 +222,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                error: null,
                data: {
                   ...localState.image.data,
-                  valid: verifyImageURL(workout.image)
-                     ? true
-                     : workout.image !== ""
-                        ? false
-                        : undefined,
+                  valid: verifyImageURL(workout.image) ? true : workout.image !== "" ? false : undefined,
                   error: false
                }
             },
@@ -285,7 +234,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          }
       });
    }, [
-      defaultDate,
+      defaultFormDate,
       globalDispatch,
       globalState.tagSearch,
       globalState.tags,
@@ -301,8 +250,8 @@ export default function Form(props: VitalityProps): JSX.Element {
       workout.title
    ]);
 
-   const handleFormModalClose = useCallback(() => {
-      // Cleanup workout form inputs for future new workout submissions
+   const handleCloseWorkoutForm = useCallback(() => {
+      // Cleanup form inputs for future submissions
       globalDispatch({
          type: "updateState",
          value: {
@@ -332,14 +281,8 @@ export default function Form(props: VitalityProps): JSX.Element {
       user
    ]);
 
-   const handleReset = useCallback(() => {
-      // Reset basic form inputs
-      localDispatch({
-         type: "resetState",
-         value: {}
-      });
-
-      // Reset current selected tags
+   const handleResetWorkoutForm = useCallback(() => {
+      // Reset tag selection and workout property inputs
       globalDispatch({
          type: "updateState",
          value: {
@@ -353,6 +296,11 @@ export default function Form(props: VitalityProps): JSX.Element {
             }
          }
       });
+
+      localDispatch({
+         type: "resetState",
+         value: {}
+      });
    }, [
       globalDispatch,
       localDispatch,
@@ -362,13 +310,13 @@ export default function Form(props: VitalityProps): JSX.Element {
    useEffect(() => {
       if (displayFormModal && !displayingFormModal) {
          setDisplayingFormModal(true);
-         handleInitializeWorkoutState();
+         handleDisplayWorkoutForm();
          formModalRef.current?.open();
       }
    }, [
       displayFormModal,
       displayingFormModal,
-      handleInitializeWorkoutState
+      handleDisplayWorkoutForm
    ]);
 
    return (
@@ -377,14 +325,14 @@ export default function Form(props: VitalityProps): JSX.Element {
             display = { null }
             className = "max-w-3xl"
             ref = { formModalRef }
-            onClose = { handleFormModalClose }
-            onClick = { handleInitializeWorkoutState }
+            onClose = { handleCloseWorkoutForm }
+            onClick = { handleDisplayWorkoutForm }
          >
             <div className = "relative">
                <div className = "flex flex-col items-center justify-center gap-2 text-center">
                   <FontAwesomeIcon
                      icon = { faPersonRunning }
-                     className = "mt-6 text-5xl text-primary sm:text-6xl"
+                     className = "mt-6 text-[3.5rem] text-primary sm:text-6xl"
                   />
                   <h1 className = "mb-2 text-2xl font-bold sm:text-3xl">
                      { isNewWorkout ? "New" : "Edit" } Workout
@@ -393,7 +341,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                <div className = "relative mt-8 flex w-full flex-col items-stretch justify-center gap-2 text-left">
                   <FontAwesomeIcon
                      icon = { faArrowRotateLeft }
-                     onClick = { handleReset }
+                     onClick = { handleResetWorkoutForm }
                      className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                   />
                   <Input
