@@ -1,6 +1,8 @@
+/** @type {import('tailwindcss').Config} */
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+   darkMode: "selector",
    content: [
       "./components/**/*.{js,ts,jsx,tsx,mdx}",
       "./app/**/*.{js,ts,jsx,tsx,mdx}"
@@ -8,7 +10,11 @@ const config: Config = {
    theme: {
       extend: {
          colors: {
-            primary: "#2563EB"
+            primary: "#007FFF"
+         },
+         screens: {
+            xsm: "400px",
+            xxsm: "300px"
          },
          keyframes: {
             fadeIn: {
@@ -36,4 +42,5 @@ const config: Config = {
    },
    plugins: [require("@tailwindcss/forms")]
 };
+
 export default config;

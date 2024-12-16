@@ -1,8 +1,8 @@
 import clsx from "clsx";
-import testimonialData from "@/lib/landing/testimonials";
 import Image from "next/image";
+import testimonials from "@/lib/landing/testimonials";
 import Heading from "@/components/global/heading";
-import Carousel from "@/components/global/carousel";
+import Carousel from "@/components/landing/carousel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuoteLeft, faStar } from "@fortawesome/free-solid-svg-icons";
 
@@ -13,45 +13,49 @@ interface TestimonialProps {
   image: string;
 }
 
-const people: TestimonialProps[] = testimonialData;
-
 function Testimonial(props: TestimonialProps): JSX.Element {
    const { testimonial, name, stars, image } = props;
 
    return (
-      <div className = "flex flex-col box-border gap-1 justify-center align-center w-full min-h-[25rem] max-h-full mx-auto">
+      <div className = "relative mx-auto box-border flex max-h-full min-h-[22rem] w-full flex-col justify-center gap-1 py-2 sm:py-0 md:min-h-80">
          <FontAwesomeIcon
-            icon = {faQuoteLeft}
-            className = "text-4xl text-primary"
+            icon = { faQuoteLeft }
+            className = "text-[1.6rem] text-primary sm:text-3xl"
          />
-         <p className = "font-semibold text-md w-3/4 mx-auto my-4">
-            {testimonial}
+         <p className = "mx-auto mt-3 w-11/12 px-2 text-[0.9rem] font-medium xxsm:text-[0.95rem] sm:w-3/4 sm:text-base">
+            { testimonial }
          </p>
-         <div>
-            <div className = "flex flex-row flex-wrap gap-3 justify-center items-center w-full mx-auto p-5">
+         <div className = "relative">
+            <div className = "mx-auto flex w-full flex-col items-center justify-center gap-3 px-4 pt-4 sm:flex-row">
                <Image
                   priority
-                  width = {200}
-                  height = {200}
-                  quality = {100}
-                  className = "rounded-full w-[4.5rem] h-[4.5rem] object-cover object-center shadow-inner"
-                  src = {image}
+                  width = { 200 }
+                  height = { 200 }
+                  quality = { 100 }
+                  className = "size-[4.5rem] rounded-full object-cover object-center shadow-inner"
+                  src = { image }
                   alt = "Rounded avatar"
                />
-               <div>
-                  <p className = "font-semibold text-md">{name}</p>
-                  {stars.map((rating, index) => {
-                     return (
-                        <FontAwesomeIcon
-                           key = {index}
-                           icon = {faStar}
-                           className = {clsx("text-lg my-2", {
-                              "text-yellow-500": rating,
-                              "text-slate-500": !rating
-                           })}
-                        />
-                     );
-                  })}
+               <div className = "relative">
+                  <p className = "text-[0.95rem] font-bold xxsm:text-base">
+                     { name }
+                  </p>
+                  {
+                     stars.map((rating, index) => {
+                        return (
+                           <FontAwesomeIcon
+                              key = { index }
+                              icon = { faStar }
+                              className = {
+                                 clsx("my-2 text-sm", {
+                                    "text-yellow-500": rating,
+                                    "text-slate-500": !rating
+                                 })
+                              }
+                           />
+                        );
+                     })
+                  }
                </div>
             </div>
          </div>
@@ -60,25 +64,25 @@ function Testimonial(props: TestimonialProps): JSX.Element {
 }
 
 export default function Testimonials(): JSX.Element {
-   const testimonialElements: JSX.Element[] = people.map((person, index) => {
+   const elements: JSX.Element[] = testimonials.map((person, index) => {
       return (
          <Testimonial
-            {...person}
-            key = {index}
+            { ...person }
+            key = { index }
          />
       );
    });
 
    return (
-      <div className = "w-full mx-auto mt-4 mb-12">
+      <div className = "mx-auto w-full">
          <Heading
             title = "Testimonials"
-            description = "Discover the firsthand experiences of our valued users as they share insights into their fitness journey with our app"
+            description = "Explore firsthand stories from our users, sharing their fitness journeys with our app"
          />
-         <div className = "w-10/12 md:w-8/12 mx-auto">
+         <div className = "mx-auto my-8 w-10/12 lg:w-7/12">
             <Carousel
-               items = {testimonialElements}
-               columns = {1}
+               items = { elements }
+               columns = { 1 }
             />
          </div>
       </div>

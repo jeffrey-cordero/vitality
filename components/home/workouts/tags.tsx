@@ -1,29 +1,16 @@
 import clsx from "clsx";
 import Button from "@/components/global/button";
-import Input from "@/components/global/input";
 import Loading from "@/components/global/loading";
-import Conformation from "@/components/global/confirmation";
-import {
-   faGear,
-   faXmark,
-   faCloudArrowUp,
-   faTag,
-   faArrowRotateLeft,
-   faGears,
-   faTags
-} from "@fortawesome/free-solid-svg-icons";
+import Confirmation from "@/components/global/confirmation";
+import Modal from "@/components/global/modal";
+import { Input } from "@/components/global/input";
+import { faGear, faXmark, faCloudArrowUp, faTag, faArrowRotateLeft, faGears, faTags } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { addWorkoutTag, updateWorkoutTag, Tag } from "@/lib/home/workouts/tags";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
-import {
-   VitalityChildProps,
-   VitalityProps,
-   VitalityState,
-   formReducer
-} from "@/lib/global/state";
+import { VitalityChildProps, VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { Modal } from "@/components/global/modal";
 
 const form: VitalityState = {
    tagTitle: {
@@ -46,7 +33,7 @@ const form: VitalityState = {
 
 // Default tag colors
 const colors = {
-   "Light gray": "rgb(55, 55, 55)",
+   "Dark gray": "rgb(55, 55, 55)",
    "Gray": "rgb(90, 90, 90)",
    "Brown": "rgb(96, 59, 44)",
    "Orange": "rgb(133, 76, 29)",
@@ -70,23 +57,23 @@ function CreateTagContainer(props: CreateTagContainerProps) {
    const search: string = localState.tagSearch.value;
 
    return (
+
       <div
-         tabIndex = {0}
-         className = {clsx(
-            "cursor-pointer text-sm font-bold focus:scale-[1.05] hover:scale-[1.05] transition duration-300 ease-in-out rounded-full mb-2 mt-4 focus:outline-blue-500",
-         )}
-         onClick = {onSubmit}
-         onKeyDown = {(event: React.KeyboardEvent) => {
-            if (event.key === "Enter") {
-               onSubmit();
+         tabIndex = { 0 }
+         className = "mx-auto mb-2 mt-4 flex max-w-full cursor-pointer flex-row flex-wrap items-center justify-center gap-x-2 rounded-full px-5 py-[0.6rem] text-sm font-bold text-white transition duration-300 ease-in-out hover:scale-[1.03] focus:scale-[1.03] focus:outline-blue-500"
+         style = { { backgroundColor: randomColor } }
+         onClick = { onSubmit }
+         onKeyDown = {
+            (event: React.KeyboardEvent) => {
+               if (event.key === "Enter") {
+                  onSubmit();
+               }
             }
-         }}>
-         <div
-            className = "relative flex justify-center items-center gap-2 px-4 py-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-white"
-            style = {{ backgroundColor: randomColor }}>
-            <FontAwesomeIcon icon = {faTags} />
-            {search}
-         </div>
+         }
+      >
+         <p className = "mx-auto line-clamp-1 max-w-full cursor-pointer text-ellipsis break-all text-center">{ search }</p>
+         <FontAwesomeIcon icon = { faTags } />
+
       </div>
    );
 }
@@ -117,30 +104,31 @@ function TagColorInput(props: VitalityChildProps) {
       ]);
 
    return (
-      <div className = "relative w-full mx-auto">
-         {names.map((name: string) => {
-            const color = colors[name];
+      <div className = "relative mx-auto flex w-full flex-col gap-1">
+         {
+            names.map((name: string) => {
+               const color = colors[name];
 
-            return (
-               <div
-                  style = {{ backgroundColor: color }}
-                  className = {clsx(
-                     "flex justify-center items-center text-sm cursor-pointer w-full h-[2.6rem] border-[2px] rounded-sm p-3 text-white text-center",
-                     {
-                        "border-primary border-[4px] shadow-2xl":
-                           localState.tagColor.value === color,
-                        "border-white": localState.tagColor.value !== color
-                     },
-                  )}
-                  onClick = {(event) => {
-                     event.stopPropagation();
-                     handleColorChange(color);
-                  }}
-                  key = {name}>
-                  {name}
-               </div>
-            );
-         })}
+               return (
+                  <Button
+                     style = { { backgroundColor: color } }
+                     className = {
+                        clsx(
+                           "flex h-[2.7rem] w-full cursor-pointer items-center justify-center rounded-lg border-2 p-1 text-center text-sm text-white focus:border-0",
+                           {
+                              "border-primary border-[3px] shadow-2xl": localState.tagColor.value === color,
+                              "border-white dark:border-slate-800": localState.tagColor.value !== color
+                           },
+                        )
+                     }
+                     onClick = { () => handleColorChange(color) }
+                     key = { name }
+                  >
+                     { name }
+                  </Button>
+               );
+            })
+         }
       </div>
    );
 }
@@ -174,64 +162,63 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
             method,
          );
 
-         const successMethod = () => {
-            const { options, selected } = globalState.tags.data;
-            const returnedTag: Tag = response.body.data as Tag;
-
-            const mapOrFilter =
-               method === "update"
-                  ? (tag: Tag) =>
-                     tag && tag.id === returnedTag.id ? returnedTag : tag
-                  : (tag: Tag) => tag !== undefined && tag.id !== returnedTag.id;
-
-            const newTags: Tag[] =
-               method === "update"
-                  ? [...options.map(mapOrFilter)]
-                  : [...options.filter(mapOrFilter)];
-            const newSelected: Tag[] =
-               method === "update"
-                  ? [...selected.map(mapOrFilter)]
-                  : [...selected.filter(mapOrFilter)];
-
-            // Holds valid existing workout tags to account for removals in other tag view containers
-            const newDictionary: Record<string, Tag> = Object.fromEntries(
-               newTags.map((tag) => [tag.id, tag]),
-            );
-
-            if (method === "update") {
-               newDictionary[returnedTag.id] = returnedTag;
-            } else {
-               delete newDictionary[returnedTag.id];
-            }
-
-            globalDispatch({
-               type: "updateState",
-               value: {
-                  id: "tags",
-                  input: {
-                     ...globalState.tags,
-                     data: {
-                        ...globalState.tags.data,
-                        options: newTags,
-                        selected: newSelected,
-                        dictionary: newDictionary
-                     }
-                  }
-               }
-            });
-
-            // Close the modal form element and scroll into editing tag element
-            onSave();
-         };
-
          if (response.status !== "Error") {
             // Handle success or failure responses
-            handleResponse(
-               localDispatch,
-               response,
-               successMethod,
-               updateNotification,
-            );
+            handleResponse(response, localDispatch, updateNotification, () => {
+               const { options, selected } = globalState.tags.data;
+               const returnedTag: Tag = response.body.data as Tag;
+
+               const mapOrFilter =
+                  method === "update"
+                     ? (tag: Tag) =>
+                        tag && tag.id === returnedTag.id ? returnedTag : tag
+                     : (tag: Tag) => tag !== undefined && tag.id !== returnedTag.id;
+
+               const newTags: Tag[] =
+                  method === "update"
+                     ? [...options.map(mapOrFilter)]
+                     : [...options.filter(mapOrFilter)];
+               const newSelected: Tag[] =
+                  method === "update"
+                     ? [...selected.map(mapOrFilter)]
+                     : [...selected.filter(mapOrFilter)];
+
+               // Holds valid existing workout tags to account for removals in other tag view containers
+               const newDictionary: Record<string, Tag> = Object.fromEntries(
+                  newTags.map((tag) => [tag.id, tag]),
+               );
+
+               if (method === "update") {
+                  newDictionary[returnedTag.id] = returnedTag;
+               } else {
+                  delete newDictionary[returnedTag.id];
+               }
+
+               globalDispatch({
+                  type: "updateState",
+                  value: {
+                     id: "tags",
+                     input: {
+                        ...globalState.tags,
+                        data: {
+                           ...globalState.tags.data,
+                           options: newTags,
+                           selected: newSelected,
+                           dictionary: newDictionary
+                        }
+                     }
+                  }
+               });
+
+               updateNotification({
+                  status: "Success",
+                  message: `${method === "delete" ? "Deleted" : "Updated"} workout tag`,
+                  timer: 1000
+               });
+
+               // Close the modal form element and scroll into editing tag element
+               onSave();
+            });
          } else {
             // Handle error response uniquely by mapping response identifiers to local state identifiers
             localDispatch({
@@ -263,13 +250,13 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
    );
 
    return (
-      <div className = "flex flex-col justify-center align-center text-center gap-3 text-black">
-         <div className = "flex flex-col justify-center align-center text-center gap-3">
+      <div className = "flex flex-col items-stretch justify-center gap-3 text-center text-black dark:text-white">
+         <div className = "flex flex-col items-center justify-center gap-3 text-center">
             <FontAwesomeIcon
-               icon = {faGear}
-               className = "text-4xl text-primary mt-6"
+               icon = { faGear }
+               className = "mt-6 text-5xl text-primary"
             />
-            <h1 className = "text-2xl font-bold text-black mb-2 px-2">
+            <h1 className = "mb-2 px-2 text-2xl font-bold">
                Edit Tag
             </h1>
          </div>
@@ -277,34 +264,36 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
             id = "tagTitle"
             type = "text"
             label = "Title"
-            icon = {faTag}
-            input = {localState.tagTitle}
-            dispatch = {localDispatch}
-            onSubmit = {() => handleTagUpdates("update")}
+            icon = { faTag }
+            input = { localState.tagTitle }
+            dispatch = { localDispatch }
+            onSubmit = { () => handleTagUpdates("update") }
             autoFocus
             required
          />
-         <div className = "flex flex-col justify-center items-center gap-1">
-            <TagColorInput {...props} />
-            {localState.tagColor.error !== null && (
-               <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                  <p className = "text-red-500 font-bold input-error">
-                     {" "}
-                     {localState.tagColor.error}{" "}
-                  </p>
-               </div>
-            )}
+         <div className = "flex flex-col items-center justify-center gap-1">
+            <TagColorInput { ...props } />
+            {
+               localState.tagColor.error !== null && (
+                  <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 opacity-0">
+                     <p className = "input-error font-bold text-red-500">
+                        { localState.tagColor.error }
+                     </p>
+                  </div>
+               )
+            }
          </div>
          <div className = "flex flex-col gap-2">
-            <Conformation
+            <Confirmation
                message = "Delete this tag?"
-               onConformation = {() => handleTagUpdates("delete")}
+               onConfirmation = { () => handleTagUpdates("delete") }
             />
             <Button
                type = "submit"
-               className = "bg-primary text-white w-full  h-[2.4rem]"
-               icon = {faCloudArrowUp}
-               onClick = {() => handleTagUpdates("update")}>
+               className = "h-[2.4rem] w-full bg-primary text-white"
+               icon = { faCloudArrowUp }
+               onClick = { () => handleTagUpdates("update") }
+            >
                Save
             </Button>
          </div>
@@ -386,51 +375,63 @@ function TagContainer(props: TagContainerProps): JSX.Element {
 
    return (
       <li
-         className = {clsx(
-            "relative px-4 py-2 m-2 rounded-full text-sm font-bold text-white",
-         )}
-         style = {{
-            backgroundColor: tag.color
-         }}
-         ref = {tagRef}
-         key = {tag.id}>
-         <div className = "max-w-full mx-auto flex flex-row justify-center items-center">
+         className = {
+            clsx(
+               "relative m-2 rounded-full px-5 py-2 text-[0.8rem] font-bold text-white",
+            )
+         }
+         style = {
+            {
+               backgroundColor: tag.color
+            }
+         }
+         ref = { tagRef }
+         key = { tag.id }
+      >
+         <div className = "mx-auto flex max-w-full flex-row flex-wrap items-center justify-center gap-x-2">
             <div
-               onClick = {(event) => {
-                  event.stopPropagation();
+               id = { tag.id }
+               onClick = {
+                  (event) => {
+                     event.stopPropagation();
 
-                  if (!selected) {
-                     handleTagSelect(true);
+                     if (!selected) {
+                        handleTagSelect(true);
+                     }
                   }
-               }}
-               className = "cursor-pointer max-w-full pr-3 mx-auto line-clamp-1 break-all text-center text-ellipsis">
-               {tag.title}
+               }
+               className = "mx-auto line-clamp-1 max-w-full cursor-pointer text-ellipsis break-all text-center"
+            >
+               { tag.title }
             </div>
-            <div className = "flex flex-row justify-center items-center gap-2 pr-2">
+            <div className = "flex flex-row items-center justify-center gap-1">
                {
                   <Modal
-                     ref = {editTagModalRef}
+                     ref = { editTagModalRef }
                      display = {
                         <FontAwesomeIcon
-                           icon = {faGears}
-                           onClick = {handleTagEdits}
-                           className = "cursor-pointer text-md pt-1"
+                           icon = { faGears }
+                           onClick = { handleTagEdits }
+                           className = "cursor-pointer pt-1 text-sm hover:text-primary"
                         />
                      }
-                     className = "max-w-[90%] sm:max-w-xl max-h-[90%] mt-12">
+                     className = "mt-12 max-h-[90%] max-w-[95%] sm:max-w-xl"
+                  >
                      <EditTagContainer
-                        {...props}
-                        onSave = {handleTagSave}
+                        { ...props }
+                        onSave = { handleTagSave }
                      />
                   </Modal>
                }
-               {selected && (
-                  <FontAwesomeIcon
-                     onMouseDown = {() => handleTagSelect(false)}
-                     icon = {faXmark}
-                     className = "cursor-pointer text-lg"
-                  />
-               )}
+               {
+                  selected && (
+                     <FontAwesomeIcon
+                        onMouseDown = { () => handleTagSelect(false) }
+                        icon = { faXmark }
+                        className = "cursor-pointer text-base hover:text-red-500"
+                     />
+                  )
+               }
             </div>
          </div>
       </li>
@@ -441,7 +442,7 @@ interface TagsProps extends VitalityProps {
    onReset?: () => void;
 }
 
-export function Tags(props: TagsProps): JSX.Element {
+export default function Tags(props: TagsProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const { globalState, globalDispatch, onReset } = props;
@@ -503,46 +504,45 @@ export function Tags(props: TagsProps): JSX.Element {
 
       const response: VitalityResponse<Tag> = await addWorkoutTag(tag);
 
-      const successMethod = () => {
-         // Add the new tag to the overall user tag options
-         const newOption: Tag = response.body.data as Tag;
-
-         const newOptions: Tag[] = [...globalState.tags.data.options, newOption];
-         const newSelected: Tag[] = [...globalState.tags.data.selected, newOption];
-
-         // Dictionary of tags are essential to ignore deleted tags applied to existing workouts
-         const newDictionary: Record<string, Tag> = Object.fromEntries(
-            newOptions.map((tag) => [tag.id, tag]),
-         );
-
-         globalDispatch({
-            type: "updateState",
-            value: {
-               id: "tags",
-               input: {
-                  ...globalState.tags,
-                  data: {
-                     ...globalState.tags.data,
-                     options: newOptions,
-                     selected: newSelected,
-                     dictionary: newDictionary
-                  }
-               }
-            }
-         });
-
-         // Fetch a new random color
-         randomColor = colorValues[Math.floor(Math.random() * colorValues.length)];
-      };
-
       if (response.status !== "Error") {
          // Handle success or failure responses
-         handleResponse(
-            localDispatch,
-            response,
-            successMethod,
-            updateNotification,
-         );
+         handleResponse(response, localDispatch, updateNotification, () => {
+            // Add the new tag to the overall user tag options
+            const newOption: Tag = response.body.data as Tag;
+
+            const newOptions: Tag[] = [...globalState.tags.data.options, newOption];
+            const newSelected: Tag[] = [...globalState.tags.data.selected, newOption];
+
+            // Dictionary of tags are essential to ignore deleted tags applied to existing workouts
+            const newDictionary: Record<string, Tag> = Object.fromEntries(
+               newOptions.map((tag) => [tag.id, tag]),
+            );
+
+            globalDispatch({
+               type: "updateState",
+               value: {
+                  id: "tags",
+                  input: {
+                     ...globalState.tags,
+                     data: {
+                        ...globalState.tags.data,
+                        options: newOptions,
+                        selected: newSelected,
+                        dictionary: newDictionary
+                     }
+                  }
+               }
+            });
+
+            updateNotification({
+               status: "Success",
+               message: "Added workout tag",
+               timer: 1000
+            });
+
+            // Fetch a new random color
+            randomColor = colorValues[Math.floor(Math.random() * colorValues.length)];
+         });
       } else {
          // Handle error response uniquely by mapping response identifiers to local state identifiers
          localDispatch({
@@ -564,85 +564,109 @@ export function Tags(props: TagsProps): JSX.Element {
       updateNotification
    ]);
 
+   const handleCreateOrSelectTag = useCallback(() => {
+      const existingTag: Tag = tagsByTitle[search];
+
+      if (!existingTag) {
+         handleTagCreation();
+      } else {
+         document.getElementById(existingTag.id)?.click();
+      }
+   }, [
+      search,
+      tagsByTitle,
+      handleTagCreation
+   ]);
+
    return (
-      <div>
-         {fetched ? (
-            <div className = "w-full mx-auto flex flex-col flex-wrap justify-center items-center">
-               {globalState.tags.data.selected?.length > 0 && (
-                  <ul className = "flex flex-col sm:flex-row flex-wrap justify-center items-center pb-2">
-                     {globalState.tags.data.selected.map((selected: Tag) => {
-                        return (
-                           selected !== undefined && (
-                              <TagContainer
-                                 {...props}
-                                 localState = {localState}
-                                 localDispatch = {localDispatch}
-                                 tag = {selected}
-                                 selected = {true}
-                                 key = {selected.id}
+      <div className = "relative">
+         {
+            fetched ? (
+               <div className = "mx-auto flex w-full flex-col flex-wrap items-center justify-center">
+                  {
+                     globalState.tags.data.selected?.length > 0 && (
+                        <ul className = "flex flex-row flex-wrap items-center justify-center pb-2">
+                           {
+                              globalState.tags.data.selected.map((selected: Tag) => {
+                                 return (
+                                    selected !== undefined && (
+                                       <TagContainer
+                                          { ...props }
+                                          localState = { localState }
+                                          localDispatch = { localDispatch }
+                                          tag = { selected }
+                                          selected = { true }
+                                          key = { selected.id }
+                                       />
+                                    )
+                                 );
+                              })
+                           }
+                        </ul>
+                     )
+                  }
+                  <div className = "relative mx-auto w-full">
+                     {
+                        onReset && (
+                           <div className = "relative mt-6">
+                              <FontAwesomeIcon
+                                 icon = { faArrowRotateLeft }
+                                 onClick = { onReset }
+                                 className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                               />
-                           )
-                        );
-                     })}
-                  </ul>
-               )}
-               <div className = "relative w-full mx-auto">
-                  {onReset && (
-                     <div className = "relative mt-4">
-                        <FontAwesomeIcon
-                           icon = {faArrowRotateLeft}
-                           onClick = {onReset}
-                           className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                           </div>
+                        )
+                     }
+                     <Input
+                        id = "tagSearch"
+                        type = "text"
+                        input = { localState.tagSearch }
+                        label = "Tags"
+                        icon = { faTag }
+                        dispatch = { localDispatch }
+                        onSubmit = { handleCreateOrSelectTag }
+                        autoFocus = { onReset !== undefined }
+                     />
+                  </div>
+                  {
+                     searchResults.length > 0 && (
+                        <ul className = "flex flex-row flex-wrap items-center justify-center pt-2">
+                           {
+                              searchResults.map((tag: Tag) => {
+                                 return (
+                                    <TagContainer
+                                       { ...props }
+                                       localState = { localState }
+                                       localDispatch = { localDispatch }
+                                       globalState = { globalState }
+                                       globalDispatch = { globalDispatch }
+                                       tag = { tag }
+                                       selected = { false }
+                                       key = { tag.id }
+                                    />
+                                 );
+                              })
+                           }
+                        </ul>
+                     )
+                  }
+                  {
+                     search.length >= 3 && search.length <= 30 && !tagsByTitle[search] && (
+                        <CreateTagContainer
+                           { ...props }
+                           localState = { localState }
+                           localDispatch = { localDispatch }
+                           onSubmit = { () => handleTagCreation() }
                         />
-                     </div>
-                  )}
-                  <Input
-                     id = "tagSearch"
-                     type = "text"
-                     input = {localState.tagSearch}
-                     label = "Tags"
-                     icon = {faTag}
-                     dispatch = {localDispatch}
-                     onSubmit = {() => {
-                        if (!tagsByTitle[search]) {
-                           handleTagCreation();
-                        }
-                     }}
-                     autoFocus = {onReset !== undefined}
-                  />
+                     )
+                  }
                </div>
-               {searchResults.length > 0 && (
-                  <ul className = "flex flex-row flex-wrap justify-center items-center pt-2">
-                     {searchResults.map((tag: Tag) => {
-                        return (
-                           <TagContainer
-                              {...props}
-                              localState = {localState}
-                              localDispatch = {localDispatch}
-                              globalState = {globalState}
-                              globalDispatch = {globalDispatch}
-                              tag = {tag}
-                              selected = {false}
-                              key = {tag.id}
-                           />
-                        );
-                     })}
-                  </ul>
-               )}
-               {search.trim().length > 0 && !tagsByTitle[search] && (
-                  <CreateTagContainer
-                     {...props}
-                     localState = {localState}
-                     localDispatch = {localDispatch}
-                     onSubmit = {() => handleTagCreation()}
-                  />
-               )}
-            </div>
-         ) : (
-            <div className = "w-full h-full justify-center items-center py-12">
-               <Loading />
-            </div>
-         )}
+            ) : (
+               <div className = "size-full items-center justify-center py-12">
+                  <Loading />
+               </div>
+            )
+         }
       </div>
    );
 }

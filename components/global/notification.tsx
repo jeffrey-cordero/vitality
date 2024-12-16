@@ -1,14 +1,9 @@
 "use client";
-import React, { useRef } from "react";
 import clsx from "clsx";
-import { useContext } from "react";
-import {
-   faCircleCheck,
-   faTriangleExclamation,
-   faXmark
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useRef, useContext } from "react";
 import { NotificationContext } from "@/app/layout";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark, faCircleCheck, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 
 export interface NotificationProps extends React.HTMLAttributes<any> {
   status: "Initial" | "Success" | "Error" | "Failure";
@@ -24,18 +19,21 @@ export default function Notification(props: NotificationProps): JSX.Element {
    const notificationRef = useRef<HTMLDivElement>(null);
 
    const removeNotification = () => {
-      // Add a fading out animation and eventually remove from the DOM
+      // Fade-out animation for removing existing notification
       notificationRef.current?.classList.add("animate-fadeOut");
 
+      // Remove current notification after the provided timer
+      updateNotification({
+         status: "Initial",
+         message: "remove"
+      });
+
+      // Remove fade- out animation for removing future notifications
       setTimeout(() => {
-         updateNotification({
-            status: "Initial",
-            message: ""
-         });
+         notificationRef.current?.classList.remove("animate-fadeOut");
       }, 1250);
    };
 
-   // If timer is provided, remove after the desired time limit
    if (timer !== undefined) {
       setTimeout(() => {
          removeNotification();
@@ -46,46 +44,55 @@ export default function Notification(props: NotificationProps): JSX.Element {
       <>
          {
             <div
-               className = "fixed w-[30rem] max-w-[90%] min-h-[4.5rem] top-0 left-1/2 transform -translate-x-1/2 max-w-4/5 mx-auto mt-4 opacity-0 notification animate-fadeIn z-50"
-               {...props}
-               ref = {notificationRef}>
+               id = "notification"
+               className = "fixed left-1/2 top-0 z-50 mx-auto mt-4 min-h-[4.5rem] w-[30rem] max-w-[95%] -translate-x-1/2 animate-fadeIn opacity-0"
+               { ...props }
+               ref = { notificationRef }
+            >
                <div className = "text-left">
                   <div
-                     className = {clsx(
-                        "w-full border-stroke flex items-center rounded-lg border border-l-[8px] bg-white pl-4",
-                        {
-                           "border-l-green-600": status === "Success",
-                           "border-l-red-600": status !== "Success"
-                        },
-                     )}>
+                     className = {
+                        clsx(
+                           "flex w-full items-center rounded-lg border-l-8 bg-white pl-4 dark:bg-slate-800",
+                           {
+                              "border-l-green-600": status === "Success",
+                              "border-l-red-600": status !== "Success"
+                           },
+                        )
+                     }
+                  >
                      <div className = "flex items-center justify-center rounded-full">
                         <FontAwesomeIcon
-                           icon = {icon}
-                           className = {clsx("text-3xl", {
-                              "text-green-600": status === "Success",
-                              "text-red-600": status !== "Success"
-                           })}
+                           icon = { icon }
+                           className = {
+                              clsx("text-3xl", {
+                                 "text-green-600": status === "Success",
+                                 "text-red-600": status !== "Success"
+                              })
+                           }
                         />
                      </div>
-                     <div className = "flex w-full items-center justify-between px-4 py-3">
-                        <div>
-                           <div className = "my-2 flex flex-col gap-2 font-bold">
-                              <p>{message}</p>
-                              {children}
+                     <div className = "flex w-full items-center justify-between px-4 pb-3 pt-[16px]">
+                        <div className = "relative">
+                           <div className = "my-2 flex flex-col gap-2 whitespace-pre-wrap break-words pl-1 pr-6 text-[0.95rem] font-bold xsm:text-base">
+                              <p>{ message }</p>
+                              { children }
                            </div>
                         </div>
                      </div>
                   </div>
                </div>
-               <div className = "absolute top-[-8px] right-[-3px] z-50 p-3.5 rounded-e-md">
+               <div className = "absolute right-[-2px] top-[-5px] z-50 rounded-e-md p-3.5">
                   <FontAwesomeIcon
-                     icon = {faXmark}
-                     className = "cursor-pointer flex-shrink-0 size-4.5 text-[18px] text-red-500 text-md font-extrabold"
+                     icon = { faXmark }
+                     className = "size-4 shrink-0 cursor-pointer text-xl font-bold text-red-500"
                      fill = "black"
-                     onClick = {(event) => {
-                        event.stopPropagation();
-                        removeNotification();
-                     }}
+                     onClick = {
+                        (event) => {
+                           event.stopPropagation();
+                           removeNotification();
+                        }
+                     }
                   />
                </div>
             </div>

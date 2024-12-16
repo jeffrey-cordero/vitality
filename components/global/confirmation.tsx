@@ -1,70 +1,62 @@
 import Button from "@/components/global/button";
-import { Modal } from "@/components/global/modal";
-import {
-   faArrowRotateBack,
-   faSquareCheck,
-   faTrash,
-   faTrashCan
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Modal from "@/components/global/modal";
 import { useRef } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faRotateBack, faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
-interface ConformationProps {
+interface ConfirmationProps {
   message: string;
-  onConformation: () => void;
+  onConfirmation: () => void;
   icon?: boolean;
 }
 
-export default function Conformation(props: ConformationProps): JSX.Element {
-   const { message, onConformation, icon } = props;
+export default function Confirmation(props: ConfirmationProps): JSX.Element {
+   const { message, icon, onConfirmation } = props;
    const deleteModalRef = useRef<{ open: () => void; close: () => void }>(null);
 
    return (
       <Modal
-         className = "max-w-[80%] sm:max-w-md max-h-[90%] mt-12 text-center"
-         ref = {deleteModalRef}
+         className = "max-h-[90%] max-w-[90%] px-4 py-3 text-center xsm:max-w-sm"
+         ref = { deleteModalRef }
          display = {
             icon ? (
-               <div className = "bg-white">
+               <div className = "bg-white dark:bg-slate-800">
                   <FontAwesomeIcon
-                     icon = {faTrashCan}
-                     className = "cursor-pointer  text-red-500 text-xl my-4"
+                     icon = { faTrashCan }
+                     className = "my-[0.83rem] cursor-pointer text-xl text-red-500"
                   />
                </div>
             ) : (
                <Button
                   type = "button"
-                  className = "w-full bg-red-500 text-white h-[2.4rem]"
-                  icon = {faTrash}>
-            Delete
+                  className = "h-[2.4rem] w-full bg-red-500 text-white focus:ring-red-700"
+                  icon = { faTrash }
+               >
+                  Delete
                </Button>
             )
-         }>
-         <div className = "relative flex flex-col justify-between items-center gap-4 p-2">
-            <FontAwesomeIcon
-               icon = {faTrashCan}
-               className = "text-red-500 text-3xl"
-            />
-            <p className = "font-bold">{message}</p>
-            <div className = "flex flex-row flex-wrap justify-center items-center gap-2">
+         }
+      >
+         <div className = "relative flex flex-col items-center justify-between gap-3 pb-2 pt-4">
+            <p className = "px-2 text-[1.1rem] font-bold">
+               { message }
+            </p>
+            <div className = "mx-auto flex w-full flex-col items-center justify-center gap-1 sm:flex-row">
                <Button
                   type = "button"
-                  icon = {faArrowRotateBack}
-                  className = "w-[10rem] bg-gray-100 text-black px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500"
-                  onClick = {() => {
-                     // Close the confirmation modal
-                     if (deleteModalRef.current) {
-                        deleteModalRef.current.close();
-                     }
-                  }}>
-            No, cancel
+                  icon = { faRotateBack }
+                  className = "h-[2.3rem] w-full border-[1.5px] border-gray-100 bg-gray-500 px-5 py-2 text-base font-bold text-white sm:w-32 dark:border-0"
+                  onClick = { async() => deleteModalRef.current?.close() }
+               >
+                  Cancel
                </Button>
                <Button
                   type = "button"
-                  icon = {faSquareCheck}
-                  className = "w-[10rem] bg-red-500 text-white px-4 py-2 font-bold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-red-300 focus:ring-red-300"
-                  onClick = {async() => onConformation()}>
-            Yes, I&apos;m sure
+                  icon = { faCheck }
+                  className = "h-[2.3rem] w-full border-[1.5px] border-gray-100 bg-red-500 px-5 py-2 text-base font-bold text-white focus:border-red-500 focus:ring-red-700 sm:w-32 dark:border-0"
+                  onClick = { async() => onConfirmation() }
+               >
+                  Confirm
                </Button>
             </div>
          </div>

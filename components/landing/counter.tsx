@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 
 interface CounterProps {
   value: number;
-  className: string;
   start: number;
   duration: number;
+  className: string;
 }
 
-function Counter(props: CounterProps): JSX.Element {
+// https://github.com/steven-tey/precedent/blob/main/components/shared/counting-numbers.tsx
+function Circle(props: CounterProps): JSX.Element {
    const { value, className, start, duration } = props;
    const [count, setCount] = useState<number>(start);
    const easeOutQuad = (t: number, b: number, c: number, d: number) => {
@@ -20,39 +21,50 @@ function Counter(props: CounterProps): JSX.Element {
    useEffect(() => {
       let startTime: number | undefined;
       const animateCount = (timestamp: number) => {
-         if (!startTime) startTime = timestamp;
+         if (!startTime) {
+            startTime = timestamp;
+         }
+
          const timePassed = timestamp - startTime;
          const progress = timePassed / duration;
          const currentCount = easeOutQuad(progress, 0, value, 1);
+
          if (currentCount >= value) {
             setCount(value);
             return;
          }
+
          setCount(currentCount);
          requestAnimationFrame(animateCount);
       };
+
       requestAnimationFrame(animateCount);
    }, [
       value,
       duration
    ]);
 
-   return <p className = {className}>{Intl.NumberFormat().format(count)}</p>;
+   return (
+      <p className = { className }>
+         { Intl.NumberFormat().format(count) }
+      </p>
+   );
 }
 
-export default function Ring(): JSX.Element {
+export default function Counter(): JSX.Element {
    return (
-      <div className = "relative h-full w-full my-[4rem]">
+      <div className = "relative my-10 size-full">
          <motion.svg
-            className = "absolute inset-0 m-auto w-[80px] md:w-[100px] h-[80px] md:h-[100px]"
-            viewBox = "0 0 100 100">
+            className = "absolute inset-0 m-auto size-[70px] xxsm:size-[75px] xl:size-[80px]"
+            viewBox = "0 0 100 100"
+         >
             <motion.circle
-               initial = {{ pathLength: 0 }}
-               animate = {{ pathLength: 1 }}
-               whileInView = {{ pathLength: 1 }}
-               viewport = {{ once: true }}
-               transition = {{ delay: 0.3, duration: 3, ease: "easeOut" }}
-               strokeWidth = {7}
+               initial = { { pathLength: 0 } }
+               animate = { { pathLength: 1 } }
+               whileInView = { { pathLength: 1 } }
+               viewport = { { once: true } }
+               transition = { { delay: 0.3, duration: 3, ease: "easeOut" } }
+               strokeWidth = { 7 }
                strokeDasharray = "0 1"
                strokeLinecap = "round"
                transform = "rotate(-90 50 50)"
@@ -63,11 +75,11 @@ export default function Ring(): JSX.Element {
                stroke = "#22C55E"
             />
          </motion.svg>
-         <Counter
-            value = {100}
-            start = {0}
-            duration = {3500}
-            className = "relative inset-0 mx-auto flex items-center justify-center font-display text-2xl sm:text-3xl text-green-500"
+         <Circle
+            value = { 100 }
+            start = { 0 }
+            duration = { 3500 }
+            className = "relative inset-0 mx-auto flex items-center justify-center text-[1.4rem] text-green-500 xl:text-2xl"
          />
       </div>
    );

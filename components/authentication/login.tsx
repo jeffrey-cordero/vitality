@@ -2,22 +2,14 @@
 import Link from "next/link";
 import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
-import Input from "@/components/global/input";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-   faArrowRotateLeft,
-   faKey,
-   faUnlockKeyhole,
-   faUserSecret
-} from "@fortawesome/free-solid-svg-icons";
+import { Input } from "@/components/global/input";
 import { FormEvent, useContext, useReducer } from "react";
-import {
-   VitalityState,
-   formReducer
-} from "@/lib/global/state";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
+import { handleResponse } from "@/lib/global/response";
 import { login, Credentials } from "@/lib/authentication/login";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import { VitalityState, formReducer } from "@/lib/global/state";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { NotificationContext } from "@/app/layout";
+import { faArrowRotateLeft, faKey, faUnlockKeyhole, faUserSecret } from "@fortawesome/free-solid-svg-icons";
 
 const credentials: VitalityState = {
    username: {
@@ -32,17 +24,11 @@ const credentials: VitalityState = {
    }
 };
 
-export default function LoginForm(): JSX.Element {
-   const { user } = useContext(AuthenticationContext);
+export default function Login(): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, credentials);
 
-   if (user !== undefined) {
-      // Ensure after a successful logout, the URL is updated accordingly
-      window.location.reload();
-   }
-
-   const handleSubmit = async(event: FormEvent) => {
+   const handleAuthenticate = async(event: FormEvent) => {
       event.preventDefault();
 
       const credentials: Credentials = {
@@ -50,43 +36,41 @@ export default function LoginForm(): JSX.Element {
          password: state.password.value.trim()
       };
 
-      const response: VitalityResponse<null> = await login(credentials);
-
-      const successMethod = () => {
+      handleResponse(await login(credentials), dispatch, updateNotification, () => {
          window.location.reload();
-      };
-
-      handleResponse(dispatch, response, successMethod, updateNotification);
+      });
    };
 
    return (
-      <div className = "w-full mx-auto mt-8 flex flex-col items-center justify-center text-center">
+      <div className = "mx-auto flex w-full flex-col items-center justify-center text-center">
          <Heading
             title = "Log In"
             description = "Enter valid credentials to enter"
          />
-         <div className = "w-10/12 lg:w-1/2 mx-auto mt-4">
+         <div className = "mx-auto mt-8 w-11/12 sm:w-3/4 xl:w-5/12">
             <form
-               className = "relative w-full flex flex-col justify-center align-center gap-3"
-               onSubmit = {handleSubmit}>
+               className = "relative flex w-full flex-col items-stretch justify-center gap-3"
+               onSubmit = { handleAuthenticate }
+            >
                <FontAwesomeIcon
-                  icon = {faArrowRotateLeft}
-                  onClick = {() =>
-                     dispatch({
-                        type: "resetState",
-                        value: {}
-                     })
+                  icon = { faArrowRotateLeft }
+                  onClick = {
+                     () =>
+                        dispatch({
+                           type: "resetState",
+                           value: {}
+                        })
                   }
-                  className = "absolute top-[-25px] right-[10px] z-10 flex-shrink-0 size-3.5 text-md text-primary cursor-pointer"
+                  className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                />
                <Input
                   id = "username"
                   type = "text"
                   label = "Username"
                   autoComplete = "none"
-                  icon = {faUserSecret}
-                  input = {state.username}
-                  dispatch = {dispatch}
+                  icon = { faUserSecret }
+                  input = { state.username }
+                  dispatch = { dispatch }
                   autoFocus
                   required
                />
@@ -95,24 +79,26 @@ export default function LoginForm(): JSX.Element {
                   type = "password"
                   label = "Password"
                   autoComplete = "current-password"
-                  icon = {faKey}
-                  input = {state.password}
-                  dispatch = {dispatch}
+                  icon = { faKey }
+                  input = { state.password }
+                  dispatch = { dispatch }
                   required
                />
                <Button
                   type = "submit"
-                  className = "bg-primary text-white h-[2.6rem]"
-                  icon = {faUnlockKeyhole}>
-            Log In
+                  className = "h-[2.6rem] bg-primary text-white"
+                  icon = { faUnlockKeyhole }
+               >
+                  Log In
                </Button>
             </form>
-            <p className = "mt-4">
-                  Don&apos;t have an account?{" "}
+            <p className = "mt-4 px-2">
+               Don&apos;t have an account? { " " }
                <Link
                   href = "/signup"
-                  className = "text-primary font-bold">
-                  Register
+                  className = "font-bold text-primary"
+               >
+                  Sign&nbsp;Up
                </Link>
             </p>
          </div>

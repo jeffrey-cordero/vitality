@@ -1,11 +1,12 @@
 import clsx from "clsx";
 import Image from "next/image";
-import { VitalityProps } from "@/lib/global/state";
-import { Workout } from "@/lib/home/workouts/workouts";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faImage } from "@fortawesome/free-solid-svg-icons";
-import { useMemo } from "react";
 import { Tag } from "@/lib/home/workouts/tags";
+import { VitalityProps } from "@/lib/global/state";
+import { useEffect, useMemo, useState } from "react";
+import { Workout } from "@/lib/home/workouts/workouts";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { faImage, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface CardProps extends CardsProps {
   workout: Workout;
@@ -13,6 +14,11 @@ interface CardProps extends CardsProps {
 
 function Card(props: CardProps): JSX.Element {
    const { workout, globalState, globalDispatch } = props;
+   const [isValidImage, setIsValidImage] = useState<boolean>(true);
+
+   useEffect(() => {
+      setIsValidImage(verifyImageURL(workout.image));
+   }, [workout.image]);
 
    const formattedDate = useMemo(() => {
       return workout.date.toISOString().slice(0, 10);
@@ -20,20 +26,26 @@ function Card(props: CardProps): JSX.Element {
 
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
-         // Fetch workout tag, which may be missing in up-to-date dictionary due to a removal
+
          const tag: Tag | undefined = globalState.tags.data.dictionary[tagId];
 
          return (
-            tag && (
+            // Workout tag may be undefined in global state dictionary due to a potential removal or error
+            tag !== undefined && (
                <div
-                  className = {clsx(
-                     "max-w-full px-4 py-2 m-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-full text-xs font-bold text-white",
-                  )}
-                  style = {{
-                     backgroundColor: tag.color
-                  }}
-                  key = {tag.id}>
-                  {tag.title}
+                  className = {
+                     clsx(
+                        "m-1 max-w-full truncate rounded-full px-4 py-[0.45rem] text-[0.8rem] font-bold text-white md:text-[0.73rem]",
+                     )
+                  }
+                  style = {
+                     {
+                        backgroundColor: tag.color
+                     }
+                  }
+                  key = { tag.id }
+               >
+                  { tag.title }
                </div>
             )
          );
@@ -45,55 +57,70 @@ function Card(props: CardProps): JSX.Element {
 
    return (
       <div
-         id = {workout.id}
-         onClick = {() => {
-            globalDispatch({
-               type: "updateState",
-               value: {
-                  id: "workout",
-                  input: {
-                     ...globalState.workout,
-                     value: workout,
-                     data: {
-                        display: true
+         id = { workout.id }
+         onClick = {
+            () => {
+               globalDispatch({
+                  type: "updateState",
+                  value: {
+                     id: "workout",
+                     input: {
+                        ...globalState.workout,
+                        value: workout,
+                        data: {
+                           display: true
+                        }
                      }
                   }
-               }
-            });
-         }}
-         className = "relative cursor-pointer flex flex-col justify-center items-center gap-2 w-full sm:w-[16rem] h-[26rem] sm:h-[22rem] mx-auto sm:m-2 rounded-2xl overflow-hidden shadow-lg bg-white hover:scale-[1.02] transition duration-300 ease-in-out">
-         <div className = "relative w-full h-full mx-auto">
-            {workout.image ? (
-               <Image
-                  fill
-                  priority
-                  quality = {100}
-                  sizes = "100%"
-                  src = {workout.image}
-                  alt = "workout-image"
-                  className = "opacity-30 object-center object-cover"
-               />
-            ) : (
-               <div className = "absolute w-full h-full bg-white opacity-20 flex justify-center items-center">
-                  <FontAwesomeIcon
-                     className = "text-7xl text-primary"
-                     icon = {faImage}
+               });
+            }
+         }
+         className = "relative mx-0 flex h-[27rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-[1.03] md:h-[23rem] md:w-72"
+      >
+         <div className = "relative mx-auto size-full">
+            {
+               workout.image && isValidImage ? (
+                  <Image
+                     fill
+                     priority
+                     quality = { 100 }
+                     sizes = "100%"
+                     src = { workout.image }
+                     alt = "workout-image"
+                     className = "object-cover object-center opacity-40"
+                     onLoad = { () => !isValidImage && setIsValidImage(true) }
+                     onErrorCapture = { () => isValidImage && setIsValidImage(false) }
                   />
-               </div>
-            )}
-            <div className = "relative w-full h-full flex flex-col justify-start items-center overflow-hidden text-center pt-5">
-               <h2 className = "font-bold text-2xl px-6 py-4 overflow-clip max-w-[90%] text-ellipsis whitespace-nowrap leading-none tracking-tight">
-                  {workout.title}
+               ) : (
+                  <div className = "absolute flex size-full items-center justify-center bg-white opacity-40">
+                     <FontAwesomeIcon
+                        className = {
+                           clsx("text-7xl", {
+                              "text-primary" : isValidImage,
+                              "text-red-500" : !isValidImage
+                           })
+                        }
+                        icon = { !isValidImage ? faTriangleExclamation : faImage }
+                     />
+                  </div>
+               )
+            }
+            <div className = "relative flex size-full flex-col items-center justify-start overflow-hidden pt-5 text-center text-black">
+               <h2 className = "max-w-full truncate break-words px-6 pt-2 text-[1.5rem] font-extrabold md:text-[1.4rem]">
+                  { workout.title }
                </h2>
-               <p className = "font-bold text-sm">{formattedDate}</p>
+               <p className = "text-sm font-extrabold md:text-[0.85rem]">{ formattedDate }</p>
                <div
-                  className = {clsx(
-                     "w-full max-h-[15rem] flex flex-row flex-wrap justify-center items-center gap-2 py-2 px-4 overflow-auto scrollbar-hide",
-                     {
-                        "cursor-all-scroll": workoutTags.length > 0
-                     },
-                  )}>
-                  {workoutTags}
+                  className = {
+                     clsx(
+                        "scrollbar-hide flex max-h-[18.5rem] w-full max-w-[25rem] flex-row flex-wrap items-center justify-center overflow-auto px-4 py-2 md:max-h-[15.5rem]",
+                        {
+                           "cursor-all-scroll": workoutTags.length > 0
+                        },
+                     )
+                  }
+               >
+                  { workoutTags }
                </div>
             </div>
          </div>
@@ -109,15 +136,18 @@ export default function Cards(props: CardsProps): JSX.Element {
    const { workouts } = props;
 
    return (
-      <div className = "relative w-full mx-auto">
-         <div className = "flex flex-row flex-wrap justify-center items-center gap-6 my-6">
-            {workouts.map((workout: Workout) => (
-               <Card
-                  {...props}
-                  workout = {workout}
-                  key = {workout.id}
-               />
-            ))}
+      <div className = "relative mx-auto w-full">
+         <div className = "mx-auto my-6 flex flex-row flex-wrap items-center justify-center gap-8">
+            {
+               workouts.map((workout: Workout) => (
+                  <Card
+                     { ...props }
+                     workout = { workout }
+                     key = { workout.id }
+                  />
+               ))
+            }
+
          </div>
       </div>
    );

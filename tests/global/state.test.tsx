@@ -1,9 +1,9 @@
 /** @jest-environment jsdom */
-import Input from "@/components/global/input";
 import Button from "@/components/global/button";
 import Select from "@/components/global/select";
 import TextArea from "@/components/global/textarea";
 import userEvent from "@testing-library/user-event";
+import { Input } from "@/components/global/input";
 import { sendErrorMessage } from "@/lib/global/response";
 import { useCallback, useEffect, useReducer } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
@@ -184,74 +184,83 @@ function Component(): JSX.Element {
             id = "name"
             type = "text"
             label = "Name"
-            input = {state.name}
-            dispatch = {dispatch}
+            input = { state.name }
+            dispatch = { dispatch }
             autoFocus
             scrollIntoView
-            required>
-            {state.name.value}
+            required
+         >
+            { state.name.value }
          </Input>
          <Input
             id = "password"
             type = "password"
             label = "Password"
-            input = {state.password}
-            dispatch = {dispatch}>
-            {state.name.value}
+            input = { state.password }
+            dispatch = { dispatch }
+         >
+            { state.name.value }
          </Input>
          <Input
             id = "email"
             type = "email"
             label = "Email"
-            input = {state.email}
-            dispatch = {dispatch}>
-            {state.email.value}
+            input = { state.email }
+            dispatch = { dispatch }
+         >
+            { state.email.value }
          </Input>
          <TextArea
             id = "text"
             type = "text"
             label = "Text"
-            input = {state.text}
-            dispatch = {dispatch}
+            input = { state.text }
+            dispatch = { dispatch }
             autoFocus
          />
          <Select
             id = "options"
             type = "text"
-            values = {["", "1", "2", "3"]}
+            values = { ["", "1", "2", "3"] }
             label = "Options"
-            input = {state.options}
-            dispatch = {dispatch}
+            input = { state.options }
+            dispatch = { dispatch }
             autoFocus
          />
          <div
             id = "tags"
-            onClick = {handleUpdateTags}>
-            {state.tags.value.toString()}
+            onClick = { handleUpdateTags }
+         >
+            { state.tags.value.toString() }
          </div>
          <Button
             id = "initialize"
-            onClick = {handleInitializeState}>
+            onClick = { handleInitializeState }
+         >
             Initialize State
          </Button>
          <Button
             id = "updates"
-            onClick = {handleUpdateStates}>
+            onClick = { handleUpdateStates }
+         >
             Update States
          </Button>
          <Button
             id = "reset"
-            onClick = {handleResetState}>
+            onClick = { handleResetState }
+         >
             Reset State
          </Button>
          <Button
             id = "errors"
-            onClick = {handleUpdateErrors}>
+            onClick = { handleUpdateErrors }
+         >
             Update Errors
          </Button>
          <Button
             id = "handles"
-            onClick = {handleUpdateHandlesChanges}>
+            onClick = { handleUpdateHandlesChanges }
+         >
             Handle Changes
          </Button>
       </div>

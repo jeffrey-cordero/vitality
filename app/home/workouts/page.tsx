@@ -1,21 +1,16 @@
 "use client";
-import Filtering from "@/components/home/workouts/filtering";
+import Main from "@/components/global/main";
 import View from "@/components/home/workouts/view";
+import Filtering from "@/components/home/workouts/filtering";
 import Form from "@/components/home/workouts/form";
 import Pagination from "@/components/home/workouts/pagination";
 import { AuthenticationContext } from "@/app/layout";
-import { fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
 import { fetchWorkoutTags } from "@/lib/home/workouts/tags";
-import {
-   useCallback,
-   useContext,
-   useEffect,
-   useMemo,
-   useReducer,
-   useState
-} from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
+import { fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
+import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 
+const pagingValues = new Set<number>([5, 10, 25, 50, 100, 500, 1000]);
 const workouts: VitalityState = {
    search: {
       value: "",
@@ -99,7 +94,7 @@ export default function Page(): JSX.Element {
       return globalState.search.value.trim().toLowerCase();
    }, [globalState.search]);
 
-   // Workout results for case-insensitive title comparison
+   // Case-insensitive title comparison for workouts search
    const results: Workout[] = useMemo(() => {
       const filtered: Workout[] = globalState.workouts.data.filtered;
       const lower = search.toLowerCase();
@@ -111,7 +106,7 @@ export default function Page(): JSX.Element {
       search
    ]);
 
-   // Pagination calculations for current page interval
+   // Pagination calculations
    const paging: number = globalState.paging.value;
    const page: number = globalState.page.value;
 
@@ -127,13 +122,28 @@ export default function Page(): JSX.Element {
    ]);
 
    const fetchWorkoutsData = useCallback(async() => {
-      // Fetch user workouts and workout tags
+      // Fetch user workouts and workout tags for global state
       const [workoutsData, tagsData] = await Promise.all([
          fetchWorkouts(user.id),
          fetchWorkoutTags(user.id)
       ]);
 
-      // Update global state to maintain up-to-date tags, workouts, and paging
+      // Ensure paging and page localStorage values align with pagination setup
+      let paging: number = Number.parseInt(window.localStorage.getItem("paging") ?? "10");
+
+      if (!(pagingValues.has(paging))) {
+         paging = 10;
+         window.localStorage.setItem("paging", String(paging));
+      }
+
+      const pages: number = Math.ceil(workoutsData.length / paging);
+      let page: number = Number.parseInt(window.localStorage.getItem("page") ?? "0");
+
+      if (page >= pages) {
+         page = Math.min(0, pages - 1);
+         window.localStorage.setItem("page", String(page));
+      }
+
       globalDispatch({
          type: "initializeState",
          value: {
@@ -170,7 +180,11 @@ export default function Page(): JSX.Element {
             },
             paging: {
                ...globalState.paging,
-               value: Number.parseInt(window.localStorage.getItem("paging") ?? "10")
+               value: paging
+            },
+            page: {
+               ...globalState.page,
+               value: page
             }
          }
       });
@@ -179,14 +193,16 @@ export default function Page(): JSX.Element {
       globalState.workouts,
       globalState.workout,
       globalState.paging,
+      globalState.page,
       user
    ]);
 
    useEffect(() => {
-      if (user && !globalState.workouts.data.fetched) {
+      if (!globalState.workouts.data.fetched) {
          setView(
             window.localStorage.getItem("view") === "cards" ? "cards" : "table",
          );
+
          fetchWorkoutsData();
       }
    }, [
@@ -199,27 +215,27 @@ export default function Page(): JSX.Element {
    ]);
 
    return (
-      <main className = "relative w-full lg:w-11/12 mx-auto mt-8 flex flex-col justify-start items-center text-center">
+      <Main className = "mb-12">
          <Filtering
-            globalState = {globalState}
-            globalDispatch = {globalDispatch}
+            globalState = { globalState }
+            globalDispatch = { globalDispatch }
          />
          <View
-            view = {view}
-            setView = {setView}
-            workouts = {workoutsSection}
-            globalState = {globalState}
-            globalDispatch = {globalDispatch}
+            view = { view }
+            setView = { setView }
+            workouts = { workoutsSection }
+            globalState = { globalState }
+            globalDispatch = { globalDispatch }
          />
          <Form
-            globalState = {globalState}
-            globalDispatch = {globalDispatch}
+            globalState = { globalState }
+            globalDispatch = { globalDispatch }
          />
          <Pagination
-            workouts = {results}
-            globalState = {globalState}
-            globalDispatch = {globalDispatch}
+            workouts = { results }
+            globalState = { globalState }
+            globalDispatch = { globalDispatch }
          />
-      </main>
+      </Main>
    );
 }

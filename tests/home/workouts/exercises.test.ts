@@ -96,7 +96,7 @@ describe("Workout Exercises Tests", () => {
             },
             errors: {},
             message: method === "create" ?
-               "Exercise sets must be empty" : "All exercise sets must be non-empty"
+               "Exercise sets must be empty" : "All exercise sets must be valid and non-empty"
          }
       ];
 
@@ -401,8 +401,8 @@ describe("Workout Exercises Tests", () => {
          );
          expect(creating.data).toHaveLength(2);
          expect(updating).toHaveLength(2);
-         expect(error).toBeUndefined();
-         expect(errors).toBeUndefined();
+         expect(error).toBeNull();
+         expect(errors).toBeNull();
 
          const expectedNewExercise = {
             ...exercise,

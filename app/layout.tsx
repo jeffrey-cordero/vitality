@@ -5,33 +5,31 @@ import cx from "classnames";
 import Footer from "@/components/global/footer";
 import Notification from "@/components/global/notification";
 import { sfPro, inter } from "@/app/fonts";
-import { SideBar } from "@/components/global/sidebar";
-import {
-   createContext,
-   SetStateAction,
-   useCallback,
-   useEffect,
-   useState
-} from "react";
-import { getServerSession } from "@/lib/authentication/session";
-import { NotificationProps } from "@/components/global/notification";
 import { User as NextAuthUser } from "next-auth";
+import { usePathname } from "next/navigation";
+import { SideBar } from "@/components/global/sidebar";
+import { getSession } from "@/lib/authentication/session";
+import { NotificationProps } from "@/components/global/notification";
+import { createContext, useCallback, useEffect, useState } from "react";
 
 interface AuthenticationContextType {
    user: NextAuthUser | undefined;
+   theme: "dark" | "light";
+   updateTheme: (_theme: "dark" | "light") => void;
    fetched: boolean;
-   updateUser: (_user: SetStateAction<NextAuthUser | undefined>) => void;
 }
 
 interface NotificationContextType {
    notification: NotificationProps | undefined;
+   notificationQueue: NotificationProps[],
    updateNotification: (_notification: NotificationProps) => void;
 }
 
 export const AuthenticationContext = createContext<AuthenticationContextType>({
    user: undefined,
-   fetched: false,
-   updateUser: () => { }
+   theme: null,
+   updateTheme: () => {},
+   fetched: false
 });
 
 export const NotificationContext = createContext<NotificationContextType>({
@@ -40,25 +38,38 @@ export const NotificationContext = createContext<NotificationContextType>({
       status: "Initial",
       message: ""
    },
+   notificationQueue: [],
    updateNotification: (_notification: NotificationProps) => { }
 });
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-   // Layouts holds context for both user and potential notifications
    const [user, setUser] = useState<NextAuthUser | undefined>(undefined);
+   const [theme, setTheme] = useState<"light" | "dark">(null);
    const [fetched, setFetched] = useState<boolean>(false);
-   const [notification, setNotification] = useState<
-      NotificationProps | undefined
-   >(undefined);
-
-   const updateUser = (user: SetStateAction<NextAuthUser | undefined>) => {
-      setUser(user);
+   const [notificationQueue, setNotificationQueue] = useState<NotificationProps[]>([]);
+   const notification: NotificationProps = notificationQueue.length > 0 ? notificationQueue[0] : {
+      children: null,
+      status: "Initial",
+      message: ""
    };
+   const pathname: string = usePathname();
 
-   const handleAuthentication = useCallback(async() => {
+   const updateNotification = useCallback((notification: NotificationProps) => {
+      // Handle a queue of notifications to ensure all messages are displayed to the user
+      if (notification.status !== "Initial") {
+         setNotificationQueue((previousQueue) => {
+            return [...previousQueue, notification];
+         });
+      } else if (notification.message === "remove") {
+         setTimeout(() => {
+            setNotificationQueue(notificationQueue.slice(1));
+         }, 1250);
+      }
+   }, [notificationQueue]);
+
+   const authenticateUser = useCallback(async() => {
       try {
-         const user = await getServerSession();
-         setUser(user);
+         setUser(await getSession());
       } catch (error) {
          updateNotification({
             status: "Failure",
@@ -69,34 +80,32 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       }
 
       setFetched(true);
-   }, []);
+   }, [updateNotification]);
 
-   const updateNotification = (notification: NotificationProps) => {
-      setNotification(notification);
+   const updateTheme = (theme: "dark" | "light") => {
+      window.localStorage.setItem("theme", theme);
+      setTheme(theme);
    };
 
    useEffect(() => {
       if (!fetched) {
-         handleAuthentication();
+         const preferredTheme: string | undefined = window.localStorage.theme;
+         const prefersDarkMode: boolean = window.matchMedia("(prefers-color-scheme: dark)").matches;
+         const theme = preferredTheme === "dark" || (!preferredTheme && prefersDarkMode) ? "dark" : "light";
+
+         setTheme(theme);
+         authenticateUser();
       }
 
-      const handleModalClickAway = (event: MouseEvent) => {
+      const handleCloseTopMostModal = (event: MouseEvent) => {
          const modals = document.getElementsByClassName("modal");
-         const notifications = document.getElementsByClassName("notification");
-         const topMostModal =
-            modals.length > 0
-               ? (modals[modals.length - 1] as HTMLDivElement)
-               : null;
+         const notification = document.getElementById("notification");
+         const topMostModal = modals.length > 0 ? (modals[modals.length - 1] as HTMLDivElement) : null;
          const target = event.target as HTMLElement;
 
-         if (
-            topMostModal &&
-            !notifications[0]?.contains(target) &&
-            !topMostModal.contains(target)
-         ) {
-            (
-               topMostModal.getElementsByClassName("modal-close")[0] as SVGElement
-            ).dispatchEvent(
+         if (topMostModal && !topMostModal.contains(target) && !notification?.contains(target)) {
+            // Close top most modal when clicking outside, but only when the target is outside of any notification
+            (topMostModal.getElementsByClassName("modal-close")[0] as SVGElement).dispatchEvent(
                new MouseEvent("click", {
                   bubbles: true,
                   cancelable: true,
@@ -106,26 +115,29 @@ export default function Layout({ children }: { children: React.ReactNode }) {
          }
       };
 
-      document.body.addEventListener("mousedown", handleModalClickAway);
+      document.body.addEventListener("mousedown", handleCloseTopMostModal);
 
       return () => {
-         document.body.removeEventListener("mousedown", handleModalClickAway);
+         document.body.removeEventListener("mousedown", handleCloseTopMostModal);
       };
    }, [
       fetched,
-      handleAuthentication
+      authenticateUser
    ]);
 
    return (
       <html
          lang = "en"
-         className = "m-0 p-0 overflow-x-hidden w-full">
+         className = { `m-0 w-full overflow-x-hidden p-0 ${theme === "dark" && "dark"}` }
+         suppressHydrationWarning = { true }
+      >
          <head>
             <title>Vitality</title>
             <link
                rel = "icon"
                type = "image/x-icon"
-               href = "favicon.ico"></link>
+               href = "/favicon.ico"
+            />
             <meta
                name = "description"
                content = "A modern fitness tracker to fuel your fitness goals"
@@ -142,36 +154,42 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                name = "robots"
                content = "index, follow"
             />
-            <link
-               rel = "icon"
-               href = "favcon.ico"
-            />
             <meta
                name = "viewport"
                content = "width=device-width, initial-scale=1.0"
             />
          </head>
          <body
-            className = {cx(
-               sfPro.variable,
-               inter.variable,
-               "box-border m-0 p-0 overflow-x-hidden max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 text-black",
-            )}
-            suppressHydrationWarning = {true}>
-            <AuthenticationContext.Provider value = {{ user, fetched, updateUser }}>
-               <SideBar />
-               <NotificationContext.Provider
-                  value = {{ notification, updateNotification }}>
-                  <div>{children}</div>
-                  <div>
-                     {notification !== undefined &&
-                        notification.status !== "Initial" && (
-                        <Notification {...notification} />
-                     )}
-                  </div>
-               </NotificationContext.Provider>
-               <Footer />
-            </AuthenticationContext.Provider>
+            className = {
+               cx(
+                  sfPro.variable,
+                  inter.variable,
+                  "box-border m-0 p-0 overflow-x-hidden max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 dark:from-slate-900 dark:via-gray-900 dark:to-slate-900 text-black dark:text-white"
+               )
+            }
+         >
+            {
+               fetched && (
+                  <AuthenticationContext.Provider value = { { user, theme, updateTheme, fetched } }>
+                     <SideBar />
+                     <NotificationContext.Provider value = { { notification, notificationQueue, updateNotification } }>
+                        <div className = "flex min-h-screen flex-col items-center justify-start gap-6">
+                           { children }
+                           {
+                              notification !== undefined && notification.status !== "Initial" && (
+                                 <Notification { ...notification } />
+                              )
+                           }
+                           {
+                              pathname === "/" && (
+                                 <Footer />
+                              )
+                           }
+                        </div>
+                     </NotificationContext.Provider>
+                  </AuthenticationContext.Provider>
+               )
+            }
          </body>
       </html>
    );

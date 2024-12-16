@@ -1,3 +1,4 @@
+import Main from "@/components/global/main";
 import Journey from "@/components/landing/journey";
 import Highlights from "@/components/landing/highlights";
 import Services from "@/components/landing/services";
@@ -6,12 +7,12 @@ import Testimonials from "@/components/landing/testimonials";
 
 export default function Page() {
    return (
-      <main className = "w-full min-h-screen flex flex-col items-center justify-start md:px-4 text-center overflow-hidden my-10 gap-4">
+      <Main>
          <Journey />
          <Highlights />
          <Services />
          <Pricing />
          <Testimonials />
-      </main>
+      </Main>
    );
 }

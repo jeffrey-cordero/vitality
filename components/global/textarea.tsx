@@ -1,14 +1,13 @@
 "use client";
 import clsx from "clsx";
-import { ChangeEvent, useEffect, useRef, useState, useCallback } from "react";
 import { VitalityInputProps } from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ChangeEvent, useEffect, useRef, useCallback } from "react";
 
 export default function TextArea(props: VitalityInputProps): JSX.Element {
-   const { id, label, icon, onChange, placeholder, required, autoFocus, input, dispatch } =
-    props;
+   const { id, label, icon, onChange, placeholder, required, autoFocus,
+      input, dispatch } = props;
    const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
-   const [visible, setVisible] = useState<boolean>(false);
 
    useEffect(() => {
       autoFocus && textAreaRef.current?.focus();
@@ -17,47 +16,45 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
       input.error
    ]);
 
-   const handleTextAreaChange = useCallback(
-      (event: ChangeEvent<HTMLTextAreaElement>) => {
-         if (input.handlesOnChange) {
-            // Call the user-defined event handler (complex state)
-            onChange?.call(null, event);
-         } else {
-            // Simple state
-            dispatch({
-               type: "updateState",
-               value: {
-                  id: id,
-                  input: {
-                     ...input,
-                     value: event.target.value,
-                     error: null
-                  }
+   const handleTextAreaChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
+      // handlesOnChange defined implies state management is handled via the parent component
+      if (input.handlesOnChange) {
+         onChange?.call(null, event);
+      } else {
+         dispatch({
+            type: "updateState",
+            value: {
+               id: id,
+               input: {
+                  ...input,
+                  value: event.target.value,
+                  error: null
                }
-            });
-         }
-
-         handleTextAreaOverflow();
-      }, [
-         dispatch,
-         input,
-         id,
-         onChange
-      ]);
-
-   const handleKeyDown = useCallback(
-      (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-         if (textAreaRef.current && event.key === "Escape") {
-            textAreaRef.current.blur();
-
-            const modals: HTMLCollection = document.getElementsByClassName("modal");
-
-            if (modals.length > 0) {
-               // Focus the most inner modal, if any
-               (modals.item(modals.length - 1) as HTMLDivElement).focus();
             }
+         });
+      }
+
+      handleTextAreaOverflow();
+   }, [
+      dispatch,
+      input,
+      id,
+      onChange
+   ]);
+
+   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (textAreaRef.current && event.key === "Escape") {
+         // Focus the top-most modal in the DOM when blurring input element, if applicable
+         textAreaRef.current.blur();
+
+         const modals: HTMLCollection = document.getElementsByClassName("modal");
+
+         if (modals.length > 0) {
+            // Focus the most inner modal, if any
+            (modals.item(modals.length - 1) as HTMLDivElement).focus();
          }
-      }, []);
+      }
+   }, []);
 
    const handleTextAreaOverflow = () => {
       const textarea = textAreaRef.current;
@@ -69,49 +66,57 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
    };
 
    useEffect(() => {
-      // On mounting, handle overflow for large input values
-      if (!visible) {
-         handleTextAreaOverflow();
-         setVisible(true);
-      }
-   }, [visible]);
+      // Handle overflow for large values during the initial render
+      handleTextAreaOverflow();
+   }, []);
 
    return (
       <div className = "relative">
          <textarea
-            id = {id}
-            value = {input.value}
-            placeholder = {placeholder ?? ""}
-            className = {clsx(
-               "peer p-4 block w-full bg-white border-1 border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-7 focus:pb-2 [&:not(:placeholder-shown)]:pt-7 [&:not(:placeholder-shown)]:pb-2 autofill:pt-7 autofill:pb-2 min-h-[12rem] h-auto bg-transparent resize-none overflow-hidden",
-               {
-                  "border-gray-200": input.error === null,
-                  "border-red-500 ": input.error !== null
-               },
-            )}
-            onKeyDown = {(event: React.KeyboardEvent<HTMLTextAreaElement>) =>
-               handleKeyDown(event)
+            id = { id }
+            value = { input.value }
+            placeholder = { placeholder ?? "" }
+            className = {
+               clsx(
+                  "peer block h-auto min-h-60 w-full resize-none overflow-hidden rounded-lg border bg-white px-4 pb-2 pt-7 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-primary focus:pb-2 focus:pt-7 focus:ring-primary disabled:pointer-events-none disabled:opacity-50 xxsm:p-4 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
+                  {
+                     "border-gray-200": input.error === null,
+                     "border-red-500 ": input.error !== null
+                  },
+               )
             }
-            onChange = {(event: ChangeEvent<HTMLTextAreaElement>) =>
-               handleTextAreaChange(event)
-            }
-            ref = {textAreaRef}
+            onKeyDown = { (event: React.KeyboardEvent<HTMLTextAreaElement>) => handleKeyDown(event) }
+            onChange = { (event: ChangeEvent<HTMLTextAreaElement>) => handleTextAreaChange(event) }
+            ref = { textAreaRef }
          />
          <label
-            htmlFor = {id}
-            className = {clsx(
-               "absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-gray-500 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500",
-               {
-                  "font-bold": required
-               },
-            )}>
-            {icon && <FontAwesomeIcon icon = {icon} />} {label}
+            htmlFor = { id }
+            className = {
+               clsx(
+                  "pointer-events-none absolute start-0 top-0 h-full truncate border border-transparent p-4 text-xs transition duration-200 ease-in-out peer-placeholder-shown:-translate-y-2 peer-placeholder-shown:text-black peer-focus:text-xs peer-focus:text-black peer-disabled:pointer-events-none peer-disabled:opacity-50 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-gray-500 xxsm:text-sm xxsm:peer-placeholder-shown:-translate-y-0 xxsm:peer-focus:-translate-y-2 dark:peer-placeholder-shown:text-white dark:peer-[:not(:placeholder-shown)]:text-gray-400",
+                  {
+                     "font-bold": required
+                  },
+               )
+            }
+         >
+            {
+               icon && (
+                  <FontAwesomeIcon
+                     icon = { icon }
+                     className = "mr-[4px]"
+                  />
+               )
+            }
+            { label }
          </label>
-         {input.error !== null && (
-            <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-               <p className = "text-red-500 font-bold input-error"> {input.error} </p>
-            </div>
-         )}
+         {
+            input.error !== null && (
+               <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 opacity-0">
+                  <p className = "input-error font-bold text-red-500"> { input.error } </p>
+               </div>
+            )
+         }
       </div>
    );
 }

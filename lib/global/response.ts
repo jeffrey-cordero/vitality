@@ -13,7 +13,7 @@ export interface VitalityResponse<T> {
 
 export function sendSuccessMessage<T>(
    message: string,
-   data: T,
+   data: T
 ): VitalityResponse<T> {
    return {
       status: "Success",
@@ -39,7 +39,9 @@ export function sendErrorMessage<T>(
    };
 }
 
-export function sendFailureMessage<T>(error: Error): VitalityResponse<T> {
+export function sendFailureMessage<T>(
+   error: Error
+): VitalityResponse<T> {
    // Error logs strictly within a development environment
    process.env.NODE_ENV === "development" && console.error(error);
 
@@ -56,13 +58,13 @@ export function sendFailureMessage<T>(error: Error): VitalityResponse<T> {
 }
 
 export function handleResponse(
-   dispatch: Dispatch<VitalityAction<any>>,
    response: VitalityResponse<any>,
-   successMethod: () => void,
+   dispatch: Dispatch<VitalityAction<any>>,
    updateNotification: (_notification: NotificationProps) => void,
+   successMethod: () => void
 ): void {
    if (response.status === "Success") {
-      // Remove any existing notifications
+      // Remove existing notification, if any
       updateNotification({
          status: "Initial",
          message: ""
@@ -70,13 +72,15 @@ export function handleResponse(
 
       // Call the success method
       successMethod.call(null);
-   } else if (response.status === "Error" && Object.keys(response.body.errors).length > 0) {
-      // Update state to display all errors relative to the response
+   } else if (response.status === "Error"
+         && Object.keys(response.body.errors).length > 0) {
+      // Update state to display all errors found within the response
       dispatch({
          type: "updateErrors",
          value: response
       });
 
+      // Scroll into the first error element within the DOM
       document.getElementsByClassName("input-error")?.item(0)
          ?.scrollIntoView({ behavior: "smooth", block: "center" });
    } else {

@@ -1,16 +1,15 @@
 import { Workout } from "@/lib/home/workouts/workouts";
 
-const urlRegex =
-  /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg)|https?:\/\/[^/]+\/[^?#]+\?.*)$/i;
-const defaultImageRegex =
+const urlRegex = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg))$/i;
+const nextMediaRegex =
   /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
+const base64ImageRegex = /^data:image\/(jpeg|png|gif|bmp|webp);base64,[A-Za-z0-9+/=]+$/;
 
 export function verifyImageURL(url: string): boolean {
-   return url.trim().length === 0 || urlRegex.test(url) || defaultImageRegex.test(url);
+   return url.trim().length === 0 || urlRegex.test(url) || nextMediaRegex.test(url) || base64ImageRegex.test(url);
 }
 
-export function formatWorkout(workout: any): Workout {
-   // Uniform workout object containing all potential properties, tag ID's, and exercises
+export function formateDatabaseWorkout(workout: any): Workout {
    return {
       id: workout.id,
       user_id: workout.user_id,

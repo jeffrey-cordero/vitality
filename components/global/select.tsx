@@ -9,19 +9,8 @@ interface SelectProps extends VitalityInputProps {
 }
 
 export default function Select(props: SelectProps): JSX.Element {
-   const {
-      id,
-      label,
-      value,
-      values,
-      icon,
-      placeholder,
-      className,
-      onChange,
-      autoFocus,
-      input,
-      dispatch
-   } = props;
+   const { id, label, value, values, icon, placeholder, className,
+      onChange, autoFocus, required, input, dispatch } = props;
    const selectRef = useRef<HTMLSelectElement>(null);
 
    useEffect(() => {
@@ -31,63 +20,82 @@ export default function Select(props: SelectProps): JSX.Element {
       input.error
    ]);
 
-   const handleSelectChange = useCallback(
-      (event: ChangeEvent<HTMLSelectElement>) => {
-         if (input.handlesOnChange) {
-            // Call the user-defined event handler (complex state)
-            onChange?.call(null, event);
-         } else {
-            // Simple state
-            dispatch({
-               type: "updateState",
-               value: {
-                  id: id,
-                  input: {
-                     ...input,
-                     value: event.target.value,
-                     error: null
-                  }
+   const handleSelectChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
+      // handlesOnChange defined implies state management is handled via the parent component
+      if (input.handlesOnChange) {
+         onChange?.call(null, event);
+      } else {
+         dispatch({
+            type: "updateState",
+            value: {
+               id: id,
+               input: {
+                  ...input,
+                  value: event.target.value,
+                  error: null
                }
-            });
-         }
-      }, [
-         dispatch,
-         input,
-         id,
-         onChange
-      ]);
+            }
+         });
+      }
+   }, [
+      dispatch,
+      input,
+      id,
+      onChange
+   ]);
 
    return (
       <div className = "relative">
          <select
-            ref = {selectRef}
-            id = {id}
-            value = {value ?? input.value}
-            placeholder = {placeholder ?? ""}
-            className = {clsx(
-               "peer p-4 block w-full rounded-lg text-sm font-semibold border-1 placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none focus:pt-6 focus:pb-2 [&:not(:placeholder-shown)]:pt-6 [&:not(:placeholder-shown)]:pb-2 autofill:pt-6 autofill:pb-2 border-gray-200",
-               className,
-            )}
-            onChange = {handleSelectChange}>
-            {values.map((value: string) => {
-               return <option key = {value}> {value} </option>;
-            })}
+            ref = { selectRef }
+            id = { id }
+            value = { value ?? input.value }
+            placeholder = { placeholder ?? "" }
+            className = {
+               clsx("peer block w-full rounded-lg border-gray-200 bg-white p-4 text-sm font-semibold placeholder:text-transparent autofill:pb-2 autofill:pt-7 focus:border-[1.5px] focus:border-primary focus:pb-2 focus:pt-7 focus:ring-primary disabled:pointer-events-none disabled:opacity-50 dark:border-0 dark:bg-gray-700/50 dark:[color-scheme:dark] [&:not(:placeholder-shown)]:pb-2 [&:not(:placeholder-shown)]:pt-7",
+                  className,
+               )
+            }
+            onChange = { handleSelectChange }
+         >
+            {
+               values.map((value: string) => {
+                  return (
+                     <option key = { value }>
+                        { value }
+                     </option>
+                  );
+               })
+            }
          </select>
          <label
-            htmlFor = {id}
-            className = {clsx(
-               "absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-200 border border-transparent peer-disabled:opacity-50 peer-disabled:pointer-events-none peer-focus:text-xs peer-focus:-translate-y-2 peer-focus:text-gray-500 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-gray-500",
-               {
-                  "font-bold": label.includes("*")
-               },
-            )}>
-            {icon && <FontAwesomeIcon icon = {icon} />} {label}
+            htmlFor = { id }
+            className = {
+               clsx(
+                  "pointer-events-none absolute start-0 top-0 h-full truncate border border-transparent p-4 text-sm transition duration-200 ease-in-out peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-sm peer-placeholder-shown:text-black peer-focus:-translate-y-2 peer-focus:text-xs peer-focus:text-black peer-disabled:pointer-events-none peer-disabled:opacity-50 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-placeholder-shown:text-white dark:peer-[:not(:placeholder-shown)]:text-gray-400",
+                  {
+                     "font-bold": required
+                  },
+               )
+            }
+         >
+            {
+               icon && (
+                  <FontAwesomeIcon
+                     icon = { icon }
+                     className = "mr-[4px]"
+                  />
+               )
+            }
+            { label }
          </label>
-         {input.error !== null && (
-            <div className = "flex justify-center align-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-               <p className = "text-red-500 font-bold input-error"> {input.error} </p>
-            </div>
-         )}
+         {
+            input.error !== null && (
+               <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 opacity-0">
+                  <p className = "input-error font-bold text-red-500"> { input.error } </p>
+               </div>
+            )
+         }
       </div>
    );
 }

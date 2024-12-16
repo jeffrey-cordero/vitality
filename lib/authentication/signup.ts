@@ -83,7 +83,7 @@ export async function signup(
          "Invalid user registration fields",
          fields.error.flatten().fieldErrors
       );
-   } else if (!(registration.password === registration.confirmPassword)) {
+   } else if (registration.password !== registration.confirmPassword) {
       return sendErrorMessage("Invalid user registration fields", {
          password: ["Passwords do not match"],
          confirmPassword: ["Passwords do not match"]
@@ -92,9 +92,8 @@ export async function signup(
 
    try {
       const registration = fields.data;
-
       const salt = await bcrypt.genSaltSync(10);
-      registration.password = await bcrypt.hash(registration.password, salt);
+      const hashedPassword = await bcrypt.hash(registration.password, salt);
 
       const existingUsers = await prisma.users.findMany({
          where: {
@@ -107,12 +106,13 @@ export async function signup(
       });
 
       if (!existingUsers || existingUsers.length === 0) {
+         // Valid new user registration
          await prisma.users.create({
             data: {
                username: registration.username.trim(),
                name: registration.name.trim(),
                email: registration.email.trim(),
-               password: registration.password,
+               password: hashedPassword,
                birthday: registration.birthday,
                phone: registration.phone?.trim()
             }
@@ -120,7 +120,7 @@ export async function signup(
 
          return sendSuccessMessage("Successfully registered", null);
       } else {
-         // Handle taken username, email, and/or phone errors
+         // Account for taken username, email, and/or phone constraints
          const errors = {};
 
          for (const user of existingUsers) {

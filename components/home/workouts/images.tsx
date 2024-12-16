@@ -1,18 +1,12 @@
 import Image from "next/image";
 import clsx from "clsx";
 import Button from "@/components/global/button";
-import Input, { VitalityInputProps } from "@/components/global/input";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Modal } from "@/components/global/modal";
-import {
-   faCameraRetro,
-   faGlobe,
-   faPaperclip,
-   faPenToSquare,
-   faTrashCan
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Modal from "@/components/global/modal";
+import { useCallback, useMemo, useState } from "react";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Input, VitalityInputProps } from "@/components/global/input";
+import { faCameraRetro, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 const images = [
    "bike.png",
@@ -27,14 +21,18 @@ const images = [
    "weights.png"
 ];
 
+const nextMediaRegex =
+  /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
+
 interface ImagesFormProps extends VitalityInputProps {
+   url: string;
    isValidResource: boolean;
    isValidURL: boolean;
 }
 
 function ImagesForm(props: ImagesFormProps): JSX.Element {
-   const { isValidURL, isValidResource, input, dispatch } = props;
-   const [isDefaultImage, setIsDefaultImage] = useState<boolean>(true);
+   const { url, isValidURL, isValidResource, input, dispatch } = props;
+   const [isDefaultImage, setIsDefaultImage] = useState<boolean>(url === "" || nextMediaRegex.test(url));
 
    const handleImageURLUpdates = useCallback(() => {
       dispatch({
@@ -59,7 +57,6 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
 
    const handleDefaultImageSelection = useCallback(
       (source: string) => {
-         // All default images are valid image URL's
          dispatch({
             type: "updateState",
             value: {
@@ -87,7 +84,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
             id: "image",
             input: {
                ...input,
-               error: "Failed to fetch your desired image resource. Please ensure the link is valid.",
+               error: "Failed to fetch your desired image resource.",
                data: {
                   ...input.data,
                   valid: false
@@ -100,7 +97,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
       input
    ]);
 
-   const handleImageURLReset = useCallback(() => {
+   const handleResetImageURL = useCallback(() => {
       dispatch({
          type: "updateState",
          value: {
@@ -120,191 +117,237 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
       input
    ]);
 
-   useEffect(() => {
-      if (isDefaultImage) {
-         document.getElementById(input.value)
-            ?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-   });
+   const handleImageURLChanges = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+      // Ensure any changes to URL are verified on a new submission
+      dispatch({
+         type: "updateState",
+         value: {
+            id: "image",
+            input: {
+               ...input,
+               value: event.target.value,
+               error: null,
+               data: {
+                  ...input.data,
+                  valid: undefined
+               }
+            }
+         }
+      });
+   }, [
+      input,
+      dispatch
+   ]);
 
    return (
-      <div className = "flex flex-col">
-         <div className = "flex justify-start items-center text-left gap-4 mt-2 mb-4 text-sm">
+      <div className = "flex flex-col py-2">
+         <div className = "mb-4 mt-2 flex flex-wrap items-center justify-center gap-3 text-center text-base">
             <Button
-               icon = {faCameraRetro}
-               onClick = {(event: React.MouseEvent) => {
-                  event.stopPropagation();
-                  setIsDefaultImage(true);
-               }}
-               className = {clsx("transition duration-300 ease-in-out", {
-                  "scale-105 border-b-4 border-b-primary rounded-none":
-                     isDefaultImage
-               })}>
-               Defaults
+               icon = { faCameraRetro }
+               onClick = {
+                  (event: React.MouseEvent) => {
+                     event.stopPropagation();
+                     setIsDefaultImage(true);
+                  }
+               }
+               className = {
+                  clsx("transition duration-300 ease-in-out focus:text-primary focus:ring-transparent", {
+                     "scale-105 border-b-4 border-b-primary rounded-none": isDefaultImage
+                  })
+               }
+            >
+               Default
             </Button>
             <Button
-               icon = {faGlobe}
-               onClick = {(event: React.MouseEvent) => {
-                  event.stopPropagation();
-                  setIsDefaultImage(false);
-               }}
-               className = {clsx("transition duration-300 ease-in-out", {
-                  "scale-105  border-b-4 border-b-primary rounded-none":
-                     !isDefaultImage
-               })}>
+               icon = { faPaperclip }
+               onClick = {
+                  (event: React.MouseEvent) => {
+                     event.stopPropagation();
+                     setIsDefaultImage(false);
+                  }
+               }
+               className = {
+                  clsx("transition duration-300 ease-in-out focus:text-primary focus:ring-transparent", {
+                     "scale-105 border-b-4 border-b-primary rounded-none": !isDefaultImage
+                  })
+               }
+            >
                URL
             </Button>
          </div>
-         {isDefaultImage ? (
-            <div
-               tabIndex = {0}
-               className = "relative flex flex-wrap gap-6 justify-center items-center px-2 py-4">
-               {images.map((image) => {
-                  const source: string = `/workouts/${image}`;
-                  const isSelected: boolean = input.value === source;
+         {
+            isDefaultImage ? (
+               <div
+                  tabIndex = { 0 }
+                  className = "relative flex flex-wrap items-center justify-center gap-6 py-4"
+               >
+                  {
+                     images.map((image) => {
+                        const source: string = `/workouts/${image}`;
+                        const isSelected: boolean = url === source;
 
-                  return (
-                     <div
-                        tabIndex = {0}
-                        id = {source}
-                        onKeyDown = {(event) => {
-                           if (event.key === "Enter" || event.key === " ") {
-                              handleDefaultImageSelection(source);
-                           }
-                        }}
-                        className = "relative w-[12rem] h-[12rem]"
-                        key = {source}>
-                        <Image
-                           fill
-                           priority
-                           quality = {100}
-                           sizes = "100%"
-                           src = {source}
-                           key = {source}
-                           alt = "workout-image"
-                           className = {clsx(
-                              "object-cover object-center shadow-inner rounded-xl cursor-pointer", {
-                                 "border-primary border-[4px] shadow-2xl scale-[1.05] transition duration-300 ease-in-out": isSelected
-                              }
-                           )}
-                           onClick = {() => !isSelected ? handleDefaultImageSelection(source) : handleImageURLReset()}
-                        />
-                     </div>
-                  );
-               })}
-            </div>
-         ) : (
-            <div
-               onKeyDown = {(event: React.KeyboardEvent) => {
-                  if (event.key === "Enter") {
-                     handleImageURLUpdates();
+                        return (
+                           <div
+                              id = { source }
+                              className = "relative size-64 sm:size-48"
+                              key = { source }
+                           >
+                              <Image
+                                 fill
+                                 priority
+                                 tabIndex = { 0 }
+                                 quality = { 100 }
+                                 sizes = "100%"
+                                 src = { source }
+                                 key = { source }
+                                 alt = "workout-image"
+                                 className = {
+                                    clsx(
+                                       "cursor-pointer rounded-xl object-cover object-center shadow-inner", {
+                                          "border-primary border-[4px] shadow-2xl scale-[1.03] transition duration-300 ease-in-out": isSelected
+                                       }
+                                    )
+                                 }
+                                 onKeyDown = {
+                                    (event) => {
+                                       if (event.key === "Enter" || event.key === " ") {
+                                          !isSelected ? handleDefaultImageSelection(source) : handleResetImageURL();
+                                       }
+                                    }
+                                 }
+                                 onClick = { () => !isSelected ? handleDefaultImageSelection(source) : handleResetImageURL() }
+                              />
+                           </div>
+                        );
+                     })
                   }
-               }}
-               className = "relative w-full h-full mx-auto">
-               {isValidResource && isValidURL && (
-                  <div className = "flex justify-center items-center my-6">
-                     <div className = "relative w-[12rem] h-[12rem]">
-                        <Image
-                           fill
-                           priority
-                           quality = {100}
-                           sizes = "100%"
-                           src = {input.value}
-                           onError = {handleImageResourceError}
-                           alt = "workout-image"
-                           className = {clsx(
-                              "object-cover object-center rounded-xl cursor-default border-[4px] border-primary shadow-md scale-[1.05] transition duration-300 ease-in-out",
-                           )}
-                        />
-                     </div>
-                  </div>
-               )}
-               <Input
-                  {...props}
-                  onChange = {(event: React.ChangeEvent<HTMLInputElement>) => {
-                     // Ensure any changes to URL are verified on a new submission
-                     dispatch({
-                        type: "updateState",
-                        value: {
-                           id: "image",
-                           input: {
-                              ...input,
-                              value: event.target.value,
-                              error: null,
-                              data: {
-                                 ...input.data,
-                                 valid: undefined
-                              }
-                           }
+               </div>
+            ) : (
+               <div
+                  onKeyDown = {
+                     (event: React.KeyboardEvent) => {
+                        if (event.key === "Enter" && url.length > 0) {
+                           handleImageURLUpdates();
                         }
-                     });
-                  }}
-               />
-               <Button
-                  type = "button"
-                  onClick = {handleImageURLReset}
-                  className = "w-full px-4 py-2 mt-2 font-semibold border-gray-100 border-[1.5px] h-[2.4rem] focus:border-blue-500 focus:ring-blue-500 text-red-500"
-                  icon = {faTrashCan}>
-                  Remove Image
-               </Button>
-               <Button
-                  type = "button"
-                  onClick = {handleImageURLUpdates}
-                  className = "w-full bg-primary text-white mt-2 font-semibold h-[2.4rem] placeholder:text-transparent"
-                  icon = {faPaperclip}>
-                  Add Image
-               </Button>
-            </div>
-         )}
+                     }
+                  }
+                  className = "relative mx-auto size-full"
+               >
+                  {
+                     isValidResource && isValidURL && (
+                        <div className = "my-6 flex items-center justify-center">
+                           <div className = "relative size-64">
+                              <Image
+                                 fill
+                                 priority
+                                 quality = { 100 }
+                                 sizes = "100%"
+                                 src = { url }
+                                 onError = { handleImageResourceError }
+                                 alt = "workout-image"
+                                 className = {
+                                    clsx(
+                                       "scale-105 cursor-default rounded-xl border-4 border-primary object-cover object-center shadow-md transition duration-300 ease-in-out",
+                                    )
+                                 }
+                              />
+                           </div>
+                        </div>
+                     )
+                  }
+                  <Input
+                     { ...props }
+                     onChange = { handleImageURLChanges }
+                  />
+                  {
+                     url.length > 0 && (
+                        <div className = "relative">
+                           {
+                              input.data.valid && (
+                                 <Button
+                                    type = "button"
+                                    onClick = { handleResetImageURL }
+                                    className = "mt-2 h-[2.4rem] w-full bg-red-500 px-4 py-2 font-semibold text-white focus:ring-red-700"
+                                    icon = { faTrashCan }
+                                 >
+                                    Remove
+                                 </Button>
+                              )
+                           }
+                           {
+                              input.data.valid !== true && (
+                                 <Button
+                                    type = "button"
+                                    onClick = { handleImageURLUpdates }
+                                    className = "mt-2 h-[2.4rem] w-full bg-primary font-semibold text-white placeholder:text-transparent"
+                                    icon = { faPaperclip }
+                                 >
+                                    Add
+                                 </Button>
+                              )
+                           }
+
+                        </div>
+                     )
+                  }
+               </div>
+            )
+         }
       </div>
    );
 }
 
 export default function Images(props: VitalityInputProps): JSX.Element {
    const { input } = props;
+   const url: string = input.value.trim();
    const isValidResource: boolean = useMemo(() => {
-      return input.data.valid !== false && input.value.trim().length !== 0;
+      return input.data.valid === true && url.length !== 0;
    }, [
-      input.data.valid,
-      input.value
+      url,
+      input.data.valid
    ]);
    const isValidURL: boolean = useMemo(() => {
-      return verifyImageURL(input.value);
-   }, [input.value]);
-   const addedImage: boolean = isValidResource && isValidURL;
+      return verifyImageURL(url);
+   }, [url]);
 
    return (
-      <div>
+      <div className = "relative">
          <Modal
             display = {
-               <div>
+               <div className = "relative">
                   <Button
-                     className = {clsx(
-                        "w-full text-black font-semibold border-[1.5px] px-4 py-2 h-[2.4rem] placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500",
-                        {
-                           "border-[1.5px] border-red-500": input.error
-                        },
-                     )}>
+                     className = {
+                        clsx(
+                           "h-[2.6rem] w-full border-[1.5px] px-4 py-2 text-sm font-semibold placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 xxsm:text-base dark:border-0 dark:bg-gray-700/50",
+                           {
+                              "border-[2px] dark:border-[2px] border-red-500 text-red-500": input.error
+                           },
+                        )
+                     }
+                  >
                      <FontAwesomeIcon
-                        icon = {addedImage ? faPenToSquare : faPaperclip}
+                        icon = { isValidURL ? faPenToSquare : faPaperclip }
                      />
-                     {addedImage ? "Edit Image" : "Add Image"}
+                     { isValidURL ? "Edit Image" : "Add Image" }
                   </Button>
-                  {input.error !== null && (
-                     <div className = "flex justify-center align-center text-center max-w-[90%] mx-auto gap-2 p-3 opacity-0 animate-fadeIn">
-                        <p className = "text-red-500 font-bold input-error">
-                           {" "}
-                           {input.error}{" "}
-                        </p>
-                     </div>
-                  )}
+                  {
+                     input.error !== null && (
+                        <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 text-center opacity-0">
+                           <p className = "input-error font-bold text-red-500">
+                              { input.error }
+                           </p>
+                        </div>
+                     )
+                  }
                </div>
             }
-            className = "max-w-[90%] sm:max-w-xl max-h-[90%] mt-12">
+            className = "mt-12 max-h-[90%] max-w-[95%] sm:max-w-xl"
+         >
             <ImagesForm
-               {...props}
-               isValidResource = {isValidResource}
-               isValidURL = {isValidURL}
+               { ...props }
+               url = { url }
+               isValidResource = { isValidResource }
+               isValidURL = { isValidURL }
             />
          </Modal>
       </div>

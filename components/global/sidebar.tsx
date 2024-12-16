@@ -1,29 +1,15 @@
 "use client";
-import React from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import { useContext, useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname } from "next/navigation";
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import {
-   faAnglesRight,
-   faPlaneArrival,
-   faUserPlus,
-   faDoorOpen,
-   faHouse,
-   faUtensils,
-   faBrain,
-   faHeartCircleBolt,
-   faBullseye,
-   faShuffle,
-   faPeopleGroup,
-   faHandshakeAngle,
-   faGears,
-   faBarsStaggered,
-   faDumbbell
-} from "@fortawesome/free-solid-svg-icons";
 import { AuthenticationContext } from "@/app/layout";
+import { useContext, useEffect, useState } from "react";
+import { endSession } from "@/lib/authentication/session";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faUtensils, faBrain,
+   faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears, faBars,
+   faDumbbell, faRightFromBracket, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 
 interface SideBarProps {
   name: string;
@@ -34,7 +20,8 @@ interface SideBarProps {
 const landingLinks: SideBarProps[] = [
    { name: "Landing", href: "/", icon: faPlaneArrival },
    { name: "Log In", href: "/login", icon: faDoorOpen },
-   { name: "Sign Up", href: "/signup", icon: faUserPlus }
+   { name: "Sign Up", href: "/signup", icon: faUserPlus },
+   { name: "Theme", href: "\0", icon: null }
 ];
 
 const homeLinks: SideBarProps[] = [
@@ -47,23 +34,19 @@ const homeLinks: SideBarProps[] = [
    { name: "Progress", href: "/home/progress", icon: faShuffle },
    { name: "Community", href: "/home/community", icon: faPeopleGroup },
    { name: "Support", href: "/home/support", icon: faHandshakeAngle },
-   { name: "Settings", href: "/home/settings", icon: faGears }
+   { name: "Settings", href: "/home/settings", icon: faGears },
+   { name: "Theme", href: "\0", icon: null },
+   { name: "Sign Out", href: "\0", icon: faRightFromBracket }
 ];
 
 function SideBarLinks(): JSX.Element {
-   const pathname = usePathname();
-   const { user, fetched } = useContext(AuthenticationContext);
-   // Initialize links based on localStorage or pathname
+   const { user, theme, updateTheme, fetched } = useContext(AuthenticationContext);
    const [links, setLinks] = useState<SideBarProps[]>(homeLinks);
+   const pathname = usePathname();
 
-   // Update links based on user state and store in localStorage on unmount
+   // Update sidebar links based on current user and localStorage state
    useEffect(() => {
-      // Determine the new links based on user presence
-      const newLinks = user === undefined ? landingLinks : homeLinks;
-
-      if (fetched) {
-         setLinks(newLinks);
-      }
+      fetched && setLinks(user === undefined ? landingLinks : homeLinks);
    }, [
       user,
       fetched,
@@ -72,27 +55,55 @@ function SideBarLinks(): JSX.Element {
 
    return (
       <>
-         {links.map((link) => {
-            return (
-               <Link
-                  key = {link.name}
-                  href = {link.href}
-                  className = {clsx(
-                     "flex h-[50px] w-full items-center justify-start gap-10 rounded-md text-black bg-gray-50 text-sm font-medium hover:text-primary z-40",
-                     {
-                        "bg-sky-100 text-primary": pathname === link.href
-                     },
-                  )}>
-                  <div className = "w-[30px] pl-[10px]">
+         {
+            links.map((link) => {
+               const isTheme: boolean = link.name === "Theme";
+               const isSignOut: boolean = link.name === "Sign Out";
+
+               return (
+                  <Link
+                     key = { link.name }
+                     href = { link.href }
+                     className = {
+                        clsx(
+                           "z-40 flex h-[50px] w-full items-center justify-center rounded-md text-sm font-semibold hover:text-primary",
+                           {
+                              "bg-sky-100 dark:bg-slate-700 text-primary": pathname === link.href,
+                              "hover:text-yellow-400": isTheme,
+                              "hover:text-red-500": isSignOut
+                           },
+                        )
+                     }
+                     onClick = {
+                        async(event) => {
+                           switch (link.name) {
+                              case "Sign Out":
+                                 event.preventDefault();
+                                 await endSession();
+                                 window.location.reload();
+                                 break;
+                              case "Theme":
+                                 event.preventDefault();
+                                 updateTheme(theme === "dark" ? "light" : "dark");
+                                 break;
+                              default:
+                                 return;
+                           }
+                        }
+                     }
+                  >
                      <FontAwesomeIcon
-                        icon = {link.icon}
-                        className = "text-2xl"
+                        icon = { isTheme ? theme === "dark" ? faMoon : faSun : link.icon }
+                        className = {
+                           clsx("text-[1.4rem] xxsm:text-[1.6rem]", {
+                              "text-yellow-400 hover:text-yellow-500": isTheme
+                           })
+                        }
                      />
-                  </div>
-                  <p className = "whitespace-nowrap">{link.name}</p>
-               </Link>
-            );
-         })}
+                  </Link>
+               );
+            })
+         }
       </>
    );
 }
@@ -101,36 +112,44 @@ export function SideBar(): JSX.Element {
    const [visibleSideBar, setVisibleSideBar] = useState<boolean>(false);
 
    return (
-      <div>
-         <div className = "absolute top-0 left-0 z-30">
-            <div className = "relative top-0 left-0 transform translate-x-[10px] translate-y-[20px] z-30">
+      <div className = "relative">
+         <div className = "absolute left-0 top-0 z-30">
+            <div className = "relative left-0 top-0 z-30 translate-x-[10px] translate-y-[15px]">
                <FontAwesomeIcon
                   id = "sideBarButton"
-                  icon = {visibleSideBar ? faAnglesRight : faBarsStaggered}
-                  className = "text-3xl text-black font-extrabold hover:cursor-pointer"
-                  onClick = {() => {
-                     setVisibleSideBar(!visibleSideBar);
-                  }}
+                  icon = { visibleSideBar ? faAnglesRight : faBars }
+                  className = "text-3xl font-extrabold text-black hover:cursor-pointer dark:text-white"
+                  onClick = {
+                     () => {
+                        setVisibleSideBar(!visibleSideBar);
+                     }
+                  }
                />
             </div>
          </div>
          <div className = "absolute z-20">
             <div
                id = "sideBarLinks"
-               className = {clsx(
-                  "relative m-0 top-[10px] w-[4.5rem] hover:w-64 focus:w-64 transition-all duration-1000 ease-in-out",
-                  {
-                     "left-[-5rem]": !visibleSideBar,
-                     "left-[10px]": visibleSideBar
-                  },
-               )}>
+               className = {
+                  clsx(
+                     "group relative top-[-15px] m-0 w-[4.3rem] transition-all duration-1000 ease-in-out xxsm:w-20",
+                     {
+                        "left-[-5rem]": !visibleSideBar,
+                        "left-[10px]": visibleSideBar
+                     },
+                  )
+               }
+            >
                <div
-                  className = "flex h-auto mt-20 flex-col px-3 py-4 bg-gray-50 shadow-md rounded-2xl overflow-hidden"
-                  onMouseEnter = {() => {
-                     setVisibleSideBar(true);
-                  }}>
-                  <div className = "flex flex-col space-x-2 space-y-2 justify-center text-center">
-                     <div className = "flex flex-col w-full h-full items-center justify-between text-center">
+                  className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-[0.6rem] py-4 shadow-md xxsm:px-3 dark:bg-slate-800"
+                  onMouseEnter = {
+                     () => {
+                        setVisibleSideBar(true);
+                     }
+                  }
+               >
+                  <div className = "flex flex-col justify-center space-x-2 space-y-2 text-center">
+                     <div className = "flex size-full flex-col items-center justify-between text-center">
                         <SideBarLinks />
                      </div>
                   </div>

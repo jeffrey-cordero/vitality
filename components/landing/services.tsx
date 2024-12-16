@@ -2,91 +2,79 @@ import cx from "classnames";
 import Heading from "@/components/global/heading";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import {
-   faPersonRunning,
-   faUtensils,
-   faBullseye,
-   faWeightScale,
-   faBottleWater,
-   faBrain
-} from "@fortawesome/free-solid-svg-icons";
+import { faUtensils, faBullseye, faWeightScale, faBottleWater, faBrain, faDumbbell } from "@fortawesome/free-solid-svg-icons";
 
 interface ServiceProps {
   icon: IconProp;
   title: string;
   background: string;
   color: string;
-  divider: string;
 }
 
 function Service(props: ServiceProps): JSX.Element {
-   const { icon, title, background, color, divider } = props;
+   const { icon, title, background, color } = props;
    return (
       <div
-         className = {cx(
-            background,
-            color,
-            "flex flex-col align-center justify-center gap-1 w-[11rem] max-w-[90%] md:max-w-none h-[11rem] text-center rounded-2xl border border-gray-200 shadow-md p-4 mx-auto",
-         )}>
+         className = {
+            cx(
+               background,
+               color,
+               "flex flex-col items-center justify-center gap-3 h-[12rem] w-[29rem] max-w-full mx-auto xsm:max-w-none xsm:size-[10rem] text-center rounded-2xl shadow-md",
+            )
+         }
+      >
          <FontAwesomeIcon
-            icon = {icon}
-            className = {cx(color, "text-4xl")}
+            icon = { icon }
+            className = { cx(color, "text-[2.5rem] xsm:text-4xl") }
          />
-         <div className = {cx(divider, "w-1/2 mx-auto my-1")} />
-         <h1 className = "font-semibold text-2xl">{title}</h1>
+         <h1 className = "text-[1.5rem] font-bold xsm:text-xl">{ title }</h1>
       </div>
    );
 }
 
 export default function Services(): JSX.Element {
    return (
-      <div className = "w-full mx-auto my-4">
+      <div className = "mx-auto w-full max-w-7xl">
          <Heading
             title = "Our Services"
-            description = "With a commitment to innovation, we're constantly exploring new avenues to enhance your wellness experience"
+            description = "Driven by innovation, we continually explore new ways to elevate your wellness journey"
          />
-         <div className = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 justify-center content-center gap-x-[60px] gap-y-[60px] md:gap-y-[60px] w-full md:w-8/12 sm:w-11/12 mx-auto py-4">
+         <div className = "container relative mx-auto my-8 grid grid-cols-1 content-center justify-center gap-x-0 gap-y-8 px-2 xsm:grid-cols-2 xsm:gap-x-[20px] xsm:px-0 sm:gap-x-0 md:gap-x-[250px] lg:gap-x-0 xl:grid-cols-3">
             <Service
-               background = "bg-white"
+               background = "bg-white dark:bg-slate-800"
                color = "text-primary"
-               icon = {faPersonRunning}
+               icon = { faDumbbell }
                title = "Workouts"
-               divider = "bg-primary"
             />
             <Service
                background = "bg-primary"
                color = "text-white"
-               icon = {faUtensils}
+               icon = { faUtensils }
                title = "Nutrition"
-               divider = "bg-white"
             />
             <Service
-               background = "bg-white"
+               background = "bg-white dark:bg-slate-800"
                color = "text-primary"
-               icon = {faWeightScale}
+               icon = { faWeightScale }
                title = "Weight"
-               divider = "bg-primary"
             />
             <Service
                background = "bg-primary"
                color = "text-white"
-               icon = {faBottleWater}
+               icon = { faBottleWater }
                title = "Hydration"
-               divider = "bg-white"
             />
             <Service
-               background = "bg-white"
+               background = "bg-white dark:bg-slate-800"
                color = "text-primary"
-               icon = {faBullseye}
+               icon = { faBullseye }
                title = "Goals"
-               divider = "bg-primary"
             />
             <Service
                background = "bg-primary"
                color = "text-white"
-               icon = {faBrain}
+               icon = { faBrain }
                title = "Mood"
-               divider = "bg-white"
             />
          </div>
       </div>

@@ -1,9 +1,10 @@
-import SignUpForm from "@/components/authentication/signup";
+import Main from "@/components/global/main";
+import SignUp from "@/components/authentication/signup";
 
 export default function Page() {
    return (
-      <main className = "w-full mx-auto flex min-h-screen flex-col items-center justify-start px-2 md:px-4 text-center overflow-hidden">
-         <SignUpForm />
-      </main>
+      <Main className = "px-0">
+         <SignUp />
+      </Main>
    );
 }

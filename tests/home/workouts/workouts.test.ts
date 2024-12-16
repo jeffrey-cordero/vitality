@@ -4,7 +4,7 @@ import { prismaMock } from "@/tests/singleton";
 import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { tags, workouts } from "@/tests/home/workouts/data";
-import { formatWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
+import { formateDatabaseWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
 import { addWorkout, deleteWorkouts, fetchWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
 
 const MOCK_WORKOUT = workouts[0];
@@ -215,7 +215,7 @@ describe("Workouts Tests", () => {
    describe("Fetch workouts", () => {
       test("Fetch workouts for existing and missing users", async() => {
          // Mock formatted workouts from database queries
-         const formatted = [...workouts].map((workout) => formatWorkout(workout));
+         const formatted = [...workouts].map((workout) => formateDatabaseWorkout(workout));
 
          expect(await fetchWorkouts(root.id)).toEqual(formatted);
          expect(prismaMock.workouts.findMany).toHaveBeenCalledWith({
@@ -305,7 +305,7 @@ describe("Workouts Tests", () => {
          expect(await addWorkout(workout)).toEqual({
             status: "Success",
             body: {
-               data: formatWorkout({
+               data: formateDatabaseWorkout({
                   ...workout,
                   id: MOCK_ID,
                   workout_applied_tags: [
