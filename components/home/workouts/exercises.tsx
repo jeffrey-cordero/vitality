@@ -704,7 +704,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       localState.name
    ]);
 
-   const handleExerciseSetReset = useCallback((setId: string) => {
+   const handleResetExerciseSet = useCallback((setId: string) => {
       // Reset exercise set inputs
       localDispatch({
          type: "updateStates",
@@ -874,7 +874,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                                        set = { set }
                                        onBlur = { () => {} }
                                        key = { set.id }
-                                       reset = { () => handleExerciseSetReset(set.id) }
+                                       reset = { () => handleResetExerciseSet(set.id) }
                                     />
                                  );
                               })
@@ -885,7 +885,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                                     { ...props }
                                     set = { undefined }
                                     onBlur = { () => setAddSet(false) }
-                                    reset = { () => handleExerciseSetReset("") }
+                                    reset = { () => handleResetExerciseSet("") }
                                  />
                               )
                            }
@@ -901,7 +901,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                               icon = { faBook }
                               onClick = {
                                  () => {
-                                    handleExerciseSetReset("");
+                                    handleResetExerciseSet("");
                                     setAddSet(true);
                                  }
                               }

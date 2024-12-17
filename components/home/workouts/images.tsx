@@ -3,7 +3,7 @@ import clsx from "clsx";
 import Button from "@/components/global/button";
 import Modal from "@/components/global/modal";
 import { useCallback, useMemo, useState } from "react";
-import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { workoutsImageRegex, verifyImageURL } from "@/lib/home/workouts/shared";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Input, VitalityInputProps } from "@/components/global/input";
 import { faCameraRetro, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
@@ -21,9 +21,6 @@ const images = [
    "weights.png"
 ];
 
-const nextMediaRegex =
-  /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
-
 interface ImagesFormProps extends VitalityInputProps {
    url: string;
    isValidResource: boolean;
@@ -32,7 +29,7 @@ interface ImagesFormProps extends VitalityInputProps {
 
 function ImagesForm(props: ImagesFormProps): JSX.Element {
    const { url, isValidURL, isValidResource, input, dispatch } = props;
-   const [isDefaultImage, setIsDefaultImage] = useState<boolean>(url === "" || nextMediaRegex.test(url));
+   const [isDefaultImage, setIsDefaultImage] = useState<boolean>(url === "" || workoutsImageRegex.test(url));
 
    const handleImageURLUpdates = useCallback(() => {
       dispatch({
@@ -84,7 +81,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
             id: "image",
             input: {
                ...input,
-               error: "Failed to fetch your desired image resource.",
+               error: "Failed to fetch your desired image resource",
                data: {
                   ...input.data,
                   valid: false

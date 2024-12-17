@@ -1,3 +1,4 @@
+import validator from "validator";
 import { z } from "zod";
 
 export const uuidSchema = (identifier: string, state: "new" | "required") => {
@@ -17,3 +18,47 @@ export const uuidSchema = (identifier: string, state: "new" | "required") => {
          .optional()
    );
 };
+
+export const userSchema = z.object({
+   name: z
+      .string()
+      .trim()
+      .min(2, { message: "Name must be at least 2 characters" })
+      .max(200, { message: "Name must be at most 200 characters" }),
+   birthday: z
+      .date({
+         required_error: "Birthday is required",
+         invalid_type_error: "Birthday is required"
+      })
+      .max(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), {
+         message: "Birthday cannot be in the future"
+      }),
+   username: z
+      .string()
+      .trim()
+      .min(3, { message: "Username must be at least 3 characters" })
+      .max(30, { message: "Username must be at most 30 characters" }),
+   password: z
+      .string({
+         message: "Password is required"
+      })
+      .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/, {
+         message:
+         "Password must contain at least 8 characters, " +
+         "one uppercase letter, one lowercase letter, " +
+         "one number, and one special character (@$!%*#?&)"
+      }),
+   email: z
+      .string({
+         message: "Email is required"
+      })
+      .trim()
+      .email({ message: "Email is required" }),
+   phone: z
+      .string()
+      .trim()
+      .refine(validator.isMobilePhone, {
+         message: "Valid phone number is required, if provided"
+      })
+      .optional()
+});

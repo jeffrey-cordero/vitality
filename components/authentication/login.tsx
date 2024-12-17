@@ -42,7 +42,7 @@ export default function Login(): JSX.Element {
    };
 
    return (
-      <div className = "mx-auto flex w-full flex-col items-center justify-center text-center">
+      <div className = "mx-auto mb-12 flex w-full flex-col items-center justify-center text-center">
          <Heading
             title = "Log In"
             description = "Enter valid credentials to enter"

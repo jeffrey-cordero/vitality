@@ -17,7 +17,6 @@ export const authConfig = {
             token.id = user.id;
             token.name = user.name;
             token.email = user.email;
-            token.picture = user.image;
          }
 
          return token;
@@ -25,7 +24,6 @@ export const authConfig = {
       async session({ session, token }) {
          session.user.id = token.sub as string;
          session.user.email = token.email as string;
-         session.user.image = token.picture as string;
 
          return session;
       },

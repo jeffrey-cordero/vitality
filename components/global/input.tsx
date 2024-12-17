@@ -17,7 +17,7 @@ export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
 
 export function Input(props: VitalityInputProps): JSX.Element {
    const { id, label, type, icon, placeholder, className, min, autoFocus, scrollIntoView,
-      autoComplete, onChange, onSubmit, required, input, dispatch } = props;
+      autoComplete, onChange, onBlur, onSubmit, required, input, dispatch, disabled } = props;
    const inputType = input.data.type ?? type;
    const inputRef = useRef<HTMLInputElement>(null);
    const passwordIconRef = useRef<SVGSVGElement | null>(null);
@@ -114,6 +114,8 @@ export function Input(props: VitalityInputProps): JSX.Element {
                }
                onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event) }
                onChange = { (event: ChangeEvent<HTMLInputElement>) => handleInputChange(event) }
+               onBlur = { onBlur ?? undefined }
+               disabled = { disabled ?? false }
             />
             {
                (inputType === "password" || passwordIconRef.current !== null) && (

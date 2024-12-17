@@ -101,7 +101,7 @@ export default function SignUp(): JSX.Element {
    };
 
    return (
-      <div className = "mx-auto flex w-full flex-col items-center justify-center text-center">
+      <div className = "mx-auto mb-12 flex w-full flex-col items-center justify-center text-center">
          <Heading
             title = "Sign Up"
             description = "Create an account to get started"

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { uuidSchema } from "@/lib/global/zod";
 import { workout_applied_tags } from "@prisma/client";
 import { Exercise } from "@/lib/home/workouts/exercises";
-import { formateDatabaseWorkout } from "@/lib/home/workouts/shared";
+import { formateDatabaseWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
 import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
 
 export type Workout = {
@@ -17,11 +17,6 @@ export type Workout = {
   tagIds: string[];
   exercises: Exercise[];
 };
-
-const urlRegex = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg))$/i;
-const nextMediaRegex =
-  /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
-const base64ImageRegex = /^data:image\/(jpeg|png|gif|bmp|webp);base64,[A-Za-z0-9+/=]+$/;
 
 const workoutsSchema = z.object({
    user_id: uuidSchema("user", "required"),
@@ -42,7 +37,7 @@ const workoutsSchema = z.object({
    description: z.string().optional().or(z.literal("")),
    image: z
       .string()
-      .refine((value) => urlRegex.test(value) || nextMediaRegex.test(value) || base64ImageRegex.test(value), {
+      .refine((value) => verifyImageURL(value), {
          message: "Image URL must be valid"
       }).or(z.literal("")),
    tags: z.array(z.string()).optional()

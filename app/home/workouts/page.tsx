@@ -139,7 +139,7 @@ export default function Page(): JSX.Element {
       const pages: number = Math.ceil(workoutsData.length / paging);
       let page: number = Number.parseInt(window.localStorage.getItem("page") ?? "0");
 
-      if (page >= pages) {
+      if (page >= pages || page < 0) {
          page = Math.min(0, pages - 1);
          window.localStorage.setItem("page", String(page));
       }
