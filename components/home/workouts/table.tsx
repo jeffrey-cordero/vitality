@@ -27,7 +27,7 @@ function Row(props: RowProps) {
    }, [workout.image]);
 
    const formattedDate = useMemo(() => {
-      return workout.date.toISOString().slice(0, 10);
+      return workout.date.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1");
    }, [workout.date]);
 
    const handleWorkoutToggle = useCallback(() => {

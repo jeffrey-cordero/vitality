@@ -99,13 +99,11 @@ function FilterByDate(props: VitalityProps): JSX.Element {
    const filterModalRef = useRef<{ open: () => void; close: () => void }>(null);
    const dateFilterType: string = globalState.dateFilter.value;
 
-   const inputs = useMemo(() => {
-      return {
-         "Is between": undefined,
-         "Is on or after": globalState.minDate,
-         "Is on or before": globalState.maxDate
-      };
-   }, [
+   const inputs = useMemo(() => ({
+      "Is between": undefined,
+      "Is on or after": globalState.minDate,
+      "Is on or before": globalState.maxDate
+   }), [
       globalState.minDate,
       globalState.maxDate
    ]);

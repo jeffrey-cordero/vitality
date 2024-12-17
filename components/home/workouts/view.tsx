@@ -52,7 +52,7 @@ export default function View(props: ViewProps): JSX.Element {
          </div>
          <div
             id = "workoutsView"
-            className = "mx-auto flex w-full flex-col items-center justify-start px-2 lg:w-11/12"
+            className = "mx-auto flex w-full flex-col items-center justify-start px-2 2xl:w-8/12"
          >
             {
                workouts.length === 0 ? (

@@ -14,7 +14,6 @@ import { createContext, useCallback, useEffect, useState } from "react";
 
 interface AuthenticationContextType {
    user: NextAuthUser | undefined;
-   updateUser: (_user: NextAuthUser) => void;
    theme: "dark" | "light";
    updateTheme: (_theme: "dark" | "light") => void;
    fetched: boolean;
@@ -28,7 +27,6 @@ interface NotificationContextType {
 
 export const AuthenticationContext = createContext<AuthenticationContextType>({
    user: undefined,
-   updateUser: () => {},
    theme: null,
    updateTheme: () => {},
    fetched: false
@@ -68,10 +66,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
          }, 1250);
       }
    }, [notificationQueue]);
-
-   const updateUser = useCallback((user: NextAuthUser) => {
-      setUser(user);
-   }, []);
 
    const authenticateUser = useCallback(async() => {
       try {
@@ -176,7 +170,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
          >
             {
                fetched && (
-                  <AuthenticationContext.Provider value = { { user, updateUser, theme, updateTheme, fetched } }>
+                  <AuthenticationContext.Provider value = { { user, theme, updateTheme, fetched } }>
                      <SideBar />
                      <NotificationContext.Provider value = { { notification, notificationQueue, updateNotification } }>
                         <div className = "flex min-h-screen flex-col items-center justify-start gap-6">

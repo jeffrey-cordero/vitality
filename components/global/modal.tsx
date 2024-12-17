@@ -7,10 +7,11 @@ interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
   display: React.ReactNode;
   children: React.ReactNode;
   onClose?: () => void;
+  disabled?: boolean;
 }
 
 const Modal = forwardRef(function Modal(props: ModalProps, ref) {
-   const { display, children, className, onClick, onClose } = props;
+   const { display, children, className, onClick, onClose, disabled } = props;
    const [open, setOpen] = useState<boolean>(false);
    const modalRef = useRef(null);
 
@@ -47,7 +48,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
    return (
       <div className = "relative">
          <div
-            onClick = { handleOnOpen }
+            onClick = { disabled !== true ? handleOnOpen : undefined }
          >
             { display }
          </div>

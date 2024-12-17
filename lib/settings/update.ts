@@ -19,15 +19,17 @@ export async function updateUserAttribute<T extends keyof User>(
    attribute: T,
    value: User[T]
 ): Promise<VitalityResponse<void>> {
+   const isVerification: boolean = attribute === "email_verified" || attribute === "phone_verified";
+
    // Only update valid user attributes outside of the ID
-   if (attribute === "id" || !(attribute in updateSchema.shape)) {
+   if (attribute === "id" || !(attribute in updateSchema.shape) && !isVerification) {
       return sendFailureMessage(new Error("Updating user attribute must be valid"));
    }
 
    const attributeSchema = updateSchema.shape[attribute.toLowerCase()];
-   const field = attributeSchema.safeParse(value);
+   const field = attributeSchema?.safeParse(value);
 
-   if (!field.success) {
+   if (!field?.success && !isVerification) {
       return sendErrorMessage("Error caught while updating user attribute", {
          [attribute]: [field.error.errors[0].message]
       });
@@ -55,6 +57,8 @@ export async function updateUserAttribute<T extends keyof User>(
             id: user_id
          },
          data: {
+            email_verified: attribute === "email" ? false : undefined,
+            phone_verified: attribute === "phone" ? false : undefined,
             [attribute]: value
          }
       });

@@ -44,6 +44,8 @@ model users {
   email_verified Boolean        @default(false)
   phone          String?        @unique @db.VarChar(22)
   phone_verified Boolean?       @default(false)
+  notifications  Boolean?       @default(true)
+  date_format    String?        @db.VarChar(20)
   image          String?        @default("")
   workout_tags   workout_tags[]
   workouts       workouts[]

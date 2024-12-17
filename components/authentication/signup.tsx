@@ -7,10 +7,10 @@ import { login } from "@/lib/authentication/login";
 import { NotificationContext } from "@/app/layout";
 import { FormEvent, useContext, useReducer } from "react";
 import { VitalityState, formReducer } from "@/lib/global/state";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { signup, Registration } from "@/lib/authentication/signup";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateLeft, faDoorOpen, faFeather, faKey, faEnvelope, faPhone, faUserSecret, faCalendar, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faDoorOpen, faKey, faAt, faPhone, faUserSecret, faCakeCandles, faUserPlus, faSignature } from "@fortawesome/free-solid-svg-icons";
 
 const registration: VitalityState = {
    username: {
@@ -158,7 +158,7 @@ export default function SignUp(): JSX.Element {
                   type = "text"
                   label = "Name"
                   autoComplete = "name"
-                  icon = { faFeather }
+                  icon = { faSignature }
                   input = { state.name }
                   dispatch = { dispatch }
                   required
@@ -169,7 +169,7 @@ export default function SignUp(): JSX.Element {
                   label = "Birthday"
                   name = "bday"
                   autoComplete = "bday"
-                  icon = { faCalendar }
+                  icon = { faCakeCandles }
                   input = { state.birthday }
                   dispatch = { dispatch }
                   required
@@ -179,7 +179,7 @@ export default function SignUp(): JSX.Element {
                   type = "email"
                   label = "Email"
                   autoComplete = "email"
-                  icon = { faEnvelope }
+                  icon = { faAt }
                   input = { state.email }
                   dispatch = { dispatch }
                   required
