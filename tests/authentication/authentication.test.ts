@@ -17,10 +17,7 @@ const VALID_REGISTRATION: Registration = {
    email: "user@gmail.com",
    phone: "1234567890"
 };
-const INVALID_PASSWORD_MESSAGE =
-  "Password must contain at least 8 characters, " +
-  "one uppercase letter, one lowercase letter, " +
-  "one number, and one special character (@$!%*#?&)";
+const INVALID_PASSWORD_MESSAGE = "Password must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character (@$!%*#?&)";
 
 // Mock bcrypt password hashing methods
 jest.mock("bcryptjs", () => ({

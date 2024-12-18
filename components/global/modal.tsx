@@ -34,7 +34,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
    useEffect(() => {
       const modals = document.getElementsByClassName("modal");
 
-      if (modals.length > 0) {
+      if (modals.length > 0 && open) {
          document.body.parentElement.style.overflowY = "hidden";
       }
 
@@ -43,7 +43,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
             document.body.parentElement.style.overflowY = "initial";
          }
       };
-   }, []);
+   }, [open]);
 
    return (
       <div className = "relative">

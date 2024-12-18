@@ -43,10 +43,7 @@ export const userSchema = z.object({
          message: "Password is required"
       })
       .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/, {
-         message:
-         "Password must contain at least 8 characters, " +
-         "one uppercase letter, one lowercase letter, " +
-         "one number, and one special character (@$!%*#?&)"
+         message: "Password must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character (@$!%*#?&)"
       }),
    email: z
       .string({
@@ -57,7 +54,7 @@ export const userSchema = z.object({
    phone: z
       .string()
       .trim()
-      .refine(validator.isMobilePhone, {
+      .refine((val) => val === "" || validator.isMobilePhone(val), {
          message: "Valid phone number is required, if provided"
       })
       .optional()

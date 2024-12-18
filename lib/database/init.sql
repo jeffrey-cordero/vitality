@@ -8,8 +8,8 @@ CREATE TABLE "users" (
       email_verified BOOLEAN NOT NULL DEFAULT FALSE,
       phone VARCHAR(22) UNIQUE,
       phone_verified BOOLEAN DEFAULT FALSE,
-      notifications BOOLEAN DEFAULT TRUE,
-      date_format VARCHAR(20),
+      mail BOOLEAN DEFAULT FALSE,
+      sms BOOLEAN DEFAULT FALSE,
       image TEXT DEFAULT ''    
 );
 

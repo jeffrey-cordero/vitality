@@ -21,10 +21,7 @@ const registrationSchema = userSchema.extend({
          message: "Confirm password is required"
       })
       .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/, {
-         message:
-        "Password must contain at least 8 characters, " +
-        "one uppercase letter, one lowercase letter, " +
-        "one number, and one special character (@$!%*#?&)"
+         message: "Password must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character (@$!%*#?&)"
       })
 });
 
@@ -51,8 +48,7 @@ export async function signup(
 
    try {
       const registration = fields.data;
-      const salt = await bcrypt.genSaltSync(10);
-      const hashedPassword = await bcrypt.hash(registration.password, salt);
+      const hashedPassword = await bcrypt.hash(registration.password, await bcrypt.genSaltSync(10));
 
       const existingUsers = await prisma.users.findMany({
          where: {
