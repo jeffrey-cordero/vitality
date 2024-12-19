@@ -1,14 +1,13 @@
-
 import Modal from "@/components/global/modal";
 import Button from "@/components/global/button";
+import VerifyAttribute from "@/components/home/settings/verification";
 import { useDoubleTap } from "use-double-tap";
 import { Input } from "@/components/global/input";
 import { handleResponse } from "@/lib/global/response";
-import { updateAttribute, updatePassword, updatePreference } from "@/lib/settings/service";
+import { updateUserAttribute, updateUserPassword, updateUserPreference } from "@/lib/settings/service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { VitalityInputProps } from "@/components/global/input";
 import { VitalityProps } from "@/lib/global/state";
-import VerifyAttribute from "@/components/home/settings/verification";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useRef, useState } from "react";
 import { faArrowRotateLeft, faXmark, faKey, IconDefinition, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
@@ -41,7 +40,7 @@ export function GeneralAttribute(props: AttributeProps) {
       globalDispatch
    ]);
 
-   const handleUpdateAttribute = useCallback(async() => {
+   const handleupdateUserAttribute = useCallback(async() => {
       const updatingDatabaseValue: Date | string = type === "date"
          ? new Date(input.value) : input.value.trim();
       const updatingStorageValue: string = type === "date" ?
@@ -53,7 +52,7 @@ export function GeneralAttribute(props: AttributeProps) {
          return;
       }
 
-      const response = await updateAttribute(user.id, id as any, updatingDatabaseValue);
+      const response = await updateUserAttribute(user.id, id as any, updatingDatabaseValue);
 
       handleResponse(response, globalDispatch, updateNotification, async() => {
          globalDispatch({
@@ -110,7 +109,7 @@ export function GeneralAttribute(props: AttributeProps) {
                   />
                   <Input
                      { ...props }
-                     onSubmit = { handleUpdateAttribute }
+                     onSubmit = { handleupdateUserAttribute }
                      onBlur = { undefined }
                      autoComplete = { id }
                   />
@@ -118,7 +117,7 @@ export function GeneralAttribute(props: AttributeProps) {
                      type = "submit"
                      className = "mt-2 h-10 w-full bg-green-500 text-white"
                      icon = { icon }
-                     onClick = { handleUpdateAttribute }
+                     onClick = { handleupdateUserAttribute }
                   >
                      Update
                   </Button>
@@ -165,8 +164,8 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
    const passwordModalRef = useRef<{ open: () => void; close: () => void }>(null);
 
-   const handleUpdatePassword = useCallback(async() => {
-      const response = await updatePassword(
+   const handleupdateUserPassword = useCallback(async() => {
+      const response = await updateUserPassword(
          user.id,
          globalState.oldPassword.value.trim(),
          globalState.newPassword.value.trim(),
@@ -262,7 +261,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                            icon = { faKey }
                            input = { globalState.oldPassword }
                            dispatch = { globalDispatch }
-                           onSubmit = { handleUpdatePassword }
+                           onSubmit = { handleupdateUserPassword }
                            autoComplete = "current-password"
                         />
                         <Input
@@ -272,7 +271,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                            icon = { faKey }
                            input = { globalState.newPassword }
                            dispatch = { globalDispatch }
-                           onSubmit = { handleUpdatePassword }
+                           onSubmit = { handleupdateUserPassword }
                            autoComplete = "new-password"
                         />
                         <Input
@@ -282,14 +281,14 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                            icon = { faKey }
                            input = { globalState.confirmPassword }
                            dispatch = { globalDispatch }
-                           onSubmit = { handleUpdatePassword }
+                           onSubmit = { handleupdateUserPassword }
                            autoComplete = "new-password"
                         />
                         <Button
                            type = "submit"
                            className = "h-[2.6rem] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white xxsm:text-base"
                            icon = { faKey }
-                           onClick = { handleUpdatePassword }
+                           onClick = { handleupdateUserPassword }
                         >
                            Update
                         </Button>
@@ -316,7 +315,7 @@ export function SliderAttribute(props: SliderProps): JSX.Element {
    const { id, icon, label, onChange, checked, globalState, globalDispatch } = props;
 
    const handleOnChange = useCallback(async() => {
-      const response = await updatePreference(user.id, id, !checked);
+      const response = await updateUserPreference(user.id, id, !checked);
 
       handleResponse(response, globalDispatch, updateNotification, () => {
          globalDispatch({

@@ -1,8 +1,5 @@
 import { Workout } from "@/lib/home/workouts/workouts";
-
-export const urlRegex = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg))$/i;
-export const workoutsImageRegex = /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
-export const base64ImageRegex = /^data:image\/(jpeg|png|gif|bmp|webp);base64,[A-Za-z0-9+/=]+$/;
+import { urlRegex, workoutsImageRegex, base64ImageRegex } from "@/lib/home/workouts/regex";
 
 export function verifyImageURL(url: string): boolean {
    return url.trim().length === 0 || urlRegex.test(url) || workoutsImageRegex.test(url) || base64ImageRegex.test(url);

@@ -455,7 +455,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                </li>
             ) : (
                !isNewSet && (
-                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pl-8 pt-2 text-left text-sm font-semibold [overflow-wrap:anywhere] xxsm:text-[0.95rem]">
+                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pt-2 text-left text-sm font-semibold [overflow-wrap:anywhere] xxsm:text-[0.95rem] xsm:pl-8">
                      <div
                         className = "cursor-grab touch-none pt-1 text-sm"
                         { ...attributes }

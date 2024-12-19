@@ -94,6 +94,7 @@ export default function Page(): JSX.Element {
       return globalState.search.value.trim().toLowerCase();
    }, [globalState.search]);
 
+
    // Case-insensitive title comparison for workouts search
    const results: Workout[] = useMemo(() => {
       const filtered: Workout[] = globalState.workouts.data.filtered;
@@ -140,7 +141,7 @@ export default function Page(): JSX.Element {
       let page: number = Number.parseInt(window.localStorage.getItem("page") ?? "0");
 
       if (page >= pages || page < 0) {
-         page = Math.min(0, pages - 1);
+         page = Math.max(0, pages - 1);
          window.localStorage.setItem("page", String(page));
       }
 

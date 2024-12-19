@@ -3,7 +3,7 @@ import clsx from "clsx";
 import Modal from "@/components/global/modal";
 import Button from "@/components/global/button";
 import { handleResponse } from "@/lib/global/response";
-import { verifyAttribute } from "@/lib/settings/service";
+import { verifyUserAttribute } from "@/lib/settings/service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { AttributeProps } from "@/components/home/settings/attribute";
@@ -117,7 +117,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
             value: codes
          });
       } else {
-         handleResponse(await verifyAttribute(user.id, attribute), localDispatch, updateNotification, () => {
+         handleResponse(await verifyUserAttribute(user.id, attribute), localDispatch, updateNotification, () => {
             globalDispatch({
                type: "updateState",
                value: {

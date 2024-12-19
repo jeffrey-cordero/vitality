@@ -5,7 +5,7 @@ import { z } from "zod";
 import { users as User } from "@prisma/client";
 import { Credentials } from "@/lib/authentication/login";
 
-export async function fetchUserInformation(id: string): Promise<User | null> {
+export async function fetchUserAttributes(id: string): Promise<User | null> {
    try {
       const user = await prisma.users.findFirst({
          where: {
@@ -13,10 +13,8 @@ export async function fetchUserInformation(id: string): Promise<User | null> {
          }
       });
 
-      // Remove password hash value for data integrity
-      user.password = "*".repeat(user.password.length);
-
-      return user;
+      // Remove password hash value for data integrity if a user is found
+      return user !== null ? { ...user, password: "*".repeat(user.password.length) } : null;
    } catch (error) {
       return null;
    }

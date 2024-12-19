@@ -5,7 +5,12 @@ export const root = {
    username: "root",
    password: "$Vc$10$O1sZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
    email: "root@gmail.com",
-   phone: "1234567890"
+   phone: "1234567890",
+   image: "",
+   email_verified: false,
+   phone_verified: false,
+   mail: false,
+   sms: false
 };
 
 export const user = {
@@ -15,5 +20,10 @@ export const user = {
    username: "user",
    password: "$Ac$10$O033ZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
    email: "user@gmail.com",
-   phone: "1234567891"
+   phone: "1234567891",
+   image: "",
+   email_verified: false,
+   phone_verified: false,
+   mail: false,
+   sms: false
 };

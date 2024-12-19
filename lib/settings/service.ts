@@ -26,7 +26,7 @@ const updateSchema = userSchema.extend({
       .optional()
 });
 
-export async function updatePreference(
+export async function updateUserPreference(
    user_id: string,
    preference: "mail" | "sms",
    value: boolean
@@ -47,7 +47,7 @@ export async function updatePreference(
    }
 }
 
-export async function verifyAttribute(
+export async function verifyUserAttribute(
    user_id: string,
    attribute: "email" | "phone"
 ): Promise<VitalityResponse<void>> {
@@ -67,7 +67,7 @@ export async function verifyAttribute(
    }
 }
 
-export async function updatePassword(
+export async function updateUserPassword(
    user_id:string,
    oldPassword: string,
    newPassword: string,
@@ -84,10 +84,8 @@ export async function updatePassword(
    );
 
    if (Object.keys(errors).length > 0) {
-      console.log(1);
       return sendErrorMessage("Invalid password fields", errors);
    } else if (newPassword !== confirmPassword) {
-      console.log(1);
       return sendErrorMessage("Invalid password fields", {
          newPassword: ["Passwords do not match"],
          confirmPassword: ["Passwords do not match"]
@@ -142,7 +140,7 @@ export async function updatePassword(
 
 }
 
-export async function updateAttribute<T extends keyof User>(
+export async function updateUserAttribute<T extends keyof User>(
    user_id: string,
    attribute: T,
    value: User[T]
@@ -153,7 +151,7 @@ export async function updateAttribute<T extends keyof User>(
    }
 
    const attributeSchema = updateSchema.shape[attribute.toLowerCase()];
-   const field = attributeSchema.safeParse(value);
+   const field = attributeSchema?.safeParse(value);
 
    if (!field?.success) {
       return sendErrorMessage("Invalid user attribute", {
