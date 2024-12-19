@@ -2,16 +2,18 @@
 import Main from "@/components/global/main";
 import Loading from "@/components/global/loading";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { AuthenticationContext } from "./layout";
 
-export default function Home(): JSX.Element {
+export default function NotFound(): JSX.Element {
+   const { user } = useContext(AuthenticationContext);
    const router = useRouter();
 
    useEffect(() => {
-      // Re-direct to workouts page until further pages are integrated
+      // Re-direct to workouts or landing page until further pages are implemented
       setTimeout(() => {
-         router.push("/home/workouts");
-      }, 500);
+         router.push(user?.id !== undefined ? "/home/workouts" : "/");
+      }, 1000);
    }, [router]);
 
    return (

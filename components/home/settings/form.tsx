@@ -5,12 +5,12 @@ import Loading from "@/components/global/loading";
 import { users as User } from "@prisma/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { endSession } from "@/lib/authentication/session";
-import { Attribute, PasswordAttribute, SliderAttribute } from "@/components/home/settings/attribute";
+import { GeneralAttribute, PasswordAttribute, SliderAttribute } from "@/components/home/settings/attribute";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { fetchUserInformation } from "@/lib/authentication/authorize";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import { AuthenticationContext } from "@/app/layout";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
-import { faAt, faRightFromBracket, faImage, faPhone, faUserSecret, faCakeCandles, faSignature, faPhotoFilm, faMoon, faPaperPlane, faComments } from "@fortawesome/free-solid-svg-icons";
+import { faAt, faRightFromBracket, faImage, faPhone, faUserSecret, faCakeCandles, faSignature, faMoon, faPaperPlane, faComments, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 
 const form: VitalityState = {
    username: {
@@ -205,21 +205,21 @@ export default function Form(): JSX.Element {
    });
 
    return (
-      <div className = "relative mx-auto mb-12 w-11/12 text-left sm:w-3/4 xl:w-5/12">
+      <div className = "relative mx-auto mb-12 w-full px-2 text-left xsm:w-11/12 sm:w-3/4 xl:w-5/12">
          {
             globalState.image.data.fetched ? (
                <div className = "flex flex-col items-center justify-center gap-4">
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
                         title = "Profile"
-                        description = "Shape your profile with key personal details"
+                        description = "Customize your profile with a personal touch"
                      />
                      {
                         !isEditingImage ? (
                            <div className = "relative flex flex-col items-center justify-center gap-4">
-                              <div className = "relative flex size-44 flex-col items-center justify-center overflow-hidden rounded-full border-[3px] border-primary shadow-md">
+                              <div className = "relative flex size-40 flex-col items-center justify-center overflow-hidden rounded-full border-[3px] border-primary shadow-md xxsm:size-44">
                                  {
-                                    globalState.image.data.valid === true ? (
+                                    globalState.image.data.valid !== false ? (
                                        <Image
                                           fill
                                           priority
@@ -228,7 +228,7 @@ export default function Form(): JSX.Element {
                                           sizes = "100%"
                                           src = { imageURL === "" ? "/settings/default.png" : imageURL }
                                           alt = "workout-image"
-                                          className = "cursor-pointer object-cover object-center shadow-md"
+                                          className = "object-cover object-center shadow-md"
                                           onLoad = { () => globalState.image.data.valid === false && handleImageResourceValidity(true) }
                                           onErrorCapture = { () => handleImageResourceValidity(false) }
                                        />
@@ -243,14 +243,14 @@ export default function Form(): JSX.Element {
                                  }
                               </div>
                               <FontAwesomeIcon
-                                 icon = { faPhotoFilm }
-                                 className = "z-10 mb-6 cursor-pointer text-xl text-primary transition duration-300 ease-in-out hover:scale-105"
+                                 icon = { faPenToSquare }
+                                 className = "z-10 mb-2 cursor-pointer text-lg text-primary hover:text-primary/80 xxsm:text-xl xsm:mb-6"
                                  onClick = { () => setIsEditingImage(true) }
                               />
                            </div>
 
                         ) : (
-                           <Attribute
+                           <GeneralAttribute
                               id = "image"
                               type = "text"
                               label = "Image"
@@ -265,7 +265,7 @@ export default function Form(): JSX.Element {
                            />
                         )
                      }
-                     <Attribute
+                     <GeneralAttribute
                         id = "name"
                         type = "text"
                         label = "Name"
@@ -275,7 +275,7 @@ export default function Form(): JSX.Element {
                         globalState = { globalState }
                         globalDispatch = { globalDispatch }
                      />
-                     <Attribute
+                     <GeneralAttribute
                         id = "birthday"
                         type = "date"
                         label = "Birthday"
@@ -289,9 +289,9 @@ export default function Form(): JSX.Element {
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
                         title = "Security"
-                        description = "Fortify your account with personalized security settings"
+                        description = "Secure your account with tailored protection"
                      />
-                     <Attribute
+                     <GeneralAttribute
                         id = "username"
                         type = "text"
                         label = "Username"
@@ -302,7 +302,7 @@ export default function Form(): JSX.Element {
                         globalDispatch = { globalDispatch }
                      />
                   </div>
-                  <Attribute
+                  <GeneralAttribute
                      id = "email"
                      type = "email"
                      label = "Email"
@@ -312,7 +312,7 @@ export default function Form(): JSX.Element {
                      globalState = { globalState }
                      globalDispatch = { globalDispatch }
                   />
-                  <Attribute
+                  <GeneralAttribute
                      id = "phone"
                      type = "tel"
                      label = "Phone"
@@ -364,7 +364,7 @@ export default function Form(): JSX.Element {
                   </div>
                   <Button
                      type = "submit"
-                     className = "mt-12 h-[2.8rem] w-36 rounded-md bg-red-500 p-5 text-sm font-bold text-white xxsm:text-base"
+                     className = "mt-4 h-[2.8rem] rounded-md bg-red-500 p-4 text-sm font-bold text-white focus:ring-red-700 xxsm:p-5 xxsm:text-base"
                      icon = { faRightFromBracket }
                      onClick = {
                         async() => {

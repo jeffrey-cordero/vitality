@@ -41,7 +41,7 @@ export async function updatePreference(
          }
       });
 
-      return sendSuccessMessage(`Successfully updated ${preference === "mail" ? "email" : "SMS"} notification preference`, null);
+      return sendSuccessMessage(`Updated ${preference === "mail" ? "email" : "SMS"} notification preference`, null);
    } catch (error) {
       return sendFailureMessage(error);
    }
@@ -132,7 +132,7 @@ export async function updatePassword(
                }
             });
 
-            return sendSuccessMessage("Successfully updated password", null);
+            return sendSuccessMessage("Updated password", null);
 
          }
       } catch (error) {
@@ -189,7 +189,7 @@ export async function updateAttribute<T extends keyof User>(
          }
       });
 
-      return sendSuccessMessage(`Successfully updated ${attribute}`, null);
+      return sendSuccessMessage(`Updated ${attribute}`, null);
    } catch (error) {
       return sendFailureMessage(error);
    }

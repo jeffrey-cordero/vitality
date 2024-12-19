@@ -490,7 +490,7 @@ export default function Filtering(props: VitalityProps): JSX.Element {
       <div className = "relative w-full sm:w-auto">
          <Heading
             title = "Workouts"
-            description = "Ready to crush your goals? Create a new workout and let's make today count!"
+            description = "Create a new workout and let's make today count!"
          />
          <div className = "mx-auto my-4 flex w-full flex-col gap-2 px-2">
             <Input

@@ -70,7 +70,8 @@ function SideBarLinks(): JSX.Element {
                            {
                               "bg-sky-100 dark:bg-slate-700 text-primary": pathname === link.href,
                               "hover:text-yellow-400": isTheme,
-                              "hover:text-red-500": isSignOut
+                              "text-red-500 hover:text-red-600": isSignOut,
+                              "opacity-30" : links === homeLinks && !isTheme && !isSignOut && !(link.name === "Workouts" || link.name === "Settings")
                            },
                         )
                      }

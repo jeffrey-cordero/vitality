@@ -10,14 +10,14 @@ import { VitalityInputProps } from "@/components/global/input";
 import { VitalityProps } from "@/lib/global/state";
 import VerifyAttribute from "@/components/home/settings/verification";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { ChangeEvent, useCallback, useContext, useRef, useState } from "react";
-import { faArrowRotateLeft, faXmark, faPencil, faKey, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { useCallback, useContext, useRef, useState } from "react";
+import { faArrowRotateLeft, faXmark, faKey, IconDefinition, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 
 export interface AttributeProps extends VitalityProps, VitalityInputProps {
    editOnly?: boolean;
 }
 
-export function Attribute(props: AttributeProps) {
+export function GeneralAttribute(props: AttributeProps) {
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const { id, input, type, icon, editOnly, onBlur, globalDispatch } = props;
@@ -41,7 +41,7 @@ export function Attribute(props: AttributeProps) {
       globalDispatch
    ]);
 
-   const handleUpdateUser = useCallback(async() => {
+   const handleUpdateAttribute = useCallback(async() => {
       const updatingDatabaseValue: Date | string = type === "date"
          ? new Date(input.value) : input.value.trim();
       const updatingStorageValue: string = type === "date" ?
@@ -74,7 +74,7 @@ export function Attribute(props: AttributeProps) {
 
          updateNotification({
             status: response.status,
-            message: `Successfully updated ${id === "phone" ? "phone number" : id}`,
+            message: response.body.message,
             timer: 1500
          });
 
@@ -97,10 +97,7 @@ export function Attribute(props: AttributeProps) {
       <div className = "relative mx-auto w-full">
          {
             isEditing || editOnly ? (
-               <form
-                  onSubmit = { (e) => e.preventDefault() }
-                  className = "relative mt-8"
-               >
+               <div className = "relative mt-8">
                   <FontAwesomeIcon
                      icon = { faArrowRotateLeft }
                      className = "absolute right-[35px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
@@ -108,12 +105,12 @@ export function Attribute(props: AttributeProps) {
                   />
                   <FontAwesomeIcon
                      icon = { faXmark }
-                     className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer text-xl text-red-500"
+                     className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer text-lg text-red-500 xxsm:text-xl"
                      onClick = { () => { editOnly ? onBlur(null) : setIsEditing(false); } }
                   />
                   <Input
                      { ...props }
-                     onSubmit = { handleUpdateUser }
+                     onSubmit = { handleUpdateAttribute }
                      onBlur = { undefined }
                      autoComplete = { id }
                   />
@@ -121,22 +118,22 @@ export function Attribute(props: AttributeProps) {
                      type = "submit"
                      className = "mt-2 h-10 w-full bg-green-500 text-white"
                      icon = { icon }
-                     onClick = { handleUpdateUser }
+                     onClick = { handleUpdateAttribute }
                   >
                      Update
                   </Button>
-               </form>
+               </div>
             ) : (
-               <div className = "flex flex-row items-center justify-between gap-2">
+               <div className = "my-2 flex flex-col items-center justify-center gap-x-3 gap-y-2 xsm:my-1 xsm:flex-row xsm:justify-between">
                   <div
-                     className = "flex flex-row items-center justify-center gap-2"
+                     className = "flex flex-col items-center justify-center gap-2 xsm:flex-row"
                      { ...doubleTap }
                   >
                      <FontAwesomeIcon
                         icon = { icon }
-                        className = "w-8 text-xl text-primary"
+                        className = "w-8 text-lg text-primary xxsm:text-xl"
                      />
-                     <h2 className = "pl-2 text-lg font-semibold">
+                     <h2 className = "max-w-[30rem] whitespace-pre-wrap break-all text-center text-base font-semibold xxsm:text-[1.1rem]">
                         { input.data.stored }
                      </h2>
                   </div>
@@ -150,8 +147,8 @@ export function Attribute(props: AttributeProps) {
                         )
                      }
                      <FontAwesomeIcon
-                        icon = { faPencil }
-                        className = "cursor-pointer text-lg text-primary"
+                        icon = { faPenToSquare }
+                        className = "cursor-pointer text-lg text-primary hover:text-primary/80 xxsm:text-xl"
                         onClick = { () => setIsEditing(true) }
                      />
                   </div>
@@ -183,20 +180,23 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
             timer: 1500
          });
 
-         // Remove all password errors, if any
+         // Remove all password errors, if any, and reset their values for future updates
          globalDispatch({
             type: "updateStates",
             value: {
                oldPassword: {
                   ...globalState.oldPassword,
+                  value: "",
                   error: null
                },
                newPassword: {
                   ...globalState.newPassword,
+                  value: "",
                   error: null
                },
                confirmPassword: {
                   ...globalState.confirmPassword,
+                  value: "",
                   error: null
                }
             }
@@ -217,17 +217,17 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
 
    return (
       <div className = "relative mx-auto w-full">
-         <div className = "flex flex-row items-center justify-between gap-2">
+         <div className = "my-2 flex flex-col items-center justify-center gap-x-3 gap-y-2 xsm:my-1 xsm:flex-row xsm:justify-between">
             <div
-               className = "flex flex-row items-center justify-center gap-2"
+               className = "flex flex-col items-center justify-center gap-2 xsm:flex-row"
                { ...doubleTap }
             >
                <FontAwesomeIcon
                   icon = { faKey }
-                  className = "w-8 text-xl text-primary"
+                  className = "w-8 text-lg text-primary xxsm:text-xl"
                />
-               <h2 className = "pl-2 text-lg font-semibold">
-                  ************
+               <h2 className = "text-base font-semibold xxsm:text-[1.1rem]">
+                  ********
                </h2>
             </div>
             <div className = "flex flex-row items-center justify-center gap-2">
@@ -235,8 +235,8 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                   ref = { passwordModalRef }
                   display = {
                      <FontAwesomeIcon
-                        icon = { faPencil }
-                        className = "cursor-pointer text-lg text-primary"
+                        icon = { faPenToSquare }
+                        className = "cursor-pointer text-lg text-primary hover:text-primary/80 xxsm:text-xl"
                      />
                   }
                   className = "mt-12 max-h-[90%] max-w-full sm:max-w-xl"
@@ -244,15 +244,14 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                   <div className = "relative flex flex-col items-center justify-center gap-6 text-center">
                      <FontAwesomeIcon
                         icon = { faKey }
-                        className = "mt-6 text-4xl text-primary"
+                        className = "mt-6 text-5xl text-primary"
                      />
                      <div className = "relative mx-auto flex items-center justify-center text-center">
-                        <p className = "font-semibold">
+                        <p className = "text-sm font-bold xxsm:text-base">
                            Please enter your old password, followed by your new password and confirmation to update your credentials
                         </p>
                      </div>
-                     <form
-                        onSubmit = { (e) => e.preventDefault() }
+                     <div
                         className = "mx-auto flex w-full flex-col items-stretch justify-center gap-3"
                         aria-label = "Change Password"
                      >
@@ -264,6 +263,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                            input = { globalState.oldPassword }
                            dispatch = { globalDispatch }
                            onSubmit = { handleUpdatePassword }
+                           autoComplete = "current-password"
                         />
                         <Input
                            id = "newPassword"
@@ -273,6 +273,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                            input = { globalState.newPassword }
                            dispatch = { globalDispatch }
                            onSubmit = { handleUpdatePassword }
+                           autoComplete = "new-password"
                         />
                         <Input
                            id = "confirmPassword"
@@ -282,6 +283,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                            input = { globalState.confirmPassword }
                            dispatch = { globalDispatch }
                            onSubmit = { handleUpdatePassword }
+                           autoComplete = "new-password"
                         />
                         <Button
                            type = "submit"
@@ -291,8 +293,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                         >
                            Update
                         </Button>
-                     </form>
-
+                     </div>
                   </div>
                </Modal>
             </div>
@@ -347,13 +348,13 @@ export function SliderAttribute(props: SliderProps): JSX.Element {
 
    return (
       <div className = "relative mx-auto w-full">
-         <div className = "flex flex-row items-center justify-between gap-2">
-            <div className = "flex flex-row items-center justify-center gap-2">
+         <div className = "my-2 flex flex-col items-center justify-center gap-x-3 gap-y-2 xsm:my-1 xsm:flex-row xsm:justify-between">
+            <div className = "flex flex-col items-center justify-center gap-2 xsm:flex-row">
                <FontAwesomeIcon
                   icon = { icon }
-                  className = "w-8 text-xl text-primary"
+                  className = "w-8 text-lg text-primary xxsm:text-xl"
                />
-               <h2 className = "pl-2 text-lg font-semibold">
+               <h2 className = "max-w-[30rem] whitespace-pre-wrap break-all text-base font-semibold xxsm:text-[1.1rem]">
                   { label }
                </h2>
             </div>

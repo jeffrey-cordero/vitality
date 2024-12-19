@@ -9,7 +9,7 @@ import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { deleteWorkouts, Workout } from "@/lib/home/workouts/workouts";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { faImage, faPencil, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faImage, faPenToSquare, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 
 interface RowProps extends VitalityProps {
    workout: Workout;
@@ -101,7 +101,7 @@ function Row(props: RowProps) {
       <div
          id = { workout.id }
          className = {
-            clsx("mx-auto flex w-full cursor-pointer flex-col items-center justify-between p-6 text-center text-lg lg:flex-row lg:rounded-none lg:p-6 lg:text-lg", {
+            clsx("mx-auto flex w-full flex-col items-center justify-between p-6 text-center text-lg lg:flex-row lg:rounded-none lg:p-6 lg:text-lg", {
                "bg-gray-100 dark:bg-gray-700": isSelected,
                "bg-white dark:bg-slate-800": !isSelected
             })
@@ -171,8 +171,8 @@ function Row(props: RowProps) {
                >
                   <div className = "block px-8 pt-2 lg:pt-0">
                      <FontAwesomeIcon
-                        icon = { faPencil }
-                        className = " cursor-pointer text-xl text-primary transition duration-300 ease-in-out hover:scale-125 lg:text-lg"
+                        icon = { faPenToSquare }
+                        className = " cursor-pointer text-xl text-primary hover:text-primary/80 lg:text-lg"
                      />
                   </div>
                </div>

@@ -67,7 +67,7 @@ export default function Login(): JSX.Element {
                   id = "username"
                   type = "text"
                   label = "Username"
-                  autoComplete = "none"
+                  autoComplete = "username"
                   icon = { faUserSecret }
                   input = { state.username }
                   dispatch = { dispatch }

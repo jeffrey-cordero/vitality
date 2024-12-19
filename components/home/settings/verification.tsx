@@ -1,18 +1,15 @@
 
+import clsx from "clsx";
 import Modal from "@/components/global/modal";
 import Button from "@/components/global/button";
-import { useDoubleTap } from "use-double-tap";
-import { Input } from "@/components/global/input";
 import { handleResponse } from "@/lib/global/response";
 import { verifyAttribute } from "@/lib/settings/service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { VitalityInputProps } from "@/components/global/input";
-import { formReducer, VitalityProps, VitalityState } from "@/lib/global/state";
+import { formReducer, VitalityState } from "@/lib/global/state";
+import { AttributeProps } from "@/components/home/settings/attribute";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { ChangeEvent, useCallback, useContext, useMemo, useReducer, useRef, useState } from "react";
-import { faShield, faShieldHalved } from "@fortawesome/free-solid-svg-icons";
-import { AttributeProps } from "./attribute";
-import clsx from "clsx";
+import { faShieldHalved } from "@fortawesome/free-solid-svg-icons";
+import { ChangeEvent, useCallback, useContext, useMemo, useReducer, useRef } from "react";
 
 const verification: VitalityState = {
    first: {
@@ -34,6 +31,11 @@ const verification: VitalityState = {
    },
    fourth: {
       value: "",
+      error: null,
+      data: {}
+   },
+   empty: {
+      value: false,
       error: null,
       data: {}
    }
@@ -63,41 +65,53 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
    ]);
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>, index: number) => {
+      // Update verification code input and ensure empty error is removed, if any
       const [id, input] = inputs[index];
 
       localDispatch({
-         type: "updateState",
+         type: "updateStates",
          value: {
-            id: id,
-            input: {
+            [id]: {
                ...input,
                value: event.target.value,
                error: null
+            },
+            empty: {
+               ...localState.empty,
+               value: false
             }
          }
       });
-   }, [inputs]);
+   }, [
+      inputs,
+      localState.empty
+   ]);
 
    const handleVerificationCode = useCallback(async() => {
       // Ensure all verification inputs are non-empty
-      let containsEmptyInput: boolean = false;
-      const codes = Object.fromEntries(Object.values(inputs));
+      const codes = {
+         ...Object.fromEntries(Object.values(inputs)),
+         empty: {
+            ...localState.empty,
+            value: false
+         }
+      };
 
       for (let i = 0; i <= 3; i++) {
          const [id, input] = inputs[i];
          const isEmpty: boolean = input.value.trim() === "";
 
          if (isEmpty) {
-            containsEmptyInput = true;
+            codes.empty.value = true;
          }
 
          codes[id] = {
-            ...input,
+            ...codes[id],
             error: isEmpty ? "\0" : null
          };
       }
 
-      if (containsEmptyInput) {
+      if (codes.empty.value === true) {
          localDispatch({
             type: "initializeState",
             value: codes
@@ -117,13 +131,13 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                   }
                }
             });
-   
+
             updateNotification({
                status: "Success",
                message: `Successful ${attribute === "phone" ? "phone number" : "email"} verification`,
                timer: 1500
             });
-   
+
             verificationModalRef.current?.close();
          });
       }
@@ -131,8 +145,9 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
       user,
       inputs,
       attribute,
-      globalDispatch,
       globalState,
+      globalDispatch,
+      localState.empty,
       updateNotification
    ]);
 
@@ -140,43 +155,41 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
       <Modal
          ref = { verificationModalRef }
          display = {
-            <div className = "relative">
-               <FontAwesomeIcon
-                  icon = { input.data.verified ? faShield : faShieldHalved }
-                  className = {
-                     clsx("cursor-pointer text-lg", {
-                        "text-red-500": !input.data.verified,
-                        "text-green-500": input.data.verified
-                     })
-                  }
-               />
-            </div>
+            <FontAwesomeIcon
+               icon = { faShieldHalved }
+               className = {
+                  clsx("cursor-pointer pt-1 text-lg xxsm:text-xl", {
+                     "text-red-500 hover:text-red-600": !input.data.verified,
+                     "text-green-500 hover:text-green-600": input.data.verified
+                  })
+               }
+            />
          }
          className = "mt-12 max-h-[90%] max-w-full sm:max-w-xl"
          disabled = { input.data.verified }
       >
-         <div className = "relative flex flex-col items-center justify-center gap-4 text-center">
+         <div className = "relative flex flex-col items-center justify-center gap-4 px-1 py-2 text-center">
             <FontAwesomeIcon
-               icon = { icon }
-               className = "mt-6 text-4xl text-primary"
+               icon = { faShieldHalved }
+               className = "mt-6 text-5xl text-primary"
             />
             <div className = "relative mx-auto flex items-center justify-center text-center">
-               <p className = "font-semibold">
+               <p className = "text-sm font-bold xxsm:text-base">
                   { `A one-time verification code has been sent to your ${attribute}, please enter it below to complete the process` }
                </p>
             </div>
-            <div className = "mx-auto flex w-full flex-row items-center justify-center gap-3">
+            <div className = "mx-auto flex w-full flex-row flex-wrap items-center justify-center gap-3">
                {
                   Array.from({ length: 4 }, (_, index) => {
-                     const [__, input] = inputs[index];
+                     const [id, input] = inputs[index];
 
                      return (
                         <div
-                           className = "size-10 font-bold xxsm:size-12 xsm:size-14"
+                           className = "size-12 font-bold xsm:size-14"
                            key = { index }
                         >
                            <input
-                              id = { `verification-${index}` }
+                              id = { `verification-${id}` }
                               className = {
                                  clsx("flex size-full flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-2 text-center text-lg outline-none focus:border-[1.5px] focus:border-primary dark:border-0 dark:bg-gray-700/50", {
                                     "border-red-500 border-2 dark:border-2 focus:border-red-500 focus:ring-red-500 error" : input.error === "\0"
@@ -192,16 +205,25 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                   })
                }
             </div>
+            {
+               localState.empty.value === true && (
+                  <div className = "relative mx-auto flex animate-fadeIn items-center justify-center gap-2 px-2 text-center text-base opacity-0">
+                     <p className = "input-error font-bold text-red-500">
+                        Invalid verification code
+                     </p>
+                  </div>
+               )
+            }
             <Button
                type = "submit"
-               className = "h-[2.6rem] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white xxsm:text-base"
-               icon = { faShield }
+               className = "h-[2.6rem] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white hover:bg-primary/80 xxsm:text-base"
+               icon = { icon }
                onClick = { handleVerificationCode }
             >
                Verify
             </Button>
             <div>
-               <p className = "font-semibold">
+               <p className = "text-sm font-bold xxsm:text-base">
                   Didn&apos;t receive code?{ " " }
                   <span
                      onClick = {
