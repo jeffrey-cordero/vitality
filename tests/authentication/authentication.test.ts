@@ -1,23 +1,13 @@
 import bcrypt from "bcryptjs";
 import { expect } from "@jest/globals";
-import { prismaMock } from "@/tests/singleton";
-import { root, user } from "@/tests/authentication/data";
-import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
-import { Registration, signup } from "@/lib/authentication/signup";
-import { fetchUser, authorizeServerSession } from "@/lib/authentication/authorize";
 import { users } from "@prisma/client";
+import { prismaMock } from "@/tests/singleton";
+import { signup } from "@/lib/authentication/signup";
+import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
+import { fetchUser, authorizeServerSession } from "@/lib/authentication/authorize";
+import { invalidRegistrations, root, user, VALID_REGISTRATION, invalidPasswords } from "@/tests/authentication/data";
 
 const EXISTING_USERS = [root, user];
-const VALID_REGISTRATION: Registration = {
-   name: "user",
-   birthday: new Date(),
-   username: "user",
-   password: "ValidPassword1!",
-   confirmPassword: "ValidPassword1!",
-   email: "user@gmail.com",
-   phone: "1234567890"
-};
-const INVALID_PASSWORD_MESSAGE = "Password must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character (@$!%*#?&)";
 
 // Mock bcrypt password hashing methods
 jest.mock("bcryptjs", () => ({
@@ -29,69 +19,6 @@ jest.mock("bcryptjs", () => ({
 describe("Authentication Tests", () => {
    describe("Registration", () => {
       test("Register with invalid fields", async() => {
-         const invalidRegistrations = [
-            {
-               registration: {
-                  ...VALID_REGISTRATION,
-                  username: "",
-                  password: "",
-                  confirmPassword: "",
-                  email: "",
-                  name: "",
-                  birthday: null,
-                  phone: ""
-               },
-               errors: {
-                  username: ["Username must be at least 3 characters"],
-                  password: [INVALID_PASSWORD_MESSAGE],
-                  confirmPassword: [INVALID_PASSWORD_MESSAGE],
-                  name: ["Name must be at least 2 characters"],
-                  email: ["Email is required"],
-                  birthday: ["Birthday is required"]
-               }
-            },
-            {
-               registration: {
-                  ...VALID_REGISTRATION,
-                  phone: "27382738273971238"
-               },
-               errors: {
-                  phone: ["Valid phone number is required, if provided"]
-               }
-            },
-            {
-               registration: {
-                  ...VALID_REGISTRATION,
-                  birthday: new Date(Date.now() + 10000 * 60 * 60 * 24)
-               },
-               errors: {
-                  birthday: ["Birthday cannot be in the future"]
-               }
-            },
-            {
-               registration: {
-                  ...VALID_REGISTRATION,
-                  username: "  AB  ",
-                  name: " A "
-               },
-               errors: {
-                  username: ["Username must be at least 3 characters"],
-                  name: ["Name must be at least 2 characters"]
-               }
-            },
-            {
-               registration: {
-                  ...VALID_REGISTRATION,
-                  username: "A".repeat(31),
-                  name: "B".repeat(201)
-               },
-               errors: {
-                  username: ["Username must be at most 30 characters"],
-                  name: ["Name must be at most 200 characters"]
-               }
-            }
-         ];
-
          for (const { registration, errors } of invalidRegistrations) {
             await expect(signup(registration)).resolves.toEqual({
                status: "Error",
@@ -105,25 +32,7 @@ describe("Authentication Tests", () => {
       });
 
       test("Register with password errors", async() => {
-         const invalidRegistrations = [
-            {
-               password: "ValidPassword1?",
-               confirmPassword: "ValidPassword?",
-               errors: {
-                  confirmPassword: [INVALID_PASSWORD_MESSAGE]
-               }
-            },
-            {
-               password: "ValidPassword1!",
-               confirmPassword: "ValidPassword2!",
-               errors: {
-                  password: ["Passwords do not match"],
-                  confirmPassword: ["Passwords do not match"]
-               }
-            }
-         ];
-
-         for (const { password, confirmPassword, errors } of invalidRegistrations) {
+         for (const { password, confirmPassword, errors } of invalidPasswords) {
             const registration = {
                ...VALID_REGISTRATION,
                password,

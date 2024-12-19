@@ -154,10 +154,13 @@ export async function updateUserAttribute<T extends keyof User>(
    const field = attributeSchema?.safeParse(value);
 
    if (!field?.success) {
+      // Invalid attribute value caught
       return sendErrorMessage("Invalid user attribute", {
          [attribute]: [field.error.errors[0].message]
       });
-   } else if (attribute === "username" || attribute === "email" || attribute === "phone") {
+   }
+
+   if (attribute === "username" || attribute === "email" || attribute === "phone") {
       // Account for unique attribute database constraints
       const existingUser = await prisma.users.findFirst({
          where: {
@@ -172,6 +175,19 @@ export async function updateUserAttribute<T extends keyof User>(
          return sendErrorMessage("Account attribute conflicts", {
             [attribute]: [`${attribute[0].toUpperCase() + attribute.substring(1)} already taken`]
          });
+      }
+
+      const existingValue = await prisma.users.findFirst({
+         where: {
+            id: user_id
+         },
+         select: {
+            [attribute]: true
+         }
+      });
+
+      if (existingValue[attribute].toString() === value) {
+         return sendSuccessMessage("No updates", null);
       }
    }
 
@@ -188,6 +204,22 @@ export async function updateUserAttribute<T extends keyof User>(
       });
 
       return sendSuccessMessage(`Updated ${attribute}`, null);
+   } catch (error) {
+      return sendFailureMessage(error);
+   }
+}
+
+export async function deleteAccount(
+   user_id: string
+): Promise<VitalityResponse<void>> {
+   try {
+      await prisma.users.delete({
+         where: {
+            id: user_id
+         }
+      });
+
+      return sendSuccessMessage("Deleted account", null);
    } catch (error) {
       return sendFailureMessage(error);
    }

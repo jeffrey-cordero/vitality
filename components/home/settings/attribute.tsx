@@ -10,7 +10,43 @@ import { VitalityInputProps } from "@/components/global/input";
 import { VitalityProps } from "@/lib/global/state";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useRef, useState } from "react";
-import { faArrowRotateLeft, faXmark, faKey, IconDefinition, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faXmark, faKey, IconDefinition, faPenToSquare, faTrashCan, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import Confirmation from "@/components/global/confirmation";
+
+interface AttributeContainerProps {
+   icon: IconProp;
+   label: string;
+   input: React.ReactNode;
+   doubleTapMethod?: () => void;
+}
+
+function AttributeContainer(props: AttributeContainerProps): JSX.Element {
+   const { icon, label, input, doubleTapMethod } = props;
+   const doubleTap = useDoubleTap(doubleTapMethod);
+
+   return (
+      <div className = "relative mx-auto w-full">
+         <div className = "my-4 flex flex-col items-center justify-center gap-3 xsm:my-1 xsm:flex-row xsm:justify-between">
+            <div
+               className = "flex flex-col items-center justify-center gap-2 xsm:flex-row"
+               { ...doubleTap }
+            >
+               <FontAwesomeIcon
+                  icon = { icon }
+                  className = "w-8 text-lg text-primary xxsm:text-xl"
+               />
+               <h2 className = "max-w-[30rem] whitespace-pre-wrap text-center text-base font-semibold [overflow-wrap:anywhere] xxsm:text-[1.1rem]">
+                  { label }
+               </h2>
+            </div>
+            <div className = "relative">
+               { input }
+            </div>
+         </div>
+      </div>
+   );
+}
 
 export interface AttributeProps extends VitalityProps, VitalityInputProps {
    editOnly?: boolean;
@@ -40,7 +76,7 @@ export function GeneralAttribute(props: AttributeProps) {
       globalDispatch
    ]);
 
-   const handleupdateUserAttribute = useCallback(async() => {
+   const handleUpdateUserAttribute = useCallback(async() => {
       const updatingDatabaseValue: Date | string = type === "date"
          ? new Date(input.value) : input.value.trim();
       const updatingStorageValue: string = type === "date" ?
@@ -90,8 +126,6 @@ export function GeneralAttribute(props: AttributeProps) {
       updateNotification
    ]);
 
-   const doubleTap = useDoubleTap(() => setIsEditing(true) );
-
    return (
       <div className = "relative mx-auto w-full">
          {
@@ -109,7 +143,7 @@ export function GeneralAttribute(props: AttributeProps) {
                   />
                   <Input
                      { ...props }
-                     onSubmit = { handleupdateUserAttribute }
+                     onSubmit = { handleUpdateUserAttribute }
                      onBlur = { undefined }
                      autoComplete = { id }
                   />
@@ -117,41 +151,34 @@ export function GeneralAttribute(props: AttributeProps) {
                      type = "submit"
                      className = "mt-2 h-10 w-full bg-green-500 text-white"
                      icon = { icon }
-                     onClick = { handleupdateUserAttribute }
+                     onClick = { handleUpdateUserAttribute }
                   >
                      Update
                   </Button>
                </div>
             ) : (
-               <div className = "my-2 flex flex-col items-center justify-center gap-x-3 gap-y-2 xsm:my-1 xsm:flex-row xsm:justify-between">
-                  <div
-                     className = "flex flex-col items-center justify-center gap-2 xsm:flex-row"
-                     { ...doubleTap }
-                  >
-                     <FontAwesomeIcon
-                        icon = { icon }
-                        className = "w-8 text-lg text-primary xxsm:text-xl"
-                     />
-                     <h2 className = "max-w-[30rem] whitespace-pre-wrap break-all text-center text-base font-semibold xxsm:text-[1.1rem]">
-                        { input.data.stored }
-                     </h2>
-                  </div>
-                  <div className = "flex flex-row items-center justify-center gap-3">
-                     {
-                        input.data.verified !== undefined && input.value.trim() !== "" && (
-                           <VerifyAttribute
-                              { ...props }
-                              attribute = { id === "email" ? "email" : "phone" }
-                           />
-                        )
-                     }
-                     <FontAwesomeIcon
-                        icon = { faPenToSquare }
-                        className = "cursor-pointer text-lg text-primary hover:text-primary/80 xxsm:text-xl"
-                        onClick = { () => setIsEditing(true) }
-                     />
-                  </div>
-               </div>
+               <AttributeContainer
+                  icon = { icon }
+                  label = { input.data.stored || "Missing" }
+                  input = {
+                     <div className = "flex flex-row items-center justify-center gap-3">
+                        {
+                           input.data.verified !== undefined && input.value.trim() !== "" && (
+                              <VerifyAttribute
+                                 { ...props }
+                                 attribute = { id === "email" ? "email" : "phone" }
+                              />
+                           )
+                        }
+                        <FontAwesomeIcon
+                           icon = { faPenToSquare }
+                           className = "cursor-pointer text-lg text-primary hover:text-primary/80 xxsm:text-xl"
+                           onClick = { () => setIsEditing(true) }
+                        />
+                     </div>
+                  }
+                  doubleTapMethod = { () => setIsEditing(true) }
+               />
             )
          }
       </div>
@@ -164,7 +191,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
    const passwordModalRef = useRef<{ open: () => void; close: () => void }>(null);
 
-   const handleupdateUserPassword = useCallback(async() => {
+   const handleUpdateUserPassword = useCallback(async() => {
       const response = await updateUserPassword(
          user.id,
          globalState.oldPassword.value.trim(),
@@ -212,92 +239,79 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
       globalState.confirmPassword
    ]);
 
-   const doubleTap = useDoubleTap(() => passwordModalRef.current?.open());
-
    return (
-      <div className = "relative mx-auto w-full">
-         <div className = "my-2 flex flex-col items-center justify-center gap-x-3 gap-y-2 xsm:my-1 xsm:flex-row xsm:justify-between">
-            <div
-               className = "flex flex-col items-center justify-center gap-2 xsm:flex-row"
-               { ...doubleTap }
+      <AttributeContainer
+         icon = { faKey }
+         label = { "********" }
+         input = {
+            <Modal
+               ref = { passwordModalRef }
+               display = {
+                  <FontAwesomeIcon
+                     icon = { faPenToSquare }
+                     className = "cursor-pointer text-lg text-primary hover:text-primary/80 xxsm:text-xl"
+                  />
+               }
+               className = "mt-12 max-h-[90%] max-w-full sm:max-w-xl"
             >
-               <FontAwesomeIcon
-                  icon = { faKey }
-                  className = "w-8 text-lg text-primary xxsm:text-xl"
-               />
-               <h2 className = "text-base font-semibold xxsm:text-[1.1rem]">
-                  ********
-               </h2>
-            </div>
-            <div className = "flex flex-row items-center justify-center gap-2">
-               <Modal
-                  ref = { passwordModalRef }
-                  display = {
-                     <FontAwesomeIcon
-                        icon = { faPenToSquare }
-                        className = "cursor-pointer text-lg text-primary hover:text-primary/80 xxsm:text-xl"
-                     />
-                  }
-                  className = "mt-12 max-h-[90%] max-w-full sm:max-w-xl"
-               >
-                  <div className = "relative flex flex-col items-center justify-center gap-6 text-center">
-                     <FontAwesomeIcon
-                        icon = { faKey }
-                        className = "mt-6 text-5xl text-primary"
-                     />
-                     <div className = "relative mx-auto flex items-center justify-center text-center">
-                        <p className = "text-sm font-bold xxsm:text-base">
-                           Please enter your old password, followed by your new password and confirmation to update your credentials
-                        </p>
-                     </div>
-                     <div
-                        className = "mx-auto flex w-full flex-col items-stretch justify-center gap-3"
-                        aria-label = "Change Password"
-                     >
-                        <Input
-                           id = "oldPassword"
-                           type = "password"
-                           label = "Current Password"
-                           icon = { faKey }
-                           input = { globalState.oldPassword }
-                           dispatch = { globalDispatch }
-                           onSubmit = { handleupdateUserPassword }
-                           autoComplete = "current-password"
-                        />
-                        <Input
-                           id = "newPassword"
-                           type = "password"
-                           label = "New Password"
-                           icon = { faKey }
-                           input = { globalState.newPassword }
-                           dispatch = { globalDispatch }
-                           onSubmit = { handleupdateUserPassword }
-                           autoComplete = "new-password"
-                        />
-                        <Input
-                           id = "confirmPassword"
-                           type = "password"
-                           label = "Confirm Password"
-                           icon = { faKey }
-                           input = { globalState.confirmPassword }
-                           dispatch = { globalDispatch }
-                           onSubmit = { handleupdateUserPassword }
-                           autoComplete = "new-password"
-                        />
-                        <Button
-                           type = "submit"
-                           className = "h-[2.6rem] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white xxsm:text-base"
-                           icon = { faKey }
-                           onClick = { handleupdateUserPassword }
-                        >
-                           Update
-                        </Button>
-                     </div>
+               <div className = "relative flex flex-col items-center justify-center gap-6 py-2 text-center">
+                  <FontAwesomeIcon
+                     icon = { faKey }
+                     className = "mt-6 text-5xl text-primary"
+                  />
+                  <div className = "relative mx-auto flex items-center justify-center text-center">
+                     <p className = "text-sm font-bold xxsm:text-base">
+                        Please enter your old password, followed by your new password and confirmation to update your credentials
+                     </p>
                   </div>
-               </Modal>
-            </div>
-         </div>
-      </div>
+                  <div
+                     className = "mx-auto flex w-full flex-col items-stretch justify-center gap-3"
+                     aria-label = "Change Password"
+                  >
+                     <Input
+                        id = "oldPassword"
+                        type = "password"
+                        label = "Current Password"
+                        icon = { faKey }
+                        input = { globalState.oldPassword }
+                        dispatch = { globalDispatch }
+                        onSubmit = { handleUpdateUserPassword }
+                        autoComplete = "current-password"
+                     />
+                     <Input
+                        id = "newPassword"
+                        type = "password"
+                        label = "New Password"
+                        icon = { faKey }
+                        input = { globalState.newPassword }
+                        dispatch = { globalDispatch }
+                        onSubmit = { handleUpdateUserPassword }
+                        autoComplete = "new-password"
+                     />
+                     <Input
+                        id = "confirmPassword"
+                        type = "password"
+                        label = "Confirm Password"
+                        icon = { faKey }
+                        input = { globalState.confirmPassword }
+                        dispatch = { globalDispatch }
+                        onSubmit = { handleUpdateUserPassword }
+                        autoComplete = "new-password"
+                     />
+                     <Button
+                        type = "submit"
+                        className = "h-[2.6rem] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white xxsm:text-base"
+                        icon = { faKey }
+                        onClick = { handleUpdateUserPassword }
+                     >
+                        Update
+                     </Button>
+                  </div>
+               </div>
+            </Modal>
+         }
+         doubleTapMethod = { () => passwordModalRef.current?.open() }
+      />
    );
 }
 
@@ -346,31 +360,52 @@ export function SliderAttribute(props: SliderProps): JSX.Element {
    ]);
 
    return (
-      <div className = "relative mx-auto w-full">
-         <div className = "my-2 flex flex-col items-center justify-center gap-x-3 gap-y-2 xsm:my-1 xsm:flex-row xsm:justify-between">
-            <div className = "flex flex-col items-center justify-center gap-2 xsm:flex-row">
-               <FontAwesomeIcon
-                  icon = { icon }
-                  className = "w-8 text-lg text-primary xxsm:text-xl"
+      <AttributeContainer
+         icon = { icon }
+         label = { label }
+         input = {
+            <label className = "inline-flex cursor-pointer items-center">
+               <input
+                  id = { id ?? "darkMode" }
+                  type = "checkbox"
+                  value = ""
+                  className = "peer sr-only"
+                  onChange = { onChange ?? handleOnChange }
+                  checked = { checked }
                />
-               <h2 className = "max-w-[30rem] whitespace-pre-wrap break-all text-base font-semibold xxsm:text-[1.1rem]">
-                  { label }
-               </h2>
-            </div>
-            <div className = "relative">
-               <label className = "inline-flex cursor-pointer items-center">
-                  <input
-                     id = { id ?? "darkMode" }
-                     type = "checkbox"
-                     value = ""
-                     className = "peer sr-only"
-                     onChange = { onChange ?? handleOnChange }
-                     checked = { checked }
+               <div className = "peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:size-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/60 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-primary/60"></div>
+            </label>
+         }
+      />
+   );
+}
+interface AccountActionProps extends VitalityProps {
+   action: "delete" | "log out";
+   message: string;
+   icon: IconProp;
+   label: string;
+   onSubmit: () => void;
+}
+
+export function AccountAction(props: AccountActionProps): JSX.Element {
+   const { action, label, message, icon, onSubmit } = props;
+
+   return (
+      <AttributeContainer
+         icon = { icon }
+         label = { label }
+         input = {
+            <Confirmation
+               message = { message }
+               onConfirmation = { onSubmit }
+               display = {
+                  <FontAwesomeIcon
+                     icon = { action === "delete" ? faTrashCan : faRightFromBracket }
+                     className = "cursor-pointer text-lg text-red-500 xxsm:text-xl"
                   />
-                  <div className = "peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:size-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/60 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-primary/60"></div>
-               </label>
-            </div>
-         </div>
-      </div>
+               }
+            />
+         }
+      />
    );
 }

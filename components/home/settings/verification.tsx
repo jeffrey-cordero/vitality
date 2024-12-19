@@ -168,7 +168,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
          className = "mt-12 max-h-[90%] max-w-full sm:max-w-xl"
          disabled = { input.data.verified }
       >
-         <div className = "relative flex flex-col items-center justify-center gap-4 px-1 py-2 text-center">
+         <div className = "relative flex flex-col items-center justify-center gap-4 py-2 text-center">
             <FontAwesomeIcon
                icon = { faShieldHalved }
                className = "mt-6 text-5xl text-primary"

@@ -1,16 +1,18 @@
 import Image from "next/image";
-import Button from "@/components/global/button";
 import Heading from "@/components/global/heading";
 import Loading from "@/components/global/loading";
 import { users as User } from "@prisma/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { endSession } from "@/lib/authentication/session";
-import { GeneralAttribute, PasswordAttribute, SliderAttribute } from "@/components/home/settings/attribute";
+import { AccountAction, GeneralAttribute, PasswordAttribute, SliderAttribute } from "@/components/home/settings/attribute";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { fetchUserAttributes } from "@/lib/authentication/authorize";
-import { AuthenticationContext } from "@/app/layout";
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
-import { faAt, faRightFromBracket, faImage, faPhone, faUserSecret, faCakeCandles, faSignature, faMoon, faPaperPlane, faComments, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faAt, faImage, faPhone, faUserSecret, faCakeCandles, faSignature, faMoon, faPaperPlane, faComments, faPenToSquare, faUserLock, faUserXmark } from "@fortawesome/free-solid-svg-icons";
+
+import { handleResponse } from "@/lib/global/response";
+import { deleteAccount } from "@/lib/settings/service";
 
 const form: VitalityState = {
    username: {
@@ -77,6 +79,7 @@ const form: VitalityState = {
 
 export default function Form(): JSX.Element {
    const { user, theme, updateTheme } = useContext(AuthenticationContext);
+   const { updateNotification } = useContext(NotificationContext);
    const [globalState, globalDispatch] = useReducer(formReducer, form);
    const [isEditingImage, setIsEditingImage] = useState<boolean>(false);
 
@@ -198,6 +201,21 @@ export default function Form(): JSX.Element {
       });
    }, [globalState.image]);
 
+   const handleLogOut = useCallback(async() => {
+      await endSession();
+      window.location.reload();
+   }, []);
+
+   const handleDeleteAccount = useCallback(async() => {
+      handleResponse(await deleteAccount(user.id), globalDispatch, updateNotification, async() => {
+         await handleLogOut();
+      });
+   }, [
+      user,
+      handleLogOut,
+      updateNotification
+   ]);
+
    useEffect(() => {
       if (!globalState.image.data.fetched) {
          handleFetchUser();
@@ -208,7 +226,7 @@ export default function Form(): JSX.Element {
       <div className = "relative mx-auto mb-12 w-full px-2 text-left xsm:w-11/12 sm:w-3/4 xl:w-5/12">
          {
             globalState.image.data.fetched ? (
-               <div className = "flex flex-col items-center justify-center gap-4">
+               <div className = "flex flex-col items-center justify-center gap-6">
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
                         title = "Profile"
@@ -217,7 +235,7 @@ export default function Form(): JSX.Element {
                      {
                         !isEditingImage ? (
                            <div className = "relative flex flex-col items-center justify-center gap-4">
-                              <div className = "relative flex size-40 flex-col items-center justify-center overflow-hidden rounded-full border-[3px] border-primary shadow-md xxsm:size-44">
+                              <div className = "relative flex size-32 flex-col items-center justify-center overflow-hidden rounded-full border-[3px] border-primary shadow-md min-[225px]:size-40 xxsm:size-44">
                                  {
                                     globalState.image.data.valid !== false ? (
                                        <Image
@@ -301,31 +319,31 @@ export default function Form(): JSX.Element {
                         globalState = { globalState }
                         globalDispatch = { globalDispatch }
                      />
+                     <GeneralAttribute
+                        id = "email"
+                        type = "email"
+                        label = "Email"
+                        icon = { faAt }
+                        input = { globalState.email }
+                        dispatch = { globalDispatch }
+                        globalState = { globalState }
+                        globalDispatch = { globalDispatch }
+                     />
+                     <GeneralAttribute
+                        id = "phone"
+                        type = "tel"
+                        label = "Phone"
+                        icon = { faPhone }
+                        input = { globalState.phone }
+                        dispatch = { globalDispatch }
+                        globalState = { globalState }
+                        globalDispatch = { globalDispatch }
+                     />
+                     <PasswordAttribute
+                        globalState = { globalState }
+                        globalDispatch = { globalDispatch }
+                     />
                   </div>
-                  <GeneralAttribute
-                     id = "email"
-                     type = "email"
-                     label = "Email"
-                     icon = { faAt }
-                     input = { globalState.email }
-                     dispatch = { globalDispatch }
-                     globalState = { globalState }
-                     globalDispatch = { globalDispatch }
-                  />
-                  <GeneralAttribute
-                     id = "phone"
-                     type = "tel"
-                     label = "Phone"
-                     icon = { faPhone }
-                     input = { globalState.phone }
-                     dispatch = { globalDispatch }
-                     globalState = { globalState }
-                     globalDispatch = { globalDispatch }
-                  />
-                  <PasswordAttribute
-                     globalState = { globalState }
-                     globalDispatch = { globalDispatch }
-                  />
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
                         title = "Preferences"
@@ -340,7 +358,6 @@ export default function Form(): JSX.Element {
                         checked = { theme === "dark" }
                         onChange = { () => updateTheme(theme === "dark" ? "light" : "dark") }
                      />
-
                      <SliderAttribute
                         id = "mail"
                         label = "Email Notifications"
@@ -350,7 +367,6 @@ export default function Form(): JSX.Element {
                         checked = { globalState.mail.value === true }
                         onChange = { undefined }
                      />
-
                      <SliderAttribute
                         id = "sms"
                         label = "SMS Notifications"
@@ -360,21 +376,31 @@ export default function Form(): JSX.Element {
                         checked = { globalState.sms.value === true }
                         onChange = { undefined }
                      />
-
                   </div>
-                  <Button
-                     type = "submit"
-                     className = "mt-4 h-[2.8rem] rounded-md bg-red-500 p-4 text-sm font-bold text-white focus:ring-red-700 xxsm:p-5 xxsm:text-base"
-                     icon = { faRightFromBracket }
-                     onClick = {
-                        async() => {
-                           await endSession();
-                           window.location.reload();
-                        }
-                     }
-                  >
-                     Log Out
-                  </Button>
+                  <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
+                     <Heading
+                        title = "Actions"
+                        description = "Control your account with essential actions"
+                     />
+                     <AccountAction
+                        action = "log out"
+                        message = "Log out of your account?"
+                        icon = { faUserLock }
+                        label = "Log Out"
+                        onSubmit = { handleLogOut }
+                        globalState = { globalState }
+                        globalDispatch = { globalDispatch }
+                     />
+                     <AccountAction
+                        action = "delete"
+                        message = "Permanently delete your account?"
+                        icon = { faUserXmark }
+                        label = "Delete Account"
+                        onSubmit = { handleDeleteAccount }
+                        globalState = { globalState }
+                        globalDispatch = { globalDispatch }
+                     />
+                  </div>
                </div>
             ) : (
                <div className = "flex min-h-screen items-center justify-center">

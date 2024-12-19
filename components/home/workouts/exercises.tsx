@@ -455,7 +455,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                </li>
             ) : (
                !isNewSet && (
-                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pt-2 text-left text-sm font-semibold [overflow-wrap:anywhere] xxsm:text-[0.95rem] xsm:pl-8">
+                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pt-2 text-left text-[0.9rem] font-semibold [overflow-wrap:anywhere] xxsm:pl-8 xxsm:text-base">
                      <div
                         className = "cursor-grab touch-none pt-1 text-sm"
                         { ...attributes }
@@ -511,7 +511,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                                     className = "self-start pt-1 text-primary"
                                     icon = { faAlignJustify }
                                  />
-                                 <p>{ set.text }</p>
+                                 <p className = "[overflow-wrap:anywhere] ">{ set.text }</p>
                               </div>
                            )
                         }

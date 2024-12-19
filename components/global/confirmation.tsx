@@ -5,13 +5,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faRotateBack, faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 interface ConfirmationProps {
+  display?: React.ReactNode;
   message: string;
   onConfirmation: () => void;
   icon?: boolean;
 }
 
 export default function Confirmation(props: ConfirmationProps): JSX.Element {
-   const { message, icon, onConfirmation } = props;
+   const { display, message, icon, onConfirmation } = props;
    const deleteModalRef = useRef<{ open: () => void; close: () => void }>(null);
 
    return (
@@ -19,7 +20,7 @@ export default function Confirmation(props: ConfirmationProps): JSX.Element {
          className = "max-h-[90%] max-w-[90%] px-4 py-3 text-center xsm:max-w-sm"
          ref = { deleteModalRef }
          display = {
-            icon ? (
+            display !== undefined ? display : icon ? (
                <div className = "bg-white dark:bg-slate-800">
                   <FontAwesomeIcon
                      icon = { faTrashCan }
