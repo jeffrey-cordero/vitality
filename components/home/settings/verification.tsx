@@ -2,8 +2,8 @@
 import clsx from "clsx";
 import Modal from "@/components/global/modal";
 import Button from "@/components/global/button";
-import { handleResponse } from "@/lib/global/response";
-import { verifyUserAttribute } from "@/lib/settings/service";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
+import { verifyPreference } from "@/lib/settings/service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { AttributeProps } from "@/components/home/settings/attribute";
@@ -42,7 +42,7 @@ const verification: VitalityState = {
 };
 
 interface VerifyAttributeProps extends AttributeProps {
-   attribute: "email" | "phone";
+   attribute: "email_verified" | "phone_verified";
 }
 
 export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Element {
@@ -117,7 +117,9 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
             value: codes
          });
       } else {
-         handleResponse(await verifyUserAttribute(user.id, attribute), localDispatch, updateNotification, () => {
+         const response: VitalityResponse<void> = await verifyPreference(user.id, attribute);
+
+         handleResponse(response, localDispatch, updateNotification, () => {
             globalDispatch({
                type: "updateState",
                value: {
@@ -133,8 +135,8 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
             });
 
             updateNotification({
-               status: "Success",
-               message: `Successful ${attribute === "phone" ? "phone number" : "email"} verification`,
+               status: response.status,
+               message: response.body.message,
                timer: 1500
             });
 

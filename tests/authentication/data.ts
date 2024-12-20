@@ -25,7 +25,7 @@ export const user = {
    phone: "1234567891",
    image: "",
    email_verified: false,
-   phone_verified: false,
+   phone_verified: true,
    mail: false,
    sms: false
 };

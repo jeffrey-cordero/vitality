@@ -26,48 +26,101 @@ const updateSchema = userSchema.extend({
       .optional()
 });
 
-export async function updateUserPreference(
+export async function fetchUser(
+   user_id: string,
+   attribute: string
+): Promise<User | null> {
+   // Helper method to verify a user existence and attribute value
+   try {
+      return await prisma.users.findFirst({
+         where: { 
+            id: user_id 
+         },
+         select: {
+            [attribute]: true
+         }
+      }) as any;
+   } catch (error) {
+      return null;
+   }
+}
+
+export async function updatePreference(
    user_id: string,
    preference: "mail" | "sms",
    value: boolean
 ): Promise<VitalityResponse<void>> {
-   try {
-      await prisma.users.update({
-         where: {
-            id: user_id
-         },
-         data: {
-            [preference]: value
-         }
-      });
-
-      return sendSuccessMessage(`Updated ${preference === "mail" ? "email" : "SMS"} notification preference`, null);
-   } catch (error) {
-      return sendFailureMessage(error);
+   const user: User | null = await fetchUser(user_id, preference);
+   
+   if (user === null) {
+      return sendErrorMessage(
+         "User does not exist based on user ID",
+         null
+      );
+   } else if (user[preference] === value) {
+      return sendSuccessMessage(
+         `No changes in ${preference === "mail" ? "email" : "SMS"} notification preference`, 
+         null
+      );
+   } else {
+      try {
+         await prisma.users.update({
+            where: {
+               id: user_id
+            },
+            data: {
+               [preference]: value
+            }
+         });
+   
+         return sendSuccessMessage(
+            `Updated ${preference === "mail" ? "email" : "SMS"} notification preference`, 
+            null
+         );
+      } catch (error) {
+         return sendFailureMessage(error);
+      }
    }
 }
 
-export async function verifyUserAttribute(
+export async function verifyPreference(
    user_id: string,
-   attribute: "email" | "phone"
+   preference: "email_verified" | "phone_verified"
 ): Promise<VitalityResponse<void>> {
-   try {
-      await prisma.users.update({
-         where: {
-            id: user_id
-         },
-         data: {
-            [`${attribute}_verified`]: true
-         }
-      });
+   const user: User | null = await fetchUser(user_id, preference);
 
-      return sendSuccessMessage(`Successful ${attribute === "phone" ? "phone number" : "email"} verification`, null);
-   } catch (error) {
-      return sendFailureMessage(error);
+   if (user === null) {
+      return sendErrorMessage(
+         "User does not exist based on user ID",
+         null
+      );
+   } else if (user[preference] === true) {
+      return sendSuccessMessage(
+         `${preference === "phone_verified" ? "Phone number" : "Email"} is already verified`, 
+         null
+      );
+   } else {
+      try {
+         await prisma.users.update({
+            where: {
+               id: user_id
+            },
+            data: {
+               [preference]: true
+            }
+         });
+   
+         return sendSuccessMessage(
+            `Successful ${preference === "phone_verified" ? "phone number" : "email"} verification`,
+            null
+         );
+      } catch (error) {
+         return sendFailureMessage(error);
+      }
    }
 }
 
-export async function updateUserPassword(
+export async function updatePassword(
    user_id:string,
    oldPassword: string,
    newPassword: string,
@@ -92,15 +145,8 @@ export async function updateUserPassword(
       });
    } else {
       try {
-         // Validate old password
-         const user = await prisma.users.findFirst({
-            where: {
-               id: user_id
-            },
-            select: {
-               password: true
-            }
-         });
+         // Validate old password value matching
+         const user: User | null = await fetchUser(user_id, "password");
 
          if (!user) {
             // Invalid user ID
@@ -137,18 +183,27 @@ export async function updateUserPassword(
          return sendFailureMessage(error);
       }
    }
-
 }
 
-export async function updateUserAttribute<T extends keyof User>(
+export async function updateAttribute<T extends keyof User>(
    user_id: string,
    attribute: T,
    value: User[T]
 ): Promise<VitalityResponse<void>> {
-   // Only update valid user attributes outside of the ID
-   if (attribute === "id" || !(attribute in updateSchema.shape)) {
+   if (!(attribute in updateSchema.shape) || attribute === "id") {
       return sendFailureMessage(new Error("Updating user attribute must be valid"));
    }
+
+   const user: User | null = await fetchUser(user_id, attribute);
+
+   if (user === null) {
+      return sendErrorMessage(
+         "User does not exist based on user ID",
+         null
+      );
+   } else if (user[attribute] === value) {
+      return sendSuccessMessage(`No updates for ${attribute}`, null);
+   } 
 
    const attributeSchema = updateSchema.shape[attribute.toLowerCase()];
    const field = attributeSchema?.safeParse(value);
@@ -158,11 +213,11 @@ export async function updateUserAttribute<T extends keyof User>(
       return sendErrorMessage("Invalid user attribute", {
          [attribute]: [field.error.errors[0].message]
       });
-   }
-
+   } 
+   
    if (attribute === "username" || attribute === "email" || attribute === "phone") {
       // Account for unique attribute database constraints
-      const existingUser = await prisma.users.findFirst({
+      const attributeConflict = await prisma.users.findFirst({
          where: {
             [attribute] : value,
             NOT: {
@@ -171,23 +226,10 @@ export async function updateUserAttribute<T extends keyof User>(
          }
       });
 
-      if (existingUser) {
+      if (attributeConflict) {
          return sendErrorMessage("Account attribute conflicts", {
             [attribute]: [`${attribute[0].toUpperCase() + attribute.substring(1)} already taken`]
          });
-      }
-
-      const existingValue = await prisma.users.findFirst({
-         where: {
-            id: user_id
-         },
-         select: {
-            [attribute]: true
-         }
-      });
-
-      if (existingValue[attribute].toString() === value) {
-         return sendSuccessMessage("No updates", null);
       }
    }
 
@@ -212,6 +254,15 @@ export async function updateUserAttribute<T extends keyof User>(
 export async function deleteAccount(
    user_id: string
 ): Promise<VitalityResponse<void>> {
+   const user: User | null = await fetchUser(user_id, "username");
+
+   if (user === null) {
+      return sendErrorMessage(
+         "User does not exist based on user ID",
+         null
+      );
+   }
+
    try {
       await prisma.users.delete({
          where: {
@@ -219,7 +270,7 @@ export async function deleteAccount(
          }
       });
 
-      return sendSuccessMessage("Deleted account", null);
+      return sendSuccessMessage("Successful account deletion", null);
    } catch (error) {
       return sendFailureMessage(error);
    }
