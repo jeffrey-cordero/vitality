@@ -24,7 +24,7 @@ export const user = {
    email: "user@gmail.com",
    phone: "1234567891",
    image: "",
-   email_verified: false,
+   email_verified: true,
    phone_verified: true,
    mail: false,
    sms: false

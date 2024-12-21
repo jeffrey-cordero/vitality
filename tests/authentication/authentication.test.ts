@@ -9,13 +9,6 @@ import { invalidRegistrations, root, user, VALID_REGISTRATION, invalidPasswords 
 
 const EXISTING_USERS = [root, user];
 
-// Mock bcrypt password hashing methods
-jest.mock("bcryptjs", () => ({
-   genSaltSync: jest.fn(() => "mockedSalt"),
-   hash: jest.fn((password) => `hashed${password}`),
-   compare: jest.fn((one, two) => one === two)
-}));
-
 describe("Authentication Tests", () => {
    describe("Registration", () => {
       test("Register with invalid fields", async() => {

@@ -26,15 +26,15 @@ const updateSchema = userSchema.extend({
       .optional()
 });
 
-export async function fetchUser(
+export async function validateUser(
    user_id: string,
    attribute: string
 ): Promise<User | null> {
    // Helper method to verify a user existence and attribute value
    try {
       return await prisma.users.findFirst({
-         where: { 
-            id: user_id 
+         where: {
+            id: user_id
          },
          select: {
             [attribute]: true
@@ -50,8 +50,8 @@ export async function updatePreference(
    preference: "mail" | "sms",
    value: boolean
 ): Promise<VitalityResponse<void>> {
-   const user: User | null = await fetchUser(user_id, preference);
-   
+   const user: User | null = await validateUser(user_id, preference);
+
    if (user === null) {
       return sendErrorMessage(
          "User does not exist based on user ID",
@@ -59,7 +59,7 @@ export async function updatePreference(
       );
    } else if (user[preference] === value) {
       return sendSuccessMessage(
-         `No changes in ${preference === "mail" ? "email" : "SMS"} notification preference`, 
+         `No changes in ${preference === "mail" ? "email" : "SMS"} notification preference`,
          null
       );
    } else {
@@ -72,9 +72,9 @@ export async function updatePreference(
                [preference]: value
             }
          });
-   
+
          return sendSuccessMessage(
-            `Updated ${preference === "mail" ? "email" : "SMS"} notification preference`, 
+            `Updated ${preference === "mail" ? "email" : "SMS"} notification preference`,
             null
          );
       } catch (error) {
@@ -83,20 +83,20 @@ export async function updatePreference(
    }
 }
 
-export async function verifyPreference(
+export async function verifyAttribute(
    user_id: string,
-   preference: "email_verified" | "phone_verified"
+   attribute: "email_verified" | "phone_verified"
 ): Promise<VitalityResponse<void>> {
-   const user: User | null = await fetchUser(user_id, preference);
+   const user: User | null = await validateUser(user_id, attribute);
 
    if (user === null) {
       return sendErrorMessage(
          "User does not exist based on user ID",
          null
       );
-   } else if (user[preference] === true) {
+   } else if (user[attribute] === true) {
       return sendSuccessMessage(
-         `${preference === "phone_verified" ? "Phone number" : "Email"} is already verified`, 
+         `${attribute === "phone_verified" ? "Phone number" : "Email"} is already verified`,
          null
       );
    } else {
@@ -106,12 +106,12 @@ export async function verifyPreference(
                id: user_id
             },
             data: {
-               [preference]: true
+               [attribute]: true
             }
          });
-   
+
          return sendSuccessMessage(
-            `Successful ${preference === "phone_verified" ? "phone number" : "email"} verification`,
+            `Successful ${attribute === "phone_verified" ? "phone number" : "email"} verification`,
             null
          );
       } catch (error) {
@@ -146,7 +146,7 @@ export async function updatePassword(
    } else {
       try {
          // Validate old password value matching
-         const user: User | null = await fetchUser(user_id, "password");
+         const user: User | null = await validateUser(user_id, "password");
 
          if (!user) {
             // Invalid user ID
@@ -194,7 +194,7 @@ export async function updateAttribute<T extends keyof User>(
       return sendFailureMessage(new Error("Updating user attribute must be valid"));
    }
 
-   const user: User | null = await fetchUser(user_id, attribute);
+   const user: User | null = await validateUser(user_id, attribute);
 
    if (user === null) {
       return sendErrorMessage(
@@ -203,7 +203,7 @@ export async function updateAttribute<T extends keyof User>(
       );
    } else if (user[attribute] === value) {
       return sendSuccessMessage(`No updates for ${attribute}`, null);
-   } 
+   }
 
    const attributeSchema = updateSchema.shape[attribute.toLowerCase()];
    const field = attributeSchema?.safeParse(value);
@@ -213,8 +213,8 @@ export async function updateAttribute<T extends keyof User>(
       return sendErrorMessage("Invalid user attribute", {
          [attribute]: [field.error.errors[0].message]
       });
-   } 
-   
+   }
+
    if (attribute === "username" || attribute === "email" || attribute === "phone") {
       // Account for unique attribute database constraints
       const attributeConflict = await prisma.users.findFirst({
@@ -254,7 +254,7 @@ export async function updateAttribute<T extends keyof User>(
 export async function deleteAccount(
    user_id: string
 ): Promise<VitalityResponse<void>> {
-   const user: User | null = await fetchUser(user_id, "username");
+   const user: User | null = await validateUser(user_id, "username");
 
    if (user === null) {
       return sendErrorMessage(

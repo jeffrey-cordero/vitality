@@ -7,6 +7,12 @@ jest.mock("@/lib/prisma/client", () => ({
    default: mockDeep<PrismaClient>()
 }));
 
+jest.mock("bcryptjs", () => ({
+   genSaltSync: jest.fn(() => "mockedSalt"),
+   hash: jest.fn((password) => `hashed${password}`),
+   compare: jest.fn((a, b) => a === b)
+}));
+
 beforeEach(() => {
    mockReset(prismaMock);
 });

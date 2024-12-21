@@ -3,7 +3,7 @@ import clsx from "clsx";
 import Modal from "@/components/global/modal";
 import Button from "@/components/global/button";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { verifyPreference } from "@/lib/settings/service";
+import { verifyAttribute } from "@/lib/settings/service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { AttributeProps } from "@/components/home/settings/attribute";
@@ -117,7 +117,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
             value: codes
          });
       } else {
-         const response: VitalityResponse<void> = await verifyPreference(user.id, attribute);
+         const response: VitalityResponse<void> = await verifyAttribute(user.id, attribute);
 
          handleResponse(response, localDispatch, updateNotification, () => {
             globalDispatch({

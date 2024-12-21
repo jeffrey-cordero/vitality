@@ -49,7 +49,7 @@ export const userSchema = z.object({
       .string({
          message: "Email is required"
       })
-      .trim() 
+      .trim()
       .email({ message: "Email is required" }),
    phone: z
       .string()

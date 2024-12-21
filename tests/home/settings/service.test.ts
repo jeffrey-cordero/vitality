@@ -3,28 +3,23 @@ import { expect } from "@jest/globals";
 import { prismaMock } from "@/tests/singleton";
 import { VitalityResponse } from "@/lib/global/response";
 import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
-import { fetchUser, fetchUserAttributes } from "@/lib/authentication/authorize";
-import { invalidPasswords, invalidRegistrations, root, user } from "@/tests/authentication/data";
-import { deleteAccount, updateAttribute, updatePassword, updatePreference, verifyPreference } from "@/lib/settings/service";
+import { fetchUserAttributes } from "@/lib/authentication/authorize";
+import { invalidPasswords, invalidRegistrations, root, user, INVALID_PASSWORD_MESSAGE } from "@/tests/authentication/data";
+import { validateUser, deleteAccount, updateAttribute, updatePassword, updatePreference, verifyAttribute } from "@/lib/settings/service";
 
 let expected: VitalityResponse<void>;
 const oldPassword: string = "ValidPassword$1";
 const newPassword: string = "ValidPassword$2";
 
-jest.mock("bcryptjs", () => ({
-   genSaltSync: jest.fn(() => "mockedSalt"),
-   hash: jest.fn((password) => `hashed${password}`),
-   compare: jest.fn((one, two) => one === two)
-}));
-
 describe("Settings Tests", () => {
    beforeEach(() => {
       // @ts-ignore
       prismaMock.users.findFirst.mockImplementation(async(params) => {
-         if (params.where.email === user.email || params.where.username === user.username || params.where.phone === user.phone) {
+         if (params.where.id === user.id || params.where.email === user.email
+               || params.where.username === user.username || params.where.phone === user.phone) {
             return user;
          } else {
-            return params.where.id === root.id ? root : params.where.id === user.id ? user : null;
+            return params.where.id === root.id ? root : null;
          }
       });
 
@@ -34,7 +29,7 @@ describe("Settings Tests", () => {
       });
    });
 
-   describe("Attributes", () => {
+   describe("Fetch Attributes", () => {
       test("Fetch user attributes for existing and missing users", async() => {
          expect(await fetchUserAttributes(root.id)).toEqual({
             ...root,
@@ -50,33 +45,29 @@ describe("Settings Tests", () => {
          } as any);
       });
 
-      test("Handle database errors when fetching user", async() => {
-         // @ts-ignore
-         prismaMock.users.findFirst.mockRejectedValue(
-            new Error("Database Error")
-         );
-
-         expect(await fetchUser(root.id)).toBeNull();
-      });
-
       test("Handle database errors when fetching user attributes", async() => {
          // @ts-ignore
          prismaMock.users.findFirst.mockRejectedValue(
             new Error("Database Error")
          );
 
+         expect(await validateUser(root.id, "username")).toBeNull();
          expect(await fetchUserAttributes(root.id)).toEqual(null);
          expect(await fetchUserAttributes(MOCK_ID)).toEqual(null);
       });
+   });
 
+   describe("Update Attribute", () => {
       test("Update attribute with errors", (async() => {
-         // Invalid attributes types
+         // Invalid attributes
          expected = {
             status: "Failure",
             body: {
                data: null,
                message: "Something went wrong. Please try again.",
-               errors: { system: ["Updating user attribute must be valid"] }
+               errors: {
+                  system: ["Updating user attribute must be valid"]
+               }
             }
          };
 
@@ -84,16 +75,7 @@ describe("Settings Tests", () => {
          expect(await updateAttribute(root.id, "random" as any, "",)).toEqual(expected);
          expect(await updateAttribute(root.id, "workouts" as any, "",)).toEqual(expected);
 
-         expected = {
-            status: "Error",
-            body: {
-               data: null,
-               message: "Invalid user attribute",
-               errors: { email: [""] }
-            }
-         };
-
-         // Invalid attribute values
+         // Invalid fields
          for (const { registration, errors } of invalidRegistrations) {
             const attributes = Object.keys(registration);
 
@@ -114,18 +96,18 @@ describe("Settings Tests", () => {
          }
       }));
 
-      test("Handle database constraints when updating attribute", async() => {
+      test("Handle database constraints when updating attributes", async() => {
          // Missing user
          expect(await updateAttribute(MOCK_ID, "birthday", new Date())).toEqual({
-            status: 'Error',
+            status: "Error",
             body: {
-              data: null,
-              message: 'User does not exist based on user ID',
-              errors: {}
+               data: null,
+               message: "User does not exist based on user ID",
+               errors: {}
             }
-          });
+         });
 
-         // Taken username, email, and phone number
+         // Unique user attributes already being taken
          ["username", "email", "phone"].forEach(
             async(attribute: string) =>  {
                expect(await updateAttribute(root.id, attribute as any, user[attribute])).toEqual({
@@ -150,10 +132,11 @@ describe("Settings Tests", () => {
             }
          );
 
+         // Database error
          simulateDatabaseError("users", "update", async() => await updateAttribute(root.id, "username", "new-username"));
       });
 
-      test("Update user attribute", async() => {
+      test("Update user attributes", async() => {
          const verifyAttributeUpdates = async(
             attribute: string,
             value: any,
@@ -161,6 +144,7 @@ describe("Settings Tests", () => {
             phone_verified: boolean,
             changes: boolean
          ) => {
+            // Helper method to verify that a user attribute changes or remains untouched
             expect(await updateAttribute(root.id, attribute as any, value)).toEqual({
                status: "Success",
                body: {
@@ -189,30 +173,26 @@ describe("Settings Tests", () => {
          verifyAttributeUpdates("birthday", new Date(), undefined, undefined, true);
          verifyAttributeUpdates("name", "new-name", undefined, undefined, true);
 
-         // Update to new email, leading to false email verification variable
+         // Update verification-based attributes, which may change verification status
          verifyAttributeUpdates("email", "new-email@gmail.com", false, undefined, true);
-
-         // Update to existing email, leading to no changes in email verification variable
          verifyAttributeUpdates("email", root.email, undefined, undefined, false);
 
-         // Update to new phone, leading to false phone verification variable
          verifyAttributeUpdates("phone", "1234567892", undefined, false, true);
-
-         // Update to existing phone, leading to no changes phone verification variable
          verifyAttributeUpdates("phone", root.phone, undefined, undefined, false);
       });
    });
 
-   describe("Password", () => {
+   describe("Update Password", () => {
       test("Update password with field errors", async() => {
          for (const { password, confirmPassword, errors } of invalidPasswords) {
+            // Handling invalid passwords and passwords not matching
             expect(await updatePassword(root.id, password, password, confirmPassword)).toEqual({
                status: "Error",
                body: {
                   data: null,
                   message: "Invalid password fields",
                   errors: {
-                     oldPassword: errors.password && errors.confirmPassword ? undefined : errors.password,
+                     oldPassword: errors.password?.[0] !== INVALID_PASSWORD_MESSAGE ? undefined : errors.password,
                      newPassword: errors.password,
                      confirmPassword: errors.confirmPassword
                   }
@@ -225,7 +205,7 @@ describe("Settings Tests", () => {
          // Mock invalid password comparison
          bcrypt.compare.mockResolvedValue(false);
 
-         // Old password not matching
+         // Invalid old password
          const password: string = "ValidPassword$1";
 
          expect(await updatePassword(root.id, password, password, password)).toEqual({
@@ -239,7 +219,7 @@ describe("Settings Tests", () => {
             }
          });
 
-         // Old password matching
+         // No changes in password value
          bcrypt.compare.mockResolvedValue(true);
 
          expect(await updatePassword(root.id, password, password, password)).toEqual({
@@ -264,13 +244,13 @@ describe("Settings Tests", () => {
       });
 
       test("Handle database constraints when updating password", async() => {
-         // Invalid user ID
+         // Missing user
          expect(await updatePassword(MOCK_ID, oldPassword, newPassword, newPassword)).toEqual({
-            status: 'Error',
+            status: "Error",
             body: {
-              data: null,
-              message: 'User does not exist based on user ID',
-              errors: {}
+               data: null,
+               message: "User does not exist based on user ID",
+               errors: {}
             }
          });
 
@@ -281,7 +261,7 @@ describe("Settings Tests", () => {
             select: {
                password: true
             }
-         });
+         } as any);
 
          // Database error
          bcrypt.compare.mockResolvedValue(true);
@@ -290,11 +270,12 @@ describe("Settings Tests", () => {
 
       test("Update password", async() => {
          bcrypt.compare.mockResolvedValue(true);
+
          expect(await updatePassword(root.id, oldPassword, newPassword, newPassword)).toEqual({
-            status: 'Success',
+            status: "Success",
             body: {
                data: null,
-               message: 'Updated password',
+               message: "Updated password",
                errors: {}
             }
          });
@@ -306,79 +287,131 @@ describe("Settings Tests", () => {
             data: {
                password: await bcrypt.hash(newPassword, await bcrypt.genSaltSync(10))
             }
-         })
-      })
-   });
-
-   describe("Preferences", () => {
-      test("Update and verify preferences for missing users", async() => {
-         const expected = {
-            status: 'Error',
-            body: {
-              data: null,
-              message: 'User does not exist based on user ID',
-              errors: {}
-            }
-          };
-          
-         expect(await updatePreference(MOCK_ID, "mail", false)).toEqual(expected);
-         expect(await verifyPreference(MOCK_ID, "phone_verified")).toEqual(expected);
-      });
-
-      test("Handle database constraints when updating or verifying preference", async() => {
-         // Database errors
-         simulateDatabaseError("users", "update", async() => await updatePreference(root.id, "mail", !root.email_verified));
-         simulateDatabaseError("users", "update", async() => await verifyPreference(root.id, "phone_verified"));         
-      });
-
-      test("Update and verify preferences", async() => {
-         expect(await updatePreference(root.id, "mail", !root.email_verified)).toEqual({
-            status: 'Success',
-            body: {
-              data: null,
-              message: 'Updated email notification preference',
-              errors: {}
-            }
          });
-
-         expect(await verifyPreference(root.id, "email_verified")).toEqual({
-            status: 'Success',
-            body: {
-              data: null,
-              message: 'Successful email verification',
-              errors: {}
-            }
-          });
-
-
-          // No updates in preferences
-         expect(await updatePreference(root.id, "mail", root.email_verified)).toEqual({
-            status: 'Success',
-            body: {
-              data: null,
-              message: 'No changes in email notification preference',
-              errors: {}
-            }
-         });
-
-         expect(await verifyPreference(user.id, "phone_verified")).toEqual({
-            status: 'Success',
-            body: {
-              data: null,
-              message: 'Phone number is already verified',
-              errors: {}
-            }
-          });
       });
    });
 
-   describe("Actions", () => {
-      test("Delete account for missing user", async() => {
-         expect(await deleteAccount(MOCK_ID)).toEqual({
-            status: 'Error',
+   describe("Verify Attribute", () => {
+      test("Verify attribute for missing users", async() => {
+         expect(await verifyAttribute(MOCK_ID, "phone_verified")).toEqual({
+            status: "Error",
             body: {
                data: null,
-               message: 'User does not exist based on user ID',
+               message: "User does not exist based on user ID",
+               errors: {}
+            }
+         });
+      });
+
+      test("Handle database constraints when verifying attributes", async() => {
+         simulateDatabaseError("users", "update", async() => await verifyAttribute(root.id, "phone_verified"));
+      });
+
+      test("Verify attributes", async() => {
+         // Update verification status
+         expect(await verifyAttribute(root.id, "email_verified")).toEqual({
+            status: "Success",
+            body: {
+               data: null,
+               message: "Successful email verification",
+               errors: {}
+            }
+         });
+
+         expect(await verifyAttribute(root.id, "phone_verified")).toEqual({
+            status: "Success",
+            body: {
+               data: null,
+               message: "Successful phone number verification",
+               errors: {}
+            }
+         });
+
+         // No updates to verification status
+         expect(await verifyAttribute(user.id, "phone_verified")).toEqual({
+            status: "Success",
+            body: {
+               data: null,
+               message: "Phone number is already verified",
+               errors: {}
+            }
+         });
+
+         expect(await verifyAttribute(user.id, "email_verified")).toEqual({
+            status: "Success",
+            body: {
+               data: null,
+               message: "Email is already verified",
+               errors: {}
+            }
+         });
+      });
+   });
+
+   describe("Update Preferences", () => {
+      test("Update preferences for missing users", async() => {
+         expect(await updatePreference(MOCK_ID, "mail", false)).toEqual({
+            status: "Error",
+            body: {
+               data: null,
+               message: "User does not exist based on user ID",
+               errors: {}
+            }
+         });
+      });
+
+      test("Handle database constraints when updating preferences", async() => {
+         simulateDatabaseError("users", "update", async() => await updatePreference(root.id, "mail", !root.email_verified));
+      });
+
+      test("Update preferences", async() => {
+         // Updates preference
+         expect(await updatePreference(root.id, "mail", !root.email_verified)).toEqual({
+            status: "Success",
+            body: {
+               data: null,
+               message: "Updated email notification preference",
+               errors: {}
+            }
+         });
+
+         expect(await updatePreference(root.id, "sms", !root.phone_verified)).toEqual({
+            status: "Success",
+            body: {
+               data: null,
+               message: "Updated SMS notification preference",
+               errors: {}
+            }
+         });
+
+         // No updates to preferences
+         expect(await updatePreference(root.id, "mail", root.email_verified)).toEqual({
+            status: "Success",
+            body: {
+               data: null,
+               message: "No changes in email notification preference",
+               errors: {}
+            }
+         });
+
+         expect(await updatePreference(root.id, "sms", root.email_verified)).toEqual({
+            status: "Success",
+            body: {
+               data: null,
+               message: "No changes in SMS notification preference",
+               errors: {}
+            }
+         });
+      });
+   });
+
+   describe("Delete Account", () => {
+      test("Delete account for missing user", async() => {
+         expect(await deleteAccount(MOCK_ID)).toEqual({
+            status: "Error",
+            body: {
+               data: null,
+               message: "User does not exist based on user ID",
                errors: {}
             }
          });
@@ -388,12 +421,12 @@ describe("Settings Tests", () => {
          simulateDatabaseError("users", "delete", async() => await deleteAccount(root.id));
       });
 
-      test("Delete account", async () => {
+      test("Delete account", async() => {
          expect(await deleteAccount(root.id)).toEqual({
-            status: 'Success',
+            status: "Success",
             body: {
                data: null,
-               message: 'Successful account deletion',
+               message: "Successful account deletion",
                errors: {}
             }
          });
