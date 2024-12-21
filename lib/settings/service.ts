@@ -6,6 +6,7 @@ import { userSchema } from "@/lib/global/zod";
 import { users as User } from "@prisma/client";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
 import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
+import { authorizeAction } from "../authentication/session";
 
 const updateSchema = userSchema.extend({
    image: z
@@ -50,20 +51,22 @@ export async function updatePreference(
    preference: "mail" | "sms",
    value: boolean
 ): Promise<VitalityResponse<void>> {
-   const user: User | null = await validateUser(user_id, preference);
+   try {
+      await authorizeAction(user_id);
 
-   if (user === null) {
-      return sendErrorMessage(
-         "User does not exist based on user ID",
-         null
-      );
-   } else if (user[preference] === value) {
-      return sendSuccessMessage(
-         `No changes in ${preference === "mail" ? "email" : "SMS"} notification preference`,
-         null
-      );
-   } else {
-      try {
+      const user: User | null = await validateUser(user_id, preference);
+
+      if (user === null) {
+         return sendErrorMessage(
+            "User does not exist based on user ID",
+            null
+         );
+      } else if (user[preference] === value) {
+         return sendSuccessMessage(
+            `No changes in ${preference === "mail" ? "email" : "SMS"} notification preference`,
+            null
+         );
+      } else {
          await prisma.users.update({
             where: {
                id: user_id
@@ -77,9 +80,9 @@ export async function updatePreference(
             `Updated ${preference === "mail" ? "email" : "SMS"} notification preference`,
             null
          );
-      } catch (error) {
-         return sendFailureMessage(error);
       }
+   } catch (error) {
+      return sendFailureMessage(error);
    }
 }
 
@@ -126,12 +129,14 @@ export async function updatePassword(
    newPassword: string,
    confirmPassword: string
 ): Promise<VitalityResponse<void>> {
+   // Format errors object for backend response, if any
    const passwordSchema = userSchema.shape.password;
-   const errors = Object.fromEntries(Object.entries({
-      oldPassword: passwordSchema.safeParse(oldPassword).error?.errors[0].message ?? undefined,
-      newPassword: passwordSchema.safeParse(newPassword).error?.errors[0].message ?? undefined,
-      confirmPassword: passwordSchema.safeParse(confirmPassword).error?.errors[0].message ?? undefined
-   })
+   const validatePassword = (password: string) => {
+      return passwordSchema.safeParse(password).error?.errors[0].message;
+   };
+
+   const errors = Object.fromEntries(["oldPassword", "newPassword", "confirmPassword"]
+      .map((key) => [key, validatePassword(eval(key))])
       .filter(([_, error]) => error !== undefined)
       .map(([key, error]) => [key, [error]])
    );
@@ -145,7 +150,7 @@ export async function updatePassword(
       });
    } else {
       try {
-         // Validate old password value matching
+         // Validate old password value
          const user: User | null = await validateUser(user_id, "password");
 
          if (!user) {
@@ -160,12 +165,12 @@ export async function updatePassword(
                oldPassword: ["Old password does not match"]
             });
          } else if (oldPassword === newPassword) {
+            // New password must be different
             return sendErrorMessage("Invalid password fields", {
                newPassword: ["New password must not match old password"]
             });
          } else {
-            // Update password
-            const hashedPassword = await bcrypt.hash(newPassword, await bcrypt.genSaltSync(10));
+            const hashedPassword: string = await bcrypt.hash(newPassword, await bcrypt.genSaltSync(10));
 
             await prisma.users.update({
                where: {
@@ -177,7 +182,6 @@ export async function updatePassword(
             });
 
             return sendSuccessMessage("Updated password", null);
-
          }
       } catch (error) {
          return sendFailureMessage(error);
@@ -190,6 +194,7 @@ export async function updateAttribute<T extends keyof User>(
    attribute: T,
    value: User[T]
 ): Promise<VitalityResponse<void>> {
+   // Invalid attribute type
    if (!(attribute in updateSchema.shape) || attribute === "id") {
       return sendFailureMessage(new Error("Updating user attribute must be valid"));
    }
@@ -209,15 +214,15 @@ export async function updateAttribute<T extends keyof User>(
    const field = attributeSchema?.safeParse(value);
 
    if (!field?.success) {
-      // Invalid attribute value caught
+      // Invalid attribute value
       return sendErrorMessage("Invalid user attribute", {
          [attribute]: [field.error.errors[0].message]
       });
    }
 
    if (attribute === "username" || attribute === "email" || attribute === "phone") {
-      // Account for unique attribute database constraints
-      const attributeConflict = await prisma.users.findFirst({
+      // Valid unique attribute doesn't already exist
+      const conflict: User | null = await prisma.users.findFirst({
          where: {
             [attribute] : value,
             NOT: {
@@ -226,7 +231,7 @@ export async function updateAttribute<T extends keyof User>(
          }
       });
 
-      if (attributeConflict) {
+      if (conflict) {
          return sendErrorMessage("Account attribute conflicts", {
             [attribute]: [`${attribute[0].toUpperCase() + attribute.substring(1)} already taken`]
          });

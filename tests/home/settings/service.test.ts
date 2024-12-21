@@ -3,7 +3,7 @@ import { expect } from "@jest/globals";
 import { prismaMock } from "@/tests/singleton";
 import { VitalityResponse } from "@/lib/global/response";
 import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
-import { fetchUserAttributes } from "@/lib/authentication/authorize";
+import { fetchAttributes } from "@/lib/authentication/authorize";
 import { invalidPasswords, invalidRegistrations, root, user, INVALID_PASSWORD_MESSAGE } from "@/tests/authentication/data";
 import { validateUser, deleteAccount, updateAttribute, updatePassword, updatePreference, verifyAttribute } from "@/lib/settings/service";
 
@@ -31,7 +31,7 @@ describe("Settings Tests", () => {
 
    describe("Fetch Attributes", () => {
       test("Fetch user attributes for existing and missing users", async() => {
-         expect(await fetchUserAttributes(root.id)).toEqual({
+         expect(await fetchAttributes(root.id)).toEqual({
             ...root,
             password: "*".repeat(root.password.length)
          });
@@ -39,7 +39,7 @@ describe("Settings Tests", () => {
             where: { id: root.id }
          } as any);
 
-         expect(await fetchUserAttributes(MOCK_ID)).toEqual(null);
+         expect(await fetchAttributes(MOCK_ID)).toEqual(null);
          expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
             where: { id: MOCK_ID }
          } as any);
@@ -52,8 +52,8 @@ describe("Settings Tests", () => {
          );
 
          expect(await validateUser(root.id, "username")).toBeNull();
-         expect(await fetchUserAttributes(root.id)).toEqual(null);
-         expect(await fetchUserAttributes(MOCK_ID)).toEqual(null);
+         expect(await fetchAttributes(root.id)).toEqual(null);
+         expect(await fetchAttributes(MOCK_ID)).toEqual(null);
       });
    });
 

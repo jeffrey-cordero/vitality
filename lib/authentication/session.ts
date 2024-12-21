@@ -11,3 +11,11 @@ export async function endSession(): Promise<void> {
       redirect: true
    });
 }
+
+export async function authorizeAction(user_id: string): Promise<boolean> {
+   if ((await auth())?.user.id !== user_id) {
+      throw new Error("You do not have permission to perform this action.");
+   }
+
+   return;
+}

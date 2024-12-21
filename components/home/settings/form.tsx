@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { endSession } from "@/lib/authentication/session";
 import { AccountAction, GeneralAttribute, PasswordAttribute, SliderAttribute } from "@/components/home/settings/attribute";
 import { formReducer, VitalityState } from "@/lib/global/state";
-import { fetchUserAttributes } from "@/lib/authentication/authorize";
+import { fetchAttributes } from "@/lib/authentication/authorize";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { faAt, faImage, faPhone, faUserSecret, faCakeCandles, faSignature, faMoon, faPaperPlane, faComments, faPenToSquare, faUserLock, faUserXmark } from "@fortawesome/free-solid-svg-icons";
@@ -88,7 +88,7 @@ export default function Form(): JSX.Element {
    }, [globalState.image.data.stored]);
 
    const handleFetchUser = useCallback(async() => {
-      const information: User = await fetchUserAttributes(user.id);
+      const information: User = await fetchAttributes(user.id);
 
       globalDispatch({
          type: "initializeState",
