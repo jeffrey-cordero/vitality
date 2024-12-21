@@ -111,8 +111,8 @@ export default function Form(props: VitalityProps): JSX.Element {
          exercises: workout.exercises ?? []
       };
 
-      const response: VitalityResponse<Workout | number> = isNewWorkout ? await addWorkout(payload) :
-         method === "update" ? await updateWorkout(payload) : await deleteWorkouts([payload], user.id);
+      const response: VitalityResponse<Workout | number> = isNewWorkout ? await addWorkout(user.id, payload) :
+         method === "update" ? await updateWorkout(user.id, payload) : await deleteWorkouts(user.id, [payload]);
 
       handleResponse(response, localDispatch, updateNotification, () => {
          const newWorkout: Workout | null = method === "delete" ? payload : (response.body.data as Workout);

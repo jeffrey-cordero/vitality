@@ -4,6 +4,7 @@ import { z } from "zod";
 import { uuidSchema } from "@/lib/global/zod";
 import { workout_applied_tags } from "@prisma/client";
 import { Exercise } from "@/lib/home/workouts/exercises";
+import { authorizeAction } from "@/lib/authentication/session";
 import { formateDatabaseWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
 import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
 
@@ -47,8 +48,12 @@ const newWorkoutSchema = workoutsSchema.extend({
    id: uuidSchema("workout", "new")
 });
 
-export async function fetchWorkouts(user_id: string): Promise<Workout[]> {
+export async function fetchWorkouts(
+   user_id: string
+): Promise<Workout[]> {
    try {
+      await authorizeAction(user_id);
+
       const workouts = await prisma.workouts.findMany({
          include: {
             workout_applied_tags: {
@@ -83,9 +88,12 @@ export async function fetchWorkouts(user_id: string): Promise<Workout[]> {
 }
 
 export async function addWorkout(
+   user_id: string,
    workout: Workout,
 ): Promise<VitalityResponse<Workout>> {
    try {
+      await authorizeAction(user_id);
+
       const fields = newWorkoutSchema.safeParse(workout);
 
       if (!fields.success) {
@@ -97,7 +105,7 @@ export async function addWorkout(
       // Create a new workout with basic properties
       const newWorkout = await prisma.workouts.create({
          data: {
-            user_id: workout.user_id,
+            user_id: user_id,
             title: workout.title.trim(),
             date: workout.date,
             description: workout.description?.trim(),
@@ -133,9 +141,12 @@ export async function addWorkout(
 }
 
 export async function updateWorkout(
+   user_id: string,
    workout: Workout,
 ): Promise<VitalityResponse<Workout>> {
    try {
+      await authorizeAction(user_id);
+
       const fields = workoutsSchema.safeParse(workout);
 
       if (!fields.success) {
@@ -147,7 +158,7 @@ export async function updateWorkout(
          const existingWorkout = await prisma.workouts.findFirst({
             where: {
                id: workout.id,
-               user_id: workout.user_id
+               user_id: user_id
             },
             include: {
                workout_applied_tags: {
@@ -179,7 +190,7 @@ export async function updateWorkout(
          const updatedWorkout = await prisma.workouts.update({
             where: {
                id: workout.id,
-               user_id: workout.user_id
+               user_id: user_id
             },
             data: {
                title: workout.title.trim(),
@@ -263,17 +274,19 @@ export async function getAppliedWorkoutTagUpdates(
 }
 
 export async function deleteWorkouts(
-   workouts: Workout[],
    user_id: string,
+   workouts: Workout[],
 ): Promise<VitalityResponse<number>> {
-   // Validate user and workout(s) ID's prior to a potential delete operation
-   const errors = {};
-
-   if (!uuidSchema("user", "required").safeParse(user_id).success) {
-      errors["user_id"] = ["ID for user must be in UUID format"];
-   }
-
    try {
+      await authorizeAction(user_id);
+
+      // Validate user and workout(s) ID's prior to a potential delete operation
+      const errors = {};
+
+      if (!uuidSchema("user", "required").safeParse(user_id).success) {
+         errors["user_id"] = ["ID for user must be in UUID format"];
+      }
+
       const ids: string[] = [];
 
       for (const workout of workouts) {

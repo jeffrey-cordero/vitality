@@ -8,7 +8,8 @@ jest.mock("@/lib/prisma/client", () => ({
 }));
 
 jest.mock("@/lib/authentication/session", () => ({
-   authorizeAction: jest.fn().mockReturnValue(true)
+   // Authorization for server actions in authorized routes (next-auth)
+   authorizeAction: jest.fn()
 }));
 
 jest.mock("bcryptjs", () => ({

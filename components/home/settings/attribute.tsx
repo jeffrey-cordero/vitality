@@ -4,7 +4,7 @@ import VerifyAttribute from "@/components/home/settings/verification";
 import { useDoubleTap } from "use-double-tap";
 import { Input } from "@/components/global/input";
 import { handleResponse } from "@/lib/global/response";
-import { updateAttribute, updatePassword, updatePreference } from "@/lib/settings/service";
+import { updateAttribute, updatePassword, updatePreference } from "@/lib/home/settings/service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { VitalityInputProps } from "@/components/global/input";
 import { VitalityProps } from "@/lib/global/state";

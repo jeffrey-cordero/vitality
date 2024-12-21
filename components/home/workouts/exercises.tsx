@@ -6,10 +6,10 @@ import Confirmation from "@/components/global/confirmation";
 import { CSS } from "@dnd-kit/utilities";
 import { useDoubleTap } from "use-double-tap";
 import { Input } from "@/components/global/input";
-import { NotificationContext } from "@/app/layout";
 import { Workout } from "@/lib/home/workouts/workouts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useEffect, useReducer, useState } from "react";
 import { VitalityChildProps, VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises } from "@/lib/home/workouts/exercises";
@@ -66,6 +66,7 @@ const form: VitalityState = {
 };
 
 function CreateExercise(props: ExerciseProps): JSX.Element {
+   const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const { workout, localState, localDispatch, saveExercises, onBlur } = props;
 
@@ -78,7 +79,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          sets: []
       };
 
-      const response: VitalityResponse<Exercise> = await addExercise(payload);
+      const response: VitalityResponse<Exercise> = await addExercise(user.id, payload);
 
       handleResponse(response, localDispatch, updateNotification, () => {
          const newExercises: Exercise[] = [...workout.exercises, response.body.data as Exercise];
@@ -92,6 +93,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          });
       });
    }, [
+      user,
       localDispatch,
       localState.name.value,
       saveExercises,
@@ -162,6 +164,7 @@ interface ExerciseSetProps extends ExerciseProps {
 }
 
 function SetContainer(props: ExerciseSetProps): JSX.Element {
+   const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const { workout, exercise, set, localState, localDispatch, onBlur, reset, saveExercises } = props;
    const [isEditing, setIsEditing] = useState<boolean>(set === undefined);
@@ -229,7 +232,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
             sets: newSets
          };
 
-         response = await updateExercise(newExercise, "sets");
+         response = await updateExercise(user.id, newExercise, "sets");
       } else {
          // Update or delete set from array of exercise sets
          const newSets: ExerciseSet[] =
@@ -241,7 +244,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
             sets: newSets
          };
 
-         response = await updateExercise(newExercise, "sets");
+         response = await updateExercise(user.id, newExercise, "sets");
       }
 
       handleResponse(response, localDispatch, updateNotification, () => {
@@ -261,6 +264,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
          });
       });
    }, [
+      user,
       isNewSet,
       exercise,
       handleConstructExerciseSet,
@@ -531,6 +535,7 @@ interface ExerciseProps extends ExercisesProps, VitalityChildProps {
 }
 
 function ExerciseContainer(props: ExerciseProps): JSX.Element {
+   const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const { workout, exercise, localState, localDispatch, saveExercises } = props;
    const { id, editing } = localState.name.data;
@@ -601,6 +606,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
             };
 
             const response: VitalityResponse<Exercise> = await updateExercise(
+               user.id,
                newExercise,
                "sets",
             );
@@ -623,7 +629,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          name: localState.name.value.trim()
       };
 
-      handleResponse(await updateExercise(newExercise, "name"), localDispatch, updateNotification, () => {
+      handleResponse(await updateExercise(user.id, newExercise, "name"), localDispatch, updateNotification, () => {
          // Update the overall workout exercises
          const newExercises: Exercise[] = [...workout.exercises].map((e) =>
             e.id !== exercise.id ? e : newExercise,
@@ -639,6 +645,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          });
       });
    }, [
+      user,
       exercise,
       localDispatch,
       localState.name.value,

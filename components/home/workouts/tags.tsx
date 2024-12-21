@@ -138,26 +138,21 @@ interface EditTagContainerProps extends TagContainerProps {
 }
 
 function EditTagContainer(props: EditTagContainerProps): JSX.Element {
-   const {
-      tag,
-      globalState,
-      globalDispatch,
-      localState,
-      localDispatch,
-      onSave
-   } = props;
+   const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
+   const { tag, globalState, globalDispatch, localState, localDispatch, onSave } = props;
 
    const handleTagUpdates = useCallback(
       async(method: "update" | "delete") => {
          const payload: Tag = {
-            user_id: tag.user_id,
+            user_id: user.id,
             id: tag.id,
             title: localState.tagTitle.value.trim(),
             color: localState.tagColor.value.trim()
          };
 
          const response: VitalityResponse<Tag> = await updateWorkoutTag(
+            user.id,
             payload,
             method,
          );
@@ -237,13 +232,13 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
          }
       },
       [
+         user,
          globalDispatch,
          globalState,
          localDispatch,
          localState.tagColor,
          localState.tagTitle,
          tag.id,
-         tag.user_id,
          updateNotification,
          onSave
       ],
@@ -502,7 +497,7 @@ export default function Tags(props: TagsProps): JSX.Element {
          color: randomColor
       };
 
-      const response: VitalityResponse<Tag> = await addWorkoutTag(tag);
+      const response: VitalityResponse<Tag> = await addWorkoutTag(user.id, tag);
 
       if (response.status !== "Error") {
          // Handle success or failure responses

@@ -5,7 +5,7 @@ import { VitalityResponse } from "@/lib/global/response";
 import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
 import { fetchAttributes } from "@/lib/authentication/authorize";
 import { invalidPasswords, invalidRegistrations, root, user, INVALID_PASSWORD_MESSAGE } from "@/tests/authentication/data";
-import { validateUser, deleteAccount, updateAttribute, updatePassword, updatePreference, verifyAttribute } from "@/lib/settings/service";
+import { deleteAccount, updateAttribute, updatePassword, updatePreference, verifyAttribute } from "@/lib/home/settings/service";
 
 let expected: VitalityResponse<void>;
 const oldPassword: string = "ValidPassword$1";
@@ -51,7 +51,6 @@ describe("Settings Tests", () => {
             new Error("Database Error")
          );
 
-         expect(await validateUser(root.id, "username")).toBeNull();
          expect(await fetchAttributes(root.id)).toEqual(null);
          expect(await fetchAttributes(MOCK_ID)).toEqual(null);
       });
@@ -418,6 +417,20 @@ describe("Settings Tests", () => {
       });
 
       test("Handle database constraints when deleting account", async() => {
+         // @ts-ignore
+         prismaMock.users.findFirst.mockRejectedValueOnce(
+            new Error("Database Error")
+         );
+
+         expect(await deleteAccount(root.id)).toEqual({
+            status: "Error",
+            body: {
+               data: null,
+               message: "User does not exist based on user ID",
+               errors: {}
+            }
+         });
+
          simulateDatabaseError("users", "delete", async() => await deleteAccount(root.id));
       });
 

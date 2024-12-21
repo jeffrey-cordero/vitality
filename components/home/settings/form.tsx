@@ -12,7 +12,7 @@ import { useCallback, useContext, useEffect, useMemo, useReducer, useState } fro
 import { faAt, faImage, faPhone, faUserSecret, faCakeCandles, faSignature, faMoon, faPaperPlane, faComments, faPenToSquare, faUserLock, faUserXmark } from "@fortawesome/free-solid-svg-icons";
 
 import { handleResponse } from "@/lib/global/response";
-import { deleteAccount } from "@/lib/settings/service";
+import { deleteAccount } from "@/lib/home/settings/service";
 
 const form: VitalityState = {
    username: {

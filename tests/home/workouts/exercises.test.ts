@@ -103,7 +103,7 @@ describe("Workout Exercises Tests", () => {
       for (const { exercise, errors, message } of invalidExercises) {
          expect(
             method === "create" ?
-               await addExercise(exercise) : await updateExercise(exercise, "sets")
+               await addExercise(MOCK_ID, exercise) : await updateExercise(MOCK_ID, exercise, "sets")
          ).toEqual({
             status: "Error",
             body: {
@@ -160,7 +160,7 @@ describe("Workout Exercises Tests", () => {
       for (const { exercise, expected } of invalidExercises) {
          expect(
             method === "create" ?
-               await addExercise(exercise) : await updateExercise(exercise, "sets")
+               await addExercise(MOCK_ID, exercise) : await updateExercise(MOCK_ID, exercise, "sets")
          ).toEqual(expected);
       }
 
@@ -171,7 +171,7 @@ describe("Workout Exercises Tests", () => {
       };
 
       simulateDatabaseError("exercises", method, method === "create" ?
-         async() => addExercise(exercise) : async() => updateExercise(exercise, "sets"));
+         async() => addExercise(MOCK_ID, exercise) : async() => updateExercise(MOCK_ID, exercise, "sets"));
    };
 
    const handlePrismaMockExerciseMethods = async(params, method) => {
@@ -294,7 +294,7 @@ describe("Workout Exercises Tests", () => {
             sets: []
          };
 
-         expect(await addExercise(exercise)).toEqual({
+         expect(await addExercise(MOCK_ID, exercise)).toEqual({
             status: "Success",
             body: {
                data: {
@@ -338,7 +338,7 @@ describe("Workout Exercises Tests", () => {
             name: " Updated name "
          };
 
-         expect(await updateExercise(exercise, "name")).toEqual({
+         expect(await updateExercise(MOCK_ID, exercise, "name")).toEqual({
             status: "Success",
             body: {
                data: {
@@ -421,7 +421,7 @@ describe("Workout Exercises Tests", () => {
             ]
          };
 
-         expect(await updateExercise(exercise, "sets")).toEqual({
+         expect(await updateExercise(MOCK_ID, exercise, "sets")).toEqual({
             status: "Success",
             body: {
                data: expectedNewExercise,

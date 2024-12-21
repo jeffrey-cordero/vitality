@@ -101,7 +101,7 @@ function Row(props: RowProps) {
       <div
          id = { workout.id }
          className = {
-            clsx("mx-auto flex w-full flex-col items-center justify-between p-6 text-center text-lg lg:flex-row lg:rounded-none lg:p-6 lg:text-lg", {
+            clsx("mx-auto flex w-full cursor-pointer flex-col items-center justify-between p-6 text-center text-lg lg:flex-row lg:rounded-none lg:p-6 lg:text-lg", {
                "bg-gray-100 dark:bg-gray-700": isSelected,
                "bg-white dark:bg-slate-800": !isSelected
             })
@@ -236,7 +236,7 @@ export default function Table(props: TableProps): JSX.Element {
    ]);
 
    const handleWorkoutDelete = useCallback(async() => {
-      const response: VitalityResponse<number> = await deleteWorkouts(Array.from(visibleSelectedWorkouts), user.id);
+      const response: VitalityResponse<number> = await deleteWorkouts(user.id, Array.from(visibleSelectedWorkouts));
 
       handleResponse(response, globalDispatch, updateNotification, () => {
          const newWorkouts: Workout[] = [...globalState.workouts.value].filter((w: Workout) => {

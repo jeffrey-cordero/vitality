@@ -84,7 +84,7 @@ describe("Workout Tags Tests", () => {
       for (const { tag, errors } of invalidWorkoutTags) {
          expect(
             method === "create" ?
-               await addWorkoutTag(tag) : await updateWorkoutTag(tag, method)
+               await addWorkoutTag(root.id, tag) : await updateWorkoutTag(root.id, tag, method)
          ).toEqual({
             status: "Error",
             body: {
@@ -149,7 +149,7 @@ describe("Workout Tags Tests", () => {
 
       for (const { tag, expected } of invalidWorkoutTags) {
          expect(method === "create" ?
-            await addWorkoutTag(tag) : await updateWorkoutTag(tag, method)
+            await addWorkoutTag(tag.user_id, tag) : await updateWorkoutTag(tag.user_id, tag, method)
          ).toEqual(expected);
       }
 
@@ -159,7 +159,7 @@ describe("Workout Tags Tests", () => {
       };
 
       simulateDatabaseError("workout_tags", method, method === "create" ?
-         async() => addWorkoutTag(tag) : async() => updateWorkoutTag(tag, method)
+         async() => addWorkoutTag(root.id, tag) : async() => updateWorkoutTag(root.id, tag, method)
       );
    };
 
@@ -230,7 +230,7 @@ describe("Workout Tags Tests", () => {
             color: "rgb(133, 76, 29)"
          };
 
-         expect(await addWorkoutTag(tag)).toEqual({
+         expect(await addWorkoutTag(root.id, tag)).toEqual({
             status: "Success",
             body: {
                data: {
@@ -278,7 +278,7 @@ describe("Workout Tags Tests", () => {
             color: "rgb(110, 54, 48)"
          };
 
-         expect(await updateWorkoutTag(tag, "update")).toEqual({
+         expect(await updateWorkoutTag(root.id, tag, "update")).toEqual({
             status: "Success",
             body: {
                data: {
@@ -337,7 +337,7 @@ describe("Workout Tags Tests", () => {
             title: "  Deleting Workout Tag Title  "
          };
 
-         expect(await updateWorkoutTag(tag, "delete")).toEqual({
+         expect(await updateWorkoutTag(root.id, tag, "delete")).toEqual({
             status: "Success",
             body: {
                data: {
