@@ -84,6 +84,15 @@ export const invalidRegistrations = [
    {
       registration: {
          ...VALID_REGISTRATION,
+         birthday: new Date("1799-01-01")
+      },
+      errors: {
+         birthday: ["Birthday cannot be earlier than the year 1800"]
+      }
+   },
+   {
+      registration: {
+         ...VALID_REGISTRATION,
          username: "  AB  ",
          name: " A "
       },

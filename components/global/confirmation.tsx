@@ -14,6 +14,7 @@ interface ConfirmationProps {
 export default function Confirmation(props: ConfirmationProps): JSX.Element {
    const { display, message, icon, onConfirmation } = props;
    const deleteModalRef = useRef<{ open: () => void; close: () => void }>(null);
+   const deleteButtonRef = useRef<{ displaySave: () => void; displayRemoval: () => void }>(null);
 
    return (
       <Modal
@@ -29,9 +30,11 @@ export default function Confirmation(props: ConfirmationProps): JSX.Element {
                </div>
             ) : (
                <Button
+                  ref = { deleteButtonRef }
                   type = "button"
-                  className = "h-[2.4rem] w-full bg-red-500 text-white focus:ring-red-700"
+                  className = "h-10 w-full bg-red-500 text-white focus:ring-red-700"
                   icon = { faTrash }
+                  onClick={() => deleteButtonRef.current?.displayRemoval() }
                >
                   Delete
                </Button>

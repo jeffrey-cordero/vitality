@@ -2,22 +2,20 @@
 import clsx from "clsx";
 import Modal from "@/components/global/modal";
 import Button from "@/components/global/button";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { verifyAttribute } from "@/lib/home/settings/service";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { formReducer, VitalityState } from "@/lib/global/state";
-import { AttributeProps } from "@/components/home/settings/attribute";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShieldHalved } from "@fortawesome/free-solid-svg-icons";
+import { AttributeProps } from "@/components/home/settings/attribute";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { ChangeEvent, useCallback, useContext, useMemo, useReducer, useRef } from "react";
 
 const verification: VitalityState = {
    first: {
       value: "",
       error: null,
-      data: {
-         id: "first"
-      }
+      data: {}
    },
    second: {
       value: "",
@@ -42,7 +40,7 @@ const verification: VitalityState = {
 };
 
 interface VerifyAttributeProps extends AttributeProps {
-   attribute: "email_verified" | "phone_verified";
+   attribute: "email" | "phone";
 }
 
 export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Element {
@@ -65,7 +63,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
    ]);
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>, index: number) => {
-      // Update verification code input and ensure empty error is removed, if any
+      // Update verification code input and remove empty error, if any
       const [id, input] = inputs[index];
 
       localDispatch({
@@ -88,7 +86,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
    ]);
 
    const handleVerificationCode = useCallback(async() => {
-      // Ensure all verification inputs are non-empty
+      // Ensure non-empty verification inputs
       const codes = {
          ...Object.fromEntries(Object.values(inputs)),
          empty: {
@@ -117,7 +115,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
             value: codes
          });
       } else {
-         const response: VitalityResponse<void> = await verifyAttribute(user.id, attribute);
+         const response: VitalityResponse<void> = await verifyAttribute(user.id, `${attribute}_verified`);
 
          handleResponse(response, localDispatch, updateNotification, () => {
             globalDispatch({
@@ -232,7 +230,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                         () => {
                            updateNotification({
                               status: "Success",
-                              message: "One-time verification code has been resent",
+                              message: "A one-time verification code has been resent",
                               timer: 1500
                            });
                         }

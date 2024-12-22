@@ -302,7 +302,7 @@ export async function deleteWorkouts(
          return sendErrorMessage("Invalid workout ID fields", errors);
       }
 
-      const response = await prisma.workouts.deleteMany({
+      const batch = await prisma.workouts.deleteMany({
          where: {
             id: {
                in: ids
@@ -312,8 +312,8 @@ export async function deleteWorkouts(
       });
 
       return sendSuccessMessage(
-         `Deleted ${response.count} workout${response.count === 1 ? "" : "s"}`,
-         response.count,
+         `Deleted ${batch.count} workout${batch.count === 1 ? "" : "s"}`,
+         batch.count,
       );
    } catch (error) {
       return sendFailureMessage(error);

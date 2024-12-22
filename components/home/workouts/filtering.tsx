@@ -470,7 +470,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                   />
                   <Button
                      type = "button"
-                     className = "mt-3 h-[2.4rem] w-full bg-primary font-bold text-white"
+                     className = "mt-3 h-10 w-full bg-primary font-bold text-white"
                      icon = { faMagnifyingGlass }
                      onClick = { handleApplyTagsFilter }
                   >

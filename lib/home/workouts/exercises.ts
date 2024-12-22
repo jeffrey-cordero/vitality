@@ -109,7 +109,7 @@ const newExerciseSchema = exerciseSchema.extend({
    id: uuidSchema("exercise", "new")
 });
 
-function isEmptyExerciseSet(set: ExerciseSet) {
+export async function isEmptyExerciseSet(set: ExerciseSet) {
    return (
       !set.weight &&
       !set.repetitions &&
@@ -346,7 +346,7 @@ export async function getExerciseSetUpdates(
             error: `Invalid exercise set fields for set with ID \`${set.id}\``,
             errors: fields.error.flatten().fieldErrors
          };
-      } else if (isEmptyExerciseSet(set)) {
+      } else if (await isEmptyExerciseSet(set)) {
          return {
             creating: null,
             updating: null,

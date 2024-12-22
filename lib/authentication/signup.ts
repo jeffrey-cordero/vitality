@@ -28,27 +28,24 @@ const registrationSchema = userSchema.extend({
 export async function signup(
    registration: Registration
 ): Promise<VitalityResponse<null>> {
-   if (registration?.phone?.trim().length === 0) {
-      delete registration.phone;
-   }
-
-   const fields = registrationSchema.safeParse(registration);
-
-   if (!fields.success) {
-      return sendErrorMessage(
-         "Invalid user registration fields",
-         fields.error.flatten().fieldErrors
-      );
-   } else if (registration.password !== registration.confirmPassword) {
-      return sendErrorMessage("Invalid user registration fields", {
-         password: ["Passwords do not match"],
-         confirmPassword: ["Passwords do not match"]
-      });
-   }
-
    try {
-      const registration = fields.data;
-      const hashedPassword = await bcrypt.hash(registration.password, await bcrypt.genSaltSync(10));
+      if (registration?.phone?.trim().length === 0) {
+         delete registration.phone;
+      }
+
+      const fields = registrationSchema.safeParse(registration);
+
+      if (!fields.success) {
+         return sendErrorMessage(
+            "Invalid user registration fields",
+            fields.error.flatten().fieldErrors
+         );
+      } else if (registration.password !== registration.confirmPassword) {
+         return sendErrorMessage("Invalid user registration fields", {
+            password: ["Passwords do not match"],
+            confirmPassword: ["Passwords do not match"]
+         });
+      }
 
       const existingUsers = await prisma.users.findMany({
          where: {
@@ -62,6 +59,8 @@ export async function signup(
 
       if (!existingUsers || existingUsers.length === 0) {
          // Valid new user registration
+         const hashedPassword = await bcrypt.hash(registration.password, await bcrypt.genSaltSync(10));
+
          await prisma.users.create({
             data: {
                username: registration.username.trim(),

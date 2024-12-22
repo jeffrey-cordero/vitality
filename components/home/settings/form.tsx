@@ -2,17 +2,16 @@ import Image from "next/image";
 import Heading from "@/components/global/heading";
 import Loading from "@/components/global/loading";
 import { users as User } from "@prisma/client";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { handleResponse } from "@/lib/global/response";
 import { endSession } from "@/lib/authentication/session";
-import { AccountAction, GeneralAttribute, PasswordAttribute, SliderAttribute } from "@/components/home/settings/attribute";
+import { deleteAccount } from "@/lib/home/settings/service";
 import { formReducer, VitalityState } from "@/lib/global/state";
 import { fetchAttributes } from "@/lib/authentication/authorize";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
+import { AccountAction, GeneralAttribute, PasswordAttribute, SliderAttribute } from "@/components/home/settings/attribute";
 import { faAt, faImage, faPhone, faUserSecret, faCakeCandles, faSignature, faMoon, faPaperPlane, faComments, faPenToSquare, faUserLock, faUserXmark } from "@fortawesome/free-solid-svg-icons";
-
-import { handleResponse } from "@/lib/global/response";
-import { deleteAccount } from "@/lib/home/settings/service";
 
 const form: VitalityState = {
    username: {
@@ -83,70 +82,70 @@ export default function Form(): JSX.Element {
    const [globalState, globalDispatch] = useReducer(formReducer, form);
    const [isEditingImage, setIsEditingImage] = useState<boolean>(false);
 
-   const imageURL = useMemo(() => {
+   const imageURL: string = useMemo(() => {
       return globalState.image.data.stored.trim();
    }, [globalState.image.data.stored]);
 
-   const handleFetchUser = useCallback(async() => {
-      const information: User = await fetchAttributes(user.id);
+   const handleFetchAttributes = useCallback(async() => {
+      const attributes: User = await fetchAttributes(user.id);
 
       globalDispatch({
          type: "initializeState",
          value: {
             username: {
                ...globalState.username,
-               value: information.username,
+               value: attributes.username,
                data: {
-                  stored: information.username
+                  stored: attributes.username
                }
             },
             name: {
                ...globalState.name,
-               value: information.name,
+               value: attributes.name,
                data: {
-                  stored: information.name
+                  stored: attributes.name
                }
             },
             birthday: {
                ...globalState.birthday,
-               value: information.birthday.toISOString().split("T")[0],
+               value: attributes.birthday.toISOString().split("T")[0],
                data: {
-                  stored: information.birthday.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1")
+                  stored: attributes.birthday.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1")
                }
             },
             email: {
                ...globalState.email,
-               value: information.email,
+               value: attributes.email,
                data: {
-                  stored: information.email,
-                  verified: information.email_verified
+                  stored: attributes.email,
+                  verified: attributes.email_verified
                }
             },
             phone: {
                ...globalState.phone,
-               value: information.phone,
+               value: attributes.phone,
                data: {
-                  stored: information.phone,
-                  verified: information.phone_verified
+                  stored: attributes.phone,
+                  verified: attributes.phone_verified
                }
             },
             image: {
                ...globalState.image,
-               value: information.image,
+               value: attributes.image,
                data: {
                   ...globalState.image.data,
                   valid: true,
                   fetched: true,
-                  stored: information.image
+                  stored: attributes.image
                }
             },
             mail: {
                ...globalState.mail,
-               value: information.mail
+               value: attributes.mail
             },
             sms: {
                ...globalState.sms,
-               value: information.sms
+               value: attributes.sms
             }
          }
       });
@@ -162,8 +161,8 @@ export default function Form(): JSX.Element {
       globalState.sms
    ]);
 
-   const handleImageURLChanges = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-      // Ensure any changes to URL are verified on a new submission
+   const handleImageURLOnChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+      // Ensure any changes to user image URL are verified on a new submission
       globalDispatch({
          type: "updateState",
          value: {
@@ -184,7 +183,7 @@ export default function Form(): JSX.Element {
       globalState.image
    ]);
 
-   const handleImageResourceValidity = useCallback((valid: boolean) => {
+   const handleVerifyImageResource = useCallback((valid: boolean) => {
       globalDispatch({
          type: "updateState",
          value: {
@@ -217,13 +216,11 @@ export default function Form(): JSX.Element {
    ]);
 
    useEffect(() => {
-      if (!globalState.image.data.fetched) {
-         handleFetchUser();
-      }
+      !globalState.image.data.fetched && handleFetchAttributes();
    });
 
    return (
-      <div className = "relative mx-auto mb-12 w-full px-2 text-left xsm:w-11/12 sm:w-3/4 xl:w-5/12">
+      <div className = "relative mx-auto mb-8 w-full px-2 text-left xsm:mb-16 xsm:w-11/12 sm:w-3/4 2xl:w-1/2">
          {
             globalState.image.data.fetched ? (
                <div className = "flex flex-col items-center justify-center gap-6">
@@ -247,8 +244,8 @@ export default function Form(): JSX.Element {
                                           src = { imageURL === "" ? "/settings/default.png" : imageURL }
                                           alt = "workout-image"
                                           className = "object-cover object-center shadow-md"
-                                          onLoad = { () => globalState.image.data.valid === false && handleImageResourceValidity(true) }
-                                          onErrorCapture = { () => handleImageResourceValidity(false) }
+                                          onLoad = { () => globalState.image.data.valid === false && handleVerifyImageResource(true) }
+                                          onErrorCapture = { () => handleVerifyImageResource(false) }
                                        />
                                     ) : (
                                        <div className = "flex size-full items-center justify-center">
@@ -276,7 +273,7 @@ export default function Form(): JSX.Element {
                               input = { globalState.image }
                               dispatch = { globalDispatch }
                               onBlur = { () => setIsEditingImage(false) }
-                              onChange = { handleImageURLChanges }
+                              onChange = { handleImageURLOnChange }
                               globalState = { globalState }
                               globalDispatch = { globalDispatch }
                               editOnly
@@ -383,11 +380,11 @@ export default function Form(): JSX.Element {
                         description = "Control your account with essential actions"
                      />
                      <AccountAction
-                        action = "log out"
+                        action = "session"
                         message = "Log out of your account?"
                         icon = { faUserLock }
                         label = "Log Out"
-                        onSubmit = { handleLogOut }
+                        onConfirmation = { handleLogOut }
                         globalState = { globalState }
                         globalDispatch = { globalDispatch }
                      />
@@ -396,7 +393,7 @@ export default function Form(): JSX.Element {
                         message = "Permanently delete your account?"
                         icon = { faUserXmark }
                         label = "Delete Account"
-                        onSubmit = { handleDeleteAccount }
+                        onConfirmation = { handleDeleteAccount }
                         globalState = { globalState }
                         globalDispatch = { globalDispatch }
                      />

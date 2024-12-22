@@ -133,14 +133,11 @@ function TagColorInput(props: VitalityChildProps) {
    );
 }
 
-interface EditTagContainerProps extends TagContainerProps {
-   onSave: () => void;
-}
-
-function EditTagContainer(props: EditTagContainerProps): JSX.Element {
+function EditTagContainer(props: TagContainerProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
-   const { tag, globalState, globalDispatch, localState, localDispatch, onSave } = props;
+   const { tag, globalState, globalDispatch, localState, localDispatch } = props;
+   const saveButtonRef = useRef<{ displaySave: () => void; }>(null);
 
    const handleTagUpdates = useCallback(
       async(method: "update" | "delete") => {
@@ -205,14 +202,13 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
                   }
                });
 
-               updateNotification({
+               method === "delete" && updateNotification({
                   status: "Success",
-                  message: `${method === "delete" ? "Deleted" : "Updated"} workout tag`,
+                  message: "Deleted workout tag",
                   timer: 1000
                });
 
-               // Close the modal form element and scroll into editing tag element
-               onSave();
+               saveButtonRef.current?.displaySave();
             });
          } else {
             // Handle error response uniquely by mapping response identifiers to local state identifiers
@@ -239,8 +235,7 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
          localState.tagColor,
          localState.tagTitle,
          tag.id,
-         updateNotification,
-         onSave
+         updateNotification
       ],
    );
 
@@ -284,8 +279,9 @@ function EditTagContainer(props: EditTagContainerProps): JSX.Element {
                onConfirmation = { () => handleTagUpdates("delete") }
             />
             <Button
+               ref = { saveButtonRef }
                type = "submit"
-               className = "h-[2.4rem] w-full bg-primary text-white"
+               className = "h-10 w-full bg-primary text-white"
                icon = { faCloudArrowUp }
                onClick = { () => handleTagUpdates("update") }
             >
@@ -311,7 +307,6 @@ function TagContainer(props: TagContainerProps): JSX.Element {
       localDispatch
    } = props;
    const tagRef = useRef<HTMLLIElement>(null);
-   const editTagModalRef = useRef<{ open: () => void; close: () => void }>(null);
 
    // Handle adding or removing a selected tag
    const handleTagSelect = useCallback(
@@ -363,11 +358,6 @@ function TagContainer(props: TagContainerProps): JSX.Element {
       tag.title
    ]);
 
-   const handleTagSave = useCallback(() => {
-      editTagModalRef.current?.close();
-      tagRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-   }, []);
-
    return (
       <li
          className = {
@@ -402,7 +392,6 @@ function TagContainer(props: TagContainerProps): JSX.Element {
             <div className = "flex flex-row items-center justify-center gap-1">
                {
                   <Modal
-                     ref = { editTagModalRef }
                      display = {
                         <FontAwesomeIcon
                            icon = { faGears }
@@ -414,7 +403,6 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                   >
                      <EditTagContainer
                         { ...props }
-                        onSave = { handleTagSave }
                      />
                   </Modal>
                }
@@ -527,12 +515,6 @@ export default function Tags(props: TagsProps): JSX.Element {
                      }
                   }
                }
-            });
-
-            updateNotification({
-               status: "Success",
-               message: "Added workout tag",
-               timer: 1000
             });
 
             // Fetch a new random color

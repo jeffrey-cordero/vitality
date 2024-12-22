@@ -265,7 +265,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  <Button
                                     type = "button"
                                     onClick = { handleResetImageURL }
-                                    className = "mt-2 h-[2.4rem] w-full bg-red-500 px-4 py-2 font-semibold text-white focus:ring-red-700"
+                                    className = "mt-2 h-10 w-full bg-red-500 px-4 py-2 font-semibold text-white focus:ring-red-700"
                                     icon = { faTrashCan }
                                  >
                                     Remove
@@ -277,7 +277,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  <Button
                                     type = "button"
                                     onClick = { handleImageURLUpdates }
-                                    className = "mt-2 h-[2.4rem] w-full bg-primary font-semibold text-white placeholder:text-transparent"
+                                    className = "mt-2 h-10 w-full bg-primary font-semibold text-white placeholder:text-transparent"
                                     icon = { faPaperclip }
                                  >
                                     Add

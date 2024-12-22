@@ -15,7 +15,7 @@ import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { addWorkout, deleteWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
-import { faArrowRotateLeft, faPersonRunning, faSquarePlus, faSignature, faCalendar, faBook, faLink, faPenToSquare, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faPersonRunning, faSignature, faCalendar, faBook, faLink, faPenToSquare, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const form: VitalityState = {
    title: {
@@ -51,6 +51,7 @@ export default function Form(props: VitalityProps): JSX.Element {
    const [displayingFormModal, setDisplayingFormModal] = useState<boolean>(false);
    const displayFormModal: boolean = globalState.workout.data.display;
    const formModalRef = useRef<{ open: () => void; close: () => void }>(null);
+   const saveButtonRef = useRef<{ displaySave: () => void; }>(null);
 
    // Fetching editing workout from global state
    const workout: Workout = globalState.workout.value;
@@ -170,11 +171,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                timer: 1000
             });
          } else {
-            updateNotification({
-               status: "Success",
-               message: isNewWorkout ? "Added Workout" : "Updated Workout",
-               timer: 1000
-            });
+            method !== "add" && saveButtonRef.current?.displaySave();
          }
       });
    };
@@ -386,9 +383,10 @@ export default function Form(props: VitalityProps): JSX.Element {
                      dispatch = { localDispatch }
                   />
                   <Button
+                     ref = { saveButtonRef }
+                     icon = { faPenToSquare }
                      type = "button"
-                     className = "h-[2.4rem] bg-primary text-white"
-                     icon = { props !== undefined ? faPenToSquare : faSquarePlus }
+                     className = "h-10 bg-primary text-white"
                      onClick = { () => handleUpdateWorkout(isNewWorkout ? "add" : "update") }
                   >
                      { isNewWorkout ? "Create" : "Update" }

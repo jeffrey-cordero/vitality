@@ -30,6 +30,9 @@ export const userSchema = z.object({
          required_error: "Birthday is required",
          invalid_type_error: "Birthday is required"
       })
+      .min(new Date("1800-01-01"), {
+         message: "Birthday cannot be earlier than the year 1800" }
+      )
       .max(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), {
          message: "Birthday cannot be in the future"
       }),

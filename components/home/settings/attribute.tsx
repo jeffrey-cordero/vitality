@@ -1,28 +1,28 @@
 import Modal from "@/components/global/modal";
 import Button from "@/components/global/button";
+import Confirmation from "@/components/global/confirmation";
 import VerifyAttribute from "@/components/home/settings/verification";
 import { useDoubleTap } from "use-double-tap";
 import { Input } from "@/components/global/input";
-import { handleResponse } from "@/lib/global/response";
-import { updateAttribute, updatePassword, updatePreference } from "@/lib/home/settings/service";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { VitalityInputProps } from "@/components/global/input";
 import { VitalityProps } from "@/lib/global/state";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { useCallback, useContext, useRef, useState } from "react";
-import { faArrowRotateLeft, faXmark, faKey, IconDefinition, faPenToSquare, faTrashCan, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import Confirmation from "@/components/global/confirmation";
+import { VitalityInputProps } from "@/components/global/input";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useCallback, useContext, useRef, useState } from "react";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import { updateAttribute, updatePassword, updatePreference } from "@/lib/home/settings/service";
+import { faArrowRotateLeft, faXmark, faKey, IconDefinition, faPenToSquare, faTrashCan, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 interface AttributeContainerProps {
    icon: IconProp;
    label: string;
-   input: React.ReactNode;
+   controller: React.ReactNode;
    doubleTapMethod?: () => void;
 }
 
 function AttributeContainer(props: AttributeContainerProps): JSX.Element {
-   const { icon, label, input, doubleTapMethod } = props;
+   const { icon, label, controller, doubleTapMethod } = props;
    const doubleTap = useDoubleTap(doubleTapMethod);
 
    return (
@@ -41,7 +41,7 @@ function AttributeContainer(props: AttributeContainerProps): JSX.Element {
                </h2>
             </div>
             <div className = "relative">
-               { input }
+               { controller }
             </div>
          </div>
       </div>
@@ -57,6 +57,7 @@ export function GeneralAttribute(props: AttributeProps) {
    const { updateNotification } = useContext(NotificationContext);
    const { id, input, type, icon, editOnly, onBlur, globalDispatch } = props;
    const [isEditing, setIsEditing] = useState<boolean>(editOnly ?? false);
+   const isUniqueAttribute: boolean = id === "username" || id === "email" || id === "phone";
 
    const handleResetInput = useCallback(() => {
       globalDispatch({
@@ -77,18 +78,18 @@ export function GeneralAttribute(props: AttributeProps) {
    ]);
 
    const handleUpdateAttribute = useCallback(async() => {
-      const updatingDatabaseValue: Date | string = type === "date"
+      const updatingValue: Date | string = type === "date"
          ? new Date(input.value) : input.value.trim();
-      const updatingStorageValue: string = type === "date" ?
-         new Date(input.value).toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1") : input.value.trim();
+      const updatingStored: string = type === "date" ?
+         new Date(input.value)?.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1") : input.value.trim();
 
-      if (input.data.stored === updatingStorageValue) {
-         // Handle no changes in attribute updates
+      if (input.data.stored === updatingStored) {
+         // No changes applied to current user attribute
          editOnly ? onBlur(null) : setIsEditing(false);
          return;
       }
 
-      const response = await updateAttribute(user.id, id as any, updatingDatabaseValue);
+      const response: VitalityResponse<void> = await updateAttribute(user.id, id as any, updatingValue);
 
       handleResponse(response, globalDispatch, updateNotification, async() => {
          globalDispatch({
@@ -101,24 +102,25 @@ export function GeneralAttribute(props: AttributeProps) {
                      ...input.data,
                      valid: id === "image" ? true : undefined,
                      verified: id === "email" || id === "phone" ? false : undefined,
-                     stored: updatingStorageValue
+                     stored: updatingStored
                   }
                }
             }
          });
 
-         updateNotification({
+         isUniqueAttribute && updateNotification({
             status: response.status,
             message: response.body.message,
             timer: 1500
          });
 
          editOnly ? onBlur(null) : setIsEditing(false);
-      } );
+      });
    }, [
       id,
       user,
       globalDispatch,
+      isUniqueAttribute,
       editOnly,
       onBlur,
       input,
@@ -129,7 +131,7 @@ export function GeneralAttribute(props: AttributeProps) {
    return (
       <div className = "relative mx-auto w-full">
          {
-            isEditing || editOnly ? (
+            (isEditing || editOnly) ? (
                <div className = "relative mt-8">
                   <FontAwesomeIcon
                      icon = { faArrowRotateLeft }
@@ -160,13 +162,13 @@ export function GeneralAttribute(props: AttributeProps) {
                <AttributeContainer
                   icon = { icon }
                   label = { input.data.stored || "Missing" }
-                  input = {
+                  controller = {
                      <div className = "flex flex-row items-center justify-center gap-3">
                         {
                            input.data.verified !== undefined && input.value.trim() !== "" && (
                               <VerifyAttribute
                                  { ...props }
-                                 attribute = { id === "email" ? "email_verified" : "phone_verified" }
+                                 attribute = { id === "email" ? "email" : "phone" }
                               />
                            )
                         }
@@ -191,8 +193,8 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
    const passwordModalRef = useRef<{ open: () => void; close: () => void }>(null);
 
-   const handleupdatePassword = useCallback(async() => {
-      const response = await updatePassword(
+   const handleUpdatePassword = useCallback(async() => {
+      const response: VitalityResponse<void> = await updatePassword(
          user.id,
          globalState.oldPassword.value.trim(),
          globalState.newPassword.value.trim(),
@@ -206,7 +208,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
             timer: 1500
          });
 
-         // Remove all password errors, if any, and reset their values for future updates
+         // Reset password form inputs
          globalDispatch({
             type: "updateStates",
             value: {
@@ -243,7 +245,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
       <AttributeContainer
          icon = { faKey }
          label = { "********" }
-         input = {
+         controller = {
             <Modal
                ref = { passwordModalRef }
                display = {
@@ -275,7 +277,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                         icon = { faKey }
                         input = { globalState.oldPassword }
                         dispatch = { globalDispatch }
-                        onSubmit = { handleupdatePassword }
+                        onSubmit = { handleUpdatePassword }
                         autoComplete = "current-password"
                      />
                      <Input
@@ -285,7 +287,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                         icon = { faKey }
                         input = { globalState.newPassword }
                         dispatch = { globalDispatch }
-                        onSubmit = { handleupdatePassword }
+                        onSubmit = { handleUpdatePassword }
                         autoComplete = "new-password"
                      />
                      <Input
@@ -295,14 +297,14 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                         icon = { faKey }
                         input = { globalState.confirmPassword }
                         dispatch = { globalDispatch }
-                        onSubmit = { handleupdatePassword }
+                        onSubmit = { handleUpdatePassword }
                         autoComplete = "new-password"
                      />
                      <Button
                         type = "submit"
                         className = "h-[2.6rem] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white xxsm:text-base"
                         icon = { faKey }
-                        onClick = { handleupdatePassword }
+                        onClick = { handleUpdatePassword }
                      >
                         Update
                      </Button>
@@ -328,8 +330,8 @@ export function SliderAttribute(props: SliderProps): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
    const { id, icon, label, onChange, checked, globalState, globalDispatch } = props;
 
-   const handleOnChange = useCallback(async() => {
-      const response = await updatePreference(user.id, id, !checked);
+   const handleUpdatePreference = useCallback(async() => {
+      const response: VitalityResponse<void> = await updatePreference(user.id, id, !checked);
 
       handleResponse(response, globalDispatch, updateNotification, () => {
          globalDispatch({
@@ -341,12 +343,6 @@ export function SliderAttribute(props: SliderProps): JSX.Element {
                   value: !checked
                }
             }
-         });
-
-         updateNotification({
-            status: response.status,
-            message: response.body.message,
-            timer: 1500
          });
       });
 
@@ -363,14 +359,14 @@ export function SliderAttribute(props: SliderProps): JSX.Element {
       <AttributeContainer
          icon = { icon }
          label = { label }
-         input = {
+         controller = {
             <label className = "inline-flex cursor-pointer items-center">
                <input
                   id = { id ?? "darkMode" }
                   type = "checkbox"
                   value = ""
                   className = "peer sr-only"
-                  onChange = { onChange ?? handleOnChange }
+                  onChange = { onChange ?? handleUpdatePreference }
                   checked = { checked }
                />
                <div className = "peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:size-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/60 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-primary/60"></div>
@@ -379,25 +375,26 @@ export function SliderAttribute(props: SliderProps): JSX.Element {
       />
    );
 }
+
 interface AccountActionProps extends VitalityProps {
-   action: "delete" | "log out";
+   action: "delete" | "session";
    message: string;
    icon: IconProp;
    label: string;
-   onSubmit: () => void;
+   onConfirmation: () => void;
 }
 
 export function AccountAction(props: AccountActionProps): JSX.Element {
-   const { action, label, message, icon, onSubmit } = props;
+   const { action, label, message, icon, onConfirmation } = props;
 
    return (
       <AttributeContainer
          icon = { icon }
          label = { label }
-         input = {
+         controller = {
             <Confirmation
                message = { message }
-               onConfirmation = { onSubmit }
+               onConfirmation = { onConfirmation }
                display = {
                   <FontAwesomeIcon
                      icon = { action === "delete" ? faTrashCan : faRightFromBracket }

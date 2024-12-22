@@ -84,8 +84,8 @@ export function formReducer(
                draft[key] = {
                   ...state[key],
                   value: reset[key]?.value ?? "",
-                  error: null,
-                  data: reset[key]?.data ?? state[key].data
+                  data: reset[key]?.data ?? state[key].data,
+                  error: null
                };
             }
 

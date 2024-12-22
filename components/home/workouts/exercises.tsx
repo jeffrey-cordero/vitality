@@ -12,10 +12,10 @@ import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useEffect, useReducer, useState } from "react";
 import { VitalityChildProps, VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
-import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises } from "@/lib/home/workouts/exercises";
+import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises, isEmptyExerciseSet } from "@/lib/home/workouts/exercises";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, TouchSensor } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faDumbbell, faStopwatch, faCaretRight, faCaretDown, faCircleNotch, faXmark, faPen, faBook } from "@fortawesome/free-solid-svg-icons";
+import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faDumbbell, faStopwatch, faCaretRight, faCaretDown, faCircleNotch, faXmark, faPen, faBook, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const form: VitalityState = {
    name: {
@@ -85,12 +85,6 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          const newExercises: Exercise[] = [...workout.exercises, response.body.data as Exercise];
          saveExercises(newExercises);
          onBlur();
-
-         updateNotification({
-            status: "Success",
-            message: "Added exercise",
-            timer: 1000
-         });
       });
    }, [
       user,
@@ -148,7 +142,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          />
          <Button
             type = "button"
-            className = "h-[2.4rem] w-full border-[1.5px] border-gray-100 bg-green-600 px-4 py-2 font-bold text-white focus:border-green-800 focus:ring-2 focus:ring-green-800 dark:border-0"
+            className = "h-10 w-full border-[1.5px] border-gray-100 bg-green-500 px-4 py-2 font-bold text-white focus:border-green-600 focus:ring-2 focus:ring-green-600 dark:border-0"
             icon = { faDumbbell }
             onClick = { handleCreateNewExercise }
          >
@@ -224,6 +218,11 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
       const newSet: ExerciseSet = handleConstructExerciseSet();
       let response: VitalityResponse<Exercise>;
 
+      if (await isEmptyExerciseSet(newSet)) {
+         // Prevent empty exercise set submissions
+         return;
+      }
+
       if (method === "add") {
          // Add new set to array of exercise sets
          const newSets: ExerciseSet[] = [...exercise.sets, newSet];
@@ -256,16 +255,9 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
          saveExercises(newExercises);
          setIsEditing(false);
          onBlur();
-
-         updateNotification({
-            status: "Success",
-            message: `${isNewSet ? "Added" : method === "update" ? "Updated" : "Deleted"} exercise set`,
-            timer: 1000
-         });
       });
    }, [
       user,
-      isNewSet,
       exercise,
       handleConstructExerciseSet,
       localDispatch,
@@ -442,7 +434,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
                   />
                   <Button
                      type = "button"
-                     className = "h-[2.4rem] w-full border-[1.5px] border-gray-100 bg-green-600 px-4 py-2 font-semibold text-white focus:border-green-800 focus:ring-2 focus:ring-green-800 dark:border-0"
+                     className = "h-10 w-full border-[1.5px] border-gray-100 bg-green-500 px-4 py-2 font-semibold text-white focus:border-green-700 focus:ring-2 focus:ring-green-700 dark:border-0"
                      icon = { faBook }
                      onClick = { () => handleUpdateSet(isNewSet ? "add" : "update") }
                   >
@@ -637,12 +629,6 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
          setEditName(false);
          saveExercises(newExercises);
-
-         updateNotification({
-            status: "Success",
-            message: "Updated exercise name",
-            timer: 1000
-         });
       });
    }, [
       user,
@@ -669,12 +655,6 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          saveExercises(response.body.data as Exercise[]);
          // Remove from localStorage as the exercise no longer exists
          window.localStorage.getItem(collapsedId) && window.localStorage.removeItem(collapsedId);
-
-         updateNotification({
-            status: "Success",
-            message: "Deleted exercise",
-            timer: 1000
-         });
       });
    }, [
       workout,
@@ -812,7 +792,6 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      icon = { faPen }
                      input = { localState.name }
                      dispatch = { localDispatch }
-                     onBlur = { () => setEditName(false) }
                      onSubmit = { () => handleUpdateExerciseName() }
                      autoComplete = "none"
                      autoFocus
@@ -821,7 +800,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   />
                   <Button
                      type = "button"
-                     className = "my-2 h-[2.4rem] w-full border-[1.5px] border-gray-100 bg-green-600 px-4 py-2 text-base font-bold text-white focus:border-green-800 focus:ring-2 focus:ring-green-800 dark:border-0"
+                     className = "my-2 h-10 w-full border-[1.5px] border-gray-100 bg-green-500 px-4 py-2 text-base font-bold text-white focus:border-green-600 focus:ring-2 focus:ring-green-600 dark:border-0"
                      icon = { faPen }
                      onClick = { handleUpdateExerciseName }
                   >
@@ -904,8 +883,8 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                         <div className = "mx-auto mt-4 w-full px-2 xsm:px-8">
                            <Button
                               type = "button"
-                              className = "h-[2.4rem] w-full border-[1.5px] border-gray-100 px-4 py-2 font-bold focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50"
-                              icon = { faBook }
+                              className = "h-10 w-full border-[1.5px] border-gray-100 px-4 py-2 font-bold focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50"
+                              icon = { faPlus }
                               onClick = {
                                  () => {
                                     handleResetExerciseSet("");
@@ -913,7 +892,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                                  }
                               }
                            >
-                              Set
+                              Entry
                            </Button>
                         </div>
                      )
@@ -1054,7 +1033,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
 
    return (
       <div className = "mx-auto flex w-full flex-col items-center justify-center text-center font-bold">
-         <hr className = "my-1 w-full text-black" />
+         <hr className = "my-2 w-full text-black" />
          <DndContext
             sensors = { sensors }
             collisionDetection = { closestCenter }
@@ -1101,8 +1080,8 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                   <div className = "mx-auto w-full">
                      <Button
                         type = "button"
-                        className = "h-[2.4rem] w-full border-[1.5px] border-gray-100 px-4 py-2 font-bold focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50"
-                        icon = { faDumbbell }
+                        className = "h-10 w-full border-[1.5px] border-gray-100 px-4 py-2 font-bold focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50"
+                        icon = { faPlus }
                         onClick = { handleDisplayNewExercise }
                      >
                         Exercise
