@@ -1,10 +1,11 @@
 "use client";
-import Link from "next/link";
-import Image from "next/image";
-import Heading from "@/components/global/heading";
-import Button from "@/components/global/button";
-import Counter from "@/components/landing/counter";
 import { faBullseye } from "@fortawesome/free-solid-svg-icons";
+import Image from "next/image";
+import Link from "next/link";
+
+import Button from "@/components/global/button";
+import Heading from "@/components/global/heading";
+import Counter from "@/components/landing/counter";
 
 export default function Journey(): JSX.Element {
    return (

@@ -1,5 +1,5 @@
-import Main from "@/components/global/main";
 import SignUp from "@/components/authentication/signup";
+import Main from "@/components/global/main";
 
 export default function Page() {
    return (

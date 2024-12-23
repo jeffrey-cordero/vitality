@@ -1,9 +1,10 @@
 "use server";
 import bcrypt from "bcryptjs";
-import prisma from "@/lib/prisma/client";
 import { z } from "zod";
+
+import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
 import { userSchema } from "@/lib/global/zod";
-import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
+import prisma from "@/lib/prisma/client";
 
 export type Registration = {
   name: string;

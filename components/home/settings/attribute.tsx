@@ -1,18 +1,19 @@
-import Modal from "@/components/global/modal";
-import Button from "@/components/global/button";
-import Confirmation from "@/components/global/confirmation";
-import VerifyAttribute from "@/components/home/settings/verification";
-import { useDoubleTap } from "use-double-tap";
-import { Input } from "@/components/global/input";
-import { VitalityProps } from "@/lib/global/state";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { VitalityInputProps } from "@/components/global/input";
+import { faArrowRotateLeft, faKey, faPenToSquare, faRightFromBracket, faTrashCan, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useContext, useRef, useState } from "react";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
+import { useDoubleTap } from "use-double-tap";
+
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import Button from "@/components/global/button";
+import Confirmation from "@/components/global/confirmation";
+import { Input } from "@/components/global/input";
+import { VitalityInputProps } from "@/components/global/input";
+import Modal from "@/components/global/modal";
+import VerifyAttribute from "@/components/home/settings/verification";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
+import { VitalityProps } from "@/lib/global/state";
 import { updateAttribute, updatePassword, updatePreference } from "@/lib/home/settings/service";
-import { faArrowRotateLeft, faXmark, faKey, IconDefinition, faPenToSquare, faTrashCan, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 interface AttributeContainerProps {
    icon: IconProp;
@@ -54,7 +55,7 @@ export interface AttributeProps extends VitalityProps, VitalityInputProps {
 
 export function GeneralAttribute(props: AttributeProps) {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { id, input, type, icon, editOnly, onBlur, globalDispatch } = props;
    const [isEditing, setIsEditing] = useState<boolean>(editOnly ?? false);
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
@@ -91,7 +92,7 @@ export function GeneralAttribute(props: AttributeProps) {
 
       const response: VitalityResponse<void> = await updateAttribute(user.id, id as any, updatingValue);
 
-      handleResponse(response, globalDispatch, updateNotification, async() => {
+      handleResponse(response, globalDispatch, updateNotifications, async() => {
          globalDispatch({
             type: "updateState",
             value: {
@@ -111,7 +112,7 @@ export function GeneralAttribute(props: AttributeProps) {
          if (isUniqueAttribute) {
             editOnly ? onBlur(null) : setIsEditing(false);
 
-            updateNotification({
+            updateNotifications({
                status: response.status,
                message: response.body.message,
                timer: 1500
@@ -127,7 +128,7 @@ export function GeneralAttribute(props: AttributeProps) {
       type,
       editOnly,
       onBlur,
-      updateNotification
+      updateNotifications
    ]);
 
    const handleSubmitUpdates = useCallback(() => {
@@ -198,7 +199,7 @@ export function GeneralAttribute(props: AttributeProps) {
 
 export function PasswordAttribute(props: VitalityProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { globalState, globalDispatch } = props;
    const passwordModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
@@ -211,8 +212,8 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
          globalState.confirmPassword.value.trim()
       );
 
-      handleResponse(response, globalDispatch, updateNotification, () => {
-         updateNotification({
+      handleResponse(response, globalDispatch, updateNotifications, () => {
+         updateNotifications({
             status: response.status,
             message: response.body.message,
             timer: 1500
@@ -245,7 +246,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
    }, [
       user,
       globalDispatch,
-      updateNotification,
+      updateNotifications,
       globalState.oldPassword,
       globalState.newPassword,
       globalState.confirmPassword
@@ -344,13 +345,13 @@ interface SliderProps extends VitalityProps {
 
 export function SliderAttribute(props: SliderProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { id, icon, label, onChange, checked, globalState, globalDispatch } = props;
 
    const handleUpdatePreference = useCallback(async() => {
       const response: VitalityResponse<void> = await updatePreference(user.id, id, !checked);
 
-      handleResponse(response, globalDispatch, updateNotification, () => {
+      handleResponse(response, globalDispatch, updateNotifications, () => {
          globalDispatch({
             type: "updateState",
             value: {
@@ -369,7 +370,7 @@ export function SliderAttribute(props: SliderProps): JSX.Element {
       checked,
       globalState,
       globalDispatch,
-      updateNotification
+      updateNotifications
    ]);
 
    return (

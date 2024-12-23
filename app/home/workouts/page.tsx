@@ -1,14 +1,15 @@
 "use client";
+import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
+
+import { AuthenticationContext } from "@/app/layout";
 import Main from "@/components/global/main";
-import View from "@/components/home/workouts/view";
 import Filtering from "@/components/home/workouts/filtering";
 import Form from "@/components/home/workouts/form";
 import Pagination from "@/components/home/workouts/pagination";
-import { AuthenticationContext } from "@/app/layout";
-import { fetchWorkoutTags } from "@/lib/home/workouts/tags";
+import View from "@/components/home/workouts/view";
 import { formReducer, VitalityState } from "@/lib/global/state";
+import { fetchWorkoutTags } from "@/lib/home/workouts/tags";
 import { fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
-import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 
 const pagingValues = new Set<number>([5, 10, 25, 50, 100, 500, 1000]);
 const workouts: VitalityState = {

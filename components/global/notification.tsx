@@ -1,9 +1,10 @@
 "use client";
-import clsx from "clsx";
-import { useRef, useContext } from "react";
-import { NotificationContext } from "@/app/layout";
+import { faCircleCheck, faTriangleExclamation, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark, faCircleCheck, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import clsx from "clsx";
+import { useContext, useRef } from "react";
+
+import { NotificationContext } from "@/app/layout";
 
 export interface NotificationProps extends React.HTMLAttributes<any> {
   status: "Initial" | "Success" | "Error" | "Failure";
@@ -13,7 +14,7 @@ export interface NotificationProps extends React.HTMLAttributes<any> {
 }
 
 export default function Notification(props: NotificationProps): JSX.Element {
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { status, message, children, timer } = props;
    const icon = status === "Success" ? faCircleCheck : faTriangleExclamation;
    const notificationRef = useRef<HTMLDivElement>(null);
@@ -23,7 +24,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
       notificationRef.current?.classList.add("animate-fadeOut");
 
       // Remove current notification after the provided timer
-      updateNotification({
+      updateNotifications({
          status: "Initial",
          message: "remove"
       });

@@ -1,11 +1,12 @@
 "use server";
-import prisma from "@/lib/prisma/client";
 import { z } from "zod";
-import { uuidSchema } from "@/lib/global/zod";
-import { Workout } from "@/lib/home/workouts/workouts";
+
 import { authorizeAction } from "@/lib/authentication/session";
+import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
+import { uuidSchema } from "@/lib/global/zod";
 import { formateDatabaseWorkout } from "@/lib/home/workouts/shared";
-import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
+import { Workout } from "@/lib/home/workouts/workouts";
+import prisma from "@/lib/prisma/client";
 
 export type ExerciseSet = {
   id: string;

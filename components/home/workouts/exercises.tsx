@@ -1,21 +1,22 @@
 "use client";
-import clsx from "clsx";
-import Button from "@/components/global/button";
-import TextArea from "@/components/global/textarea";
-import Confirmation from "@/components/global/confirmation";
-import { CSS } from "@dnd-kit/utilities";
-import { useDoubleTap } from "use-double-tap";
-import { Input } from "@/components/global/input";
-import { Workout } from "@/lib/home/workouts/workouts";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
-import { VitalityChildProps, VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, TouchSensor } from "@dnd-kit/core";
+import { closestCenter, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises, isEmptyExerciseSet } from "@/lib/home/workouts/exercises";
-import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faDumbbell, faStopwatch, faCaretRight, faCaretDown, faCircleNotch, faXmark, faPersonRunning, faPlus, faListCheck } from "@fortawesome/free-solid-svg-icons";
+import { CSS } from "@dnd-kit/utilities";
+import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCaretDown, faCaretRight, faCircleNotch, faDumbbell, faListCheck, faPersonRunning, faPlus, faStopwatch, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
+import { useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
+import { useDoubleTap } from "use-double-tap";
+
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import Button from "@/components/global/button";
+import Confirmation from "@/components/global/confirmation";
+import { Input } from "@/components/global/input";
+import TextArea from "@/components/global/textarea";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
+import { formReducer, VitalityChildProps, VitalityProps, VitalityState } from "@/lib/global/state";
+import { addExercise, Exercise, ExerciseSet, isEmptyExerciseSet, updateExercise, updateExercises } from "@/lib/home/workouts/exercises";
+import { Workout } from "@/lib/home/workouts/workouts";
 
 const form: VitalityState = {
    name: {
@@ -67,7 +68,7 @@ const form: VitalityState = {
 
 function CreateExercise(props: ExerciseProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { workout, localState, localDispatch, saveExercises, onBlur } = props;
    const createButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
@@ -82,7 +83,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
 
       const response: VitalityResponse<Exercise> = await addExercise(user.id, payload);
 
-      handleResponse(response, localDispatch, updateNotification, () => {
+      handleResponse(response, localDispatch, updateNotifications, () => {
          const newExercises: Exercise[] = [...workout.exercises, response.body.data as Exercise];
          saveExercises(newExercises);
          onBlur();
@@ -92,7 +93,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
       localDispatch,
       localState.name.value,
       saveExercises,
-      updateNotification,
+      updateNotifications,
       workout.exercises,
       workout.id,
       onBlur
@@ -167,7 +168,7 @@ interface ExerciseSetProps extends ExerciseProps {
 
 function SetContainer(props: ExerciseSetProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { workout, exercise, set, localState, localDispatch, onBlur, reset, saveExercises } = props;
    const [isEditing, setIsEditing] = useState<boolean>(set === undefined);
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
@@ -255,7 +256,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
          response = await updateExercise(user.id, newExercise, "sets");
       }
 
-      handleResponse(response, localDispatch, updateNotification, () => {
+      handleResponse(response, localDispatch, updateNotifications, () => {
          // Update editing exercise
          const newExercises: Exercise[] = [...workout.exercises].map((e) =>
             e.id === exercise.id ? response.body.data as Exercise : e,
@@ -263,7 +264,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
 
          saveExercises(newExercises);
 
-         method === "delete" && updateNotification({
+         method === "delete" && updateNotifications({
             status: "Success",
             message: "Delete entry",
             timer: 1000
@@ -277,7 +278,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
       handleConstructExerciseSet,
       localDispatch,
       saveExercises,
-      updateNotification,
+      updateNotifications,
       workout.exercises,
       onBlur
    ]);
@@ -550,7 +551,7 @@ interface ExerciseProps extends ExercisesProps, VitalityChildProps {
 
 function ExerciseContainer(props: ExerciseProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { workout, exercise, localState, localDispatch, saveExercises } = props;
    const { id, editing } = localState.name.data;
    const [editName, setEditName] = useState<boolean>(false);
@@ -626,7 +627,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                "sets",
             );
 
-            handleResponse(response, localDispatch, updateNotification, () => {
+            handleResponse(response, localDispatch, updateNotifications, () => {
                // Submit changes to global state from response data
                const newExercises: Exercise[] = [...workout.exercises].map(
                   (e) => e.id === exercise.id ? response.body.data as Exercise : e,
@@ -644,7 +645,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          name: localState.name.value.trim()
       };
 
-      handleResponse(await updateExercise(user.id, newExercise, "name"), localDispatch, updateNotification, () => {
+      handleResponse(await updateExercise(user.id, newExercise, "name"), localDispatch, updateNotifications, () => {
          // Update the overall workout exercises
          const newExercises: Exercise[] = [...workout.exercises].map((e) =>
             e.id !== exercise.id ? e : newExercise,
@@ -658,7 +659,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       localDispatch,
       localState.name.value,
       saveExercises,
-      updateNotification,
+      updateNotifications,
       workout.exercises
    ]);
 
@@ -676,10 +677,10 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
       const response: VitalityResponse<Exercise[]> = await updateExercises(newWorkout);
 
-      handleResponse(response, localDispatch, updateNotification, () => {
+      handleResponse(response, localDispatch, updateNotifications, () => {
          // Update the overall workout exercises from backend response data
          saveExercises(response.body.data as Exercise[]);
-         updateNotification({
+         updateNotifications({
             status: "Success",
             message: "Delete exercise",
             timer: 1000
@@ -693,7 +694,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       exercise.id,
       localDispatch,
       saveExercises,
-      updateNotification,
+      updateNotifications,
       collapsedId
    ]);
 
@@ -944,7 +945,7 @@ interface ExercisesProps extends VitalityProps {
 }
 
 export default function Exercises(props: ExercisesProps): JSX.Element {
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { workout, globalState, globalDispatch } = props;
    const [localState, localDispatch] = useReducer(formReducer, form);
    const [addExercise, setAddExercise] = useState<boolean>(false);
@@ -1058,7 +1059,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
 
             const response: VitalityResponse<Exercise[]> = await updateExercises(newWorkout);
 
-            handleResponse(response, localDispatch, updateNotification, () => {
+            handleResponse(response, localDispatch, updateNotifications, () => {
                handleSaveExercises(response.body.data as Exercise[]);
             });
          }

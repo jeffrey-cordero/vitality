@@ -1,21 +1,22 @@
-import Modal from "@/components/global/modal";
+import { faArrowRotateLeft, faBook, faCalendar, faLink, faPenToSquare, faPersonRunning, faPlus, faSignature } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
+
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import Button from "@/components/global/button";
-import Tags from "@/components/home/workouts/tags";
-import TextArea from "@/components/global/textarea";
-import Images from "@/components/home/workouts/images";
-import Exercises from "@/components/home/workouts/exercises";
 import Confirmation from "@/components/global/confirmation";
 import { Input } from "@/components/global/input";
-import { Tag } from "@/lib/home/workouts/tags";
-import { verifyImageURL } from "@/lib/home/workouts/shared";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Modal from "@/components/global/modal";
+import TextArea from "@/components/global/textarea";
+import Exercises from "@/components/home/workouts/exercises";
 import { filterWorkout } from "@/components/home/workouts/filtering";
+import Images from "@/components/home/workouts/images";
+import Tags from "@/components/home/workouts/tags";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
-import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { formReducer, VitalityProps, VitalityState } from "@/lib/global/state";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { Tag } from "@/lib/home/workouts/tags";
 import { addWorkout, deleteWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
-import { faArrowRotateLeft, faPersonRunning, faSignature, faCalendar, faBook, faLink, faPenToSquare, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const form: VitalityState = {
    title: {
@@ -46,7 +47,7 @@ const form: VitalityState = {
 export default function Form(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const [localState, localDispatch] = useReducer(formReducer, form);
    const [displayingFormModal, setDisplayingFormModal] = useState<boolean>(false);
    const displayFormModal: boolean = globalState.workout.data.display;
@@ -115,7 +116,7 @@ export default function Form(props: VitalityProps): JSX.Element {
       const response: VitalityResponse<Workout | number> = isNewWorkout ? await addWorkout(user.id, payload) :
          method === "update" ? await updateWorkout(user.id, payload) : await deleteWorkouts(user.id, [payload]);
 
-      handleResponse(response, localDispatch, updateNotification, () => {
+      handleResponse(response, localDispatch, updateNotifications, () => {
          const newWorkout: Workout | null = method === "delete" ? payload : (response.body.data as Workout);
 
          // Fetch selected filtered tags to apply tag filtering
@@ -163,7 +164,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          if (method === "delete") {
             formModalRef.current?.close();
 
-            updateNotification({
+            updateNotifications({
                status: "Success",
                message: "Deleted workout",
                timer: 1000

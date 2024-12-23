@@ -1,6 +1,6 @@
 import { Tag } from "@/lib/home/workouts/tags";
-import { root } from "@/tests/authentication/data";
 import { Workout } from "@/lib/home/workouts/workouts";
+import { root } from "@/tests/authentication/data";
 
 export const workout: Workout = {
    id: "69b62ca8-9222-4d68-b83a-c352c3989a48",

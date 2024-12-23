@@ -1,8 +1,9 @@
-import cx from "classnames";
-import Heading from "@/components/global/heading";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faUtensils, faBullseye, faWeightScale, faBottleWater, faBrain, faDumbbell } from "@fortawesome/free-solid-svg-icons";
+import { faBottleWater, faBrain, faBullseye, faDumbbell, faUtensils, faWeightScale } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import cx from "classnames";
+
+import Heading from "@/components/global/heading";
 
 interface ServiceProps {
   icon: IconProp;

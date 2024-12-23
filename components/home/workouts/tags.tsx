@@ -1,16 +1,17 @@
-import clsx from "clsx";
-import Button from "@/components/global/button";
-import Loading from "@/components/global/loading";
-import Confirmation from "@/components/global/confirmation";
-import Modal from "@/components/global/modal";
-import { Input } from "@/components/global/input";
+import { faBan, faGears, faPenToSquare, faTag, faTags, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import clsx from "clsx";
 import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
-import { addWorkoutTag, updateWorkoutTag, Tag } from "@/lib/home/workouts/tags";
-import { VitalityChildProps, VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
-import { faXmark, faTag, faGears, faTags, faPenToSquare, faBan } from "@fortawesome/free-solid-svg-icons";
+
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import Button from "@/components/global/button";
+import Confirmation from "@/components/global/confirmation";
+import { Input } from "@/components/global/input";
+import Loading from "@/components/global/loading";
+import Modal from "@/components/global/modal";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
+import { formReducer, VitalityChildProps, VitalityProps, VitalityState } from "@/lib/global/state";
+import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/home/workouts/tags";
 
 const form: VitalityState = {
    tagTitle: {
@@ -129,7 +130,7 @@ function TagColorInput(props: VitalityChildProps) {
 
 function EditTagContainer(props: TagContainerProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { tag, globalState, globalDispatch, localState, localDispatch } = props;
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
@@ -150,7 +151,7 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
 
          if (response.status !== "Error") {
             // Handle success or failure responses
-            handleResponse(response, localDispatch, updateNotification, () => {
+            handleResponse(response, localDispatch, updateNotifications, () => {
                const { options, selected } = globalState.tags.data;
                const returnedTag: Tag = response.body.data as Tag;
 
@@ -196,7 +197,7 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
                   }
                });
 
-               method === "delete" && updateNotification({
+               method === "delete" && updateNotifications({
                   status: "Success",
                   message: "Deleted workout tag",
                   timer: 1000
@@ -227,7 +228,7 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
          localState.tagColor,
          localState.tagTitle,
          tag.id,
-         updateNotification
+         updateNotifications
       ],
    );
 
@@ -424,7 +425,7 @@ interface TagsProps extends VitalityProps {
 
 export default function Tags(props: TagsProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { globalState, globalDispatch, onReset } = props;
 
    // Fetch overall and selected tags lists
@@ -486,7 +487,7 @@ export default function Tags(props: TagsProps): JSX.Element {
 
       if (response.status !== "Error") {
          // Handle success or failure responses
-         handleResponse(response, localDispatch, updateNotification, () => {
+         handleResponse(response, localDispatch, updateNotifications, () => {
             // Add the new tag to the overall user tag options
             const newOption: Tag = response.body.data as Tag;
 
@@ -535,7 +536,7 @@ export default function Tags(props: TagsProps): JSX.Element {
       localState.tagSearch,
       globalState.tags,
       user,
-      updateNotification
+      updateNotifications
    ]);
 
    const handleCreateOrSelectTag = useCallback(() => {

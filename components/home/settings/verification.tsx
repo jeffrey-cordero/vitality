@@ -1,15 +1,16 @@
 
-import clsx from "clsx";
-import Modal from "@/components/global/modal";
-import Button from "@/components/global/button";
-import { verifyAttribute } from "@/lib/home/settings/service";
-import { formReducer, VitalityState } from "@/lib/global/state";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShieldHalved } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
+import { ChangeEvent, useCallback, useContext, useReducer, useRef } from "react";
+
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import Button from "@/components/global/button";
+import Modal from "@/components/global/modal";
 import { AttributeProps } from "@/components/home/settings/attribute";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { ChangeEvent, useCallback, useContext, useReducer, useRef } from "react";
+import { formReducer, VitalityState } from "@/lib/global/state";
+import { verifyAttribute } from "@/lib/home/settings/service";
 
 const verification: VitalityState = {
    "0": {
@@ -45,7 +46,7 @@ interface VerifyAttributeProps extends AttributeProps {
 
 export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { attribute, input, icon, globalState, globalDispatch } = props;
    const [localState, localDispatch] = useReducer(formReducer, verification);
    const verificationModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
@@ -108,7 +109,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
       } else {
          const response: VitalityResponse<void> = await verifyAttribute(user.id, `${attribute}_verified`);
 
-         handleResponse(response, localDispatch, updateNotification, () => {
+         handleResponse(response, localDispatch, updateNotifications, () => {
             globalDispatch({
                type: "updateState",
                value: {
@@ -123,7 +124,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                }
             });
 
-            updateNotification({
+            updateNotifications({
                status: response.status,
                message: response.body.message,
                timer: 1500
@@ -138,7 +139,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
       localState,
       globalState,
       globalDispatch,
-      updateNotification
+      updateNotifications
    ]);
 
    const handleSubmitUpdates = useCallback(() => {
@@ -225,7 +226,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                   <span
                      onClick = {
                         () => {
-                           updateNotification({
+                           updateNotifications({
                               status: "Success",
                               message: "One-time verification code has been resent",
                               timer: 1500

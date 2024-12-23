@@ -1,6 +1,6 @@
-import Link from "next/link";
+import { faGithub, faMeta, faXTwitter, faYoutube } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGithub, faYoutube, faXTwitter, faMeta } from "@fortawesome/free-brands-svg-icons";
+import Link from "next/link";
 
 export default function Footer(): JSX.Element {
    return (

@@ -1,15 +1,16 @@
 "use client";
-import Link from "next/link";
-import Heading from "@/components/global/heading";
-import Button from "@/components/global/button";
-import { Input } from "@/components/global/input";
-import { useCallback, useContext, useReducer, useRef } from "react";
-import { handleResponse } from "@/lib/global/response";
-import { login, Credentials } from "@/lib/authentication/login";
-import { VitalityState, formReducer } from "@/lib/global/state";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { NotificationContext } from "@/app/layout";
 import { faArrowRotateLeft, faKey, faUnlockKeyhole, faUserSecret } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
+import { useCallback, useContext, useReducer, useRef } from "react";
+
+import { NotificationContext } from "@/app/layout";
+import Button from "@/components/global/button";
+import Heading from "@/components/global/heading";
+import { Input } from "@/components/global/input";
+import { Credentials, login } from "@/lib/authentication/login";
+import { handleResponse } from "@/lib/global/response";
+import { formReducer, VitalityState } from "@/lib/global/state";
 
 const credentials: VitalityState = {
    username: {
@@ -25,7 +26,7 @@ const credentials: VitalityState = {
 };
 
 export default function Login(): JSX.Element {
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, credentials);
    const loginButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
@@ -35,13 +36,13 @@ export default function Login(): JSX.Element {
          password: state.password.value.trim()
       };
 
-      handleResponse(await login(credentials), dispatch, updateNotification, () => {
+      handleResponse(await login(credentials), dispatch, updateNotifications, () => {
          window.location.reload();
       });
    }, [
       state.username,
       state.password,
-      updateNotification
+      updateNotifications
    ]);
 
    const handleSubmitAuthentication = useCallback(() => {

@@ -1,13 +1,14 @@
-import Button from "@/components/global/button";
+import { faMagnifyingGlass, faPhotoFilm, faTable } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
-import Table from "@/components/home/workouts/table";
-import Cards from "@/components/home/workouts/cards";
-import Loading from "@/components/global/loading";
 import { Dispatch, useCallback } from "react";
+
+import Button from "@/components/global/button";
+import Loading from "@/components/global/loading";
+import Cards from "@/components/home/workouts/cards";
+import Table from "@/components/home/workouts/table";
 import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass, faPhotoFilm, faTable } from "@fortawesome/free-solid-svg-icons";
 
 interface ViewProps extends VitalityProps {
   view: "table" | "cards";

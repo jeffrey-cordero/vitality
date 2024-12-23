@@ -1,10 +1,11 @@
+import { faQuoteLeft, faStar } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import Image from "next/image";
-import testimonials from "@/lib/landing/testimonials";
+
 import Heading from "@/components/global/heading";
 import Carousel from "@/components/landing/carousel";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faQuoteLeft, faStar } from "@fortawesome/free-solid-svg-icons";
+import testimonials from "@/lib/landing/testimonials";
 
 interface TestimonialProps {
   testimonial: string;

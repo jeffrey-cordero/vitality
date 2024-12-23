@@ -1,11 +1,12 @@
-import bcrypt from "bcryptjs";
 import { expect } from "@jest/globals";
-import { prismaMock } from "@/tests/singleton";
-import { VitalityResponse } from "@/lib/global/response";
-import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
+import bcrypt from "bcryptjs";
+
 import { fetchAttributes } from "@/lib/authentication/authorize";
-import { invalidPasswords, invalidRegistrations, root, user, INVALID_PASSWORD_MESSAGE } from "@/tests/authentication/data";
+import { VitalityResponse } from "@/lib/global/response";
 import { deleteAccount, updateAttribute, updatePassword, updatePreference, verifyAttribute } from "@/lib/home/settings/service";
+import { INVALID_PASSWORD_MESSAGE, invalidPasswords, invalidRegistrations, root, user } from "@/tests/authentication/data";
+import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
+import { prismaMock } from "@/tests/singleton";
 
 let expected: VitalityResponse<void>;
 const oldPassword: string = "ValidPassword$1";

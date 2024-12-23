@@ -1,8 +1,9 @@
 "use client";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import { ChangeEvent, useCallback, useEffect, useRef } from "react";
+
 import { VitalityInputProps } from "@/components/global/input";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface SelectProps extends VitalityInputProps {
   values: any[];

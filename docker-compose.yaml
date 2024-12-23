@@ -59,7 +59,7 @@ services:
     networks:
       - vitality_network
     ports:
-      - "5430:5432"
+      - "5432:5432"
     healthcheck:
        test: ['CMD', 'pg_isready', '-U', 'postgres', '-d', 'vitality']
        interval: 60s

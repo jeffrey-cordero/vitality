@@ -1,7 +1,8 @@
-import Heading from "@/components/global/heading";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faHeartCircleBolt, faCodeCompare, faFeatherPointed } from "@fortawesome/free-solid-svg-icons";
+import { faCodeCompare, faFeatherPointed, faHeartCircleBolt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import Heading from "@/components/global/heading";
 
 interface CardProps {
   icon: IconProp;

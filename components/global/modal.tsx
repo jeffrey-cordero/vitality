@@ -1,6 +1,6 @@
-import clsx from "clsx";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {

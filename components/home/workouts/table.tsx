@@ -1,15 +1,16 @@
+import { faImage, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import Image from "next/image";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import Confirmation from "@/components/global/confirmation";
-import { Tag } from "@/lib/home/workouts/tags";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { VitalityProps } from "@/lib/global/state";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
+import { Tag } from "@/lib/home/workouts/tags";
 import { deleteWorkouts, Workout } from "@/lib/home/workouts/workouts";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { faImage, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 interface RowProps extends VitalityProps {
    workout: Workout;
@@ -183,7 +184,7 @@ interface TableProps extends VitalityProps {
 
 export default function Table(props: TableProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { workouts, globalState, globalDispatch } = props;
    const selected: Set<Workout> = globalState.workouts.data.selected;
 
@@ -233,7 +234,7 @@ export default function Table(props: TableProps): JSX.Element {
    const handleWorkoutDelete = useCallback(async() => {
       const response: VitalityResponse<number> = await deleteWorkouts(user.id, Array.from(visibleSelectedWorkouts));
 
-      handleResponse(response, globalDispatch, updateNotification, () => {
+      handleResponse(response, globalDispatch, updateNotifications, () => {
          const newWorkouts: Workout[] = [...globalState.workouts.value].filter((w: Workout) => {
             return !(visibleSelectedWorkouts.has(w));
          });
@@ -271,7 +272,7 @@ export default function Table(props: TableProps): JSX.Element {
             }
          });
 
-         updateNotification({
+         updateNotifications({
             status: response.status,
             message: response.body.message,
             timer: 1000
@@ -282,7 +283,7 @@ export default function Table(props: TableProps): JSX.Element {
       globalDispatch,
       selected,
       globalState,
-      updateNotification,
+      updateNotifications,
       visibleSelectedWorkouts
    ]);
 

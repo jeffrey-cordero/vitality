@@ -1,12 +1,13 @@
 "use client";
+import { faAnglesLeft, faAnglesRight, faFileLines, faTabletScreenButton } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
+import { ChangeEvent, useCallback } from "react";
+
 import Button from "@/components/global/button";
 import Select from "@/components/global/select";
-import { ChangeEvent, useCallback } from "react";
 import { VitalityProps } from "@/lib/global/state";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAnglesLeft, faAnglesRight, faFileLines, faTabletScreenButton } from "@fortawesome/free-solid-svg-icons";
 
 interface PaginationProps extends VitalityProps {
    workouts: Workout[];

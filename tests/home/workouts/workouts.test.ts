@@ -1,11 +1,12 @@
 import { expect } from "@jest/globals";
-import { root } from "@/tests/authentication/data";
-import { prismaMock } from "@/tests/singleton";
-import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { tags, workouts } from "@/tests/home/workouts/data";
+
 import { formateDatabaseWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
 import { addWorkout, deleteWorkouts, fetchWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
+import { root } from "@/tests/authentication/data";
+import { tags, workouts } from "@/tests/home/workouts/data";
+import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
+import { prismaMock } from "@/tests/singleton";
 
 const MOCK_WORKOUT = workouts[0];
 

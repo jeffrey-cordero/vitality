@@ -1,5 +1,6 @@
 import { produce } from "immer";
 import { Dispatch } from "react";
+
 import { VitalityResponse } from "@/lib/global/response";
 
 export interface VitalityInputState {

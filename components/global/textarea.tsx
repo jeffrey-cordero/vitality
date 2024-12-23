@@ -1,8 +1,9 @@
 "use client";
-import clsx from "clsx";
-import { VitalityInputProps } from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ChangeEvent, useEffect, useRef, useCallback } from "react";
+import clsx from "clsx";
+import { ChangeEvent, useCallback, useEffect, useRef } from "react";
+
+import { VitalityInputProps } from "@/components/global/input";
 
 export default function TextArea(props: VitalityInputProps): JSX.Element {
    const { id, label, icon, onChange, placeholder, required, autoFocus,

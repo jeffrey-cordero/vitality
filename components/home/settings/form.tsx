@@ -1,17 +1,18 @@
+import { faAt, faCakeCandles, faComments, faImage, faMoon, faPaperPlane, faPenToSquare, faPhone, faSignature, faUserLock, faUserSecret, faUserXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { users as User } from "@prisma/client";
 import Image from "next/image";
+import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
+
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import Heading from "@/components/global/heading";
 import Loading from "@/components/global/loading";
-import { users as User } from "@prisma/client";
-import { handleResponse } from "@/lib/global/response";
-import { endSession } from "@/lib/authentication/session";
-import { deleteAccount } from "@/lib/home/settings/service";
-import { formReducer, VitalityState } from "@/lib/global/state";
-import { fetchAttributes } from "@/lib/authentication/authorize";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { AccountAction, GeneralAttribute, PasswordAttribute, SliderAttribute } from "@/components/home/settings/attribute";
-import { faAt, faImage, faPhone, faUserSecret, faCakeCandles, faSignature, faMoon, faPaperPlane, faComments, faPenToSquare, faUserLock, faUserXmark } from "@fortawesome/free-solid-svg-icons";
+import { fetchAttributes } from "@/lib/authentication/authorize";
+import { endSession } from "@/lib/authentication/session";
+import { handleResponse } from "@/lib/global/response";
+import { formReducer, VitalityState } from "@/lib/global/state";
+import { deleteAccount } from "@/lib/home/settings/service";
 
 const form: VitalityState = {
    username: {
@@ -78,7 +79,7 @@ const form: VitalityState = {
 
 export default function Form(): JSX.Element {
    const { user, theme, updateTheme } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const [globalState, globalDispatch] = useReducer(formReducer, form);
    const [isEditingImage, setIsEditingImage] = useState<boolean>(false);
 
@@ -206,13 +207,13 @@ export default function Form(): JSX.Element {
    }, []);
 
    const handleDeleteAccount = useCallback(async() => {
-      handleResponse(await deleteAccount(user.id), globalDispatch, updateNotification, async() => {
+      handleResponse(await deleteAccount(user.id), globalDispatch, updateNotifications, async() => {
          await handleLogOut();
       });
    }, [
       user,
       handleLogOut,
-      updateNotification
+      updateNotifications
    ]);
 
    useEffect(() => {

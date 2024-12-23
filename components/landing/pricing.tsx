@@ -1,10 +1,11 @@
 "use client";
-import Heading from "@/components/global/heading";
-import Button from "@/components/global/button";
+import { faCheck, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useRef } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
+
+import Button from "@/components/global/button";
+import Heading from "@/components/global/heading";
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;

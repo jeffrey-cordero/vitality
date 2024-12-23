@@ -1,13 +1,14 @@
 "use client";
-import Link from "next/link";
-import clsx from "clsx";
-import { usePathname } from "next/navigation";
-import { AuthenticationContext } from "@/app/layout";
-import { useContext, useEffect, useState } from "react";
-import { endSession } from "@/lib/authentication/session";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faGears, faBars, faDumbbell, faRightFromBracket, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faAnglesRight, faBars, faDoorOpen, faDumbbell, faGears, faMoon, faPlaneArrival, faRightFromBracket, faSun, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
+
+import { AuthenticationContext } from "@/app/layout";
+import { endSession } from "@/lib/authentication/session";
 
 interface SideBarProps {
   name: string;

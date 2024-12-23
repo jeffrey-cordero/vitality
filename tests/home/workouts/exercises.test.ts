@@ -1,9 +1,10 @@
 import { expect } from "@jest/globals";
-import { prismaMock } from "@/tests/singleton";
-import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
-import { workouts } from "@/tests/home/workouts/data";
+
+import { addExercise, Exercise, ExerciseSet, getExerciseSetUpdates, getExercisesUpdates, isEmptyExerciseSet, updateExercise, updateExercises } from "@/lib/home/workouts/exercises";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { isEmptyExerciseSet, addExercise, Exercise, getExercisesUpdates, getExerciseSetUpdates, updateExercise, updateExercises, ExerciseSet } from "@/lib/home/workouts/exercises";
+import { workouts } from "@/tests/home/workouts/data";
+import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
+import { prismaMock } from "@/tests/singleton";
 
 const MOCK_WORKOUTS = workouts;
 const MOCK_WORKOUT: Workout = MOCK_WORKOUTS[0];

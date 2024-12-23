@@ -1,12 +1,13 @@
 /** @jest-environment jsdom */
+import { act, render, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { useCallback, useEffect, useReducer } from "react";
+
+import { Input } from "@/components/global/input";
 import Select from "@/components/global/select";
 import TextArea from "@/components/global/textarea";
-import userEvent from "@testing-library/user-event";
-import { Input } from "@/components/global/input";
 import { sendErrorMessage } from "@/lib/global/response";
-import { useCallback, useEffect, useReducer } from "react";
 import { formReducer, VitalityState } from "@/lib/global/state";
-import { act, render, waitFor } from "@testing-library/react";
 
 let globalState: VitalityState;
 

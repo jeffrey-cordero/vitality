@@ -1,16 +1,17 @@
-import Button from "@/components/global/button";
-import Select from "@/components/global/select";
-import Heading from "@/components/global/heading";
-import Modal from "@/components/global/modal";
-import Tags from "@/components/home/workouts/tags";
-import { Tag } from "@/lib/home/workouts/tags";
-import { Input } from "@/components/global/input";
-import { useCallback, useMemo, useRef } from "react";
-import { Workout } from "@/lib/home/workouts/workouts";
+import { faArrowLeft, faArrowRight, faArrowsUpDown, faBan, faCalendar, faMagnifyingGlass, faTag, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { sendSuccessMessage, sendErrorMessage } from "@/lib/global/response";
+import { useCallback, useMemo, useRef } from "react";
+
+import Button from "@/components/global/button";
+import Heading from "@/components/global/heading";
+import { Input } from "@/components/global/input";
+import Modal from "@/components/global/modal";
+import Select from "@/components/global/select";
+import Tags from "@/components/home/workouts/tags";
+import { sendErrorMessage, sendSuccessMessage } from "@/lib/global/response";
 import { VitalityInputState, VitalityProps, VitalityState } from "@/lib/global/state";
-import { faCalendar, faMagnifyingGlass, faArrowsUpDown, faArrowRight, faArrowLeft, faTag, faBan, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { Tag } from "@/lib/home/workouts/tags";
+import { Workout } from "@/lib/home/workouts/workouts";
 
 export function filterByTags(
    filteredTagIds: Set<string>,

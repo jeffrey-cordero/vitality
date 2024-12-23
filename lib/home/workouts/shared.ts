@@ -1,5 +1,5 @@
+import { base64ImageRegex, urlRegex, workoutsImageRegex } from "@/lib/home/workouts/regex";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { urlRegex, workoutsImageRegex, base64ImageRegex } from "@/lib/home/workouts/regex";
 
 export function verifyImageURL(url: string): boolean {
    return url.trim().length === 0 || urlRegex.test(url) || workoutsImageRegex.test(url) || base64ImageRegex.test(url);

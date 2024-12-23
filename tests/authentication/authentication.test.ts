@@ -1,11 +1,12 @@
-import bcrypt from "bcryptjs";
 import { expect } from "@jest/globals";
 import { users } from "@prisma/client";
-import { prismaMock } from "@/tests/singleton";
+import bcrypt from "bcryptjs";
+
+import { authorizeServerSession, fetchUser } from "@/lib/authentication/authorize";
 import { signup } from "@/lib/authentication/signup";
+import { invalidPasswords, invalidRegistrations, root, user, VALID_REGISTRATION } from "@/tests/authentication/data";
 import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
-import { fetchUser, authorizeServerSession } from "@/lib/authentication/authorize";
-import { invalidRegistrations, root, user, VALID_REGISTRATION, invalidPasswords } from "@/tests/authentication/data";
+import { prismaMock } from "@/tests/singleton";
 
 const EXISTING_USERS = [root, user];
 

@@ -1,6 +1,7 @@
 import { Dispatch } from "react";
-import { VitalityAction } from "@/lib/global/state";
+
 import { NotificationProps } from "@/components/global/notification";
+import { VitalityAction } from "@/lib/global/state";
 
 export interface VitalityResponse<T> {
    status: "Success" | "Error" | "Failure";
@@ -60,12 +61,12 @@ export function sendFailureMessage<T>(
 export function handleResponse(
    response: VitalityResponse<any>,
    dispatch: Dispatch<VitalityAction<any>>,
-   updateNotification: (_notification: NotificationProps) => void,
+   updateNotifications: (_notification: NotificationProps) => void,
    successMethod: () => void
 ): void {
    if (response.status === "Success") {
       // Remove existing notification, if any
-      updateNotification({
+      updateNotifications({
          status: "Initial",
          message: ""
       });
@@ -85,7 +86,7 @@ export function handleResponse(
          ?.scrollIntoView({ behavior: "smooth", block: "center" });
    } else {
       // Display failure notification to the user
-      updateNotification({
+      updateNotifications({
          status: response.status,
          message: response.body.message,
          timer: undefined

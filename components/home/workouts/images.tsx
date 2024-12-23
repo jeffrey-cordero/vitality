@@ -1,13 +1,14 @@
-import Image from "next/image";
-import clsx from "clsx";
-import Button from "@/components/global/button";
-import Modal from "@/components/global/modal";
-import { useCallback, useMemo, useState } from "react";
-import { verifyImageURL } from "@/lib/home/workouts/shared";
-import { workoutsImageRegex } from "@/lib/home/workouts/regex";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Input, VitalityInputProps } from "@/components/global/input";
 import { faCameraRetro, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
+import Image from "next/image";
+import { useCallback, useMemo, useState } from "react";
+
+import Button from "@/components/global/button";
+import { Input, VitalityInputProps } from "@/components/global/input";
+import Modal from "@/components/global/modal";
+import { workoutsImageRegex } from "@/lib/home/workouts/regex";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
 
 const images = [
    "bike.png",

@@ -1,16 +1,19 @@
 "use client";
-import "@/app/global.css";
+
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import "@/app/global.css";
+
 import cx from "classnames";
-import Footer from "@/components/global/footer";
-import Notification from "@/components/global/notification";
-import { sfPro, inter } from "@/app/fonts";
 import { usePathname } from "next/navigation";
 import { User as NextAuthUser } from "next-auth";
+import { createContext, useCallback, useEffect, useState } from "react";
+
+import { inter, sfPro } from "@/app/fonts";
+import Footer from "@/components/global/footer";
+import Notification from "@/components/global/notification";
+import { NotificationProps } from "@/components/global/notification";
 import { SideBar } from "@/components/global/sidebar";
 import { getSession } from "@/lib/authentication/session";
-import { NotificationProps } from "@/components/global/notification";
-import { createContext, useCallback, useEffect, useState } from "react";
 
 interface AuthenticationContextType {
    user: NextAuthUser | undefined;
@@ -20,9 +23,8 @@ interface AuthenticationContextType {
 }
 
 interface NotificationContextType {
-   notification: NotificationProps | undefined;
    notificationQueue: NotificationProps[],
-   updateNotification: (_notification: NotificationProps) => void;
+   updateNotifications: (_notification: NotificationProps) => void;
 }
 
 export const AuthenticationContext = createContext<AuthenticationContextType>({
@@ -33,13 +35,8 @@ export const AuthenticationContext = createContext<AuthenticationContextType>({
 });
 
 export const NotificationContext = createContext<NotificationContextType>({
-   notification: {
-      children: null,
-      status: "Initial",
-      message: ""
-   },
    notificationQueue: [],
-   updateNotification: (_notification: NotificationProps) => { }
+   updateNotifications: (_notification: NotificationProps) => { }
 });
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -47,14 +44,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
    const [theme, setTheme] = useState<"light" | "dark">(null);
    const [fetched, setFetched] = useState<boolean>(false);
    const [notificationQueue, setNotificationQueue] = useState<NotificationProps[]>([]);
-   const notification: NotificationProps = notificationQueue.length > 0 ? notificationQueue[0] : {
-      children: null,
-      status: "Initial",
-      message: ""
-   };
    const pathname: string = usePathname();
 
-   const updateNotification = useCallback((notification: NotificationProps) => {
+   const updateNotifications = useCallback((notification: NotificationProps) => {
       // Handle a queue of notifications to ensure all messages are displayed to the user
       if (notification.status !== "Initial") {
          setNotificationQueue((previousQueue) => {
@@ -71,7 +63,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       try {
          setUser(await getSession());
       } catch (error) {
-         updateNotification({
+         updateNotifications({
             status: "Failure",
             message: error.message
          });
@@ -80,7 +72,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       }
 
       setFetched(true);
-   }, [updateNotification]);
+   }, [updateNotifications]);
 
    const updateTheme = (theme: "dark" | "light") => {
       window.localStorage.setItem("theme", theme);
@@ -172,12 +164,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                fetched && (
                   <AuthenticationContext.Provider value = { { user, theme, updateTheme, fetched } }>
                      <SideBar />
-                     <NotificationContext.Provider value = { { notification, notificationQueue, updateNotification } }>
+                     <NotificationContext.Provider value = { { notificationQueue, updateNotifications } }>
                         <div className = "flex min-h-screen flex-col items-center justify-start gap-6">
                            { children }
                            {
-                              notification !== undefined && notification.status !== "Initial" && (
-                                 <Notification { ...notification } />
+                              notificationQueue.length > 0 && (
+                                 <Notification { ...notificationQueue[0] } />
                               )
                            }
                            {

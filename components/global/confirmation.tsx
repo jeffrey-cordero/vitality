@@ -1,8 +1,9 @@
+import { faCheck, faRotateBack, faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useRef } from "react";
+
 import Button from "@/components/global/button";
 import Modal from "@/components/global/modal";
-import { useRef } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faRotateBack, faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 interface ConfirmationProps {
   display?: React.ReactNode;

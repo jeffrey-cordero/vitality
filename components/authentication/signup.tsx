@@ -1,16 +1,17 @@
 "use client";
-import Heading from "@/components/global/heading";
-import Button from "@/components/global/button";
+import { faArrowRotateLeft, faAt, faCakeCandles, faDoorOpen, faKey, faPhone, faSignature, faUserPlus, faUserSecret } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
+import { useCallback, useContext, useReducer, useRef } from "react";
+
+import { NotificationContext } from "@/app/layout";
+import Button from "@/components/global/button";
+import Heading from "@/components/global/heading";
 import { Input } from "@/components/global/input";
 import { login } from "@/lib/authentication/login";
-import { NotificationContext } from "@/app/layout";
-import { useCallback, useContext, useReducer, useRef } from "react";
-import { VitalityState, formReducer } from "@/lib/global/state";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { signup, Registration } from "@/lib/authentication/signup";
+import { Registration, signup } from "@/lib/authentication/signup";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { faArrowRotateLeft, faDoorOpen, faKey, faAt, faPhone, faUserSecret, faCakeCandles, faUserPlus, faSignature } from "@fortawesome/free-solid-svg-icons";
+import { formReducer, VitalityState } from "@/lib/global/state";
 
 const registration: VitalityState = {
    username: {
@@ -51,7 +52,7 @@ const registration: VitalityState = {
 };
 
 export default function SignUp(): JSX.Element {
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, registration);
    const signupButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
@@ -68,9 +69,9 @@ export default function SignUp(): JSX.Element {
 
       const response: VitalityResponse<null> = await signup(registration);
 
-      handleResponse(response, dispatch, updateNotification, () => {
+      handleResponse(response, dispatch, updateNotifications, () => {
          // Display notification with login button for redirection
-         updateNotification({
+         updateNotifications({
             status: "Success",
             message: "Successfully registered",
             timer: undefined,
@@ -105,7 +106,7 @@ export default function SignUp(): JSX.Element {
       state.email,
       state.birthday,
       state.phone,
-      updateNotification
+      updateNotifications
    ]);
 
    const handleSubmitRegistration = useCallback(() => {

@@ -4,7 +4,7 @@
     "build": "next build",
     "dev": "next dev --turbo",
     "start": "next start",
-    "lint": "npx eslint . --fix",
+    "lint": "npx eslint . --fix --ignore-pattern 'next-env.**'",
     "tests": "NODE_OPTIONS='--experimental-vm-modules' NODE_NO_WARNINGS=1 npx jest tests/* --collect-coverage --detectOpenHandles --verbose"
   },
   "dependencies": {
@@ -55,8 +55,10 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.0.0",
     "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-tailwindcss": "^3.17.5",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",

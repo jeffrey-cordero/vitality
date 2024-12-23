@@ -1,13 +1,14 @@
 /** @jest-environment jsdom */
 import { Dispatch } from "react";
-import { VitalityAction } from "@/lib/global/state";
+
 import { NotificationProps } from "@/components/global/notification";
 import { handleResponse, sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
+import { VitalityAction } from "@/lib/global/state";
 
 // Mocked dependencies
 const dispatch: Dispatch<VitalityAction<any>> = jest.fn();
 const successMethod: () => void = jest.fn();
-const updateNotification: (_notification: NotificationProps) => void = jest.fn();
+const updateNotifications: (_notification: NotificationProps) => void = jest.fn();
 
 let response: VitalityResponse<any>;
 
@@ -20,7 +21,7 @@ describe("Backend Response Tests", () => {
             Number.MAX_VALUE
          );
 
-         handleResponse(response, dispatch, updateNotification, successMethod);
+         handleResponse(response, dispatch, updateNotifications, successMethod);
 
          expect(response).toEqual({
             status: "Success",
@@ -30,7 +31,7 @@ describe("Backend Response Tests", () => {
                errors: {}
             }
          });
-         expect(updateNotification).toHaveBeenCalledWith({
+         expect(updateNotifications).toHaveBeenCalledWith({
             status: "Initial",
             message: ""
          });
@@ -56,7 +57,7 @@ describe("Backend Response Tests", () => {
             name: ["Name must be at least 2 characters"]
          });
 
-         handleResponse(response, dispatch, updateNotification, successMethod);
+         handleResponse(response, dispatch, updateNotifications, successMethod);
 
          expect(response).toEqual({
             status: "Error",
@@ -75,7 +76,7 @@ describe("Backend Response Tests", () => {
             block: "center"
          });
          expect(successMethod).not.toHaveBeenCalled();
-         expect(updateNotification).not.toHaveBeenCalled();
+         expect(updateNotifications).not.toHaveBeenCalled();
       });
    });
 
@@ -90,7 +91,7 @@ describe("Backend Response Tests", () => {
 
          response = sendFailureMessage(new Error("Database connection error"));
 
-         handleResponse(response, dispatch, updateNotification, successMethod);
+         handleResponse(response, dispatch, updateNotifications, successMethod);
 
          expect(response).toEqual({
             status: "Failure",
@@ -100,7 +101,7 @@ describe("Backend Response Tests", () => {
                errors: { system: ["Database connection error"] }
             }
          });
-         expect(updateNotification).toHaveBeenCalledWith({
+         expect(updateNotifications).toHaveBeenCalledWith({
             status: "Failure",
             message: "Something went wrong. Please try again."
          });

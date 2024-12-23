@@ -1,12 +1,13 @@
 "use server";
-import bcrypt from "bcryptjs";
-import prisma from "@/lib/prisma/client";
-import { z } from "zod";
-import { userSchema } from "@/lib/global/zod";
 import { users as User } from "@prisma/client";
-import { verifyImageURL } from "@/lib/home/workouts/shared";
+import bcrypt from "bcryptjs";
+import { z } from "zod";
+
 import { authorizeAction } from "@/lib/authentication/session";
 import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
+import { userSchema } from "@/lib/global/zod";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
+import prisma from "@/lib/prisma/client";
 
 const updateSchema = userSchema.extend({
    image: z

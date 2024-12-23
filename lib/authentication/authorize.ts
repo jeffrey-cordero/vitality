@@ -1,9 +1,10 @@
 "use server";
-import bcrypt from "bcryptjs";
-import prisma from "@/lib/prisma/client";
-import { z } from "zod";
 import { users as User } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import { z } from "zod";
+
 import { Credentials } from "@/lib/authentication/login";
+import prisma from "@/lib/prisma/client";
 
 export async function fetchAttributes(id: string): Promise<User | null> {
    try {
