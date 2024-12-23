@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma/client";
 import { z } from "zod";
 import { uuidSchema } from "@/lib/global/zod";
 import { Workout } from "@/lib/home/workouts/workouts";
+import { authorizeAction } from "@/lib/authentication/session";
 import { formateDatabaseWorkout } from "@/lib/home/workouts/shared";
 import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
 
@@ -108,7 +109,7 @@ const newExerciseSchema = exerciseSchema.extend({
    id: uuidSchema("exercise", "new")
 });
 
-function isEmptyExerciseSet(set: ExerciseSet) {
+export async function isEmptyExerciseSet(set: ExerciseSet) {
    return (
       !set.weight &&
       !set.repetitions &&
@@ -120,9 +121,12 @@ function isEmptyExerciseSet(set: ExerciseSet) {
 }
 
 export async function addExercise(
+   user_id: string,
    exercise: Exercise
 ): Promise<VitalityResponse<Exercise>> {
    try {
+      await authorizeAction(user_id);
+
       const fields = newExerciseSchema.safeParse(exercise);
 
       if (!fields.success) {
@@ -186,10 +190,13 @@ export async function addExercise(
 }
 
 export async function updateExercise(
+   user_id: string,
    exercise: Exercise,
    method: "name" | "sets"
 ): Promise<VitalityResponse<Exercise>> {
    try {
+      await authorizeAction(user_id);
+
       const fields = exerciseSchema.safeParse(exercise);
 
       if (!fields.success) {
@@ -339,7 +346,7 @@ export async function getExerciseSetUpdates(
             error: `Invalid exercise set fields for set with ID \`${set.id}\``,
             errors: fields.error.flatten().fieldErrors
          };
-      } else if (isEmptyExerciseSet(set)) {
+      } else if (await isEmptyExerciseSet(set)) {
          return {
             creating: null,
             updating: null,

@@ -1,5 +1,5 @@
 import Credentials from "next-auth/providers/credentials";
-import type { NextAuthConfig } from "next-auth";
+import { NextAuthConfig } from "next-auth";
 import { authorizeServerSession } from "@/lib/authentication/authorize";
 
 export const authConfig = {
@@ -27,9 +27,9 @@ export const authConfig = {
 
          return session;
       },
-      async authorized({ auth, request: { nextUrl } }) {
+      async authorized({ auth, request }) {
          const isLoggedIn = !!auth?.user;
-         const isOnHome = nextUrl.pathname.startsWith("/home");
+         const isOnHome = request.nextUrl.pathname.startsWith("/home");
 
          if (isOnHome) {
             if (isLoggedIn) {
@@ -38,7 +38,7 @@ export const authConfig = {
 
             return false;
          } else if (isLoggedIn) {
-            return Response.redirect(new URL("/home", nextUrl));
+            return Response.redirect(new URL("/home", request.nextUrl));
          } else {
             return true;
          }

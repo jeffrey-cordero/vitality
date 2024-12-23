@@ -1,21 +1,86 @@
 import clsx from "clsx";
-import { useRef } from "react";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHourglassHalf, faSquareCheck } from "@fortawesome/free-solid-svg-icons";
+import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
+  onSubmit?: () => Promise<void>;
+  onConfirmation?: () => Promise<void>;
   icon?: IconProp;
-  styling?: string
+  iconStyling?: string
+  isSingleSubmission?: boolean;
 }
 
-export default function Button(props: ButtonProps): JSX.Element {
-   const { children, className, icon, styling, onClick } = props;
+const Button = forwardRef(function Button(props: ButtonProps, ref) {
+   const { children, className, icon, iconStyling, onClick, onSubmit, onConfirmation, onBlur, isSingleSubmission, ...rest } = props;
+   const [displaySubmitted, setDisplaySubmitted] = useState<boolean>(false);
+   const [displayConfirmed, setDisplayConfirmed] = useState<boolean>(false);
+   const savedIconRef = useRef<SVGSVGElement>(null);
+   const submitTimeOut = useRef<NodeJS.Timeout>(null);
+   const revertTimeOut = useRef<NodeJS.Timeout>(null);
+   const confirmTimeOut = useRef<NodeJS.Timeout>(null);
    const buttonRef = useRef(null);
+
+   const handleSubmit = useCallback(async() => {
+      // Cancel any pending response submission timeout for single submission buttons
+      if (isSingleSubmission) {
+         clearTimeout(submitTimeOut.current);
+         clearTimeout(revertTimeOut.current);
+      }
+
+      // Display the submit icon with a bouncing animation temporarily
+      setDisplaySubmitted(true);
+
+      submitTimeOut.current = setTimeout(async() => {
+         // Cancel any pending update icon removal timeout and submit response
+         clearTimeout(revertTimeOut.current);
+
+         await onSubmit();
+
+         revertTimeOut.current = setTimeout(() => {
+            setDisplaySubmitted(false);
+            onBlur?.call(null);
+         });
+      }, 750);
+   }, [
+      onBlur,
+      onSubmit,
+      isSingleSubmission
+   ]);
+
+   const handleConfirmation = useCallback(async() => {
+      // Cancel any pending response submission timeout
+      clearTimeout(confirmTimeOut.current);
+
+      // Display the confirm icon with a wiggle animation temporarily
+      setDisplayConfirmed(true);
+
+      confirmTimeOut.current = setTimeout(async() => {
+         await onConfirmation();
+         setDisplayConfirmed(false);
+         onBlur?.call(null);
+      }, 1000);
+   }, [
+      onBlur,
+      onConfirmation
+   ]);
+
+   const handleOnClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+      // Always call the defined onClick method and blur the element
+      onClick?.call(this, event);
+      buttonRef.current?.blur();
+   }, [onClick]);
+
+   useImperativeHandle(ref, () => ({
+      submit: handleSubmit,
+      confirm: handleConfirmation
+   }));
 
    return (
       <button
-         { ...props }
+         { ...rest }
          ref = { buttonRef }
          className = {
             clsx(
@@ -23,24 +88,24 @@ export default function Button(props: ButtonProps): JSX.Element {
                className
             )
          }
-         onClick = {
-            (event: React.MouseEvent<HTMLButtonElement>) => {
-               // Always call the defined onClick method and blur the button element
-               onClick?.call(this, event);
-               buttonRef.current?.blur();
-            }
-         }
+         onClick = { handleOnClick }
       >
          {
             icon && (
                <FontAwesomeIcon
-                  className = { styling }
-                  icon = { icon }
-
+                  ref = { savedIconRef }
+                  className = {
+                     clsx(iconStyling, {
+                        "animate-wiggle": displaySubmitted || displayConfirmed
+                     })
+                  }
+                  icon = { displaySubmitted ? faHourglassHalf : displayConfirmed ? faSquareCheck : icon }
                />
             )
          }
          { children }
       </button>
    );
-}
+});
+
+export default Button;

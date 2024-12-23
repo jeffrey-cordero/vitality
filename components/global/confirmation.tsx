@@ -5,21 +5,23 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faRotateBack, faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 interface ConfirmationProps {
+  display?: React.ReactNode;
   message: string;
-  onConfirmation: () => void;
+  onConfirmation: () => Promise<void>;
   icon?: boolean;
 }
 
 export default function Confirmation(props: ConfirmationProps): JSX.Element {
-   const { message, icon, onConfirmation } = props;
-   const deleteModalRef = useRef<{ open: () => void; close: () => void }>(null);
+   const { display, message, icon, onConfirmation } = props;
+   const confirmModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
+   const confirmButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
    return (
       <Modal
          className = "max-h-[90%] max-w-[90%] px-4 py-3 text-center xsm:max-w-sm"
-         ref = { deleteModalRef }
+         ref = { confirmModalRef }
          display = {
-            icon ? (
+            display !== undefined ? display : icon ? (
                <div className = "bg-white dark:bg-slate-800">
                   <FontAwesomeIcon
                      icon = { faTrashCan }
@@ -29,8 +31,9 @@ export default function Confirmation(props: ConfirmationProps): JSX.Element {
             ) : (
                <Button
                   type = "button"
-                  className = "h-[2.4rem] w-full bg-red-500 text-white focus:ring-red-700"
+                  className = "h-10 w-full bg-red-500 text-white focus:ring-red-700"
                   icon = { faTrash }
+                  onClick = { () => confirmButtonRef.current?.confirm() }
                >
                   Delete
                </Button>
@@ -46,15 +49,17 @@ export default function Confirmation(props: ConfirmationProps): JSX.Element {
                   type = "button"
                   icon = { faRotateBack }
                   className = "h-[2.3rem] w-full border-[1.5px] border-gray-100 bg-gray-500 px-5 py-2 text-base font-bold text-white sm:w-32 dark:border-0"
-                  onClick = { async() => deleteModalRef.current?.close() }
+                  onClick = { async() => confirmModalRef.current?.close() }
                >
                   Cancel
                </Button>
                <Button
+                  ref = { confirmButtonRef }
                   type = "button"
                   icon = { faCheck }
                   className = "h-[2.3rem] w-full border-[1.5px] border-gray-100 bg-red-500 px-5 py-2 text-base font-bold text-white focus:border-red-500 focus:ring-red-700 sm:w-32 dark:border-0"
-                  onClick = { async() => onConfirmation() }
+                  onClick = { () => confirmButtonRef.current?.confirm() }
+                  onConfirmation = { onConfirmation }
                >
                   Confirm
                </Button>

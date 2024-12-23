@@ -7,7 +7,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
    return (
       <>
-         { user && children }
+         { user?.id !== undefined && children }
       </>
    );
 }

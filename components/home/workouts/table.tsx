@@ -8,8 +8,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { deleteWorkouts, Workout } from "@/lib/home/workouts/workouts";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import { faImage, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { faImage, faPencil, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 
 interface RowProps extends VitalityProps {
    workout: Workout;
@@ -27,7 +27,7 @@ function Row(props: RowProps) {
    }, [workout.image]);
 
    const formattedDate = useMemo(() => {
-      return workout.date.toISOString().slice(0, 10);
+      return workout.date.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1");
    }, [workout.date]);
 
    const handleWorkoutToggle = useCallback(() => {
@@ -133,7 +133,7 @@ function Row(props: RowProps) {
                   <div className = "relative order-2 flex size-36 items-center justify-center min-[275px]:size-44 min-[375px]:size-52 lg:order-none lg:size-36">
                      <Image
                         fill
-                        loading = "eager"
+                        priority
                         quality = { 100 }
                         sizes = "100%"
                         src = { workout.image }
@@ -146,13 +146,8 @@ function Row(props: RowProps) {
                ) : (
                   <div className = "order-2 flex size-36 items-center justify-center overflow-hidden rounded-full min-[275px]:size-44 min-[375px]:size-52 lg:order-none lg:size-36">
                      <FontAwesomeIcon
-                        className = {
-                           clsx("text-[3.75rem] min-[275px]:text-[3.8rem] min-[375px]:text-[4.3rem] lg:text-5xl", {
-                              "text-primary": isValidImage,
-                              "text-red-500": !isValidImage
-                           })
-                        }
-                        icon = { !isValidImage ? faTriangleExclamation : faImage }
+                        className = "text-[3.75rem] text-primary min-[275px]:text-[3.8rem] min-[375px]:text-[4.3rem] lg:text-5xl"
+                        icon = { faImage }
                      />
                   </div>
                )
@@ -171,8 +166,8 @@ function Row(props: RowProps) {
                >
                   <div className = "block px-8 pt-2 lg:pt-0">
                      <FontAwesomeIcon
-                        icon = { faPencil }
-                        className = " cursor-pointer text-xl text-primary transition duration-300 ease-in-out hover:scale-125 lg:text-lg"
+                        icon = { faPenToSquare }
+                        className = " cursor-pointer text-xl text-primary hover:text-primary/80 lg:text-lg"
                      />
                   </div>
                </div>
@@ -236,7 +231,7 @@ export default function Table(props: TableProps): JSX.Element {
    ]);
 
    const handleWorkoutDelete = useCallback(async() => {
-      const response: VitalityResponse<number> = await deleteWorkouts(Array.from(visibleSelectedWorkouts), user.id);
+      const response: VitalityResponse<number> = await deleteWorkouts(user.id, Array.from(visibleSelectedWorkouts));
 
       handleResponse(response, globalDispatch, updateNotification, () => {
          const newWorkouts: Workout[] = [...globalState.workouts.value].filter((w: Workout) => {
@@ -343,7 +338,7 @@ export default function Table(props: TableProps): JSX.Element {
                visibleSelectedWorkouts.size > 0 && (
                   <Confirmation
                      message = { `Delete ${visibleSelectedWorkouts.size} workout${visibleSelectedWorkouts.size === 1 ? "" : "s"}?` }
-                     onConfirmation = { () => handleWorkoutDelete() }
+                     onConfirmation = { handleWorkoutDelete }
                      icon
                   />
                )

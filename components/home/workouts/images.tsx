@@ -4,6 +4,7 @@ import Button from "@/components/global/button";
 import Modal from "@/components/global/modal";
 import { useCallback, useMemo, useState } from "react";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { workoutsImageRegex } from "@/lib/home/workouts/regex";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Input, VitalityInputProps } from "@/components/global/input";
 import { faCameraRetro, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
@@ -21,9 +22,6 @@ const images = [
    "weights.png"
 ];
 
-const nextMediaRegex =
-  /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
-
 interface ImagesFormProps extends VitalityInputProps {
    url: string;
    isValidResource: boolean;
@@ -32,7 +30,7 @@ interface ImagesFormProps extends VitalityInputProps {
 
 function ImagesForm(props: ImagesFormProps): JSX.Element {
    const { url, isValidURL, isValidResource, input, dispatch } = props;
-   const [isDefaultImage, setIsDefaultImage] = useState<boolean>(url === "" || nextMediaRegex.test(url));
+   const [isDefaultImage, setIsDefaultImage] = useState<boolean>(url === "" || workoutsImageRegex.test(url));
 
    const handleImageURLUpdates = useCallback(() => {
       dispatch({
@@ -84,7 +82,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
             id: "image",
             input: {
                ...input,
-               error: "Failed to fetch your desired image resource.",
+               error: "Failed to fetch your desired image resource",
                data: {
                   ...input.data,
                   valid: false
@@ -208,13 +206,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                        }
                                     )
                                  }
-                                 onKeyDown = {
-                                    (event) => {
-                                       if (event.key === "Enter" || event.key === " ") {
-                                          !isSelected ? handleDefaultImageSelection(source) : handleResetImageURL();
-                                       }
-                                    }
-                                 }
+                                 onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && !isSelected ? handleDefaultImageSelection(source) : handleResetImageURL() }
                                  onClick = { () => !isSelected ? handleDefaultImageSelection(source) : handleResetImageURL() }
                               />
                            </div>
@@ -224,13 +216,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                </div>
             ) : (
                <div
-                  onKeyDown = {
-                     (event: React.KeyboardEvent) => {
-                        if (event.key === "Enter" && url.length > 0) {
-                           handleImageURLUpdates();
-                        }
-                     }
-                  }
+                  onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && url.length > 0 && handleImageURLUpdates() }
                   className = "relative mx-auto size-full"
                >
                   {
@@ -267,7 +253,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  <Button
                                     type = "button"
                                     onClick = { handleResetImageURL }
-                                    className = "mt-2 h-[2.4rem] w-full bg-red-500 px-4 py-2 font-semibold text-white focus:ring-red-700"
+                                    className = "mt-2 h-10 w-full bg-red-500 px-4 py-2 font-semibold text-white focus:ring-red-700"
                                     icon = { faTrashCan }
                                  >
                                     Remove
@@ -279,7 +265,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  <Button
                                     type = "button"
                                     onClick = { handleImageURLUpdates }
-                                    className = "mt-2 h-[2.4rem] w-full bg-primary font-semibold text-white placeholder:text-transparent"
+                                    className = "mt-2 h-10 w-full bg-primary font-semibold text-white placeholder:text-transparent"
                                     icon = { faPaperclip }
                                  >
                                     Add

@@ -1,5 +1,4 @@
 /** @jest-environment jsdom */
-import Button from "@/components/global/button";
 import Select from "@/components/global/select";
 import TextArea from "@/components/global/textarea";
 import userEvent from "@testing-library/user-event";
@@ -233,36 +232,36 @@ function Component(): JSX.Element {
          >
             { state.tags.value.toString() }
          </div>
-         <Button
+         <button
             id = "initialize"
             onClick = { handleInitializeState }
          >
             Initialize State
-         </Button>
-         <Button
+         </button>
+         <button
             id = "updates"
             onClick = { handleUpdateStates }
          >
             Update States
-         </Button>
-         <Button
+         </button>
+         <button
             id = "reset"
             onClick = { handleResetState }
          >
             Reset State
-         </Button>
-         <Button
+         </button>
+         <button
             id = "errors"
             onClick = { handleUpdateErrors }
          >
             Update Errors
-         </Button>
-         <Button
+         </button>
+         <button
             id = "handles"
             onClick = { handleUpdateHandlesChanges }
          >
             Handle Changes
-         </Button>
+         </button>
       </div>
    );
 }
@@ -331,24 +330,26 @@ describe("State Management Tests", () => {
          });
 
          await act(async() => {
+            await userEvent.click(passwordIcon);
             await userEvent.type(dom.container.querySelector("#name"), "user");
             await userEvent.keyboard("{Escape}");
             await userEvent.type(dom.container.querySelector("#password"), "password");
+            await userEvent.keyboard("{Tab}");
             await userEvent.keyboard("{Enter}");
             await userEvent.type(dom.container.querySelector("#email"), "user@gmail.com");
+            await userEvent.keyboard("{Enter}");
             await userEvent.type(dom.container.querySelector("#text"), "Hello\nWorld");
             await userEvent.keyboard("{Escape}");
             await userEvent.selectOptions(dom.container.querySelector("#options"), "3");
             await userEvent.click(dom.container.querySelector("#tags"));
-            await userEvent.click(passwordIcon);
          });
 
          await waitFor(() => {
-            expect(dom.container.querySelector("#password") as HTMLInputElement).toHaveProperty("type", "password");
+            expect(dom.container.querySelector("#password") as HTMLInputElement).toHaveProperty("type", "text");
 
             validateStateChanges(dom, {
                "name": { value: "user", error: null, data: {} },
-               "password": { value: "password", error: null, data: { type: "password" } },
+               "password": { value: "password", error: null, data: { type: "text" } },
                "text": { value: "Hello\nWorld", error: null, data: {} },
                "options": { value: "3", error: null, data: {} },
                "email": { value: "user@gmail.com", error: null, data: {} },

@@ -3,7 +3,7 @@ import { prismaMock } from "@/tests/singleton";
 import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
 import { workouts } from "@/tests/home/workouts/data";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { addExercise, Exercise, getExercisesUpdates, getExerciseSetUpdates, updateExercise, updateExercises } from "@/lib/home/workouts/exercises";
+import { isEmptyExerciseSet, addExercise, Exercise, getExercisesUpdates, getExerciseSetUpdates, updateExercise, updateExercises, ExerciseSet } from "@/lib/home/workouts/exercises";
 
 const MOCK_WORKOUTS = workouts;
 const MOCK_WORKOUT: Workout = MOCK_WORKOUTS[0];
@@ -103,7 +103,7 @@ describe("Workout Exercises Tests", () => {
       for (const { exercise, errors, message } of invalidExercises) {
          expect(
             method === "create" ?
-               await addExercise(exercise) : await updateExercise(exercise, "sets")
+               await addExercise(MOCK_ID, exercise) : await updateExercise(MOCK_ID, exercise, "sets")
          ).toEqual({
             status: "Error",
             body: {
@@ -112,6 +112,8 @@ describe("Workout Exercises Tests", () => {
                errors: errors
             }
          });
+
+         message === "Exercise sets must be empty" && expect(exercise.sets.some((set: ExerciseSet) => isEmptyExerciseSet(set)));
       }
 
       // @ts-ignore
@@ -160,7 +162,7 @@ describe("Workout Exercises Tests", () => {
       for (const { exercise, expected } of invalidExercises) {
          expect(
             method === "create" ?
-               await addExercise(exercise) : await updateExercise(exercise, "sets")
+               await addExercise(MOCK_ID, exercise) : await updateExercise(MOCK_ID, exercise, "sets")
          ).toEqual(expected);
       }
 
@@ -171,7 +173,7 @@ describe("Workout Exercises Tests", () => {
       };
 
       simulateDatabaseError("exercises", method, method === "create" ?
-         async() => addExercise(exercise) : async() => updateExercise(exercise, "sets"));
+         async() => addExercise(MOCK_ID, exercise) : async() => updateExercise(MOCK_ID, exercise, "sets"));
    };
 
    const handlePrismaMockExerciseMethods = async(params, method) => {
@@ -294,7 +296,7 @@ describe("Workout Exercises Tests", () => {
             sets: []
          };
 
-         expect(await addExercise(exercise)).toEqual({
+         expect(await addExercise(MOCK_ID, exercise)).toEqual({
             status: "Success",
             body: {
                data: {
@@ -338,7 +340,7 @@ describe("Workout Exercises Tests", () => {
             name: " Updated name "
          };
 
-         expect(await updateExercise(exercise, "name")).toEqual({
+         expect(await updateExercise(MOCK_ID, exercise, "name")).toEqual({
             status: "Success",
             body: {
                data: {
@@ -421,7 +423,7 @@ describe("Workout Exercises Tests", () => {
             ]
          };
 
-         expect(await updateExercise(exercise, "sets")).toEqual({
+         expect(await updateExercise(MOCK_ID, exercise, "sets")).toEqual({
             status: "Success",
             body: {
                data: expectedNewExercise,

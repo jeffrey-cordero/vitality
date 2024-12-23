@@ -32,11 +32,16 @@ const config: Config = {
                to: {
                   opacity: "0"
                }
+            },
+            wiggle: {
+               "0%, 100%": { transform: "rotate(-5deg)" },
+               "50%": { transform: "rotate(5deg)" }
             }
          },
          animation: {
             fadeIn: "fadeIn 700ms ease-in-out forwards",
-            fadeOut: "fadeOut 700ms ease-in-out forwards"
+            fadeOut: "fadeOut 700ms ease-in-out forwards",
+            wiggle: "wiggle 700ms ease-in-out infinite"
          }
       }
    },

@@ -2,6 +2,7 @@
 import prisma from "@/lib/prisma/client";
 import { z } from "zod";
 import { uuidSchema } from "@/lib/global/zod";
+import { authorizeAction } from "@/lib/authentication/session";
 import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
 
 const colors = new Set([
@@ -46,12 +47,14 @@ const newWorkoutTagSchema = workoutTagSchema.extend({
 });
 
 export async function fetchWorkoutTags(
-   userId: string
+   user_id: string
 ): Promise<Tag[]> {
    try {
+      await authorizeAction(user_id);
+
       return await prisma.workout_tags.findMany({
          where: {
-            user_id: userId
+            user_id: user_id
          }
       });
    } catch (error) {
@@ -60,21 +63,24 @@ export async function fetchWorkoutTags(
 }
 
 export async function addWorkoutTag(
+   user_id: string,
    tag: Tag
 ): Promise<VitalityResponse<Tag>> {
-   const fields = newWorkoutTagSchema.safeParse(tag);
-
-   if (!fields.success) {
-      const errors = fields.error.flatten().fieldErrors;
-      return sendErrorMessage("Invalid workout tag fields", errors);
-   }
-
    try {
+      await authorizeAction(user_id);
+
+      const fields = newWorkoutTagSchema.safeParse(tag);
+
+      if (!fields.success) {
+         const errors = fields.error.flatten().fieldErrors;
+         return sendErrorMessage("Invalid workout tag fields", errors);
+      }
+
       // Workout tags are unique based on their titles
       const existingTag = await prisma.workout_tags.findFirst({
          where: {
             title: tag.title.trim(),
-            user_id: tag.user_id
+            user_id: user_id
          }
       });
 
@@ -86,7 +92,7 @@ export async function addWorkoutTag(
 
       const newTag: Tag = await prisma.workout_tags.create({
          data: {
-            user_id: tag.user_id,
+            user_id: user_id,
             title: tag.title.trim(),
             color: tag.color.trim()
          }
@@ -99,24 +105,27 @@ export async function addWorkoutTag(
 }
 
 export async function updateWorkoutTag(
+   user_id: string,
    tag: Tag,
    method: "update" | "delete"
 ): Promise<VitalityResponse<Tag>> {
-   const fields = workoutTagSchema.safeParse(tag);
-
-   if (!fields.success) {
-      return sendErrorMessage(
-         "Invalid workout tag fields",
-         fields.error.flatten().fieldErrors
-      );
-   }
-
    try {
+      await authorizeAction(user_id);
+
+      const fields = workoutTagSchema.safeParse(tag);
+
+      if (!fields.success) {
+         return sendErrorMessage(
+            "Invalid workout tag fields",
+            fields.error.flatten().fieldErrors
+         );
+      }
+
       // Ensure the workout tag already exists
       const existingTag = await prisma.workout_tags.findFirst({
          where: {
             id: tag.id.trim(),
-            user_id: tag.user_id.trim()
+            user_id: user_id.trim()
          }
       });
 
@@ -134,7 +143,7 @@ export async function updateWorkoutTag(
             const workoutTagTitleEntry = await prisma.workout_tags.findFirst({
                where: {
                   title: tag.title.trim(),
-                  user_id: tag.user_id,
+                  user_id: user_id,
                   NOT: {
                      id: tag.id
                   }
@@ -151,7 +160,7 @@ export async function updateWorkoutTag(
                const newTag = await prisma.workout_tags.update({
                   where: {
                      id: tag.id,
-                     user_id: tag.user_id
+                     user_id: user_id
                   },
                   data: {
                      title: tag.title.trim(),
@@ -165,7 +174,7 @@ export async function updateWorkoutTag(
             const deletedTag = await prisma.workout_tags.delete({
                where: {
                   id: tag.id,
-                  user_id: tag.user_id
+                  user_id: user_id
                }
             });
 

@@ -1,7 +1,7 @@
 {
   "root": true,
   "extends": ["next/core-web-vitals", "plugin:tailwindcss/recommended"],
-  "plugins": ["react", "tailwindcss"],
+  "plugins": ["react", "tailwindcss", "@typescript-eslint"],
   "rules": {
     "indent": ["error", 3, { "SwitchCase": 1 }],
     "quotes": ["error", "double"],

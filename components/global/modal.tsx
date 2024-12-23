@@ -7,10 +7,11 @@ interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
   display: React.ReactNode;
   children: React.ReactNode;
   onClose?: () => void;
+  disabled?: boolean;
 }
 
 const Modal = forwardRef(function Modal(props: ModalProps, ref) {
-   const { display, children, className, onClick, onClose } = props;
+   const { display, children, className, onClick, onClose, disabled } = props;
    const [open, setOpen] = useState<boolean>(false);
    const modalRef = useRef(null);
 
@@ -27,13 +28,14 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
 
    useImperativeHandle(ref, () => ({
       close: handleOnClose,
-      open: handleOnOpen
+      open: handleOnOpen,
+      isOpen: () => open
    }));
 
    useEffect(() => {
       const modals = document.getElementsByClassName("modal");
 
-      if (modals.length > 0) {
+      if (modals.length > 0 && open) {
          document.body.parentElement.style.overflowY = "hidden";
       }
 
@@ -42,12 +44,12 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
             document.body.parentElement.style.overflowY = "initial";
          }
       };
-   }, []);
+   }, [open]);
 
    return (
       <div className = "relative">
          <div
-            onClick = { handleOnOpen }
+            onClick = { disabled !== true ? handleOnOpen : undefined }
          >
             { display }
          </div>

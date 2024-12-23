@@ -55,7 +55,7 @@ describe("Workouts Tests", () => {
       for (const { workout, errors } of invalidWorkouts) {
          expect(
             method === "create" ?
-               await addWorkout(workout) : await updateWorkout(workout)
+               await addWorkout(root.id, workout) : await updateWorkout(root.id, workout)
          ).toEqual({
             status: "Error",
             body: {
@@ -98,7 +98,7 @@ describe("Workouts Tests", () => {
       for (const { workout, expected } of invalidWorkouts) {
          expect(
             method === "create"
-               ? await addWorkout(workout) : await updateWorkout(workout)
+               ? await addWorkout(workout.user_id, workout) : await updateWorkout(workout.user_id, workout)
          ).toEqual(expected);
       }
 
@@ -108,7 +108,7 @@ describe("Workouts Tests", () => {
       };
 
       simulateDatabaseError("workouts", method, method === "create" ?
-         async() => addWorkout(workout) : async() =>  updateWorkout(workout)
+         async() => addWorkout(root.id, workout) : async() =>  updateWorkout(root.id, workout)
       );
    };
 
@@ -302,7 +302,7 @@ describe("Workouts Tests", () => {
             exercises: []
          };
 
-         expect(await addWorkout(workout)).toEqual({
+         expect(await addWorkout(root.id, workout)).toEqual({
             status: "Success",
             body: {
                data: formateDatabaseWorkout({
@@ -369,7 +369,7 @@ describe("Workouts Tests", () => {
             exercises: []
          };
 
-         expect(await updateWorkout(workout)).toEqual({
+         expect(await updateWorkout(root.id, workout)).toEqual({
             status: "Success",
             body: {
                data: {
@@ -426,7 +426,7 @@ describe("Workouts Tests", () => {
             user_id: ""
          };
 
-         expect(await deleteWorkouts([workout], workout.user_id)).toEqual({
+         expect(await deleteWorkouts(workout.user_id, [workout])).toEqual({
             status: "Error",
             body: {
                data: null,
@@ -443,7 +443,7 @@ describe("Workouts Tests", () => {
             id: ""
          };
 
-         expect(await deleteWorkouts([workout], workout.user_id)).toEqual({
+         expect(await deleteWorkouts( workout.user_id, [workout])).toEqual({
             status: "Error",
             body: {
                data: null,
@@ -466,7 +466,7 @@ describe("Workouts Tests", () => {
             image: ""
          };
 
-         expect(await deleteWorkouts([workout], workout.user_id)).toEqual({
+         expect(await deleteWorkouts(workout.user_id, [workout])).toEqual({
             status: "Failure",
             body: {
                data: null,
@@ -484,7 +484,7 @@ describe("Workouts Tests", () => {
          // Delete single workout
          workout = workouts[0];
 
-         expect(await deleteWorkouts([workout], workout.user_id)).toEqual({
+         expect(await deleteWorkouts(workout.user_id, [workout])).toEqual({
             status: "Success",
             body: { data: 1, message: "Deleted 1 workout", errors: {} }
          });
@@ -499,8 +499,8 @@ describe("Workouts Tests", () => {
          // Delete multiple workouts while including missing workouts
          expect(
             await deleteWorkouts(
+               workout.user_id,
                [workouts[0], workouts[1], workouts[2]],
-               workout.user_id
             )
          ).toEqual({
             status: "Success",
@@ -517,7 +517,7 @@ describe("Workouts Tests", () => {
          expect(Object.keys(workoutsById).length).toBe(0);
 
          // Empty workouts array
-         expect(await deleteWorkouts([], workout.user_id)).toEqual({
+         expect(await deleteWorkouts(workout.user_id, [])).toEqual({
             status: "Success",
             body: { data: 0, message: "Deleted 0 workouts", errors: {} }
          });

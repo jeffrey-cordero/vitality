@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import Button from "@/components/global/button";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { VitalityAction, VitalityInputState } from "@/lib/global/state";
@@ -17,7 +16,7 @@ export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
 
 export function Input(props: VitalityInputProps): JSX.Element {
    const { id, label, type, icon, placeholder, className, min, autoFocus, scrollIntoView,
-      autoComplete, onChange, onSubmit, required, input, dispatch } = props;
+      autoComplete, onChange, onBlur, onSubmit, required, input, dispatch, disabled } = props;
    const inputType = input.data.type ?? type;
    const inputRef = useRef<HTMLInputElement>(null);
    const passwordIconRef = useRef<SVGSVGElement | null>(null);
@@ -68,6 +67,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
       } else if (inputRef.current && event.key === "Enter") {
          // Call the relative form submission method, if any
          onSubmit?.call(null);
+         inputRef.current?.blur();
       }
    }, [onSubmit]);
 
@@ -114,11 +114,14 @@ export function Input(props: VitalityInputProps): JSX.Element {
                }
                onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event) }
                onChange = { (event: ChangeEvent<HTMLInputElement>) => handleInputChange(event) }
+               onBlur = { onBlur ?? undefined }
+               disabled = { disabled ?? false }
             />
             {
                (inputType === "password" || passwordIconRef.current !== null) && (
-                  <Button
-                     tabIndex = { -1 }
+                  <button
+                     tabIndex = { 0 }
+                     onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && handlePasswordIconClick() }
                      type = "button"
                      className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
                   >
@@ -132,12 +135,12 @@ export function Input(props: VitalityInputProps): JSX.Element {
                         }
                         onClick = { handlePasswordIconClick }
                      />
-                  </Button>
+                  </button>
                )
             }
             {
                input.data.valid !== undefined && (
-                  <Button
+                  <button
                      tabIndex = { -1 }
                      type = "button"
                      className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
@@ -151,7 +154,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                            })
                         }
                      />
-                  </Button>
+                  </button>
                )
             }
             <label

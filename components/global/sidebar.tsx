@@ -7,9 +7,7 @@ import { useContext, useEffect, useState } from "react";
 import { endSession } from "@/lib/authentication/session";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faHouse, faUtensils, faBrain,
-   faHeartCircleBolt, faBullseye, faShuffle, faPeopleGroup, faHandshakeAngle, faGears, faBars,
-   faDumbbell, faRightFromBracket, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faGears, faBars, faDumbbell, faRightFromBracket, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 
 interface SideBarProps {
   name: string;
@@ -25,15 +23,7 @@ const landingLinks: SideBarProps[] = [
 ];
 
 const homeLinks: SideBarProps[] = [
-   { name: "Home", href: "/home", icon: faHouse },
    { name: "Workouts", href: "/home/workouts", icon: faDumbbell },
-   { name: "Nutrition", href: "/home/nutrition", icon: faUtensils },
-   { name: "Mood", href: "/home/mood", icon: faBrain },
-   { name: "Health", href: "/home/health", icon: faHeartCircleBolt },
-   { name: "Goals", href: "/home/goals", icon: faBullseye },
-   { name: "Progress", href: "/home/progress", icon: faShuffle },
-   { name: "Community", href: "/home/community", icon: faPeopleGroup },
-   { name: "Support", href: "/home/support", icon: faHandshakeAngle },
    { name: "Settings", href: "/home/settings", icon: faGears },
    { name: "Theme", href: "\0", icon: null },
    { name: "Sign Out", href: "\0", icon: faRightFromBracket }
@@ -70,7 +60,7 @@ function SideBarLinks(): JSX.Element {
                            {
                               "bg-sky-100 dark:bg-slate-700 text-primary": pathname === link.href,
                               "hover:text-yellow-400": isTheme,
-                              "hover:text-red-500": isSignOut
+                              "text-red-500 hover:text-red-600": isSignOut
                            },
                         )
                      }
@@ -140,14 +130,7 @@ export function SideBar(): JSX.Element {
                   )
                }
             >
-               <div
-                  className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-[0.6rem] py-4 shadow-md xxsm:px-3 dark:bg-slate-800"
-                  onMouseEnter = {
-                     () => {
-                        setVisibleSideBar(true);
-                     }
-                  }
-               >
+               <div className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-[0.6rem] py-4 shadow-md xxsm:px-3 dark:bg-slate-800">
                   <div className = "flex flex-col justify-center space-x-2 space-y-2 text-center">
                      <div className = "flex size-full flex-col items-center justify-between text-center">
                         <SideBarLinks />
