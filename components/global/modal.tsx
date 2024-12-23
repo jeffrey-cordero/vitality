@@ -28,7 +28,8 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
 
    useImperativeHandle(ref, () => ({
       close: handleOnClose,
-      open: handleOnOpen
+      open: handleOnOpen,
+      isOpen: () => open
    }));
 
    useEffect(() => {

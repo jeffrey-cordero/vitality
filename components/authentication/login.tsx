@@ -3,7 +3,7 @@ import Link from "next/link";
 import Heading from "@/components/global/heading";
 import Button from "@/components/global/button";
 import { Input } from "@/components/global/input";
-import { FormEvent, useContext, useReducer } from "react";
+import { useCallback, useContext, useReducer, useRef } from "react";
 import { handleResponse } from "@/lib/global/response";
 import { login, Credentials } from "@/lib/authentication/login";
 import { VitalityState, formReducer } from "@/lib/global/state";
@@ -27,10 +27,9 @@ const credentials: VitalityState = {
 export default function Login(): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, credentials);
+   const loginButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
-   const handleAuthenticate = async(event: FormEvent) => {
-      event.preventDefault();
-
+   const handleAuthenticate = useCallback(async() => {
       const credentials: Credentials = {
          username: state.username.value.trim(),
          password: state.password.value.trim()
@@ -39,7 +38,15 @@ export default function Login(): JSX.Element {
       handleResponse(await login(credentials), dispatch, updateNotification, () => {
          window.location.reload();
       });
-   };
+   }, [
+      state.username,
+      state.password,
+      updateNotification
+   ]);
+
+   const handleSubmitAuthentication = useCallback(() => {
+      loginButtonRef.current?.submit();
+   }, []);
 
    return (
       <div className = "mx-auto mb-12 flex w-full flex-col items-center justify-center text-center">
@@ -48,10 +55,7 @@ export default function Login(): JSX.Element {
             description = "Enter valid credentials to enter"
          />
          <div className = "mx-auto mt-8 w-11/12 sm:w-3/4 xl:w-5/12">
-            <form
-               className = "relative flex w-full flex-col items-stretch justify-center gap-3"
-               onSubmit = { handleAuthenticate }
-            >
+            <div className = "relative flex w-full flex-col items-stretch justify-center gap-3">
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
                   onClick = {
@@ -71,6 +75,7 @@ export default function Login(): JSX.Element {
                   icon = { faUserSecret }
                   input = { state.username }
                   dispatch = { dispatch }
+                  onSubmit = { handleSubmitAuthentication }
                   autoFocus
                   required
                />
@@ -82,16 +87,21 @@ export default function Login(): JSX.Element {
                   icon = { faKey }
                   input = { state.password }
                   dispatch = { dispatch }
+                  onSubmit = { handleSubmitAuthentication }
                   required
                />
                <Button
+                  ref = { loginButtonRef }
                   type = "submit"
                   className = "h-[2.6rem] bg-primary text-white"
                   icon = { faUnlockKeyhole }
+                  onSubmit = { handleAuthenticate }
+                  onClick = { handleSubmitAuthentication }
+                  isSingleSubmission = { true }
                >
                   Log In
                </Button>
-            </form>
+            </div>
             <p className = "mt-4 px-2">
                Don&apos;t have an account? { " " }
                <Link

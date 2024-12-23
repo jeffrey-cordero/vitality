@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import Button from "@/components/global/button";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { VitalityAction, VitalityInputState } from "@/lib/global/state";
@@ -68,6 +67,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
       } else if (inputRef.current && event.key === "Enter") {
          // Call the relative form submission method, if any
          onSubmit?.call(null);
+         inputRef.current?.blur();
       }
    }, [onSubmit]);
 
@@ -119,8 +119,9 @@ export function Input(props: VitalityInputProps): JSX.Element {
             />
             {
                (inputType === "password" || passwordIconRef.current !== null) && (
-                  <Button
-                     tabIndex = { -1 }
+                  <button
+                     tabIndex = { 0 }
+                     onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && handlePasswordIconClick() }
                      type = "button"
                      className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
                   >
@@ -134,12 +135,12 @@ export function Input(props: VitalityInputProps): JSX.Element {
                         }
                         onClick = { handlePasswordIconClick }
                      />
-                  </Button>
+                  </button>
                )
             }
             {
                input.data.valid !== undefined && (
-                  <Button
+                  <button
                      tabIndex = { -1 }
                      type = "button"
                      className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
@@ -153,7 +154,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                            })
                         }
                      />
-                  </Button>
+                  </button>
                )
             }
             <label

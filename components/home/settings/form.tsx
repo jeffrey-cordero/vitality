@@ -123,9 +123,9 @@ export default function Form(): JSX.Element {
             },
             phone: {
                ...globalState.phone,
-               value: attributes.phone,
+               value: attributes.phone ?? "",
                data: {
-                  stored: attributes.phone,
+                  stored: attributes.phone ?? "",
                   verified: attributes.phone_verified
                }
             },
@@ -233,29 +233,18 @@ export default function Form(): JSX.Element {
                         !isEditingImage ? (
                            <div className = "relative flex flex-col items-center justify-center gap-4">
                               <div className = "relative flex size-32 flex-col items-center justify-center overflow-hidden rounded-full border-[3px] border-primary shadow-md min-[225px]:size-40 xxsm:size-44">
-                                 {
-                                    globalState.image.data.valid !== false ? (
-                                       <Image
-                                          fill
-                                          priority
-                                          tabIndex = { 0 }
-                                          quality = { 100 }
-                                          sizes = "100%"
-                                          src = { imageURL === "" ? "/settings/default.png" : imageURL }
-                                          alt = "workout-image"
-                                          className = "object-cover object-center shadow-md"
-                                          onLoad = { () => globalState.image.data.valid === false && handleVerifyImageResource(true) }
-                                          onErrorCapture = { () => handleVerifyImageResource(false) }
-                                       />
-                                    ) : (
-                                       <div className = "flex size-full items-center justify-center">
-                                          <FontAwesomeIcon
-                                             icon = { faImage }
-                                             className = "text-7xl text-red-500"
-                                          />
-                                       </div>
-                                    )
-                                 }
+                                 <Image
+                                    fill
+                                    priority
+                                    tabIndex = { 0 }
+                                    quality = { 100 }
+                                    sizes = "100%"
+                                    src = { imageURL === "" || globalState.image.data.valid === false ? "/settings/default.png" : imageURL }
+                                    alt = "workout-image"
+                                    className = "bg-gray-50 object-cover object-center shadow-md dark:bg-gray-200"
+                                    onLoad = { () => globalState.image.data.valid === false && handleVerifyImageResource(true) }
+                                    onErrorCapture = { () => handleVerifyImageResource(false) }
+                                 />
                               </div>
                               <FontAwesomeIcon
                                  icon = { faPenToSquare }

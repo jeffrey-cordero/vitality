@@ -5,7 +5,7 @@ import { VitalityProps } from "@/lib/global/state";
 import { useEffect, useMemo, useState } from "react";
 import { Workout } from "@/lib/home/workouts/workouts";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
-import { faImage, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface CardProps extends CardsProps {
@@ -75,7 +75,7 @@ function Card(props: CardProps): JSX.Element {
                });
             }
          }
-         className = "relative mx-0 flex h-[27rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md md:h-[23rem] md:w-72"
+         className = "relative mx-0 flex h-[27rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-[1.03] focus:scale-[1.03] md:h-[23rem] md:w-72"
       >
          <div className = "relative mx-auto size-full">
             {
@@ -94,13 +94,8 @@ function Card(props: CardProps): JSX.Element {
                ) : (
                   <div className = "absolute flex size-full items-center justify-center bg-white opacity-40">
                      <FontAwesomeIcon
-                        className = {
-                           clsx("text-7xl", {
-                              "text-primary" : isValidImage,
-                              "text-red-500" : !isValidImage
-                           })
-                        }
-                        icon = { !isValidImage ? faTriangleExclamation : faImage }
+                        className = "text-7xl text-primary"
+                        icon = { faImage }
                      />
                   </div>
                )

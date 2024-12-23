@@ -3,7 +3,7 @@ import { prismaMock } from "@/tests/singleton";
 import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
 import { workouts } from "@/tests/home/workouts/data";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { addExercise, Exercise, getExercisesUpdates, getExerciseSetUpdates, updateExercise, updateExercises } from "@/lib/home/workouts/exercises";
+import { isEmptyExerciseSet, addExercise, Exercise, getExercisesUpdates, getExerciseSetUpdates, updateExercise, updateExercises, ExerciseSet } from "@/lib/home/workouts/exercises";
 
 const MOCK_WORKOUTS = workouts;
 const MOCK_WORKOUT: Workout = MOCK_WORKOUTS[0];
@@ -112,6 +112,8 @@ describe("Workout Exercises Tests", () => {
                errors: errors
             }
          });
+
+         message === "Exercise sets must be empty" && expect(exercise.sets.some((set: ExerciseSet) => isEmptyExerciseSet(set)));
       }
 
       // @ts-ignore

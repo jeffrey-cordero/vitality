@@ -8,8 +8,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { deleteWorkouts, Workout } from "@/lib/home/workouts/workouts";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import { faImage, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { faImage, faPenToSquare, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 
 interface RowProps extends VitalityProps {
    workout: Workout;
@@ -146,13 +146,8 @@ function Row(props: RowProps) {
                ) : (
                   <div className = "order-2 flex size-36 items-center justify-center overflow-hidden rounded-full min-[275px]:size-44 min-[375px]:size-52 lg:order-none lg:size-36">
                      <FontAwesomeIcon
-                        className = {
-                           clsx("text-[3.75rem] min-[275px]:text-[3.8rem] min-[375px]:text-[4.3rem] lg:text-5xl", {
-                              "text-primary": isValidImage,
-                              "text-red-500": !isValidImage
-                           })
-                        }
-                        icon = { !isValidImage ? faTriangleExclamation : faImage }
+                        className = "text-[3.75rem] text-primary min-[275px]:text-[3.8rem] min-[375px]:text-[4.3rem] lg:text-5xl"
+                        icon = { faImage }
                      />
                   </div>
                )
@@ -343,7 +338,7 @@ export default function Table(props: TableProps): JSX.Element {
                visibleSelectedWorkouts.size > 0 && (
                   <Confirmation
                      message = { `Delete ${visibleSelectedWorkouts.size} workout${visibleSelectedWorkouts.size === 1 ? "" : "s"}?` }
-                     onConfirmation = { () => handleWorkoutDelete() }
+                     onConfirmation = { handleWorkoutDelete }
                      icon
                   />
                )

@@ -4,13 +4,13 @@ import Loading from "@/components/global/loading";
 import Confirmation from "@/components/global/confirmation";
 import Modal from "@/components/global/modal";
 import { Input } from "@/components/global/input";
-import { faGear, faXmark, faCloudArrowUp, faTag, faArrowRotateLeft, faGears, faTags } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { addWorkoutTag, updateWorkoutTag, Tag } from "@/lib/home/workouts/tags";
+import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
+import { addWorkoutTag, updateWorkoutTag, Tag } from "@/lib/home/workouts/tags";
 import { VitalityChildProps, VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
+import { faXmark, faTag, faGears, faTags, faPenToSquare, faBan } from "@fortawesome/free-solid-svg-icons";
 
 const form: VitalityState = {
    tagTitle: {
@@ -63,13 +63,7 @@ function CreateTagContainer(props: CreateTagContainerProps) {
          className = "mx-auto mb-2 mt-4 flex max-w-full cursor-pointer flex-row flex-wrap items-center justify-center gap-x-2 rounded-full px-5 py-[0.6rem] text-sm font-bold text-white transition duration-300 ease-in-out hover:scale-[1.03] focus:scale-[1.03] focus:outline-blue-500"
          style = { { backgroundColor: randomColor } }
          onClick = { onSubmit }
-         onKeyDown = {
-            (event: React.KeyboardEvent) => {
-               if (event.key === "Enter") {
-                  onSubmit();
-               }
-            }
-         }
+         onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && onSubmit() }
       >
          <p className = "mx-auto line-clamp-1 max-w-full cursor-pointer text-ellipsis break-all text-center">{ search }</p>
          <FontAwesomeIcon icon = { faTags } />
@@ -114,9 +108,9 @@ function TagColorInput(props: VitalityChildProps) {
                      style = { { backgroundColor: color } }
                      className = {
                         clsx(
-                           "flex h-[2.7rem] w-full cursor-pointer items-center justify-center rounded-lg border-2 p-1 text-center text-sm text-white focus:border-0",
+                           "flex h-[2.7rem] w-full cursor-pointer items-center justify-center rounded-lg border-2 p-1 text-center text-sm text-white transition duration-300 ease-in-out focus:border-0 xxsm:text-sm",
                            {
-                              "border-primary border-[3px] shadow-2xl": localState.tagColor.value === color,
+                              "scale-[1.07]": localState.tagColor.value === color,
                               "border-white dark:border-slate-800": localState.tagColor.value !== color
                            },
                         )
@@ -137,7 +131,7 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const { tag, globalState, globalDispatch, localState, localDispatch } = props;
-   const saveButtonRef = useRef<{ displaySave: () => void; }>(null);
+   const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
    const handleTagUpdates = useCallback(
       async(method: "update" | "delete") => {
@@ -207,8 +201,6 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
                   message: "Deleted workout tag",
                   timer: 1000
                });
-
-               saveButtonRef.current?.displaySave();
             });
          } else {
             // Handle error response uniquely by mapping response identifiers to local state identifiers
@@ -239,11 +231,15 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
       ],
    );
 
+   const handleSubmitUpdates = useCallback(() => {
+      updateButtonRef.current?.submit();
+   }, []);
+
    return (
       <div className = "flex flex-col items-stretch justify-center gap-3 text-center text-black dark:text-white">
          <div className = "flex flex-col items-center justify-center gap-3 text-center">
             <FontAwesomeIcon
-               icon = { faGear }
+               icon = { faTag }
                className = "mt-6 text-5xl text-primary"
             />
             <h1 className = "mb-2 px-2 text-2xl font-bold">
@@ -257,7 +253,7 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
             icon = { faTag }
             input = { localState.tagTitle }
             dispatch = { localDispatch }
-            onSubmit = { () => handleTagUpdates("update") }
+            onSubmit = { handleSubmitUpdates }
             autoFocus
             required
          />
@@ -274,19 +270,20 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
             }
          </div>
          <div className = "flex flex-col gap-2">
-            <Confirmation
-               message = "Delete this tag?"
-               onConfirmation = { () => handleTagUpdates("delete") }
-            />
             <Button
-               ref = { saveButtonRef }
+               ref = { updateButtonRef }
                type = "submit"
                className = "h-10 w-full bg-primary text-white"
-               icon = { faCloudArrowUp }
-               onClick = { () => handleTagUpdates("update") }
+               icon = { faPenToSquare }
+               onSubmit = { () => handleTagUpdates("update") }
+               onClick = { handleSubmitUpdates }
             >
-               Save
+               Update
             </Button>
+            <Confirmation
+               message = "Delete this tag?"
+               onConfirmation = { async() => await handleTagUpdates("delete") }
+            />
          </div>
       </div>
    );
@@ -362,7 +359,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
       <li
          className = {
             clsx(
-               "relative m-2 rounded-full px-5 py-2 text-[0.8rem] font-bold text-white",
+               "relative m-2 rounded-full px-5 py-2 text-[0.75rem] font-bold text-white xxsm:text-[0.8rem]",
             )
          }
          style = {
@@ -396,7 +393,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                         <FontAwesomeIcon
                            icon = { faGears }
                            onClick = { handleTagEdits }
-                           className = "cursor-pointer pt-1 text-sm hover:text-primary"
+                           className = "cursor-pointer pt-1 text-sm hover:opacity-70"
                         />
                      }
                      className = "mt-12 max-h-[90%] max-w-[95%] sm:max-w-xl"
@@ -587,9 +584,9 @@ export default function Tags(props: TagsProps): JSX.Element {
                         onReset && (
                            <div className = "relative mt-6">
                               <FontAwesomeIcon
-                                 icon = { faArrowRotateLeft }
+                                 icon = { faBan }
                                  onClick = { onReset }
-                                 className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
+                                 className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-red-500"
                               />
                            </div>
                         )

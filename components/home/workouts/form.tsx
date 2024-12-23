@@ -50,8 +50,8 @@ export default function Form(props: VitalityProps): JSX.Element {
    const [localState, localDispatch] = useReducer(formReducer, form);
    const [displayingFormModal, setDisplayingFormModal] = useState<boolean>(false);
    const displayFormModal: boolean = globalState.workout.data.display;
-   const formModalRef = useRef<{ open: () => void; close: () => void }>(null);
-   const saveButtonRef = useRef<{ displaySave: () => void; }>(null);
+   const formModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
+   const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
    // Fetching editing workout from global state
    const workout: Workout = globalState.workout.value;
@@ -135,7 +135,6 @@ export default function Form(props: VitalityProps): JSX.Element {
          const pages: number = Math.ceil(newWorkouts.length / globalState.paging.value);
          const page: number = globalState.page.value;
 
-         // Update editing workout and overall workouts global state
          globalDispatch({
             type: "updateStates",
             value: {
@@ -143,8 +142,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                   ...globalState.workout,
                   value: newWorkout,
                   data: {
-                     ...globalState.workout.data,
-                     display: method === "delete" ? false : true
+                     display: method === "delete" ? false : formModalRef.current?.isOpen()
                   }
                },
                workouts: {
@@ -170,11 +168,13 @@ export default function Form(props: VitalityProps): JSX.Element {
                message: "Deleted workout",
                timer: 1000
             });
-         } else {
-            method !== "add" && saveButtonRef.current?.displaySave();
          }
       });
    };
+
+   const handleSubmitUpdates = useCallback(() => {
+      updateButtonRef.current?.submit();
+   }, []);
 
    const handleDisplayWorkoutForm = useCallback(() => {
       // Update workout tag selection form inputs
@@ -273,7 +273,8 @@ export default function Form(props: VitalityProps): JSX.Element {
       });
 
       setDisplayingFormModal(false);
-   }, [globalDispatch,
+   }, [
+      globalDispatch,
       globalState.workout,
       user
    ]);
@@ -306,9 +307,8 @@ export default function Form(props: VitalityProps): JSX.Element {
 
    useEffect(() => {
       if (displayFormModal && !displayingFormModal) {
-         setDisplayingFormModal(true);
-         handleDisplayWorkoutForm();
          formModalRef.current?.open();
+         setDisplayingFormModal(true);
       }
    }, [
       displayFormModal,
@@ -348,7 +348,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      icon = { faSignature }
                      input = { localState.title }
                      dispatch = { localDispatch }
-                     onSubmit = { () => handleUpdateWorkout(isNewWorkout ? "add" : "update") }
+                     onSubmit = { handleSubmitUpdates }
                      autoFocus
                      required
                   />
@@ -359,7 +359,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      icon = { faCalendar }
                      input = { localState.date }
                      dispatch = { localDispatch }
-                     onSubmit = { () => handleUpdateWorkout(isNewWorkout ? "add" : "update") }
+                     onSubmit = { handleSubmitUpdates }
                      required
                   />
                   <Tags
@@ -379,23 +379,25 @@ export default function Form(props: VitalityProps): JSX.Element {
                      label = "Description"
                      icon = { faBook }
                      input = { localState.description }
-                     onSubmit = { () => handleUpdateWorkout(isNewWorkout ? "add" : "update") }
+                     onSubmit = { handleSubmitUpdates }
                      dispatch = { localDispatch }
                   />
                   <Button
-                     ref = { saveButtonRef }
+                     ref = { updateButtonRef }
                      icon = { faPenToSquare }
                      type = "button"
                      className = "h-10 bg-primary text-white"
-                     onClick = { () => handleUpdateWorkout(isNewWorkout ? "add" : "update") }
+                     onSubmit = { () => handleUpdateWorkout(isNewWorkout ? "add" : "update") }
+                     onClick = { handleSubmitUpdates }
+                     isSingleSubmission = { isNewWorkout ? true : undefined }
                   >
                      { isNewWorkout ? "Create" : "Update" }
                   </Button>
                   {
                      !isNewWorkout && (
                         <Confirmation
-                           message = "Delete this workout?"
-                           onConfirmation = { () => handleUpdateWorkout("delete") }
+                           message = "Delete workout?"
+                           onConfirmation = { async() => await handleUpdateWorkout("delete") }
                         />
                      )
                   }

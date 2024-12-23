@@ -80,13 +80,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                <FontAwesomeIcon
                   tabIndex = { 0 }
                   icon = { faAnglesLeft }
-                  onKeyDown = {
-                     (event: React.KeyboardEvent) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                           handleLeftClick();
-                        }
-                     }
-                  }
+                  onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && handleLeftClick() }
                   className = "cursor-pointer text-xl text-primary hover:text-primary/60 focus:border-transparent focus:text-primary/60 focus:outline-0"
                   onClick = { handleLeftClick }
                />
@@ -145,13 +139,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                <FontAwesomeIcon
                   tabIndex = { 0 }
                   icon = { faAnglesRight }
-                  onKeyDown = {
-                     (event: React.KeyboardEvent) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                           handleRightClick();
-                        }
-                     }
-                  }
+                  onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && handleRightClick() }
                   className = "cursor-pointer text-xl text-primary hover:text-primary/60 focus:border-transparent focus:text-primary/60 focus:outline-0"
                   onClick = { handleRightClick }
                />

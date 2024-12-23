@@ -206,13 +206,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                        }
                                     )
                                  }
-                                 onKeyDown = {
-                                    (event) => {
-                                       if (event.key === "Enter" || event.key === " ") {
-                                          !isSelected ? handleDefaultImageSelection(source) : handleResetImageURL();
-                                       }
-                                    }
-                                 }
+                                 onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && !isSelected ? handleDefaultImageSelection(source) : handleResetImageURL() }
                                  onClick = { () => !isSelected ? handleDefaultImageSelection(source) : handleResetImageURL() }
                               />
                            </div>
@@ -222,13 +216,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                </div>
             ) : (
                <div
-                  onKeyDown = {
-                     (event: React.KeyboardEvent) => {
-                        if (event.key === "Enter" && url.length > 0) {
-                           handleImageURLUpdates();
-                        }
-                     }
-                  }
+                  onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && url.length > 0 && handleImageURLUpdates() }
                   className = "relative mx-auto size-full"
                >
                   {

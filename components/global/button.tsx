@@ -1,51 +1,86 @@
 import clsx from "clsx";
-import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHourglassHalf, faSquareCheck } from "@fortawesome/free-solid-svg-icons";
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
+  onSubmit?: () => Promise<void>;
+  onConfirmation?: () => Promise<void>;
   icon?: IconProp;
-  styling?: string
+  iconStyling?: string
+  isSingleSubmission?: boolean;
 }
 
 const Button = forwardRef(function Button(props: ButtonProps, ref) {
-   const { children, className, icon, styling, onClick, onBlur } = props;
-   const [displaySaved, setDisplaySaved] = useState<boolean>(false);
-   const [displayRemoval, setDisplayRemoval] = useState<boolean>(false);
+   const { children, className, icon, iconStyling, onClick, onSubmit, onConfirmation, onBlur, isSingleSubmission, ...rest } = props;
+   const [displaySubmitted, setDisplaySubmitted] = useState<boolean>(false);
+   const [displayConfirmed, setDisplayConfirmed] = useState<boolean>(false);
    const savedIconRef = useRef<SVGSVGElement>(null);
+   const submitTimeOut = useRef<NodeJS.Timeout>(null);
+   const revertTimeOut = useRef<NodeJS.Timeout>(null);
+   const confirmTimeOut = useRef<NodeJS.Timeout>(null);
    const buttonRef = useRef(null);
-   const revertInterval = useRef<NodeJS.Timeout>(null);
 
-   const handleDisplaySave = useCallback(() => {
-      // Display the save icon with a bouncing animation temporarily
-      setDisplaySaved(true);
-      clearTimeout(revertInterval.current);
+   const handleSubmit = useCallback(async() => {
+      // Cancel any pending response submission timeout for single submission buttons
+      if (isSingleSubmission) {
+         clearTimeout(submitTimeOut.current);
+         clearTimeout(revertTimeOut.current);
+      }
 
-      revertInterval.current = setTimeout(() => {
-         setDisplaySaved(false);
+      // Display the submit icon with a bouncing animation temporarily
+      setDisplaySubmitted(true);
+
+      submitTimeOut.current = setTimeout(async() => {
+         // Cancel any pending update icon removal timeout and submit response
+         clearTimeout(revertTimeOut.current);
+
+         await onSubmit();
+
+         revertTimeOut.current = setTimeout(() => {
+            setDisplaySubmitted(false);
+            onBlur?.call(null);
+         });
+      }, 750);
+   }, [
+      onBlur,
+      onSubmit,
+      isSingleSubmission
+   ]);
+
+   const handleConfirmation = useCallback(async() => {
+      // Cancel any pending response submission timeout
+      clearTimeout(confirmTimeOut.current);
+
+      // Display the confirm icon with a wiggle animation temporarily
+      setDisplayConfirmed(true);
+
+      confirmTimeOut.current = setTimeout(async() => {
+         await onConfirmation();
+         setDisplayConfirmed(false);
          onBlur?.call(null);
-      }, 2500);
+      }, 1000);
+   }, [
+      onBlur,
+      onConfirmation
+   ]);
 
-   }, [onBlur]);
-
-   const handleDisplayRemoval = useCallback(() => {
-      setDisplayRemoval(true);
-
-      setTimeout(() => {
-         setDisplayRemoval(false);
-      }, 2000);
-   }, [])
+   const handleOnClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+      // Always call the defined onClick method and blur the element
+      onClick?.call(this, event);
+      buttonRef.current?.blur();
+   }, [onClick]);
 
    useImperativeHandle(ref, () => ({
-      displaySave: handleDisplaySave,
-      displayRemoval: handleDisplayRemoval
+      submit: handleSubmit,
+      confirm: handleConfirmation
    }));
 
    return (
       <button
-         { ...props }
+         { ...rest }
          ref = { buttonRef }
          className = {
             clsx(
@@ -53,25 +88,18 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
                className
             )
          }
-         onClick = {
-            (event: React.MouseEvent<HTMLButtonElement>) => {
-               // Always call the defined onClick method and blur the button element
-               onClick?.call(this, event);
-               buttonRef.current?.blur();
-            }
-         }
+         onClick = { handleOnClick }
       >
          {
             icon && (
                <FontAwesomeIcon
                   ref = { savedIconRef }
                   className = {
-                     clsx(styling, {
-                        "animate-bounce": displaySaved,
-                        "animate-wiggle": displayRemoval
+                     clsx(iconStyling, {
+                        "animate-wiggle": displaySubmitted || displayConfirmed
                      })
                   }
-                  icon = { displaySaved ? faFloppyDisk : icon }
+                  icon = { displaySubmitted ? faHourglassHalf : displayConfirmed ? faSquareCheck : icon }
                />
             )
          }

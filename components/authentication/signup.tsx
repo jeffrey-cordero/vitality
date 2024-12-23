@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Input } from "@/components/global/input";
 import { login } from "@/lib/authentication/login";
 import { NotificationContext } from "@/app/layout";
-import { FormEvent, useContext, useReducer } from "react";
+import { useCallback, useContext, useReducer, useRef } from "react";
 import { VitalityState, formReducer } from "@/lib/global/state";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { signup, Registration } from "@/lib/authentication/signup";
@@ -53,10 +53,9 @@ const registration: VitalityState = {
 export default function SignUp(): JSX.Element {
    const { updateNotification } = useContext(NotificationContext);
    const [state, dispatch] = useReducer(formReducer, registration);
+   const signupButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
-   const handleRegistration = async(event: FormEvent) => {
-      event.preventDefault();
-
+   const handleRegistration = useCallback(async() => {
       const registration: Registration = {
          name: state.name.value.trim(),
          username: state.username.value.trim(),
@@ -98,7 +97,20 @@ export default function SignUp(): JSX.Element {
             )
          });
       });
-   };
+   }, [
+      state.name,
+      state.username,
+      state.password,
+      state.confirmPassword,
+      state.email,
+      state.birthday,
+      state.phone,
+      updateNotification
+   ]);
+
+   const handleSubmitRegistration = useCallback(() => {
+      signupButtonRef.current?.submit();
+   }, []);
 
    return (
       <div className = "mx-auto mb-12 flex w-full flex-col items-center justify-center text-center">
@@ -107,10 +119,7 @@ export default function SignUp(): JSX.Element {
             description = "Create an account to get started"
          />
          <div className = "mx-auto mt-8 w-11/12 sm:w-3/4 xl:w-5/12">
-            <form
-               className = "relative mx-auto flex w-full flex-col items-stretch justify-center gap-3"
-               onSubmit = { handleRegistration }
-            >
+            <div className = "relative mx-auto flex w-full flex-col items-stretch justify-center gap-3">
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
                   onClick = {
@@ -130,6 +139,7 @@ export default function SignUp(): JSX.Element {
                   icon = { faUserSecret }
                   input = { state.username }
                   dispatch = { dispatch }
+                  onSubmit = { handleSubmitRegistration }
                   autoFocus
                   required
                />
@@ -141,6 +151,7 @@ export default function SignUp(): JSX.Element {
                   icon = { faKey }
                   input = { state.password }
                   dispatch = { dispatch }
+                  onSubmit = { handleSubmitRegistration }
                   required
                />
                <Input
@@ -151,6 +162,7 @@ export default function SignUp(): JSX.Element {
                   icon = { faKey }
                   input = { state.confirmPassword }
                   dispatch = { dispatch }
+                  onSubmit = { handleSubmitRegistration }
                   required
                />
                <Input
@@ -161,6 +173,7 @@ export default function SignUp(): JSX.Element {
                   icon = { faSignature }
                   input = { state.name }
                   dispatch = { dispatch }
+                  onSubmit = { handleSubmitRegistration }
                   required
                />
                <Input
@@ -172,6 +185,7 @@ export default function SignUp(): JSX.Element {
                   icon = { faCakeCandles }
                   input = { state.birthday }
                   dispatch = { dispatch }
+                  onSubmit = { handleSubmitRegistration }
                   required
                />
                <Input
@@ -182,6 +196,7 @@ export default function SignUp(): JSX.Element {
                   icon = { faAt }
                   input = { state.email }
                   dispatch = { dispatch }
+                  onSubmit = { handleSubmitRegistration }
                   required
                />
                <Input
@@ -192,15 +207,20 @@ export default function SignUp(): JSX.Element {
                   icon = { faPhone }
                   input = { state.phone }
                   dispatch = { dispatch }
+                  onSubmit = { handleSubmitRegistration }
                />
                <Button
+                  ref = { signupButtonRef }
                   type = "submit"
                   className = "h-[2.6rem] bg-primary text-white"
                   icon = { faUserPlus }
+                  onSubmit = { handleRegistration }
+                  onClick = { handleSubmitRegistration }
+                  isSingleSubmission = { true }
                >
                   Sign Up
                </Button>
-            </form>
+            </div>
             <p className = "mt-4 px-2">
                Already have an account?{ " " }
                <Link

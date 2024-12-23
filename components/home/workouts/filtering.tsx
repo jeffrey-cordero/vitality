@@ -10,7 +10,7 @@ import { Workout } from "@/lib/home/workouts/workouts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { sendSuccessMessage, sendErrorMessage } from "@/lib/global/response";
 import { VitalityInputState, VitalityProps, VitalityState } from "@/lib/global/state";
-import { faCalendar, faMagnifyingGlass, faArrowsUpDown, faArrowRight, faArrowLeft, faArrowRotateLeft, faTag, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, faMagnifyingGlass, faArrowsUpDown, faArrowRight, faArrowLeft, faTag, faBan, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 export function filterByTags(
    filteredTagIds: Set<string>,
@@ -96,7 +96,8 @@ function DateInput(props: DateInputProps) {
 
 function FilterByDate(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
-   const filterModalRef = useRef<{ open: () => void; close: () => void }>(null);
+   const filterModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
+   const filterButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
    const dateFilterType: string = globalState.dateFilter.value;
 
    const inputs = useMemo(() => ({
@@ -108,7 +109,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
       globalState.maxDate
    ]);
 
-   const handleApplyDateFilter = useCallback(() => {
+   const handleApplyDateFilter = useCallback(async() => {
       // Handle potential invalid inputs
       const errors = {};
 
@@ -184,6 +185,10 @@ function FilterByDate(props: VitalityProps): JSX.Element {
       globalState,
       globalDispatch
    ]);
+
+   const handleSubmitSearch = useCallback(() => {
+      filterButtonRef.current?.submit();
+   }, []);
 
    const handleResetDateFilter = useCallback(() => {
       // Fall back to tags filtering, if applicable
@@ -264,14 +269,14 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          <div className = "flex flex-col items-stretch justify-center gap-2 text-center">
             <FontAwesomeIcon
                icon = { faCalendar }
-               className = "mt-6 text-3xl text-primary"
+               className = "mt-6 text-3xl text-primary xxsm:text-4xl"
             />
-            <h1 className = "mb-2 text-2xl font-bold">Filter by Date</h1>
+            <h1 className = "text-xl font-bold xxsm:mb-2 xxsm:text-2xl">Filter by Date</h1>
             <div className = "relative mt-8">
                <FontAwesomeIcon
-                  icon = { faArrowRotateLeft }
+                  icon = { faBan }
                   onClick = { handleResetDateFilter }
-                  className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
+                  className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-red-500"
                />
                <Select
                   id = "dateFilter"
@@ -319,10 +324,12 @@ function FilterByDate(props: VitalityProps): JSX.Element {
                   )
                }
                <Button
+                  ref = { filterButtonRef }
                   type = "button"
                   className = "mt-3 h-10 w-full bg-primary text-sm font-bold text-white"
                   icon = { faMagnifyingGlass }
-                  onClick = { handleApplyDateFilter }
+                  onSubmit = { handleApplyDateFilter }
+                  onClick = { handleSubmitSearch }
                >
                   Apply
                </Button>
@@ -334,7 +341,8 @@ function FilterByDate(props: VitalityProps): JSX.Element {
 
 function FilterByTags(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
-   const filterModalRef = useRef<{ open: () => void; close: () => void }>(null);
+   const filterModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
+   const filterButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
    const handleDisplayFilteredTags = useCallback(() => {
       globalDispatch({
@@ -355,7 +363,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
       globalDispatch
    ]);
 
-   const handleApplyTagsFilter = useCallback(() => {
+   const handleApplyTagsFilter = useCallback(async() => {
       globalDispatch({
          type: "updateState",
          value: {
@@ -403,6 +411,10 @@ function FilterByTags(props: VitalityProps): JSX.Element {
       globalState,
       globalDispatch
    ]);
+
+   const handleSubmitSearch = useCallback(() => {
+      filterButtonRef.current?.submit();
+   }, []);
 
    const handleResetTagsFilter = useCallback(() => {
       // Fall back to date filtering, if applicable
@@ -459,9 +471,9 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          <div className = "flex flex-col items-stretch justify-center gap-2 text-center">
             <FontAwesomeIcon
                icon = { faTag }
-               className = "mt-6 text-4xl text-primary"
+               className = "mt-6 text-3xl text-primary xxsm:text-4xl"
             />
-            <h1 className = "mb-2 text-2xl font-bold">Filter by Tags</h1>
+            <h1 className = "text-xl font-bold xxsm:mb-2 xxsm:text-2xl">Filter by Tags</h1>
             <div className = "relative">
                <div className = "mx-auto my-2 w-full">
                   <Tags
@@ -469,10 +481,12 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                      onReset = { handleResetTagsFilter }
                   />
                   <Button
+                     ref = { filterButtonRef }
                      type = "button"
                      className = "mt-3 h-10 w-full bg-primary font-bold text-white"
                      icon = { faMagnifyingGlass }
-                     onClick = { handleApplyTagsFilter }
+                     onSubmit = { handleApplyTagsFilter }
+                     onClick = { handleSubmitSearch }
                   >
                      Apply
                   </Button>

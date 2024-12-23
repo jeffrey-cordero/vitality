@@ -9,25 +9,25 @@ import { faShieldHalved } from "@fortawesome/free-solid-svg-icons";
 import { AttributeProps } from "@/components/home/settings/attribute";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { ChangeEvent, useCallback, useContext, useMemo, useReducer, useRef } from "react";
+import { ChangeEvent, useCallback, useContext, useReducer, useRef } from "react";
 
 const verification: VitalityState = {
-   first: {
+   "0": {
       value: "",
       error: null,
       data: {}
    },
-   second: {
+   "1": {
       value: "",
       error: null,
       data: {}
    },
-   third: {
+   "2": {
       value: "",
       error: null,
       data: {}
    },
-   fourth: {
+   "3": {
       value: "",
       error: null,
       data: {}
@@ -48,28 +48,15 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
    const { updateNotification } = useContext(NotificationContext);
    const { attribute, input, icon, globalState, globalDispatch } = props;
    const [localState, localDispatch] = useReducer(formReducer, verification);
-   const verificationModalRef = useRef<{ open: () => void; close: () => void }>(null);
-
-   const inputs = useMemo(() => ({
-      0: ["first", localState.first],
-      1: ["second", localState.second],
-      2: ["third", localState.third],
-      3: ["fourth", localState.fourth]
-   }), [
-      localState.first,
-      localState.second,
-      localState.third,
-      localState.fourth
-   ]);
+   const verificationModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
+   const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>, index: number) => {
       // Update verification code input and remove empty error, if any
-      const [id, input] = inputs[index];
-
       localDispatch({
          type: "updateStates",
          value: {
-            [id]: {
+            [index]: {
                ...input,
                value: event.target.value,
                error: null
@@ -81,14 +68,14 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
          }
       });
    }, [
-      inputs,
+      input,
       localState.empty
    ]);
 
    const handleVerificationCode = useCallback(async() => {
       // Ensure non-empty verification inputs
       const codes = {
-         ...Object.fromEntries(Object.values(inputs)),
+         ...localState,
          empty: {
             ...localState.empty,
             value: false
@@ -96,15 +83,19 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
       };
 
       for (let i = 0; i <= 3; i++) {
-         const [id, input] = inputs[i];
-         const isEmpty: boolean = input.value.trim() === "";
+         // Fetch the most up-to-date value within the DOM
+         const value: string = (document.getElementById(`verification-${i}`) as HTMLInputElement).value;
+
+         // All verification inputs must be non-empty
+         const isEmpty: boolean = value.trim() === "";
 
          if (isEmpty) {
             codes.empty.value = true;
          }
 
-         codes[id] = {
-            ...codes[id],
+         codes[i] = {
+            ...localState[i],
+            value: value,
             error: isEmpty ? "\0" : null
          };
       }
@@ -143,13 +134,16 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
       }
    }, [
       user,
-      inputs,
       attribute,
+      localState,
       globalState,
       globalDispatch,
-      localState.empty,
       updateNotification
    ]);
+
+   const handleSubmitUpdates = useCallback(() => {
+      updateButtonRef.current?.submit();
+   }, []);
 
    return (
       <Modal
@@ -181,7 +175,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
             <div className = "mx-auto flex w-full flex-row flex-wrap items-center justify-center gap-3">
                {
                   Array.from({ length: 4 }, (_, index) => {
-                     const [id, input] = inputs[index];
+                     const input = localState[index];
 
                      return (
                         <div
@@ -189,7 +183,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                            key = { index }
                         >
                            <input
-                              id = { `verification-${id}` }
+                              id = { `verification-${index}` }
                               className = {
                                  clsx("flex size-full flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-2 text-center text-lg outline-none focus:border-[1.5px] focus:border-primary dark:border-0 dark:bg-gray-700/50", {
                                     "border-red-500 border-2 dark:border-2 focus:border-red-500 focus:ring-red-500 error" : input.error === "\0"
@@ -198,7 +192,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                               onChange = { (event: ChangeEvent<HTMLInputElement>) => handleInputChange(event, index) }
                               type = "text"
                               maxLength = { 1 }
-                              onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => event.key === "Enter" && handleVerificationCode() }
+                              onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => event.key === "Enter" && handleSubmitUpdates() }
                            />
                         </div>
                      );
@@ -215,10 +209,13 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                )
             }
             <Button
+               ref = { updateButtonRef }
                type = "submit"
                className = "h-[2.6rem] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white hover:bg-primary/80 xxsm:text-base"
                icon = { icon }
-               onClick = { handleVerificationCode }
+               onSubmit = { handleVerificationCode }
+               onClick = { handleSubmitUpdates }
+               isSingleSubmission = { true }
             >
                Verify
             </Button>
@@ -230,7 +227,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                         () => {
                            updateNotification({
                               status: "Success",
-                              message: "A one-time verification code has been resent",
+                              message: "One-time verification code has been resent",
                               timer: 1500
                            });
                         }

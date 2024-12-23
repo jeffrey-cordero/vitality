@@ -57,6 +57,7 @@ export function GeneralAttribute(props: AttributeProps) {
    const { updateNotification } = useContext(NotificationContext);
    const { id, input, type, icon, editOnly, onBlur, globalDispatch } = props;
    const [isEditing, setIsEditing] = useState<boolean>(editOnly ?? false);
+   const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
    const isUniqueAttribute: boolean = id === "username" || id === "email" || id === "phone";
 
    const handleResetInput = useCallback(() => {
@@ -85,7 +86,6 @@ export function GeneralAttribute(props: AttributeProps) {
 
       if (input.data.stored === updatingStored) {
          // No changes applied to current user attribute
-         editOnly ? onBlur(null) : setIsEditing(false);
          return;
       }
 
@@ -108,25 +108,31 @@ export function GeneralAttribute(props: AttributeProps) {
             }
          });
 
-         isUniqueAttribute && updateNotification({
-            status: response.status,
-            message: response.body.message,
-            timer: 1500
-         });
+         if (isUniqueAttribute) {
+            editOnly ? onBlur(null) : setIsEditing(false);
 
-         editOnly ? onBlur(null) : setIsEditing(false);
+            updateNotification({
+               status: response.status,
+               message: response.body.message,
+               timer: 1500
+            });
+         }
       });
    }, [
       id,
       user,
       globalDispatch,
       isUniqueAttribute,
-      editOnly,
-      onBlur,
       input,
       type,
+      editOnly,
+      onBlur,
       updateNotification
    ]);
+
+   const handleSubmitUpdates = useCallback(() => {
+      updateButtonRef.current?.submit();
+   }, []);
 
    return (
       <div className = "relative mx-auto w-full">
@@ -145,15 +151,18 @@ export function GeneralAttribute(props: AttributeProps) {
                   />
                   <Input
                      { ...props }
-                     onSubmit = { handleUpdateAttribute }
+                     onSubmit = { handleSubmitUpdates }
                      onBlur = { undefined }
                      autoComplete = { id }
                   />
                   <Button
+                     ref = { updateButtonRef }
                      type = "submit"
-                     className = "mt-2 h-10 w-full bg-green-500 text-white"
+                     className = "mt-2 h-10 w-full bg-primary text-white"
                      icon = { icon }
-                     onClick = { handleUpdateAttribute }
+                     onClick = { handleSubmitUpdates }
+                     onSubmit = { handleUpdateAttribute }
+                     isSingleSubmission = { isUniqueAttribute ? true : undefined }
                   >
                      Update
                   </Button>
@@ -191,7 +200,8 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotification } = useContext(NotificationContext);
    const { globalState, globalDispatch } = props;
-   const passwordModalRef = useRef<{ open: () => void; close: () => void }>(null);
+   const passwordModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
+   const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
    const handleUpdatePassword = useCallback(async() => {
       const response: VitalityResponse<void> = await updatePassword(
@@ -241,6 +251,10 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
       globalState.confirmPassword
    ]);
 
+   const handleSubmitUpdates = useCallback(() => {
+      updateButtonRef.current?.submit();
+   }, []);
+
    return (
       <AttributeContainer
          icon = { faKey }
@@ -277,7 +291,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                         icon = { faKey }
                         input = { globalState.oldPassword }
                         dispatch = { globalDispatch }
-                        onSubmit = { handleUpdatePassword }
+                        onSubmit = { handleSubmitUpdates }
                         autoComplete = "current-password"
                      />
                      <Input
@@ -287,7 +301,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                         icon = { faKey }
                         input = { globalState.newPassword }
                         dispatch = { globalDispatch }
-                        onSubmit = { handleUpdatePassword }
+                        onSubmit = { handleSubmitUpdates }
                         autoComplete = "new-password"
                      />
                      <Input
@@ -297,14 +311,17 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                         icon = { faKey }
                         input = { globalState.confirmPassword }
                         dispatch = { globalDispatch }
-                        onSubmit = { handleUpdatePassword }
+                        onSubmit = { handleSubmitUpdates }
                         autoComplete = "new-password"
                      />
                      <Button
+                        ref = { updateButtonRef }
                         type = "submit"
                         className = "h-[2.6rem] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white xxsm:text-base"
                         icon = { faKey }
-                        onClick = { handleUpdatePassword }
+                        onSubmit = { handleUpdatePassword }
+                        onClick = { handleSubmitUpdates }
+                        isSingleSubmission = { true }
                      >
                         Update
                      </Button>
@@ -381,7 +398,7 @@ interface AccountActionProps extends VitalityProps {
    message: string;
    icon: IconProp;
    label: string;
-   onConfirmation: () => void;
+   onConfirmation: () => Promise<void>;
 }
 
 export function AccountAction(props: AccountActionProps): JSX.Element {
