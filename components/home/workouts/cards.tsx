@@ -4,7 +4,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
-import { VitalityProps } from "@/lib/global/state";
+import { VitalityProps } from "@/lib/global/reducer";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
 import { Tag } from "@/lib/home/workouts/tags";
 import { Workout } from "@/lib/home/workouts/workouts";

@@ -7,7 +7,7 @@ import Testimonials from "@/components/landing/testimonials";
 
 export default function Page() {
    return (
-      <Main>
+      <Main className = "gap-2 md:gap-10">
          <Journey />
          <Highlights />
          <Services />

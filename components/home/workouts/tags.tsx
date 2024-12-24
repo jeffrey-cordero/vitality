@@ -10,7 +10,7 @@ import { Input } from "@/components/global/input";
 import Loading from "@/components/global/loading";
 import Modal from "@/components/global/modal";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { formReducer, VitalityChildProps, VitalityProps, VitalityState } from "@/lib/global/state";
+import { formReducer, VitalityChildProps, VitalityProps, VitalityState } from "@/lib/global/reducer";
 import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/home/workouts/tags";
 
 const form: VitalityState = {

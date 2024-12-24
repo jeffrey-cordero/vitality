@@ -7,7 +7,7 @@ import Button from "@/components/global/button";
 import Loading from "@/components/global/loading";
 import Cards from "@/components/home/workouts/cards";
 import Table from "@/components/home/workouts/table";
-import { VitalityProps } from "@/lib/global/state";
+import { VitalityProps } from "@/lib/global/reducer";
 import { Workout } from "@/lib/home/workouts/workouts";
 
 interface ViewProps extends VitalityProps {

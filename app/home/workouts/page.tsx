@@ -7,7 +7,7 @@ import Filtering from "@/components/home/workouts/filtering";
 import Form from "@/components/home/workouts/form";
 import Pagination from "@/components/home/workouts/pagination";
 import View from "@/components/home/workouts/view";
-import { formReducer, VitalityState } from "@/lib/global/state";
+import { formReducer, VitalityState } from "@/lib/global/reducer";
 import { fetchWorkoutTags } from "@/lib/home/workouts/tags";
 import { fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
 

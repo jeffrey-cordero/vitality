@@ -3,7 +3,7 @@ import { Dispatch } from "react";
 
 import { NotificationProps } from "@/components/global/notification";
 import { handleResponse, sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
-import { VitalityAction } from "@/lib/global/state";
+import { VitalityAction } from "@/lib/global/reducer";
 
 // Mocked dependencies
 const dispatch: Dispatch<VitalityAction<any>> = jest.fn();
@@ -15,7 +15,7 @@ let response: VitalityResponse<any>;
 describe("Backend Response Tests", () => {
    describe("Success response", () => {
       test("Handle successful backend response", () => {
-         // Ensure notification is reset and success method is called
+         // Ensure the success method is called
          response = sendSuccessMessage(
             "Successfully processed request",
             Number.MAX_VALUE
@@ -30,10 +30,6 @@ describe("Backend Response Tests", () => {
                message: "Successfully processed request",
                errors: {}
             }
-         });
-         expect(updateNotifications).toHaveBeenCalledWith({
-            status: "Initial",
-            message: ""
          });
          expect(successMethod).toHaveBeenCalled();
          expect(dispatch).not.toHaveBeenCalled();

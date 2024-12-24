@@ -1,4 +1,4 @@
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faHourglassHalf, faSquareCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
@@ -8,7 +8,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
   onSubmit?: () => Promise<void>;
   onConfirmation?: () => Promise<void>;
-  icon?: IconProp;
+  icon?: IconDefinition;
   iconStyling?: string
   isSingleSubmission?: boolean;
 }

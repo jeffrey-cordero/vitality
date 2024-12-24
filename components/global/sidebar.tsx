@@ -1,6 +1,8 @@
 "use client";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faAnglesRight, faBars, faDoorOpen, faDumbbell, faGears, faMoon, faPlaneArrival, faRightFromBracket, faSun, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { faAnglesRight, faBars,
+   faBrain,
+   faBullseye, faDoorOpen,    faDumbbell, faGears, faHeartCircleBolt, faHouse, faMoon, faPlaneArrival, faRightFromBracket, faShuffle, faSun, faUserPlus, faUtensils } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import Link from "next/link";
@@ -24,7 +26,13 @@ const landingLinks: SideBarProps[] = [
 ];
 
 const homeLinks: SideBarProps[] = [
+   { name: "Home", href: "#", icon: faHouse },
    { name: "Workouts", href: "/home/workouts", icon: faDumbbell },
+   { name: "Nutrition", href: "#", icon: faUtensils },
+   { name: "Mood", href: "#", icon: faBrain },
+   { name: "Health", href: "#", icon: faHeartCircleBolt },
+   { name: "Goals", href: "#", icon: faBullseye },
+   { name: "Progress", href: "#", icon: faShuffle },
    { name: "Settings", href: "/home/settings", icon: faGears },
    { name: "Theme", href: "\0", icon: null },
    { name: "Sign Out", href: "\0", icon: faRightFromBracket }
@@ -61,7 +69,8 @@ function SideBarLinks(): JSX.Element {
                            {
                               "bg-sky-100 dark:bg-slate-700 text-primary": pathname === link.href,
                               "hover:text-yellow-400": isTheme,
-                              "text-red-500 hover:text-red-600": isSignOut
+                              "text-red-500 hover:text-red-600": isSignOut,
+                              "opacity-30": link.href === "#"
                            },
                         )
                      }
@@ -131,7 +140,7 @@ export function SideBar(): JSX.Element {
                   )
                }
             >
-               <div className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-[0.6rem] py-4 shadow-md xxsm:px-3 dark:bg-slate-800">
+               <div className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-[0.6rem] py-3 shadow-md xxsm:px-3 xxsm:py-4 dark:bg-slate-800">
                   <div className = "flex flex-col justify-center space-x-2 space-y-2 text-center">
                      <div className = "flex size-full flex-col items-center justify-between text-center">
                         <SideBarLinks />

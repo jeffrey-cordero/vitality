@@ -24,14 +24,13 @@ export default function Notification(props: NotificationProps): JSX.Element {
       notificationRef.current?.classList.add("animate-fadeOut");
 
       // Remove current notification after the provided timer
-      updateNotifications({
-         status: "Initial",
-         message: "remove"
-      });
-
-      // Remove fade- out animation for removing future notifications
       setTimeout(() => {
          notificationRef.current?.classList.remove("animate-fadeOut");
+
+         updateNotifications({
+            status: "Success",
+            message: "remove"
+         });
       }, 1250);
    };
 

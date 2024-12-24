@@ -11,7 +11,7 @@ import { AccountAction, GeneralAttribute, PasswordAttribute, SliderAttribute } f
 import { fetchAttributes } from "@/lib/authentication/authorize";
 import { endSession } from "@/lib/authentication/session";
 import { handleResponse } from "@/lib/global/response";
-import { formReducer, VitalityState } from "@/lib/global/state";
+import { formReducer, VitalityState } from "@/lib/global/reducer";
 import { deleteAccount } from "@/lib/home/settings/service";
 
 const form: VitalityState = {
@@ -228,7 +228,7 @@ export default function Form(): JSX.Element {
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
                         title = "Profile"
-                        description = "Customize your profile with a personal touch"
+                        message = "Customize your profile with a personal touch"
                      />
                      {
                         !isEditingImage ? (
@@ -294,7 +294,7 @@ export default function Form(): JSX.Element {
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
                         title = "Security"
-                        description = "Secure your account with tailored protection"
+                        message = "Secure your account with tailored protection"
                      />
                      <GeneralAttribute
                         id = "username"
@@ -334,7 +334,7 @@ export default function Form(): JSX.Element {
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
                         title = "Preferences"
-                        description = "Craft your personalized experience"
+                        message = "Craft your personalized experience"
                      />
                      <SliderAttribute
                         id = { null }
@@ -367,7 +367,7 @@ export default function Form(): JSX.Element {
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
                         title = "Actions"
-                        description = "Control your account with essential actions"
+                        message = "Control your account with essential actions"
                      />
                      <AccountAction
                         action = "session"

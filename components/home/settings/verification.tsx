@@ -9,7 +9,7 @@ import Button from "@/components/global/button";
 import Modal from "@/components/global/modal";
 import { AttributeProps } from "@/components/home/settings/attribute";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { formReducer, VitalityState } from "@/lib/global/state";
+import { formReducer, VitalityState } from "@/lib/global/reducer";
 import { verifyAttribute } from "@/lib/home/settings/service";
 
 const verification: VitalityState = {

@@ -9,7 +9,7 @@ import Modal from "@/components/global/modal";
 import Select from "@/components/global/select";
 import Tags from "@/components/home/workouts/tags";
 import { sendErrorMessage, sendSuccessMessage } from "@/lib/global/response";
-import { VitalityInputState, VitalityProps, VitalityState } from "@/lib/global/state";
+import { VitalityInputState, VitalityProps, VitalityState } from "@/lib/global/reducer";
 import { Tag } from "@/lib/home/workouts/tags";
 import { Workout } from "@/lib/home/workouts/workouts";
 
@@ -505,7 +505,7 @@ export default function Filtering(props: VitalityProps): JSX.Element {
       <div className = "relative w-full sm:w-auto">
          <Heading
             title = "Workouts"
-            description = "Create a new workout and let's make today count!"
+            message = "Create a new workout and let's make today count!"
          />
          <div className = "mx-auto my-4 flex w-full flex-col gap-2 px-2">
             <Input

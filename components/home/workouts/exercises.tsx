@@ -14,7 +14,7 @@ import Confirmation from "@/components/global/confirmation";
 import { Input } from "@/components/global/input";
 import TextArea from "@/components/global/textarea";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { formReducer, VitalityChildProps, VitalityProps, VitalityState } from "@/lib/global/state";
+import { formReducer, VitalityChildProps, VitalityProps, VitalityState } from "@/lib/global/reducer";
 import { addExercise, Exercise, ExerciseSet, isEmptyExerciseSet, updateExercise, updateExercises } from "@/lib/home/workouts/exercises";
 import { Workout } from "@/lib/home/workouts/workouts";
 

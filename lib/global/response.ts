@@ -1,7 +1,7 @@
 import { Dispatch } from "react";
 
 import { NotificationProps } from "@/components/global/notification";
-import { VitalityAction } from "@/lib/global/state";
+import { VitalityAction } from "@/lib/global/reducer";
 
 export interface VitalityResponse<T> {
    status: "Success" | "Error" | "Failure";
@@ -65,12 +65,6 @@ export function handleResponse(
    successMethod: () => void
 ): void {
    if (response.status === "Success") {
-      // Remove existing notification, if any
-      updateNotifications({
-         status: "Initial",
-         message: ""
-      });
-
       // Call the success method
       successMethod.call(null);
    } else if (response.status === "Error"

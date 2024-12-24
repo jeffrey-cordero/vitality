@@ -7,7 +7,7 @@ import { Input } from "@/components/global/input";
 import Select from "@/components/global/select";
 import TextArea from "@/components/global/textarea";
 import { sendErrorMessage } from "@/lib/global/response";
-import { formReducer, VitalityState } from "@/lib/global/state";
+import { formReducer, VitalityState } from "@/lib/global/reducer";
 
 let globalState: VitalityState;
 
@@ -267,7 +267,7 @@ function Component(): JSX.Element {
    );
 }
 
-describe("State Management Tests", () => {
+describe("State Reducer Tests", () => {
    // Mock scrollIntoView method for DOM elements
    Element.prototype.scrollIntoView = jest.fn();
 

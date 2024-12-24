@@ -6,7 +6,7 @@ import { ChangeEvent, useCallback } from "react";
 
 import Button from "@/components/global/button";
 import Select from "@/components/global/select";
-import { VitalityProps } from "@/lib/global/state";
+import { VitalityProps } from "@/lib/global/reducer";
 import { Workout } from "@/lib/home/workouts/workouts";
 
 interface PaginationProps extends VitalityProps {

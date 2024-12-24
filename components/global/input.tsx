@@ -1,16 +1,15 @@
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faCircleCheck, faCircleXmark, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faCircleXmark, faEye, faEyeSlash, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import { ChangeEvent, Dispatch, useCallback, useEffect, useRef } from "react";
 
-import { VitalityAction, VitalityInputState } from "@/lib/global/state";
+import { VitalityAction, VitalityInputState } from "@/lib/global/reducer";
 
 export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
    label: string;
    input: VitalityInputState;
    dispatch: Dispatch<VitalityAction<any>>;
-   icon?: IconProp;
+   icon?: IconDefinition;
    onSubmit?: () => void;
    scrollIntoView?: boolean;
 }

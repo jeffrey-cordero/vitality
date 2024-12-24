@@ -1,4 +1,3 @@
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { faArrowRotateLeft, faKey, faPenToSquare, faRightFromBracket, faTrashCan, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useContext, useRef, useState } from "react";
@@ -12,11 +11,11 @@ import { VitalityInputProps } from "@/components/global/input";
 import Modal from "@/components/global/modal";
 import VerifyAttribute from "@/components/home/settings/verification";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { VitalityProps } from "@/lib/global/state";
+import { VitalityProps } from "@/lib/global/reducer";
 import { updateAttribute, updatePassword, updatePreference } from "@/lib/home/settings/service";
 
 interface AttributeContainerProps {
-   icon: IconProp;
+   icon: IconDefinition;
    label: string;
    controller: React.ReactNode;
    doubleTapMethod?: () => void;
@@ -397,7 +396,7 @@ export function SliderAttribute(props: SliderProps): JSX.Element {
 interface AccountActionProps extends VitalityProps {
    action: "delete" | "session";
    message: string;
-   icon: IconProp;
+   icon: IconDefinition;
    label: string;
    onConfirmation: () => Promise<void>;
 }

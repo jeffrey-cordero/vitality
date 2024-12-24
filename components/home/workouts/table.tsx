@@ -7,7 +7,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import Confirmation from "@/components/global/confirmation";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { VitalityProps } from "@/lib/global/state";
+import { VitalityProps } from "@/lib/global/reducer";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
 import { Tag } from "@/lib/home/workouts/tags";
 import { deleteWorkouts, Workout } from "@/lib/home/workouts/workouts";

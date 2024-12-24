@@ -10,9 +10,9 @@ import Heading from "@/components/global/heading";
 import { Input } from "@/components/global/input";
 import { Credentials, login } from "@/lib/authentication/login";
 import { handleResponse } from "@/lib/global/response";
-import { formReducer, VitalityState } from "@/lib/global/state";
+import { formReducer, VitalityState } from "@/lib/global/reducer";
 
-const credentials: VitalityState = {
+const form: VitalityState = {
    username: {
       value: "",
       error: null,
@@ -27,7 +27,7 @@ const credentials: VitalityState = {
 
 export default function Login(): JSX.Element {
    const { updateNotifications } = useContext(NotificationContext);
-   const [state, dispatch] = useReducer(formReducer, credentials);
+   const [state, dispatch] = useReducer(formReducer, form);
    const loginButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
    const handleAuthenticate = useCallback(async() => {
@@ -53,7 +53,7 @@ export default function Login(): JSX.Element {
       <div className = "mx-auto mb-12 flex w-full flex-col items-center justify-center text-center">
          <Heading
             title = "Log In"
-            description = "Enter valid credentials to enter"
+            message = "Enter valid credentials to enter"
          />
          <div className = "mx-auto mt-8 w-11/12 sm:w-3/4 xl:w-5/12">
             <div className = "relative flex w-full flex-col items-stretch justify-center gap-3">

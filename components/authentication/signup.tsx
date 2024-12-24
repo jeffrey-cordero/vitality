@@ -11,7 +11,7 @@ import { Input } from "@/components/global/input";
 import { login } from "@/lib/authentication/login";
 import { Registration, signup } from "@/lib/authentication/signup";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { formReducer, VitalityState } from "@/lib/global/state";
+import { formReducer, VitalityState } from "@/lib/global/reducer";
 
 const registration: VitalityState = {
    username: {
@@ -117,7 +117,7 @@ export default function SignUp(): JSX.Element {
       <div className = "mx-auto mb-12 flex w-full flex-col items-center justify-center text-center">
          <Heading
             title = "Sign Up"
-            description = "Create an account to get started"
+            message = "Create an account to get started"
          />
          <div className = "mx-auto mt-8 w-11/12 sm:w-3/4 xl:w-5/12">
             <div className = "relative mx-auto flex w-full flex-col items-stretch justify-center gap-3">

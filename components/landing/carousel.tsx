@@ -14,13 +14,13 @@ export default function Carousel(props: CarouselProps): JSX.Element {
 
    const nextSlide = () => {
       setCurrentIndex(
-         (prevIndex: number) => (prevIndex + 1) % items.length
+         (previousIndex: number) => (previousIndex + 1) % items.length
       );
    };
 
    const prevSlide = () => {
       setCurrentIndex(
-         (prevIndex: number) => (prevIndex - 1 + items.length) % items.length
+         (previousIndex: number) => (previousIndex - 1 + items.length) % items.length
       );
    };
 

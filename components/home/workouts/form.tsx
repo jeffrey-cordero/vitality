@@ -13,7 +13,7 @@ import { filterWorkout } from "@/components/home/workouts/filtering";
 import Images from "@/components/home/workouts/images";
 import Tags from "@/components/home/workouts/tags";
 import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { formReducer, VitalityProps, VitalityState } from "@/lib/global/state";
+import { formReducer, VitalityProps, VitalityState } from "@/lib/global/reducer";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
 import { Tag } from "@/lib/home/workouts/tags";
 import { addWorkout, deleteWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
