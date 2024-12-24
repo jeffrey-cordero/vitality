@@ -33,6 +33,9 @@ const workoutsSchema = z.object({
          required_error: "Date is required",
          invalid_type_error: "Date is required"
       })
+      .min(new Date("1800-01-01"), {
+         message: "Date cannot be earlier than the year 1800" }
+      )
       .max(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), {
          message: "Date must not be after today"
       }),

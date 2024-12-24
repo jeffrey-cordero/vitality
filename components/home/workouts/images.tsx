@@ -38,11 +38,9 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
          type: "updateState",
          value: {
             id: "image",
-            input: {
-               ...input,
+            value: {
                error: isValidURL ? null : "Invalid image URL",
                data: {
-                  ...input.data,
                   valid: isValidURL
                }
             }
@@ -50,7 +48,6 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
       });
    }, [
       dispatch,
-      input,
       isValidURL
    ]);
 
@@ -60,49 +57,38 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
             type: "updateState",
             value: {
                id: "image",
-               input: {
-                  ...input,
+               value: {
                   value: source,
                   error: null,
                   data: {
-                     ...input.data,
                      valid: true
                   }
                }
             }
          });
-      }, [
-         dispatch,
-         input
-      ]);
+      }, [dispatch]);
 
    const handleImageResourceError = useCallback(() => {
       dispatch({
          type: "updateState",
          value: {
             id: "image",
-            input: {
-               ...input,
+            value: {
                error: "Failed to fetch your desired image resource",
                data: {
-                  ...input.data,
                   valid: false
                }
             }
          }
       });
-   }, [
-      dispatch,
-      input
-   ]);
+   }, [dispatch]);
 
    const handleResetImageURL = useCallback(() => {
       dispatch({
          type: "updateState",
          value: {
             id: "image",
-            input: {
-               ...input,
+            value: {
                error: null,
                value: "",
                data: {
@@ -111,10 +97,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
             }
          }
       });
-   }, [
-      dispatch,
-      input
-   ]);
+   }, [dispatch]);
 
    const handleImageURLChanges = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
       // Ensure any changes to URL are verified on a new submission
@@ -122,21 +105,16 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
          type: "updateState",
          value: {
             id: "image",
-            input: {
-               ...input,
+            value: {
                value: event.target.value,
                error: null,
                data: {
-                  ...input.data,
                   valid: undefined
                }
             }
          }
       });
-   }, [
-      input,
-      dispatch
-   ]);
+   }, [dispatch]);
 
    return (
       <div className = "flex flex-col py-2">
@@ -315,7 +293,7 @@ export default function Images(props: VitalityInputProps): JSX.Element {
                      <FontAwesomeIcon
                         icon = { isValidURL ? faPenToSquare : faPaperclip }
                      />
-                     { isValidURL ? "Edit Image" : "Add Image" }
+                     { isValidResource ? "Edit Image" : "Add Image" }
                   </Button>
                   {
                      input.error !== null && (

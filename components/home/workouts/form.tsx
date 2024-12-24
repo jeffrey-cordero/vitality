@@ -141,22 +141,18 @@ export default function Form(props: VitalityProps): JSX.Element {
             type: "updateStates",
             value: {
                workout: {
-                  ...globalState.workout,
                   value: newWorkout,
                   data: {
                      display: method === "delete" ? false : formModalRef.current?.isOpen()
                   }
                },
                workouts: {
-                  ...globalState.workouts,
                   value: newWorkouts,
                   data: {
-                     ...globalState.workouts.data,
                      filtered: newFiltered
                   }
                },
                page: {
-                  ...globalState.page,
                   value: page >= pages ? Math.max(0, page - 1) : page
                }
             }
@@ -188,7 +184,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                   selected: workout.tagIds.map((tagId: string) => globalState.tags.data?.dictionary[tagId]) ?? []
                }
             },
-            tagSearch: {
+            search: {
                error: null,
                value: ""
             }
@@ -279,7 +275,7 @@ export default function Form(props: VitalityProps): JSX.Element {
 
       localDispatch({
          type: "resetState",
-         value: {}
+         value: form
       });
    }, [
       globalDispatch,

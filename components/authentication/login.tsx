@@ -94,7 +94,7 @@ export default function Login(): JSX.Element {
                />
                <Button
                   ref = { loginButtonRef }
-                  type = "submit"
+                  type = "button"
                   className = "h-[2.6rem] bg-primary text-white"
                   icon = { faUnlockKeyhole }
                   onSubmit = { authenticate }

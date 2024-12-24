@@ -29,18 +29,14 @@ export default function Pagination(props: PaginationProps): JSX.Element {
             type: "updateState",
             value: {
                id: "page",
-               input: {
-                  ...globalState.page,
+               value: {
                   value: page
                }
             }
          });
 
          window.localStorage.setItem("page", String(page));
-      }, [
-         globalDispatch,
-         globalState.page
-      ]);
+      }, [globalDispatch]);
 
    const handleLeftClick = () => {
       handlePageClick(Math.max(0, page - 1));
@@ -55,12 +51,10 @@ export default function Pagination(props: PaginationProps): JSX.Element {
          type: "updateStates",
          value: {
             paging: {
-               ...globalState.paging,
                value: Number.parseInt(event.target.value)
             },
             page: {
-               ...globalState.page,
-               // Reset to initial page index
+               // Reset to the initial page
                value: 0
             }
          }
@@ -68,11 +62,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
 
       window.localStorage.setItem("paging", String(event.target.value));
       document.getElementById("workoutsView")?.scrollIntoView({ behavior: "smooth", block: "start" });
-   }, [
-      globalDispatch,
-      globalState.paging,
-      globalState.page
-   ]);
+   }, [globalDispatch]);
 
    return (
       workouts.length > 0 && (

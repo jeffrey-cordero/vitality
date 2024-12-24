@@ -79,7 +79,6 @@ export function Input(props: VitalityInputProps): JSX.Element {
             id: id,
             value: {
                data: {
-                  ...input.data,
                   type: inputType === "password" ? "text" : "password"
                }
             }
@@ -87,7 +86,6 @@ export function Input(props: VitalityInputProps): JSX.Element {
       });
    }, [
       dispatch,
-      input,
       id,
       inputType
    ]);

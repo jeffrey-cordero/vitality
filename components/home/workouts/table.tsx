@@ -40,10 +40,8 @@ function Row(props: RowProps) {
          type: "updateState",
          value: {
             id: "workouts",
-            input: {
-               ...globalState.workouts,
+            value: {
                data: {
-                  ...globalState.workouts.data,
                   selected: newSelected
                }
             }
@@ -52,7 +50,6 @@ function Row(props: RowProps) {
    }, [
       globalDispatch,
       selected,
-      globalState.workouts,
       workout
    ]);
 
@@ -87,8 +84,7 @@ function Row(props: RowProps) {
          type: "updateState",
          value: {
             id: "workout",
-            input: {
-               ...globalState.workout,
+            value: {
                value: workout,
                data: {
                   display: true
@@ -96,7 +92,10 @@ function Row(props: RowProps) {
             }
          }
       });
-   }, [globalDispatch, globalState.workout, workout]);
+   }, [
+      workout,
+      globalDispatch
+   ]);
 
    return (
       <div
@@ -201,19 +200,14 @@ export default function Table(props: TableProps): JSX.Element {
             type: "updateState",
             value: {
                id: "workouts",
-               input: {
-                  ...globalState.workouts,
+               value: {
                   data: {
-                     ...globalState.workouts.data,
                      selected: newSelected
                   }
                }
             }
          });
-      }, [
-         globalDispatch,
-         globalState.workouts
-      ]);
+      }, [globalDispatch]);
 
    const handleWorkoutToggle = useMemo(() => {
       return () => {
@@ -257,16 +251,13 @@ export default function Table(props: TableProps): JSX.Element {
             type: "updateStates",
             value: {
                workouts: {
-                  ...globalState.workouts,
                   value: newWorkouts,
                   data: {
-                     ...globalState.workouts.data,
                      filtered: newFiltered,
                      selected: newSelected
                   }
                },
                page: {
-                  ...globalState.page,
                   value: page >= pages ? Math.max(0, page - 1) : page
                }
             }

@@ -15,20 +15,20 @@ import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/home/workouts/tags";
 
 const form: VitalityState = {
    tagTitle: {
+      id: "tagTitle",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    tagColor: {
+      id: "tagColor",
       value: null,
       error: null,
-      data: {},
       handlesChanges: true
    },
    tagSearch: {
+      id: "tagSearch",
       value: "",
-      error: null,
-      data: {}
+      error: null
    }
 };
 
@@ -86,17 +86,13 @@ function TagColorInput(props: VitalityChildProps) {
             type: "updateState",
             value: {
                id: "tagColor",
-               input: {
-                  ...localState.tagColor,
+               value: {
                   value: color,
                   error: null
                }
             }
          });
-      }, [
-         localDispatch,
-         localState
-      ]);
+      }, [localDispatch]);
 
    return (
       <div className = "relative mx-auto flex w-full flex-col gap-1">
@@ -185,10 +181,8 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
                   type: "updateState",
                   value: {
                      id: "tags",
-                     input: {
-                        ...globalState.tags,
+                     value: {
                         data: {
-                           ...globalState.tags.data,
                            options: newTags,
                            selected: newSelected,
                            dictionary: newDictionary
@@ -209,11 +203,9 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
                type: "updateStates",
                value: {
                   tagTitle: {
-                     ...localState.tagTitle,
                      error: response.body.errors["title"]?.[0] ?? null
                   },
                   tagColor: {
-                     ...localState.tagColor,
                      error: response.body.errors["color"]?.[0] ?? null
                   }
                }
@@ -296,14 +288,7 @@ interface TagContainerProps extends VitalityChildProps {
 }
 
 function TagContainer(props: TagContainerProps): JSX.Element {
-   const {
-      tag,
-      selected,
-      globalState,
-      globalDispatch,
-      localState,
-      localDispatch
-   } = props;
+   const { tag, selected, globalState, globalDispatch, localDispatch } = props;
    const tagRef = useRef<HTMLLIElement>(null);
 
    // Handle adding or removing a selected tag
@@ -313,10 +298,8 @@ function TagContainer(props: TagContainerProps): JSX.Element {
             type: "updateState",
             value: {
                id: "tags",
-               input: {
-                  ...globalState.tags,
+               value: {
                   data: {
-                     ...globalState.tags.data,
                      selected: adding
                         ? [...globalState.tags.data?.selected, tag]
                         : [...globalState.tags.data?.selected].filter(
@@ -338,12 +321,10 @@ function TagContainer(props: TagContainerProps): JSX.Element {
          type: "updateStates",
          value: {
             tagTitle: {
-               ...localState.tagTitle,
                value: tag.title,
                error: null
             },
             tagColor: {
-               ...localState.tagColor,
                value: tag.color,
                error: null
             }
@@ -351,7 +332,6 @@ function TagContainer(props: TagContainerProps): JSX.Element {
       });
    }, [
       localDispatch,
-      localState,
       tag.color,
       tag.title
    ]);
@@ -503,10 +483,8 @@ export default function Tags(props: TagsProps): JSX.Element {
                type: "updateState",
                value: {
                   id: "tags",
-                  input: {
-                     ...globalState.tags,
+                  value: {
                      data: {
-                        ...globalState.tags.data,
                         options: newOptions,
                         selected: newSelected,
                         dictionary: newDictionary
@@ -524,7 +502,6 @@ export default function Tags(props: TagsProps): JSX.Element {
             type: "updateStates",
             value: {
                tagSearch: {
-                  ...localState.tagSearch,
                   error: response.body.errors["title"]?.[0] ?? null
                }
             }

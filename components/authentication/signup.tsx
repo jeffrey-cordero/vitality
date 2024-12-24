@@ -212,7 +212,7 @@ export default function SignUp(): JSX.Element {
                />
                <Button
                   ref = { signupButtonRef }
-                  type = "submit"
+                  type = "button"
                   className = "h-[2.6rem] bg-primary text-white"
                   icon = { faUserPlus }
                   onSubmit = { register }

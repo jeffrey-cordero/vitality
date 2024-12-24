@@ -11,8 +11,6 @@ import { formReducer, VitalityState } from "@/lib/global/reducer";
 import { fetchWorkoutTags } from "@/lib/home/workouts/tags";
 import { fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
 
-const pagingValues = new Set<number>([5, 10, 25, 50, 100, 500, 1000]);
-
 const form: VitalityState = {
    search: {
       id: "search",
@@ -89,6 +87,8 @@ const form: VitalityState = {
       handlesChanges: true
    }
 };
+
+const pagingValues = new Set<number>([5, 10, 25, 50, 100, 500, 1000]);
 
 export default function Page(): JSX.Element {
    const { user } = useContext(AuthenticationContext);

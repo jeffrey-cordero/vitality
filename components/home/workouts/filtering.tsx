@@ -141,7 +141,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
 
       if (Object.keys(errors).length > 0) {
          globalDispatch({
-            type: "updateErrors",
+            type: "processResponse",
             value: sendErrorMessage(
                "Invalid Date filter(s)",
                errors,
@@ -150,7 +150,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
       } else {
          // Remove all errors, if any, and apply filter all available workouts
          globalDispatch({
-            type: "updateErrors",
+            type: "processResponse",
             value: sendSuccessMessage("Success", null)
          });
 
@@ -168,10 +168,8 @@ function FilterByDate(props: VitalityProps): JSX.Element {
             type: "updateState",
             value: {
                id: "workouts",
-               input: {
-                  ...globalState.workouts,
+               value: {
                   data: {
-                     ...globalState.workouts.data,
                      filtered: filteredWorkouts,
                      appliedDateFiltering: true
                   }
@@ -210,7 +208,6 @@ function FilterByDate(props: VitalityProps): JSX.Element {
             // Reset filtered workouts
             workouts: {
                data: {
-                  ...globalState.workouts.data,
                   appliedDateFiltering: false,
                   filtered: newFiltered
                },
@@ -218,22 +215,18 @@ function FilterByDate(props: VitalityProps): JSX.Element {
             },
             // Reset date filtering inputs
             dateFilter: {
-               ...globalState.dateFilter,
                error: null
             },
             minDate: {
-               ...globalState.minDate,
                error: null,
                value: ""
             },
             maxDate: {
-               ...globalState.maxDate,
                error: null,
                value: ""
             },
             // Reset view to the first page
             page: {
-               ...globalState.page,
                error: null,
                value: 0
             }
@@ -241,10 +234,6 @@ function FilterByDate(props: VitalityProps): JSX.Element {
       });
    }, [
       globalDispatch,
-      globalState.page,
-      globalState.maxDate,
-      globalState.minDate,
-      globalState.dateFilter,
       globalState.workouts.data,
       globalState.workouts.value,
       globalState.tags.data?.filtered
@@ -350,10 +339,8 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          type: "updateState",
          value: {
             id: "tags",
-            input: {
-               ...globalState.tags,
+            value: {
                data: {
-                  ...globalState.tags.data,
                   selected: globalState.tags.data?.filtered
                }
             }
@@ -369,10 +356,8 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          type: "updateState",
          value: {
             id: "tags",
-            input: {
-               ...globalState.tags,
+            value: {
                data: {
-                  ...globalState.tags.data,
                   // Store filtered tags selection for future `handleDisplayFilteredTags` invocations
                   filtered: globalState.tags.data?.selected
                }
@@ -395,10 +380,8 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          type: "updateState",
          value: {
             id: "workouts",
-            input: {
-               ...globalState.workouts,
+            value: {
                data: {
-                  ...globalState.workouts.data,
                   filtered: filteredWorkouts,
                   appliedTagsFiltering: true
                }
@@ -430,7 +413,6 @@ function FilterByTags(props: VitalityProps): JSX.Element {
          value: {
             workouts: {
                data: {
-                  ...globalState.workouts.data,
                   appliedTagsFiltering: false,
                   filtered: newFiltered
                },
@@ -438,7 +420,6 @@ function FilterByTags(props: VitalityProps): JSX.Element {
             },
             tags: {
                data: {
-                  ...globalState.tags.data,
                   selected: [],
                   filtered: []
                },

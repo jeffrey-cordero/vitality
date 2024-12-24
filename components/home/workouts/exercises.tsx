@@ -20,6 +20,7 @@ import { Workout } from "@/lib/home/workouts/workouts";
 
 const form: VitalityState = {
    name: {
+      id: "name",
       value: "",
       error: null,
       data: {
@@ -28,36 +29,38 @@ const form: VitalityState = {
       }
    },
    weight: {
+      id: "weight",
       value: "",
       error: null,
       data: {}
    },
    repetitions: {
+      id: "repetitions",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    hours: {
+      id: "hours",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    minutes: {
+      id: "minutes",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    seconds: {
+      id: "seconds",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    text: {
+      id: "text",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    exerciseId: {
+      id: "exerciseId",
       value: null,
       error: null,
       data: {
@@ -112,12 +115,11 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
                   localDispatch({
                      type: "updateState",
                      value: {
-                        input: {
-                           ...localState.name,
+                        id: "name",
+                        value: {
                            value: "",
                            error: null
-                        },
-                        id: "name"
+                        }
                      }
                   });
                }
@@ -290,42 +292,35 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
    const handleExerciseSetEdits = useCallback(() => {
       // Update inputs to match set props
       localDispatch({
-         type: "initializeState",
+         type: "updateStates",
          value: {
             exerciseId: {
-               ...localState.exerciseId,
                value: exercise.id,
                data: {
                   setId: set?.id ?? ""
                }
             },
             weight: {
-               ...localState.weight,
                value: set?.weight ?? "",
                error: null
             },
             repetitions: {
-               ...localState.repetitions,
                value: set?.repetitions ?? "",
                error: null
             },
             hours: {
-               ...localState.hours,
                value: set?.hours ?? "",
                error: null
             },
             minutes: {
-               ...localState.minutes,
                value: set?.minutes ?? "",
                error: null
             },
             seconds: {
-               ...localState.seconds,
                value: set?.seconds ?? "",
                error: null
             },
             text: {
-               ...localState.text,
                value: set?.text ?? "",
                error: null
             }
@@ -337,20 +332,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
    }, [
       exercise.id,
       localDispatch,
-      localState.exerciseId,
-      localState.hours,
-      localState.minutes,
-      localState.repetitions,
-      localState.seconds,
-      localState.text,
-      localState.weight,
-      set?.hours,
-      set?.id,
-      set?.minutes,
-      set?.repetitions,
-      set?.seconds,
-      set?.text,
-      set?.weight
+      set
    ]);
 
    const doubleTap = useDoubleTap(handleExerciseSetEdits);
@@ -704,8 +686,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          type: "updateState",
          value: {
             id: "name",
-            input: {
-               ...localState.name,
+            value: {
                value: exercise.name,
                error: null,
                data: {
@@ -720,8 +701,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    }, [
       exercise.id,
       exercise.name,
-      localDispatch,
-      localState.name
+      localDispatch
    ]);
 
    const handleResetExerciseSet = useCallback((setId: string) => {
@@ -730,39 +710,32 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          type: "updateStates",
          value: {
             exerciseId: {
-               ...localState.exerciseId,
                value: exercise.id,
                data: {
                   setId: setId
                }
             },
             weight: {
-               ...localState.weight,
                value: "",
                error: null
             },
             repetitions: {
-               ...localState.repetitions,
                value: "",
                error: null
             },
             hours: {
-               ...localState.hours,
                value: "",
                error: null
             },
             minutes: {
-               ...localState.minutes,
                value: "",
                error: null
             },
             seconds: {
-               ...localState.seconds,
                value: "",
                error: null
             },
             text: {
-               ...localState.text,
                value: "",
                error: null
             }
@@ -772,14 +745,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       setAddSet(true);
    }, [
       exercise.id,
-      localDispatch,
-      localState.exerciseId,
-      localState.hours,
-      localState.minutes,
-      localState.repetitions,
-      localState.seconds,
-      localState.text,
-      localState.weight
+      localDispatch
    ]);
 
    const doubleTap = useDoubleTap(handleDisplayEditName);
@@ -800,12 +766,11 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                            localDispatch({
                               type: "updateState",
                               value: {
-                                 input: {
-                                    ...localState.name,
+                                 id: "name",
+                                 value: {
                                     value: "",
                                     error: null
-                                 },
-                                 id: "name"
+                                 }
                               }
                            });
                         }
@@ -960,8 +925,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
          type: "updateState",
          value: {
             id: "name",
-            input: {
-               ...localState.name,
+            value: {
                value: "",
                error: null,
                data: {
@@ -973,10 +937,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
       });
 
       setAddExercise(true);
-   }, [
-      localDispatch,
-      localState.name
-   ]);
+   }, [localDispatch]);
 
    const handleSaveExercises = useCallback(async(updatingExercises: Exercise[]) => {
       // Update editing workout and overall workouts
@@ -995,14 +956,11 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
          type: "updateStates",
          value: {
             workout: {
-               ...globalState.workout,
                value: newWorkout
             },
             workouts: {
-               ...globalState.workouts,
                value: newWorkouts,
                data: {
-                  ...globalState.workouts.data,
                   filtered: newFiltered
                }
             }
@@ -1012,9 +970,9 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
       setAddExercise(false);
    }, [
       globalDispatch,
-      globalState.workout,
-      globalState.workouts,
-      workout
+      workout,
+      globalState.workouts.value,
+      globalState.workouts.data?.filtered
    ]);
 
    // Drag and drop for exercises

@@ -65,8 +65,7 @@ function Card(props: CardProps): JSX.Element {
                   type: "updateState",
                   value: {
                      id: "workout",
-                     input: {
-                        ...globalState.workout,
+                     value: {
                         value: workout,
                         data: {
                            display: true
