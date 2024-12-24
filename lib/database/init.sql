@@ -41,10 +41,10 @@ CREATE TABLE "exercises" (
 
 CREATE INDEX "exercises_workout_index" ON "exercises" (workout_id);
 
-CREATE TABLE "sets" (
+CREATE TABLE "exercise_entries" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       exercise_id UUID NOT NULL REFERENCES "exercises"(id) ON DELETE CASCADE ON UPDATE CASCADE,
-      set_order INTEGER NOT NULL,
+      entry_order INTEGER NOT NULL,
       weight INTEGER,
       hours INTEGER,
       minutes INTEGER,
@@ -53,7 +53,7 @@ CREATE TABLE "sets" (
       text TEXT
 );
 
-CREATE INDEX "sets_exercise_index" ON "sets" (exercise_id);
+CREATE INDEX "entries_exercise_index" ON "exercise_entries" (exercise_id);
 
 CREATE TABLE "workout_tags" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -15,8 +15,9 @@ import { Input } from "@/components/global/input";
 import TextArea from "@/components/global/textarea";
 import { formReducer, VitalityChildProps, VitalityProps, VitalityState } from "@/lib/global/reducer";
 import { processResponse, VitalityResponse } from "@/lib/global/response";
-import { addExercise, Exercise, ExerciseSet, isEmptyExerciseSet, updateExercise, updateExercises } from "@/lib/home/workouts/exercises";
+import { addExercise, Exercise, ExerciseEntry, isEmptyExerciseEntry, updateExercise, updateExercises } from "@/lib/home/workouts/exercises";
 import { Workout } from "@/lib/home/workouts/workouts";
+import ExerciseEntryContainer from "@/components/home/workouts/entries";
 
 const form: VitalityState = {
    name: {
@@ -64,7 +65,7 @@ const form: VitalityState = {
       value: null,
       error: null,
       data: {
-         setId: ""
+         entryId: ""
       }
    }
 };
@@ -81,7 +82,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          workout_id: workout.id,
          name: localState.name.value.trim(),
          exercise_order: workout.exercises.length,
-         sets: []
+         entries: []
       };
 
       const response: VitalityResponse<Exercise> = await addExercise(user.id, payload);
@@ -163,369 +164,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
    );
 }
 
-interface ExerciseSetProps extends ExerciseProps {
-   set: ExerciseSet | undefined;
-   reset: () => void;
-}
-
-function SetContainer(props: ExerciseSetProps): JSX.Element {
-   const { user } = useContext(AuthenticationContext);
-   const { updateNotifications } = useContext(NotificationContext);
-   const { workout, exercise, set, localState, localDispatch, onBlur, reset, saveExercises } = props;
-   const [isEditing, setIsEditing] = useState<boolean>(set === undefined);
-   const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
-
-   // Interning exercise set form inputs
-   const isNewSet: boolean = set === undefined;
-   const editingExerciseId: string = localState.exerciseId.value;
-   const editingSetId: string = localState.exerciseId.data?.setId;
-   const displayEditSet = isEditing && exercise.id === editingExerciseId && (isNewSet ? editingSetId === "" : set.id === editingSetId);
-
-   // Prevent drag and drop mechanisms when creating or editing an exercise set
-   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-      id: set?.id,
-      disabled: isNewSet || displayEditSet
-   });
-
-   const style = {
-      transform: CSS.Transform.toString(transform),
-      transition
-   };
-
-   const handleConstructExerciseSet = useCallback(() => {
-      // Helper method to format the set inputs for the backend methods
-      const parseSetNumber = (value: any) => {
-         const isEmpty: boolean = typeof value === "string" && value.trim().length === 0;
-         const number: number = +value;
-
-         return (isEmpty || isNaN(number) || number < 0) ? null : number;
-      };
-
-      return {
-         ...set,
-         id: isNewSet ? "" : set.id,
-         exercise_id: exercise.id,
-         set_order: isNewSet ? exercise.sets.length : set.set_order,
-         weight: parseSetNumber(localState.weight.value),
-         repetitions: parseSetNumber(localState.repetitions.value),
-         hours: parseSetNumber(localState.hours.value),
-         minutes: parseSetNumber(localState.minutes.value),
-         seconds: parseSetNumber(localState.seconds.value),
-         text: localState.text.value.trim()
-      };
-   }, [
-      set,
-      isNewSet,
-      exercise.id,
-      exercise.sets.length,
-      localState.hours.value,
-      localState.minutes.value,
-      localState.repetitions.value,
-      localState.seconds.value,
-      localState.text.value,
-      localState.weight.value
-   ]);
-
-   const handleUpdateSet = useCallback(async(method: "add" | "update" | "delete") => {
-      const newSet: ExerciseSet = handleConstructExerciseSet();
-      let response: VitalityResponse<Exercise>;
-
-      if (await isEmptyExerciseSet(newSet)) {
-         // Prevent empty exercise set submissions
-         return;
-      }
-
-      if (method === "add") {
-         // Add new set to array of exercise sets
-         const newSets: ExerciseSet[] = [...exercise.sets, newSet];
-         const newExercise: Exercise = {
-            ...exercise,
-            sets: newSets
-         };
-
-         response = await updateExercise(user.id, newExercise, "sets");
-      } else {
-         // Update or delete set from array of exercise sets
-         const newSets: ExerciseSet[] =
-            method === "update"
-               ? [...exercise.sets].map((s) => (s.id === newSet.id ? newSet : s))
-               : [...exercise.sets].filter((s) => s.id !== newSet.id);
-         const newExercise: Exercise = {
-            ...exercise,
-            sets: newSets
-         };
-
-         response = await updateExercise(user.id, newExercise, "sets");
-      }
-
-      processResponse(response, localDispatch, updateNotifications, () => {
-         // Update editing exercise
-         const newExercises: Exercise[] = [...workout.exercises].map((e) =>
-            e.id === exercise.id ? response.body.data as Exercise : e,
-         );
-
-         saveExercises(newExercises);
-
-         method === "delete" && updateNotifications({
-            status: "Success",
-            message: "Delete entry",
-            timer: 1000
-         });
-
-         onBlur();
-      });
-   }, [
-      user,
-      exercise,
-      handleConstructExerciseSet,
-      localDispatch,
-      saveExercises,
-      updateNotifications,
-      workout.exercises,
-      onBlur
-   ]);
-
-   const handleSubmitUpdates = useCallback(() => {
-      updateButtonRef.current?.submit();
-   }, []);
-
-   const handleExerciseSetEdits = useCallback(() => {
-      // Update inputs to match set props
-      localDispatch({
-         type: "updateStates",
-         value: {
-            exerciseId: {
-               value: exercise.id,
-               data: {
-                  setId: set?.id ?? ""
-               }
-            },
-            weight: {
-               value: set?.weight ?? "",
-               error: null
-            },
-            repetitions: {
-               value: set?.repetitions ?? "",
-               error: null
-            },
-            hours: {
-               value: set?.hours ?? "",
-               error: null
-            },
-            minutes: {
-               value: set?.minutes ?? "",
-               error: null
-            },
-            seconds: {
-               value: set?.seconds ?? "",
-               error: null
-            },
-            text: {
-               value: set?.text ?? "",
-               error: null
-            }
-         }
-      });
-
-      // Display inputs
-      setIsEditing(true);
-   }, [
-      exercise.id,
-      localDispatch,
-      set
-   ]);
-
-   const doubleTap = useDoubleTap(handleExerciseSetEdits);
-
-   return (
-      <div
-         ref = { setNodeRef }
-         style = { style }
-         className = "mx-auto w-full"
-      >
-         {
-            displayEditSet ? (
-               <li className = "relative mx-auto mt-10 flex w-full flex-col items-stretch justify-start gap-2 px-2 text-center font-medium sm:px-8">
-                  <FontAwesomeIcon
-                     icon = { faArrowRotateLeft }
-                     onClick = { reset }
-                     className = "absolute right-[35px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer pr-2 text-base text-primary sm:pr-8"
-                  />
-                  <FontAwesomeIcon
-                     icon = { faXmark }
-                     className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer pr-2 text-xl text-red-500 sm:pr-8"
-                     onClick = {
-                        () => {
-                           if (isNewSet) {
-                              // Remove from DOM for new exercise set inputs
-                              onBlur();
-                           }
-
-                           setIsEditing(false);
-                        }
-                     }
-                  />
-
-                  <Input
-                     id = "weight"
-                     type = "number"
-                     label = "Weight"
-                     min = "0"
-                     icon = { faDumbbell }
-                     input = { localState.weight }
-                     dispatch = { localDispatch }
-                     onSubmit = { handleSubmitUpdates }
-                     autoFocus
-                  />
-                  <Input
-                     id = "repetitions"
-                     type = "number"
-                     label = "Repetitions"
-                     min = "0"
-                     icon = { faArrowUp91 }
-                     input = { localState.repetitions }
-                     dispatch = { localDispatch }
-                     onSubmit = { handleSubmitUpdates }
-                  />
-                  <div className = "flex flex-col items-start justify-between gap-2 sm:flex-row">
-                     <div className = "mx-auto w-full">
-                        <Input
-                           id = "hours"
-                           type = "number"
-                           label = "Hours"
-                           min = "0"
-                           icon = { faStopwatch }
-                           input = { localState.hours }
-                           dispatch = { localDispatch }
-                           onSubmit = { handleSubmitUpdates }
-                        />
-                     </div>
-                     <div className = "mx-auto w-full">
-                        <Input
-                           id = "minutes"
-                           type = "number"
-                           label = "Minutes"
-                           min = "0"
-                           icon = { faStopwatch }
-                           input = { localState.minutes }
-                           dispatch = { localDispatch }
-                           onSubmit = { handleSubmitUpdates }
-                        />
-                     </div>
-                     <div className = "mx-auto w-full">
-                        <Input
-                           id = "seconds"
-                           type = "number"
-                           label = "Seconds"
-                           min = "0"
-                           icon = { faStopwatch }
-                           input = { localState.seconds }
-                           dispatch = { localDispatch }
-                           onSubmit = { handleSubmitUpdates }
-                           scrollIntoView
-                        />
-                     </div>
-                  </div>
-                  <TextArea
-                     id = "text"
-                     type = "text"
-                     label = "Text"
-                     icon = { faAlignJustify }
-                     input = { localState.text }
-                     dispatch = { localDispatch }
-                  />
-                  <Button
-                     ref = { updateButtonRef }
-                     type = "button"
-                     className = "h-10 w-full border-[1.5px] border-gray-100 bg-green-500 px-4 py-2 font-semibold text-white focus:border-green-700 focus:ring-2 focus:ring-green-700 dark:border-0"
-                     icon = { faPersonRunning }
-                     onSubmit = { () => handleUpdateSet(isNewSet ? "add" : "update") }
-                     onClick = { handleSubmitUpdates }
-                     isSingleSubmission = { isNewSet ? true : undefined }
-                  >
-                     { isNewSet ? "Create" : "Update" }
-                  </Button>
-                  {
-                     !isNewSet && (
-                        <Confirmation
-                           message = "Delete entry?"
-                           onConfirmation = { () => handleUpdateSet("delete") }
-                        />
-                     )
-                  }
-               </li>
-            ) : (
-               !isNewSet && (
-                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pt-2 text-left text-[0.9rem] font-semibold [overflow-wrap:anywhere] xxsm:pl-8 xxsm:text-base">
-                     <div
-                        className = "cursor-grab touch-none pt-1 text-sm"
-                        { ...attributes }
-                        { ...listeners }
-                     >
-                        <FontAwesomeIcon icon = { faCircleNotch } />
-                     </div>
-                     <div
-                        className = "flex cursor-pointer flex-col gap-2 pl-2"
-                        { ...doubleTap }
-                     >
-                        {
-                           set.weight !== null && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
-                                 <FontAwesomeIcon
-                                    className = "self-start pt-1 text-primary"
-                                    icon = { faDumbbell }
-                                 />
-                                 <p>{ set.weight }</p>
-                              </div>
-                           )
-                        }
-                        {
-                           set.repetitions !== null && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
-                                 <FontAwesomeIcon
-                                    className = "self-start pt-1 text-primary"
-                                    icon = { faArrowUp91 }
-                                 />
-                                 <p>{ set.repetitions }</p>
-                              </div>
-                           )
-                        }
-                        {
-                           (set.hours !== null || set.minutes !== null || set.seconds !== null) && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
-                                 <FontAwesomeIcon
-                                    className = "self-start pt-1 text-primary"
-                                    icon = { faStopwatch }
-                                 />
-                                 <p>
-                                    { String(set.hours ?? 0).padStart(2, "0") }:
-                                    { String(set.minutes ?? 0).padStart(2, "0") }:
-                                    { String(set.seconds ?? 0).padStart(2, "0") }
-                                 </p>
-                              </div>
-                           )
-                        }
-                        {
-                           set.text && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
-                                 <FontAwesomeIcon
-                                    className = "self-start pt-1 text-primary"
-                                    icon = { faAlignJustify }
-                                 />
-                                 <p className = "[overflow-wrap:anywhere] ">{ set.text }</p>
-                              </div>
-                           )
-                        }
-                     </div>
-                  </li>
-               )
-            )
-         }
-      </div>
-   );
-}
-
-interface ExerciseProps extends ExercisesProps, VitalityChildProps {
+export interface ExerciseProps extends ExercisesProps, VitalityChildProps {
    exercise: Exercise;
    onBlur?: () => void;
    saveExercises: (_updatingExercises: Exercise[]) => void;
@@ -848,16 +487,16 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                         <ul
                            className = {
                               clsx("mx-auto my-1 flex w-full list-disc flex-col gap-2", {
-                                 "hidden" : exercise.sets.length === 0 && !addSet
+                                 "hidden" : exercise.entries.length === 0 && !addSet
                               })
                            }
                         >
                            {
-                              exercise.sets.map((set: ExerciseSet) => {
+                              exercise.entries.map((set: ExerciseSet) => {
                                  return (
-                                    <SetContainer
+                                    <ExerciseEntryContainer
                                        { ...props }
-                                       set = { set }
+                                       entry = { set }
                                        onBlur = { () => {} }
                                        key = { set.id }
                                        reset = { () => handleResetExerciseSet(set.id) }
@@ -867,9 +506,9 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                            }
                            {
                               addSet && (
-                                 <SetContainer
+                                 <ExerciseEntryContainer
                                     { ...props }
-                                    set = { undefined }
+                                    entry = { undefined }
                                     onBlur = { () => setAddSet(false) }
                                     reset = { () => handleResetExerciseSet("") }
                                  />

@@ -1,12 +1,12 @@
 "use server";
-import { workout_applied_tags } from "@prisma/client";
 import { z } from "zod";
+import { workout_applied_tags } from '@prisma/client';
 
 import { authorizeAction } from "@/lib/authentication/session";
 import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
 import { uuidSchema } from "@/lib/global/zod";
 import { Exercise } from "@/lib/home/workouts/exercises";
-import { formateDatabaseWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
+import { formatDatabaseWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
 import prisma from "@/lib/prisma/client";
 
 export type Workout = {
@@ -68,7 +68,11 @@ export async function fetchWorkouts(
             },
             exercises: {
                include: {
-                  sets: true
+                  exercise_entries: {
+                     orderBy: {
+                        entry_order: "asc"
+                     }
+                  }
                },
                orderBy: {
                   exercise_order: "asc"
@@ -84,7 +88,7 @@ export async function fetchWorkouts(
       });
 
       return workouts.map(
-         (workout) => formateDatabaseWorkout(workout)
+         (workout) => formatDatabaseWorkout(workout)
       );
    } catch (error) {
       return [];
@@ -129,7 +133,11 @@ export async function addWorkout(
             },
             exercises: {
                include: {
-                  sets: true
+                  exercise_entries: {
+                     orderBy: {
+                        entry_order: "asc"
+                     }
+                  }
                },
                orderBy: {
                   exercise_order: "asc"
@@ -138,7 +146,7 @@ export async function addWorkout(
          }
       });
 
-      return sendSuccessMessage("Added new workout", formateDatabaseWorkout(newWorkout));
+      return sendSuccessMessage("Added new workout", formatDatabaseWorkout(newWorkout));
    } catch (error) {
       return sendFailureMessage(error);
    }
@@ -173,7 +181,11 @@ export async function updateWorkout(
                },
                exercises: {
                   include: {
-                     sets: true
+                     exercise_entries: {
+                        orderBy: {
+                           entry_order: "asc"
+                        }
+                     }
                   },
                   orderBy: {
                      exercise_order: "asc"
@@ -221,7 +233,11 @@ export async function updateWorkout(
                },
                exercises: {
                   include: {
-                     sets: true
+                     exercise_entries: {
+                        orderBy: {
+                           entry_order: "asc"
+                        }
+                     }
                   },
                   orderBy: {
                      exercise_order: "asc"
@@ -232,7 +248,7 @@ export async function updateWorkout(
 
          return sendSuccessMessage(
             "Successfully updated workout",
-            formateDatabaseWorkout(updatedWorkout),
+            formatDatabaseWorkout(updatedWorkout),
          );
       }
    } catch (error) {

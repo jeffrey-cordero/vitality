@@ -4,14 +4,14 @@ import { z } from "zod";
 import { authorizeAction } from "@/lib/authentication/session";
 import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
 import { uuidSchema } from "@/lib/global/zod";
-import { formateDatabaseWorkout } from "@/lib/home/workouts/shared";
+import { formatDatabaseExercise, formatDatabaseWorkout } from "@/lib/home/workouts/shared";
 import { Workout } from "@/lib/home/workouts/workouts";
 import prisma from "@/lib/prisma/client";
 
-export type ExerciseSet = {
+export type ExerciseEntry = {
   id: string;
   exercise_id: string;
-  set_order: number;
+  entry_order: number;
   hours?: number;
   minutes?: number;
   seconds?: number;
@@ -22,11 +22,11 @@ export type ExerciseSet = {
 
 const MAX_NUMBER: number = 2147483647;
 
-const setSchema = z.object({
-   id: uuidSchema("set", "required"),
+const exerciseEntrySchema = z.object({
+   id: uuidSchema("entry", "required"),
    exercise_id: uuidSchema("exercise", "required"),
-   set_order: z.number().min(0, {
-      message: "Set order must be non-negative"
+   entry_order: z.number().min(0, {
+      message: "Entry order must be non-negative"
    }),
    hours: z
       .number()
@@ -81,8 +81,8 @@ const setSchema = z.object({
    text: z.string().optional().nullable()
 });
 
-const newSetSchema = setSchema.extend({
-   id: uuidSchema("set", "new")
+const newExerciseEntrySchema = exerciseEntrySchema.extend({
+   id: uuidSchema("entry", "new")
 });
 
 export type Exercise = {
@@ -90,7 +90,7 @@ export type Exercise = {
   workout_id: string;
   name: string;
   exercise_order: number;
-  sets: ExerciseSet[];
+  entries: ExerciseEntry[];
 };
 
 const exerciseSchema = z.object({
@@ -110,21 +110,18 @@ const newExerciseSchema = exerciseSchema.extend({
    id: uuidSchema("exercise", "new")
 });
 
-export async function isEmptyExerciseSet(set: ExerciseSet) {
+export async function isEmptyExerciseEntry(entry: ExerciseEntry) {
    return (
-      !set.weight &&
-      !set.repetitions &&
-      !set.hours &&
-      !set.minutes &&
-      !set.seconds &&
-      set.text?.trim() === ""
+      !entry.weight &&
+      !entry.repetitions &&
+      !entry.hours &&
+      !entry.minutes &&
+      !entry.seconds &&
+      entry.text?.trim() === ""
    );
 }
 
-export async function addExercise(
-   user_id: string,
-   exercise: Exercise
-): Promise<VitalityResponse<Exercise>> {
+export async function addExercise(user_id: string, exercise: Exercise): Promise<VitalityResponse<Exercise>> {
    try {
       await authorizeAction(user_id);
 
@@ -162,9 +159,9 @@ export async function addExercise(
             "Exercise order must match current workout exercises length",
             null
          );
-      } else if (exercise.sets.length > 0) {
+      } else if (exercise.entries.length > 0) {
          return sendErrorMessage(
-            "Exercise sets must be empty",
+            "Exercise entries must be empty",
             null
          );
       } else {
@@ -175,26 +172,22 @@ export async function addExercise(
                exercise_order: exercise.exercise_order
             },
             include: {
-               sets: {
+               exercise_entries: {
                   orderBy: {
-                     set_order: "asc"
+                     entry_order: "asc"
                   }
                }
             }
          });
 
-         return sendSuccessMessage("Successfully added new exercise", newExercise);
+         return sendSuccessMessage("Successfully added new exercise", formatDatabaseExercise(newExercise));
       }
    } catch (error) {
       return sendFailureMessage(error);
    }
 }
 
-export async function updateExercise(
-   user_id: string,
-   exercise: Exercise,
-   method: "name" | "sets"
-): Promise<VitalityResponse<Exercise>> {
+export async function updateExercise(user_id: string, exercise: Exercise, method: "name" | "entries"): Promise<VitalityResponse<Exercise>> {
    try {
       await authorizeAction(user_id);
 
@@ -227,9 +220,9 @@ export async function updateExercise(
             workout_id: exercise.workout_id
          },
          include: {
-            sets: {
+            exercise_entries: {
                orderBy: {
-                  set_order: "asc"
+                  entry_order: "asc"
                }
             }
          }
@@ -254,9 +247,9 @@ export async function updateExercise(
                name: trimmed
             },
             include: {
-               sets: {
+               exercise_entries: {
                   orderBy: {
-                     set_order: "asc"
+                     entry_order: "asc"
                   }
                }
             }
@@ -264,12 +257,12 @@ export async function updateExercise(
 
          return sendSuccessMessage(
             "Successfully updated exercise name",
-            newExercise
+            formatDatabaseExercise(newExercise)
          );
       } else {
-         // Construct create, update, and delete exercise set arrays
+         // Construct create, update, and delete exercise entry arrays
          const { creating, updating, removing, error, errors } =
-            await getExerciseSetUpdates(existingExercise, exercise);
+            await getExerciseEntryUpdates(existingExercise, exercise);
 
          if (error !== null) {
             return sendErrorMessage(error, errors);
@@ -281,24 +274,24 @@ export async function updateExercise(
                workout_id: exercise.workout_id
             },
             data: {
-               sets: {
+               exercise_entries: {
                   createMany: creating,
                   updateMany: updating,
                   deleteMany: removing
                }
             },
             include: {
-               sets: {
+               exercise_entries: {
                   orderBy: {
-                     set_order: "asc"
+                     entry_order: "asc"
                   }
                }
             }
          });
 
          return sendSuccessMessage(
-            "Successfully updated exercise sets",
-            newExercise
+            "Successfully updated exercise entries",
+            formatDatabaseExercise(newExercise)
          );
       }
    } catch (error) {
@@ -306,64 +299,64 @@ export async function updateExercise(
    }
 }
 
-export async function getExerciseSetUpdates(
+export async function getExerciseEntryUpdates(
    existingExercise: any,
    newExercise: Exercise
 ): Promise<{
-  creating: { data: ExerciseSet[] } | null;
-  updating: { where: { id: string; exercise_id: string }; data: ExerciseSet }[] | null;
+  creating: { data: ExerciseEntry[] } | null;
+  updating: { where: { id: string; exercise_id: string }; data: ExerciseEntry }[] | null;
   removing: { id: { in: string[] }} | null;
   error: null | string;
   errors: null | Record<string, string[] | undefined>
 }> {
-   const existingExerciseSets: string[] = existingExercise?.sets.map(
-      (set: ExerciseSet) => set.id
+   const existingExerciseEntries: string[] = existingExercise?.sets.map(
+      (entry: ExerciseEntry) => entry.id
    );
-   const newExerciseSets: Set<string> = new Set(
-      newExercise.sets.map(
-         (set: ExerciseSet) => set.id
+   const newExerciseEntries: Set<string> = new Set(
+      newExercise.entries.map(
+         (entry: ExerciseEntry) => entry.id
       )
    );
 
-   // Format formatting create/update entries and determine set IDs to remove
+   // Format formatting create/update entries and determine entry ID's to remove
    const creating = [];
    const updating = [];
-   const removing: string[] = existingExerciseSets.filter(
-      (id: string) => !newExerciseSets.has(id)
+   const removing: string[] = existingExerciseEntries.filter(
+      (id: string) => !newExerciseEntries.has(id)
    );
 
-   for (let i = 0; i < newExercise.sets.length; i++) {
-      const set: ExerciseSet = newExercise.sets[i];
+   for (let i = 0; i < newExercise.entries.length; i++) {
+      const entry: ExerciseEntry = newExercise.entries[i];
 
-      // Handle validating constructing or existing exercise set fields
-      const fields = set.id.trim() === ""
-         ? newSetSchema.safeParse(set) : setSchema.safeParse(set);
+      // Handle validating constructing or existing exercise entry fields
+      const fields = entry.id.trim() === ""
+         ? newExerciseEntrySchema.safeParse(entry) : exerciseEntrySchema.safeParse(entry);
 
       if (!fields.success) {
          return {
             creating: null,
             updating: null,
             removing: null,
-            error: `Invalid exercise set fields for set with ID \`${set.id}\``,
+            error: `Invalid exercise entry fields for entry with ID \`${entry.id}\``,
             errors: fields.error.flatten().fieldErrors
          };
-      } else if (await isEmptyExerciseSet(set)) {
+      } else if (await isEmptyExerciseEntry(entry)) {
          return {
             creating: null,
             updating: null,
             removing: null,
-            error: "All exercise sets must be valid and non-empty",
+            error: "All exercise entries must be valid and non-empty",
             errors: null
          };
       } else {
-         const isNewExerciseSet: boolean = !set.id || set.id.trim() === "";
+         const isNewExerciseSet: boolean = !entry.id || entry.id.trim() === "";
 
-         const newExerciseSet: ExerciseSet = {
-            ...newExercise.sets[i],
+         const newExerciseSet: ExerciseEntry = {
+            ...newExercise.entries[i],
             exercise_id: undefined,
-            id: isNewExerciseSet ? undefined : set.id,
-            set_order: i,
-            text: newExercise.sets[i].text?.trim()
+            id: isNewExerciseSet ? undefined : entry.id,
+            entry_order: i,
+            text: newExercise.entries[i].text?.trim()
          };
 
          if (isNewExerciseSet) {
@@ -419,9 +412,9 @@ export async function updateExercises(
          include: {
             exercises: {
                include: {
-                  sets: {
+                  exercise_entries: {
                      orderBy: {
-                        set_order: "asc"
+                        entry_order: "asc"
                      }
                   }
                }
@@ -455,9 +448,9 @@ export async function updateExercises(
          include: {
             exercises: {
                include: {
-                  sets: {
+                  exercise_entries: {
                      orderBy: {
-                        set_order: "asc"
+                        entry_order: "asc"
                      }
                   }
                },
@@ -470,7 +463,7 @@ export async function updateExercises(
 
       return sendSuccessMessage(
          "Successfully updated workout exercise ordering",
-         formateDatabaseWorkout(newWorkout).exercises
+         formatDatabaseWorkout(newWorkout).exercises
       );
    } catch (error) {
       return sendFailureMessage(error);

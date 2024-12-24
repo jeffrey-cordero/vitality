@@ -9,29 +9,14 @@ datasource db {
 }
 
 model exercises {
-  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  workout_id     String   @db.Uuid
-  exercise_order Int
-  name           String   @db.VarChar(50)
-  workouts       workouts @relation(fields: [workout_id], references: [id], onDelete: Cascade)
-  sets           sets[]
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workout_id       String             @db.Uuid
+  exercise_order   Int
+  name             String             @db.VarChar(50)
+  exercise_entries exercise_entries[]
+  workouts         workouts           @relation(fields: [workout_id], references: [id], onDelete: Cascade)
 
   @@index([workout_id], map: "exercises_workout_index")
-}
-
-model sets {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  exercise_id String    @db.Uuid
-  set_order   Int
-  weight      Int?
-  hours       Int?
-  minutes     Int?
-  seconds     Int?
-  repetitions Int?
-  text        String?
-  exercises   exercises @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
-
-  @@index([exercise_id], map: "sets_exercise_index")
 }
 
 model users {
@@ -71,6 +56,21 @@ model workouts {
   users                users                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id], map: "workouts_user_index")
+}
+
+model exercise_entries {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  exercise_id String    @db.Uuid
+  entry_order Int
+  weight      Int?
+  hours       Int?
+  minutes     Int?
+  seconds     Int?
+  repetitions Int?
+  text        String?
+  exercises   exercises @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
+
+  @@index([exercise_id], map: "entries_exercise_index")
 }
 
 model workout_applied_tags {
