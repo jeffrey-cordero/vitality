@@ -4,90 +4,98 @@ import { Dispatch } from "react";
 import { VitalityResponse } from "@/lib/global/response";
 
 export interface VitalityInputState {
+  id: string;
   value: any;
   error: string | null;
-  data: Record<string, any>;
-  handlesOnChange?: boolean;
+  data?: Record<string, any>;
+  handlesChanges?: boolean;
 }
 
-export type VitalityState = Record<string, VitalityInputState>;
-export type VitalityUpdateState = { id: string; input: VitalityInputState };
-
 export interface VitalityProps {
-  globalState: VitalityState;
-  globalDispatch: Dispatch<VitalityAction<any>>;
+   globalState: VitalityState;
+   globalDispatch: Dispatch<VitalityAction<any>>;
 }
 
 export interface VitalityChildProps extends VitalityProps {
-  localState: VitalityState;
-  localDispatch: Dispatch<VitalityAction<any>>;
+   localState: VitalityState;
+   localDispatch: Dispatch<VitalityAction<any>>;
 }
 
-export type VitalityResetState = Record<string, {
-   value: any;
-   data: { [key: string]: any };
-}>
+export type VitalityState = Record<string, VitalityInputState>;
+export type VitalityUpdateState = { id: string; value: Partial<VitalityInputState>};
+export type VitalityUpdateStates = Partial<Record<string, Partial<VitalityInputState>>>;
 
 export interface VitalityAction<T> {
   type:
-    | "initializeState"
     | "updateState"
+    | "resetState"
     | "updateStates"
-    | "updateErrors"
-    | "resetState";
+    | "processResponse"
   value:
-    | VitalityState
     | VitalityUpdateState
+    | VitalityUpdateStates
     | VitalityResponse<T>
-    | VitalityState
-    | VitalityResetState;
 }
 
-export function formReducer(
-   state: VitalityState,
-   action: VitalityAction<any>
-): VitalityState {
+export function formReducer(state: VitalityState, action: VitalityAction<any>): VitalityState {
    return produce(state, (draft) => {
+      const updateDraft = (update: VitalityUpdateState) => {
+         const { id, value } = update;
+
+         // Merge provided state object with existing state object
+         draft[id] = {
+            ...state[id],
+            ...value
+         };
+
+         // If data object currently exists, merge it with provided state data object
+         state[id].data && (draft[id].data = {
+            ...state[id].data,
+            ...value.data
+         });
+      };
+
       switch (action.type) {
-         case "initializeState":
-            const inputs = action.value as VitalityState;
-
-            for (const key of Object.keys(inputs)) {
-               draft[key] = inputs[key];
-            }
-
-            break;
          case "updateState":
-            const { id, input } = action.value as VitalityUpdateState;
-            draft[id] = input;
+            // Update the state object with the provided update
+            updateDraft(action.value as VitalityUpdateState);
 
             break;
          case "updateStates":
-            const updates = action.value as VitalityState;
+            const updates = action.value as VitalityUpdateStates;
 
-            for (const key in state) {
-               draft[key] = updates[key] ?? state[key];
+            for (const key in updates) {
+               // Update each state object with the provided updates
+               updateDraft({
+                  id: key,
+                  value: updates[key]
+               });
             }
 
             break;
-         case "updateErrors":
+         case "processResponse":
             const response = action.value as VitalityResponse<any>;
 
             for (const key in state) {
-               draft[key].error = response.body.errors[key]?.[0] ?? null;
+               // Add applicable error messages or nullify existing errors
+               updateDraft({
+                  id: key,
+                  value: {
+                     error: response.body.errors[key]?.[0] ?? null
+                  }
+               });
             }
 
             break;
          case "resetState":
-            const reset = action.value as VitalityResetState;
+            const reset = action.value as VitalityUpdateStates;
 
             for (const key in state) {
-               draft[key] = {
-                  ...state[key],
-                  value: reset[key]?.value ?? "",
-                  data: reset[key]?.data ?? state[key].data,
-                  error: null
-               };
+               // Reset the state object to its initial value or the provided reset value
+               updateDraft({
+                  id: key,
+                  value: reset[key] ?? state[key]
+               });
             }
 
             break;

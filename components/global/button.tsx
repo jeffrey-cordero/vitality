@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children?: React.ReactNode;
+  children: React.ReactNode;
   onSubmit?: () => Promise<void>;
   onConfirmation?: () => Promise<void>;
   icon?: IconDefinition;

@@ -2,8 +2,8 @@
 import { Dispatch } from "react";
 
 import { NotificationProps } from "@/components/global/notification";
-import { handleResponse, sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
 import { VitalityAction } from "@/lib/global/reducer";
+import { processResponse, sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
 
 // Mocked dependencies
 const dispatch: Dispatch<VitalityAction<any>> = jest.fn();
@@ -21,7 +21,7 @@ describe("Backend Response Tests", () => {
             Number.MAX_VALUE
          );
 
-         handleResponse(response, dispatch, updateNotifications, successMethod);
+         processResponse(response, dispatch, updateNotifications, successMethod);
 
          expect(response).toEqual({
             status: "Success",
@@ -53,7 +53,7 @@ describe("Backend Response Tests", () => {
             name: ["Name must be at least 2 characters"]
          });
 
-         handleResponse(response, dispatch, updateNotifications, successMethod);
+         processResponse(response, dispatch, updateNotifications, successMethod);
 
          expect(response).toEqual({
             status: "Error",
@@ -87,7 +87,7 @@ describe("Backend Response Tests", () => {
 
          response = sendFailureMessage(new Error("Database connection error"));
 
-         handleResponse(response, dispatch, updateNotifications, successMethod);
+         processResponse(response, dispatch, updateNotifications, successMethod);
 
          expect(response).toEqual({
             status: "Failure",

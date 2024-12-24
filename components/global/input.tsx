@@ -17,7 +17,7 @@ export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
 export function Input(props: VitalityInputProps): JSX.Element {
    const { id, label, type, icon, placeholder, className, min, autoFocus, scrollIntoView,
       autoComplete, onChange, onBlur, onSubmit, required, input, dispatch, disabled } = props;
-   const inputType = input.data.type ?? type;
+   const inputType = input.data?.type ?? type;
    const inputRef = useRef<HTMLInputElement>(null);
    const passwordIconRef = useRef<SVGSVGElement | null>(null);
 
@@ -31,16 +31,15 @@ export function Input(props: VitalityInputProps): JSX.Element {
    ]);
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-      // handlesOnChange defined implies state management is handled via the parent component
-      if (input.handlesOnChange) {
+      // handlesChanges defined implies state management is handled via the parent component
+      if (input.handlesChanges) {
          onChange?.call(null, event);
       } else {
          dispatch({
             type: "updateState",
             value: {
                id: id,
-               input: {
-                  ...input,
+               value: {
                   value: event.target.value,
                   error: null
                }
@@ -78,8 +77,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
          type: "updateState",
          value: {
             id: id,
-            input: {
-               ...input,
+            value: {
                data: {
                   ...input.data,
                   type: inputType === "password" ? "text" : "password"
@@ -130,7 +128,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                         icon = { inputType == "password" ? faEye : faEyeSlash }
                         className = {
                            clsx("password-icon size-[0.95rem] shrink-0 xxsm:size-4", {
-                              "text-primary" : input.data.type && input.data.type !== "password"
+                              "text-primary" : input.data?.type && input.data?.type !== "password"
                            })
                         }
                         onClick = { handlePasswordIconClick }
@@ -139,18 +137,18 @@ export function Input(props: VitalityInputProps): JSX.Element {
                )
             }
             {
-               input.data.valid !== undefined && (
+               input.data?.valid !== undefined && (
                   <button
                      tabIndex = { -1 }
                      type = "button"
                      className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
                   >
                      <FontAwesomeIcon
-                        icon = { input.data.valid ? faCircleCheck : faCircleXmark }
+                        icon = { input.data?.valid ? faCircleCheck : faCircleXmark }
                         className = {
                            clsx("size-[0.95rem] shrink-0 xxsm:size-4", {
-                              "text-green-500": input.data.valid,
-                              "text-red-500": !(input.data.valid)
+                              "text-green-500": input.data?.valid,
+                              "text-red-500": !(input.data?.valid)
                            })
                         }
                      />

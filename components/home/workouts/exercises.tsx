@@ -13,8 +13,8 @@ import Button from "@/components/global/button";
 import Confirmation from "@/components/global/confirmation";
 import { Input } from "@/components/global/input";
 import TextArea from "@/components/global/textarea";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { formReducer, VitalityChildProps, VitalityProps, VitalityState } from "@/lib/global/reducer";
+import { processResponse, VitalityResponse } from "@/lib/global/response";
 import { addExercise, Exercise, ExerciseSet, isEmptyExerciseSet, updateExercise, updateExercises } from "@/lib/home/workouts/exercises";
 import { Workout } from "@/lib/home/workouts/workouts";
 
@@ -83,7 +83,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
 
       const response: VitalityResponse<Exercise> = await addExercise(user.id, payload);
 
-      handleResponse(response, localDispatch, updateNotifications, () => {
+      processResponse(response, localDispatch, updateNotifications, () => {
          const newExercises: Exercise[] = [...workout.exercises, response.body.data as Exercise];
          saveExercises(newExercises);
          onBlur();
@@ -176,7 +176,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
    // Interning exercise set form inputs
    const isNewSet: boolean = set === undefined;
    const editingExerciseId: string = localState.exerciseId.value;
-   const editingSetId: string = localState.exerciseId.data.setId;
+   const editingSetId: string = localState.exerciseId.data?.setId;
    const displayEditSet = isEditing && exercise.id === editingExerciseId && (isNewSet ? editingSetId === "" : set.id === editingSetId);
 
    // Prevent drag and drop mechanisms when creating or editing an exercise set
@@ -256,7 +256,7 @@ function SetContainer(props: ExerciseSetProps): JSX.Element {
          response = await updateExercise(user.id, newExercise, "sets");
       }
 
-      handleResponse(response, localDispatch, updateNotifications, () => {
+      processResponse(response, localDispatch, updateNotifications, () => {
          // Update editing exercise
          const newExercises: Exercise[] = [...workout.exercises].map((e) =>
             e.id === exercise.id ? response.body.data as Exercise : e,
@@ -562,7 +562,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    // Interning editing exercise name input
    const collapsedId: string = `collapsed-${exercise.id}`;
    const editingExerciseId: string = localState.exerciseId.value;
-   const editingSetId: string = localState.exerciseId.data.setId;
+   const editingSetId: string = localState.exerciseId.data?.setId;
    const displayEditName = editing && editName && exercise.id === id;
    const hideNewSetButton = addSet && exercise.id === editingExerciseId && editingSetId === "";
 
@@ -627,7 +627,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                "sets",
             );
 
-            handleResponse(response, localDispatch, updateNotifications, () => {
+            processResponse(response, localDispatch, updateNotifications, () => {
                // Submit changes to global state from response data
                const newExercises: Exercise[] = [...workout.exercises].map(
                   (e) => e.id === exercise.id ? response.body.data as Exercise : e,
@@ -645,7 +645,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          name: localState.name.value.trim()
       };
 
-      handleResponse(await updateExercise(user.id, newExercise, "name"), localDispatch, updateNotifications, () => {
+      processResponse(await updateExercise(user.id, newExercise, "name"), localDispatch, updateNotifications, () => {
          // Update the overall workout exercises
          const newExercises: Exercise[] = [...workout.exercises].map((e) =>
             e.id !== exercise.id ? e : newExercise,
@@ -677,7 +677,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
 
       const response: VitalityResponse<Exercise[]> = await updateExercises(newWorkout);
 
-      handleResponse(response, localDispatch, updateNotifications, () => {
+      processResponse(response, localDispatch, updateNotifications, () => {
          // Update the overall workout exercises from backend response data
          saveExercises(response.body.data as Exercise[]);
          updateNotifications({
@@ -987,7 +987,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
       const newWorkouts: Workout[] = [...globalState.workouts.value].map(
          (workout) => workout.id === newWorkout.id ? newWorkout : workout
       );
-      const newFiltered: Workout[] = [...globalState.workouts.data.filtered].map(
+      const newFiltered: Workout[] = [...globalState.workouts.data?.filtered].map(
          (workout) => (workout.id === newWorkout.id ? newWorkout : workout)
       );
 
@@ -1059,7 +1059,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
 
             const response: VitalityResponse<Exercise[]> = await updateExercises(newWorkout);
 
-            handleResponse(response, localDispatch, updateNotifications, () => {
+            processResponse(response, localDispatch, updateNotifications, () => {
                handleSaveExercises(response.body.data as Exercise[]);
             });
          }

@@ -28,7 +28,7 @@ function Card(props: CardProps): JSX.Element {
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
 
-         const tag: Tag | undefined = globalState.tags.data.dictionary[tagId];
+         const tag: Tag | undefined = globalState.tags.data?.dictionary[tagId];
 
          return (
             // Workout tag may be undefined in global state dictionary due to a potential removal or error
@@ -53,7 +53,7 @@ function Card(props: CardProps): JSX.Element {
       });
    }, [
       workout,
-      globalState.tags.data.dictionary
+      globalState.tags.data?.dictionary
    ]);
 
    return (

@@ -4,10 +4,10 @@ import clsx from "clsx";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
-  display: React.ReactNode;
-  children: React.ReactNode;
-  onClose?: () => void;
-  disabled?: boolean;
+   display: React.ReactNode;
+   children: React.ReactNode;
+   onClose?: () => void;
+   disabled?: boolean;
 }
 
 const Modal = forwardRef(function Modal(props: ModalProps, ref) {

@@ -8,8 +8,8 @@ import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import Button from "@/components/global/button";
 import Modal from "@/components/global/modal";
 import { AttributeProps } from "@/components/home/settings/attribute";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { formReducer, VitalityState } from "@/lib/global/reducer";
+import { processResponse, VitalityResponse } from "@/lib/global/response";
 import { verifyAttribute } from "@/lib/home/settings/service";
 
 const verification: VitalityState = {
@@ -109,7 +109,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
       } else {
          const response: VitalityResponse<void> = await verifyAttribute(user.id, `${attribute}_verified`);
 
-         handleResponse(response, localDispatch, updateNotifications, () => {
+         processResponse(response, localDispatch, updateNotifications, () => {
             globalDispatch({
                type: "updateState",
                value: {
@@ -154,14 +154,14 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                icon = { faShieldHalved }
                className = {
                   clsx("cursor-pointer pt-1 text-lg xxsm:text-xl", {
-                     "text-red-500 hover:text-red-600": !input.data.verified,
-                     "text-green-500 hover:text-green-600": input.data.verified
+                     "text-red-500 hover:text-red-600": !input.data?.verified,
+                     "text-green-500 hover:text-green-600": input.data?.verified
                   })
                }
             />
          }
          className = "mt-12 max-h-[90%] max-w-full sm:max-w-xl"
-         disabled = { input.data.verified }
+         disabled = { input.data?.verified }
       >
          <div className = "relative flex flex-col items-center justify-center gap-4 py-2 text-center">
             <FontAwesomeIcon

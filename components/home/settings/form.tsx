@@ -10,8 +10,8 @@ import Loading from "@/components/global/loading";
 import { AccountAction, GeneralAttribute, PasswordAttribute, SliderAttribute } from "@/components/home/settings/attribute";
 import { fetchAttributes } from "@/lib/authentication/authorize";
 import { endSession } from "@/lib/authentication/session";
-import { handleResponse } from "@/lib/global/response";
 import { formReducer, VitalityState } from "@/lib/global/reducer";
+import { processResponse } from "@/lib/global/response";
 import { deleteAccount } from "@/lib/home/settings/service";
 
 const form: VitalityState = {
@@ -63,7 +63,7 @@ const form: VitalityState = {
          fetched: false,
          stored: ""
       },
-      handlesOnChange: true
+      handlesChanges: true
    },
    mail: {
       value: false,
@@ -84,8 +84,8 @@ export default function Form(): JSX.Element {
    const [isEditingImage, setIsEditingImage] = useState<boolean>(false);
 
    const imageURL: string = useMemo(() => {
-      return globalState.image.data.stored.trim();
-   }, [globalState.image.data.stored]);
+      return globalState.image.data?.stored.trim();
+   }, [globalState.image.data?.stored]);
 
    const handleFetchAttributes = useCallback(async() => {
       const attributes: User = await fetchAttributes(user.id);
@@ -207,7 +207,7 @@ export default function Form(): JSX.Element {
    }, []);
 
    const handleDeleteAccount = useCallback(async() => {
-      handleResponse(await deleteAccount(user.id), globalDispatch, updateNotifications, async() => {
+      processResponse(await deleteAccount(user.id), globalDispatch, updateNotifications, async() => {
          await handleLogOut();
       });
    }, [
@@ -217,13 +217,13 @@ export default function Form(): JSX.Element {
    ]);
 
    useEffect(() => {
-      !globalState.image.data.fetched && handleFetchAttributes();
+      !globalState.image.data?.fetched && handleFetchAttributes();
    });
 
    return (
       <div className = "relative mx-auto mb-8 w-full px-2 text-left xsm:mb-16 xsm:w-11/12 sm:w-3/4 2xl:w-1/2">
          {
-            globalState.image.data.fetched ? (
+            globalState.image.data?.fetched ? (
                <div className = "flex flex-col items-center justify-center gap-6">
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
@@ -240,10 +240,10 @@ export default function Form(): JSX.Element {
                                     tabIndex = { 0 }
                                     quality = { 100 }
                                     sizes = "100%"
-                                    src = { imageURL === "" || globalState.image.data.valid === false ? "/settings/default.png" : imageURL }
+                                    src = { imageURL === "" || globalState.image.data?.valid === false ? "/settings/default.png" : imageURL }
                                     alt = "workout-image"
                                     className = "bg-gray-50 object-cover object-center shadow-md dark:bg-gray-200"
-                                    onLoad = { () => globalState.image.data.valid === false && handleVerifyImageResource(true) }
+                                    onLoad = { () => globalState.image.data?.valid === false && handleVerifyImageResource(true) }
                                     onErrorCapture = { () => handleVerifyImageResource(false) }
                                  />
                               </div>

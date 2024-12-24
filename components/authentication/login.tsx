@@ -9,19 +9,19 @@ import Button from "@/components/global/button";
 import Heading from "@/components/global/heading";
 import { Input } from "@/components/global/input";
 import { Credentials, login } from "@/lib/authentication/login";
-import { handleResponse } from "@/lib/global/response";
 import { formReducer, VitalityState } from "@/lib/global/reducer";
+import { processResponse } from "@/lib/global/response";
 
 const form: VitalityState = {
    username: {
+      id: "username",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    password: {
+      id: "password",
       value: "",
-      error: null,
-      data: {}
+      error: null
    }
 };
 
@@ -30,13 +30,13 @@ export default function Login(): JSX.Element {
    const [state, dispatch] = useReducer(formReducer, form);
    const loginButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
-   const handleAuthenticate = useCallback(async() => {
+   const authenticate = useCallback(async() => {
       const credentials: Credentials = {
          username: state.username.value.trim(),
          password: state.password.value.trim()
       };
 
-      handleResponse(await login(credentials), dispatch, updateNotifications, () => {
+      processResponse(await login(credentials), dispatch, updateNotifications, () => {
          window.location.reload();
       });
    }, [
@@ -45,7 +45,7 @@ export default function Login(): JSX.Element {
       updateNotifications
    ]);
 
-   const handleSubmitAuthentication = useCallback(() => {
+   const submitAuthentication = useCallback(() => {
       loginButtonRef.current?.submit();
    }, []);
 
@@ -55,16 +55,17 @@ export default function Login(): JSX.Element {
             title = "Log In"
             message = "Enter valid credentials to enter"
          />
-         <div className = "mx-auto mt-8 w-11/12 sm:w-3/4 xl:w-5/12">
-            <div className = "relative flex w-full flex-col items-stretch justify-center gap-3">
+         <div className = "mx-auto mt-12 w-11/12 sm:w-3/4 xl:w-5/12">
+            <form className = "relative flex w-full flex-col items-stretch justify-center gap-3">
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
                   onClick = {
-                     () =>
+                     () => {
                         dispatch({
                            type: "resetState",
-                           value: {}
-                        })
+                           value: form
+                        });
+                     }
                   }
                   className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                />
@@ -76,7 +77,7 @@ export default function Login(): JSX.Element {
                   icon = { faUserSecret }
                   input = { state.username }
                   dispatch = { dispatch }
-                  onSubmit = { handleSubmitAuthentication }
+                  onSubmit = { submitAuthentication }
                   autoFocus
                   required
                />
@@ -88,7 +89,7 @@ export default function Login(): JSX.Element {
                   icon = { faKey }
                   input = { state.password }
                   dispatch = { dispatch }
-                  onSubmit = { handleSubmitAuthentication }
+                  onSubmit = { submitAuthentication }
                   required
                />
                <Button
@@ -96,13 +97,13 @@ export default function Login(): JSX.Element {
                   type = "submit"
                   className = "h-[2.6rem] bg-primary text-white"
                   icon = { faUnlockKeyhole }
-                  onSubmit = { handleAuthenticate }
-                  onClick = { handleSubmitAuthentication }
+                  onSubmit = { authenticate }
+                  onClick = { submitAuthentication }
                   isSingleSubmission = { true }
                >
                   Log In
                </Button>
-            </div>
+            </form>
             <p className = "mt-4 px-2">
                Don&apos;t have an account? { " " }
                <Link

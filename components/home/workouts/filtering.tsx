@@ -8,8 +8,8 @@ import { Input } from "@/components/global/input";
 import Modal from "@/components/global/modal";
 import Select from "@/components/global/select";
 import Tags from "@/components/home/workouts/tags";
-import { sendErrorMessage, sendSuccessMessage } from "@/lib/global/response";
 import { VitalityInputState, VitalityProps, VitalityState } from "@/lib/global/reducer";
+import { sendErrorMessage, sendSuccessMessage } from "@/lib/global/response";
 import { Tag } from "@/lib/home/workouts/tags";
 import { Workout } from "@/lib/home/workouts/workouts";
 
@@ -155,7 +155,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
          });
 
          const filteredTagIds: Set<string> = new Set(
-            globalState.tags.data.filtered.map(
+            globalState.tags.data?.filtered.map(
                (tag: Tag) => tag.id
             )
          );
@@ -193,9 +193,9 @@ function FilterByDate(props: VitalityProps): JSX.Element {
 
    const handleResetDateFilter = useCallback(() => {
       // Fall back to tags filtering, if applicable
-      const appliedTagsFiltering: boolean = globalState.workouts.data.appliedTagsFiltering;
+      const appliedTagsFiltering: boolean = globalState.workouts.data?.appliedTagsFiltering;
       const filteredTagIds: Set<string> = new Set(
-         globalState.tags.data.filtered.map(
+         globalState.tags.data?.filtered.map(
             (tag: Tag) => tag.id
          )
       );
@@ -247,7 +247,7 @@ function FilterByDate(props: VitalityProps): JSX.Element {
       globalState.dateFilter,
       globalState.workouts.data,
       globalState.workouts.value,
-      globalState.tags.data.filtered
+      globalState.tags.data?.filtered
    ]);
 
    return (
@@ -354,7 +354,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                ...globalState.tags,
                data: {
                   ...globalState.tags.data,
-                  selected: globalState.tags.data.filtered
+                  selected: globalState.tags.data?.filtered
                }
             }
          }
@@ -374,14 +374,14 @@ function FilterByTags(props: VitalityProps): JSX.Element {
                data: {
                   ...globalState.tags.data,
                   // Store filtered tags selection for future `handleDisplayFilteredTags` invocations
-                  filtered: globalState.tags.data.selected
+                  filtered: globalState.tags.data?.selected
                }
             }
          }
       });
 
       const filteredTagIds: Set<string> = new Set(
-         globalState.tags.data.selected.map(
+         globalState.tags.data?.selected.map(
             (tag: Tag) => tag.id
          )
       );
@@ -419,7 +419,7 @@ function FilterByTags(props: VitalityProps): JSX.Element {
 
    const handleResetTagsFilter = useCallback(() => {
       // Fall back to date filtering, if applicable
-      const appliedDateFiltering: boolean = globalState.workouts.data.appliedDateFiltering;
+      const appliedDateFiltering: boolean = globalState.workouts.data?.appliedDateFiltering;
 
       const newFiltered: Workout[] = [...globalState.workouts.value].filter(
          (workout) => !appliedDateFiltering || filterByDate(globalState, workout)

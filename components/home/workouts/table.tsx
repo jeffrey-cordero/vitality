@@ -6,8 +6,8 @@ import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import Confirmation from "@/components/global/confirmation";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { VitalityProps } from "@/lib/global/reducer";
+import { processResponse, VitalityResponse } from "@/lib/global/response";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
 import { Tag } from "@/lib/home/workouts/tags";
 import { deleteWorkouts, Workout } from "@/lib/home/workouts/workouts";
@@ -20,7 +20,7 @@ interface RowProps extends VitalityProps {
 function Row(props: RowProps) {
    const { workout, globalState, globalDispatch } = props;
    const [isValidImage, setIsValidImage] = useState<boolean>(true);
-   const selected: Set<Workout> = globalState.workouts.data.selected;
+   const selected: Set<Workout> = globalState.workouts.data?.selected;
    const isSelected: boolean = selected.has(workout);
 
    useEffect(() => {
@@ -58,7 +58,7 @@ function Row(props: RowProps) {
 
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
-         const tag: Tag | undefined = globalState.tags.data.dictionary[tagId];
+         const tag: Tag | undefined = globalState.tags.data?.dictionary[tagId];
 
          return (
             // Workout tag may be undefined in global state dictionary due to a potential removal or error
@@ -79,7 +79,7 @@ function Row(props: RowProps) {
       });
    }, [
       workout,
-      globalState.tags.data.dictionary
+      globalState.tags.data?.dictionary
    ]);
 
    const handleEditWorkout = useCallback(() => {
@@ -186,7 +186,7 @@ export default function Table(props: TableProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotifications } = useContext(NotificationContext);
    const { workouts, globalState, globalDispatch } = props;
-   const selected: Set<Workout> = globalState.workouts.data.selected;
+   const selected: Set<Workout> = globalState.workouts.data?.selected;
 
    const visibleSelectedWorkouts = useMemo(() => {
       return new Set<Workout>(workouts.filter(workout => selected.has(workout)));
@@ -234,12 +234,12 @@ export default function Table(props: TableProps): JSX.Element {
    const handleWorkoutDelete = useCallback(async() => {
       const response: VitalityResponse<number> = await deleteWorkouts(user.id, Array.from(visibleSelectedWorkouts));
 
-      handleResponse(response, globalDispatch, updateNotifications, () => {
+      processResponse(response, globalDispatch, updateNotifications, () => {
          const newWorkouts: Workout[] = [...globalState.workouts.value].filter((w: Workout) => {
             return !(visibleSelectedWorkouts.has(w));
          });
 
-         const newFiltered: Workout[] = [...globalState.workouts.data.filtered].filter((w: Workout) => {
+         const newFiltered: Workout[] = [...globalState.workouts.data?.filtered].filter((w: Workout) => {
             return !(visibleSelectedWorkouts.has(w));
          });
 

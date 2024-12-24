@@ -12,35 +12,36 @@ import Exercises from "@/components/home/workouts/exercises";
 import { filterWorkout } from "@/components/home/workouts/filtering";
 import Images from "@/components/home/workouts/images";
 import Tags from "@/components/home/workouts/tags";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { formReducer, VitalityProps, VitalityState } from "@/lib/global/reducer";
+import { processResponse, VitalityResponse } from "@/lib/global/response";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
 import { Tag } from "@/lib/home/workouts/tags";
 import { addWorkout, deleteWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
 
 const form: VitalityState = {
    title: {
+      id: "title",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    date: {
+      id: "date",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    description: {
+      id: "description",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    image: {
+      id: "image",
       value: "",
       error: null,
+      handlesChanges: true,
       data: {
          valid: undefined
-      },
-      handlesOnChange: true
+      }
    }
 };
 
@@ -50,7 +51,7 @@ export default function Form(props: VitalityProps): JSX.Element {
    const { updateNotifications } = useContext(NotificationContext);
    const [localState, localDispatch] = useReducer(formReducer, form);
    const [displayingFormModal, setDisplayingFormModal] = useState<boolean>(false);
-   const displayFormModal: boolean = globalState.workout.data.display;
+   const displayFormModal: boolean = globalState.workout.data?.display;
    const formModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
@@ -116,12 +117,12 @@ export default function Form(props: VitalityProps): JSX.Element {
       const response: VitalityResponse<Workout | number> = isNewWorkout ? await addWorkout(user.id, payload) :
          method === "update" ? await updateWorkout(user.id, payload) : await deleteWorkouts(user.id, [payload]);
 
-      handleResponse(response, localDispatch, updateNotifications, () => {
+      processResponse(response, localDispatch, updateNotifications, () => {
          const newWorkout: Workout | null = method === "delete" ? payload : (response.body.data as Workout);
 
          // Fetch selected filtered tags to apply tag filtering
          const filteredTagIds: Set<string> = new Set(
-            globalState.tags.data.filtered.map(
+            globalState.tags.data?.filtered.map(
                (tag: Tag) => tag.id
             )
          );
@@ -180,20 +181,14 @@ export default function Form(props: VitalityProps): JSX.Element {
    const handleDisplayWorkoutForm = useCallback(() => {
       // Update workout tag selection form inputs
       globalDispatch({
-         type: "initializeState",
+         type: "updateStates",
          value: {
             tags: {
-               ...globalState.tags,
                data: {
-                  ...globalState.tags.data,
-                  selected:
-                     workout.tagIds.map(
-                        (tagId: string) => globalState.tags.data.dictionary[tagId],
-                     ) ?? []
+                  selected: workout.tagIds.map((tagId: string) => globalState.tags.data?.dictionary[tagId]) ?? []
                }
             },
             tagSearch: {
-               ...globalState.tagSearch,
                error: null,
                value: ""
             }
@@ -202,30 +197,25 @@ export default function Form(props: VitalityProps): JSX.Element {
 
       // Update workout property inputs
       localDispatch({
-         type: "initializeState",
+         type: "updateStates",
          value: {
             title: {
-               ...localState.title,
                error: null,
                value: workout.title
             },
             date: {
-               ...localState.date,
                error: null,
                value: isNewWorkout ? defaultFormDate : workout.date.toISOString().split("T")[0]
             },
             image: {
-               ...localState.image,
                value: workout.image,
                error: null,
                data: {
-                  ...localState.image.data,
                   valid: verifyImageURL(workout.image) ? true : workout.image !== "" ? false : undefined,
                   error: false
                }
             },
             description: {
-               ...localState.description,
                error: null,
                value: workout.description
             }
@@ -234,18 +224,13 @@ export default function Form(props: VitalityProps): JSX.Element {
    }, [
       defaultFormDate,
       globalDispatch,
-      globalState.tagSearch,
-      globalState.tags,
       isNewWorkout,
-      localState.date,
-      localState.description,
-      localState.image,
-      localState.title,
       workout.date,
       workout.description,
       workout.image,
       workout.tagIds,
-      workout.title
+      workout.title,
+      globalState.tags.data?.dictionary
    ]);
 
    const handleCloseWorkoutForm = useCallback(() => {
@@ -254,8 +239,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          type: "updateState",
          value: {
             id: "workout",
-            input: {
-               ...globalState.workout,
+            value: {
                value: {
                   id: "",
                   user_id: user.id,
@@ -276,7 +260,6 @@ export default function Form(props: VitalityProps): JSX.Element {
       setDisplayingFormModal(false);
    }, [
       globalDispatch,
-      globalState.workout,
       user
    ]);
 
@@ -286,10 +269,8 @@ export default function Form(props: VitalityProps): JSX.Element {
          type: "updateState",
          value: {
             id: "tags",
-            input: {
-               ...globalState.tags,
+            value: {
                data: {
-                  ...globalState.tags.data,
                   selected: []
                }
             }
@@ -302,8 +283,7 @@ export default function Form(props: VitalityProps): JSX.Element {
       });
    }, [
       globalDispatch,
-      localDispatch,
-      globalState.tags
+      localDispatch
    ]);
 
    useEffect(() => {
@@ -424,8 +404,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      type: "updateState",
                      value: {
                         id: "workout",
-                        input: {
-                           ...globalState.workout,
+                        value: {
                            value: {
                               id: "",
                               user_id: user.id,

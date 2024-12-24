@@ -18,7 +18,7 @@ interface ViewProps extends VitalityProps {
 
 export default function View(props: ViewProps): JSX.Element {
    const { view, setView, workouts, globalState, globalDispatch } = props;
-   const fetched: boolean = globalState.workouts.data.fetched;
+   const fetched: boolean = globalState.workouts.data?.fetched;
 
    const toggleView = useCallback((view: "table" | "cards") => {
       setView(view);

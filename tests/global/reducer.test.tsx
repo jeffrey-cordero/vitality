@@ -6,19 +6,19 @@ import { useCallback, useEffect, useReducer } from "react";
 import { Input } from "@/components/global/input";
 import Select from "@/components/global/select";
 import TextArea from "@/components/global/textarea";
-import { sendErrorMessage } from "@/lib/global/response";
 import { formReducer, VitalityState } from "@/lib/global/reducer";
+import { sendErrorMessage } from "@/lib/global/response";
 
 let globalState: VitalityState;
 
 // Initial state
 const initialState: VitalityState = {
-   name: { value: "", error: null, data: { valid: undefined } },
-   password: { value: "", error: null, data: {} },
-   text: { value: "", error: null, data: {} },
-   options: { value: "", error: null, data: {} },
-   email: { value: "", error: null, data: {} },
-   tags: { value: [], error: null, data: {}, handlesOnChange: true }
+   name: { id: "name", value: "", error: null, data: { valid: undefined } },
+   password: { id: "password", value: "", error: null },
+   text: { id:"text", value: "", error: null },
+   options: { id: "options", value: "", error: null },
+   email: { value: "", error: null },
+   tags: { value: [], error: null, data: {}, handlesChanges: true }
 };
 
 function Component(): JSX.Element {
@@ -114,7 +114,7 @@ function Component(): JSX.Element {
                data: {
                   valid: true
                },
-               handlesOnChange: true
+               handlesChanges: true
             },
             email: {
                ...state.email,
@@ -123,12 +123,12 @@ function Component(): JSX.Element {
             text: {
                ...state.text,
                value: "updateText",
-               handlesOnChange: true
+               handlesChanges: true
             },
             options: {
                ...state.options,
                value: "2",
-               handlesOnChange: true
+               handlesChanges: true
             }
          }
       });
@@ -155,15 +155,15 @@ function Component(): JSX.Element {
          value: {
             name: {
                ...state.name,
-               handlesOnChange: true
+               handlesChanges: true
             },
             text: {
                ...state.text,
-               handlesOnChange: true
+               handlesChanges: true
             },
             options: {
                ...state.options,
-               handlesOnChange: true
+               handlesChanges: true
             }
 
          }
@@ -303,7 +303,7 @@ describe("State Reducer Tests", () => {
                   value: [ "One", "Two", "Three" ],
                   error: null,
                   data: {},
-                  handlesOnChange: true
+                  handlesChanges: true
                }
             });
          });
@@ -354,7 +354,7 @@ describe("State Reducer Tests", () => {
                "text": { value: "Hello\nWorld", error: null, data: {} },
                "options": { value: "3", error: null, data: {} },
                "email": { value: "user@gmail.com", error: null, data: {} },
-               "tags": { value: ["Extend"], error: null, data: {}, handlesOnChange: true }
+               "tags": { value: ["Extend"], error: null, data: {}, handlesChanges: true }
             });
          });
       });
@@ -368,12 +368,12 @@ describe("State Reducer Tests", () => {
 
          await waitFor(() => {
             validateStateChanges(dom, {
-               name: { value: "updateName", error: null, data: { valid: true }, handlesOnChange: true },
+               name: { value: "updateName", error: null, data: { valid: true }, handlesChanges: true },
                password: { value: "", error: null, data: {} },
-               text: { value: "updateText", error: null, data: {}, handlesOnChange: true },
-               options: { value: "2", error: null, data: {}, handlesOnChange: true },
+               text: { value: "updateText", error: null, data: {}, handlesChanges: true },
+               options: { value: "2", error: null, data: {}, handlesChanges: true },
                email: { value: "update@gmail.com", error: null, data: {} },
-               tags: { value: [], error: null, data: {}, handlesOnChange: true }
+               tags: { value: [], error: null, data: {}, handlesChanges: true }
             });
          });
       });
@@ -407,15 +407,15 @@ describe("State Reducer Tests", () => {
                text: { value: "", error: null, data: {} },
                options: { value: "", error: null, data: {} },
                email: { value: "", error: null, data: {} },
-               tags: { value: [], error: null, data: {}, handlesOnChange: true }
+               tags: { value: [], error: null, data: {}, handlesChanges: true }
             });
          });
       });
 
-      test("Validate no changes for inputs with handlesOnChange defined", async() => {
+      test("Validate no changes for inputs with handlesChanges defined", async() => {
          const dom = render(<Component />);
 
-         // Apply handlesOnChange to name, text, and options inputs
+         // Apply handlesChanges to name, text, and options inputs
          await act(async() => {
             await userEvent.click(dom.container.querySelector("#handles"));
          });
@@ -429,12 +429,12 @@ describe("State Reducer Tests", () => {
          // Validate no changes for name, text, and options inputs
          await waitFor(() => {
             validateStateChanges(dom, {
-               name: { value: "", error: null, data: { valid: undefined }, handlesOnChange: true },
+               name: { value: "", error: null, data: { valid: undefined }, handlesChanges: true },
                password: { value: "", error: null, data: {} },
-               text: { value: "", error: null, data: {}, handlesOnChange: true },
-               options: { value: "", error: null, data: {}, handlesOnChange: true },
+               text: { value: "", error: null, data: {}, handlesChanges: true },
+               options: { value: "", error: null, data: {}, handlesChanges: true },
                email: { value: "", error: null, data: {} },
-               tags: { value: [], error: null, data: {}, handlesOnChange: true }
+               tags: { value: [], error: null, data: {}, handlesChanges: true }
             });
          });
       });
@@ -461,7 +461,7 @@ describe("State Reducer Tests", () => {
                   value: ["Four", "Five", "Six"],
                   error: null,
                   data: { reset: true },
-                  handlesOnChange: true
+                  handlesChanges: true
                }
             });
          });

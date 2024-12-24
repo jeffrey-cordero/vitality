@@ -12,6 +12,7 @@ export type Credentials = {
 export async function login(credentials: Credentials): Promise<VitalityResponse<null>> {
    try {
       const userCredentials = new FormData();
+
       userCredentials.append("username", credentials.username.trim());
       userCredentials.append("password", credentials.password);
 

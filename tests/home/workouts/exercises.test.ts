@@ -186,14 +186,14 @@ describe("Workout Exercises Tests", () => {
             ...params.data
          };
 
-         if (params.data.sets) {
+         if (params.data?.sets) {
             // Mock adding, removing, and updating exercise set entries
             newExercise.sets = [
-               ...params.data.sets.updateMany.map((update) => ({
+               ...params.data?.sets.updateMany.map((update) => ({
                   ...update.data,
                   exercise_id: params.where.id
                })),
-               ...params.data.sets.createMany.data.map((create, index) => ({
+               ...params.data?.sets.createMany.data?.map((create, index) => ({
                   ...create,
                   id: `${MOCK_ID}${index}`,
                   exercise_id: params.where.id
@@ -215,14 +215,14 @@ describe("Workout Exercises Tests", () => {
 
    const handlePrismaMockWorkoutMethods = async(params) => {
       // Mock updating/deleting workout exercise entries
-      const updating = params.data.exercises.updateMany;
+      const updating = params.data?.exercises.updateMany;
 
       const newWorkout: Workout = {
          ...workoutsByIds[params.where.id as string],
          exercises: updating.map((update) => {
             const newExercise = {
                ...exercisesByIds[update.where.id],
-               exercise_order: update.data.exercise_order
+               exercise_order: update.data?.exercise_order
             };
 
             exercisesByIds[update.where.id as string] = newExercise;
@@ -231,7 +231,7 @@ describe("Workout Exercises Tests", () => {
          })
       };
 
-      const removing = params.data.exercises.deleteMany.id.in;
+      const removing = params.data?.exercises.deleteMany.id.in;
 
       for (const exerciseID of removing) {
          delete exercisesByIds[exerciseID];

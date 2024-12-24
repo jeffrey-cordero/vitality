@@ -18,16 +18,15 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
    ]);
 
    const handleTextAreaChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
-      // handlesOnChange defined implies state management is handled via the parent component
-      if (input.handlesOnChange) {
+      // handlesChanges defined implies state management is handled via the parent component
+      if (input.handlesChanges) {
          onChange?.call(null, event);
       } else {
          dispatch({
             type: "updateState",
             value: {
                id: id,
-               input: {
-                  ...input,
+               value: {
                   value: event.target.value,
                   error: null
                }

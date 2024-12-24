@@ -10,8 +10,8 @@ import { Input } from "@/components/global/input";
 import { VitalityInputProps } from "@/components/global/input";
 import Modal from "@/components/global/modal";
 import VerifyAttribute from "@/components/home/settings/verification";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { VitalityProps } from "@/lib/global/reducer";
+import { processResponse, VitalityResponse } from "@/lib/global/response";
 import { updateAttribute, updatePassword, updatePreference } from "@/lib/home/settings/service";
 
 interface AttributeContainerProps {
@@ -84,14 +84,14 @@ export function GeneralAttribute(props: AttributeProps) {
       const updatingStored: string = type === "date" ?
          new Date(input.value)?.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1") : input.value.trim();
 
-      if (input.data.stored === updatingStored) {
+      if (input.data?.stored === updatingStored) {
          // No changes applied to current user attribute
          return;
       }
 
       const response: VitalityResponse<void> = await updateAttribute(user.id, id as any, updatingValue);
 
-      handleResponse(response, globalDispatch, updateNotifications, async() => {
+      processResponse(response, globalDispatch, updateNotifications, async() => {
          globalDispatch({
             type: "updateState",
             value: {
@@ -170,11 +170,11 @@ export function GeneralAttribute(props: AttributeProps) {
             ) : (
                <AttributeContainer
                   icon = { icon }
-                  label = { input.data.stored || "Missing" }
+                  label = { input.data?.stored || "Missing" }
                   controller = {
                      <div className = "flex flex-row items-center justify-center gap-3">
                         {
-                           input.data.verified !== undefined && input.value.trim() !== "" && (
+                           input.data?.verified !== undefined && input.value.trim() !== "" && (
                               <VerifyAttribute
                                  { ...props }
                                  attribute = { id === "email" ? "email" : "phone" }
@@ -211,7 +211,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
          globalState.confirmPassword.value.trim()
       );
 
-      handleResponse(response, globalDispatch, updateNotifications, () => {
+      processResponse(response, globalDispatch, updateNotifications, () => {
          updateNotifications({
             status: response.status,
             message: response.body.message,
@@ -350,7 +350,7 @@ export function SliderAttribute(props: SliderProps): JSX.Element {
    const handleUpdatePreference = useCallback(async() => {
       const response: VitalityResponse<void> = await updatePreference(user.id, id, !checked);
 
-      handleResponse(response, globalDispatch, updateNotifications, () => {
+      processResponse(response, globalDispatch, updateNotifications, () => {
          globalDispatch({
             type: "updateState",
             value: {

@@ -58,20 +58,19 @@ export function sendFailureMessage<T>(
    };
 }
 
-export function handleResponse(
+export function processResponse(
    response: VitalityResponse<any>,
    dispatch: Dispatch<VitalityAction<any>>,
    updateNotifications: (_notification: NotificationProps) => void,
    successMethod: () => void
 ): void {
    if (response.status === "Success") {
-      // Call the success method
+      // Call the success method provided
       successMethod.call(null);
-   } else if (response.status === "Error"
-         && Object.keys(response.body.errors).length > 0) {
+   } else if (response.status === "Error" && Object.keys(response.body.errors).length > 0) {
       // Update state to display all errors found within the response
       dispatch({
-         type: "updateErrors",
+         type: "processResponse",
          value: response
       });
 
@@ -79,7 +78,7 @@ export function handleResponse(
       document.getElementsByClassName("input-error")?.item(0)
          ?.scrollIntoView({ behavior: "smooth", block: "center" });
    } else {
-      // Display failure notification to the user
+      // Display failure or unique error notification to the user
       updateNotifications({
          status: response.status,
          message: response.body.message,

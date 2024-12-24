@@ -115,7 +115,7 @@ describe("Workouts Tests", () => {
 
    const handlePrismaMockMethods = async(params, method) => {
       const isInvalidUser = method === "create" ?
-         params.data.user_id !== root.id : params.where.user_id !== root.id;
+         params.data?.user_id !== root.id : params.where.user_id !== root.id;
 
       if (isInvalidUser) {
          throw new PrismaClientKnownRequestError("Foreign key constraint violated", {
@@ -138,32 +138,32 @@ describe("Workouts Tests", () => {
          ...params.data,
          workout_applied_tags: [],
          id: method === "create" ? MOCK_ID : params.where.id,
-         user_id: method === "create" ? params.data.user_id : params.where.user_id
+         user_id: method === "create" ? params.data?.user_id : params.where.user_id
       };
 
       if (method === "create") {
          // Mock creation of applied workout tags
-         newWorkout.workout_applied_tags = params.data.workout_applied_tags.create.map(
+         newWorkout.workout_applied_tags = params.data?.workout_applied_tags.create.map(
             (tag: { tag_id: string }) => ({
                workout_id: MOCK_ID,
                tag_id: tag.tag_id
             })
          );
       } else {
-         delete workoutsById[params.data.id];
+         delete workoutsById[params.data?.id];
 
          if (method === "update") {
             // Mock createMany and deleteMany workout tag application methods
             const existingWorkout = workoutsById[params.where.id];
 
             const creatingTags = new Set(
-               params.data.workout_applied_tags?.createMany.data.map(
+               params.data?.workout_applied_tags?.createMany.data?.map(
                   (tag: { tag_id: string }) => tag.tag_id
                )
             );
 
             const removingTags = new Set(
-               params.data.workout_applied_tags?.deleteMany.tag_id.in
+               params.data?.workout_applied_tags?.deleteMany.tag_id.in
             );
 
             const existingTags = existingWorkout.tagIds.filter(

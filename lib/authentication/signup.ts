@@ -26,9 +26,7 @@ const registrationSchema = userSchema.extend({
       })
 });
 
-export async function signup(
-   registration: Registration
-): Promise<VitalityResponse<null>> {
+export async function signup(registration: Registration): Promise<VitalityResponse<null>> {
    try {
       if (registration?.phone?.trim().length === 0) {
          delete registration.phone;
@@ -48,7 +46,8 @@ export async function signup(
          });
       }
 
-      const existingUsers = await prisma.users.findMany({
+      // Check for existing users with the same username, email, and/or phone
+      const conflicts = await prisma.users.findMany({
          where: {
             OR: [
                { username: registration.username.trim() },
@@ -58,7 +57,7 @@ export async function signup(
          }
       });
 
-      if (!existingUsers || existingUsers.length === 0) {
+      if (!conflicts || conflicts.length === 0) {
          // Valid new user registration
          const hashedPassword = await bcrypt.hash(registration.password, await bcrypt.genSaltSync(10));
 
@@ -78,18 +77,10 @@ export async function signup(
          // Account for taken username, email, and/or phone constraints
          const errors = {};
 
-         for (const user of existingUsers) {
-            if (user.username === registration.username) {
-               errors["username"] = ["Username already taken"];
-            }
-
-            if (user.email === registration.email) {
-               errors["email"] = ["Email already taken"];
-            }
-
-            if (user.phone === registration.phone) {
-               errors["phone"] = ["Phone number already taken"];
-            }
+         for (const user of conflicts) {
+            user.username === registration.username && (errors["username"] = ["Username already taken"]);
+            user.email === registration.email && (errors["email"] = ["Email already taken"]);
+            user.phone === registration.phone && (errors["phone"] = ["Phone number already taken"]);
          }
 
          return sendErrorMessage("Account registration conflicts", errors);

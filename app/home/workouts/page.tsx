@@ -12,40 +12,43 @@ import { fetchWorkoutTags } from "@/lib/home/workouts/tags";
 import { fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
 
 const pagingValues = new Set<number>([5, 10, 25, 50, 100, 500, 1000]);
-const workouts: VitalityState = {
+
+const form: VitalityState = {
    search: {
+      id: "search",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    dateFilter: {
+      id: "dateFilter",
       value: "Is on or after",
-      error: null,
-      data: {}
+      error: null
    },
    minDate: {
+      id: "minDate",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    maxDate: {
+      id: "maxDate",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    tags: {
-      value: null,
+      id: "tags",
+      value: [],
       error: null,
+      handlesChanges: true,
       data: {
          options: [],
          selected: [],
          filtered: [],
          dictionary: {},
          fetched: false
-      },
-      handlesOnChange: true
+      }
    },
    workouts: {
+      id: "workouts",
       value: [],
       error: null,
       data: {
@@ -57,6 +60,7 @@ const workouts: VitalityState = {
       }
    },
    workout: {
+      id: "workout",
       value: {
          id: "",
          user_id: "",
@@ -73,22 +77,22 @@ const workouts: VitalityState = {
       }
    },
    paging: {
+      id: "paging",
       value: 10,
       error: null,
-      data: {},
-      handlesOnChange: true
+      handlesChanges: true
    },
    page: {
+      id: "page",
       value: 0,
       error: null,
-      data: {},
-      handlesOnChange: true
+      handlesChanges: true
    }
 };
 
 export default function Page(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const [globalState, globalDispatch] = useReducer(formReducer, workouts);
+   const [globalState, globalDispatch] = useReducer(formReducer, form);
    const [view, setView] = useState<"table" | "cards">("table");
 
    const search: string = useMemo(() => {
@@ -97,13 +101,13 @@ export default function Page(): JSX.Element {
 
    // Case-insensitive title comparison for workouts search
    const results: Workout[] = useMemo(() => {
-      const filtered: Workout[] = globalState.workouts.data.filtered;
+      const filtered: Workout[] = globalState.workouts.data?.filtered;
       const lower = search.toLowerCase();
 
       return search === "" ?
          filtered : filtered.filter((w) => w.title.toLowerCase().includes(lower));
    }, [
-      globalState.workouts.data.filtered,
+      globalState.workouts.data?.filtered,
       search
    ]);
 
@@ -146,12 +150,10 @@ export default function Page(): JSX.Element {
       }
 
       globalDispatch({
-         type: "initializeState",
+         type: "updateStates",
          value: {
             tags: {
-               ...globalState.tags,
                data: {
-                  ...globalState.tags.data,
                   options: tagsData,
                   selected: [],
                   filtered: [],
@@ -162,10 +164,8 @@ export default function Page(): JSX.Element {
                }
             },
             workouts: {
-               ...globalState.workouts,
                value: workoutsData,
                data: {
-                  ...globalState.workouts.data,
                   filtered: workoutsData,
                   appliedDateFiltering: false,
                   appliedTagsFiltering: false,
@@ -173,33 +173,22 @@ export default function Page(): JSX.Element {
                }
             },
             workout: {
-               ...globalState.workout,
                value: {
-                  ...globalState.workout.value,
                   user_id: user.id
                }
             },
             paging: {
-               ...globalState.paging,
                value: paging
             },
             page: {
-               ...globalState.page,
                value: page
             }
          }
       });
-   }, [
-      globalState.tags,
-      globalState.workouts,
-      globalState.workout,
-      globalState.paging,
-      globalState.page,
-      user
-   ]);
+   }, [user]);
 
    useEffect(() => {
-      if (!globalState.workouts.data.fetched) {
+      if (!globalState.workouts.data?.fetched) {
          setView(
             window.localStorage.getItem("view") === "cards" ? "cards" : "table",
          );
@@ -209,7 +198,7 @@ export default function Page(): JSX.Element {
    }, [
       user,
       fetchWorkoutsData,
-      globalState.workouts.data.fetched,
+      globalState.workouts.data?.fetched,
       globalState.tags,
       globalState.workouts,
       view

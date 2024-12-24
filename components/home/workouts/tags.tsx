@@ -9,8 +9,8 @@ import Confirmation from "@/components/global/confirmation";
 import { Input } from "@/components/global/input";
 import Loading from "@/components/global/loading";
 import Modal from "@/components/global/modal";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
 import { formReducer, VitalityChildProps, VitalityProps, VitalityState } from "@/lib/global/reducer";
+import { processResponse, VitalityResponse } from "@/lib/global/response";
 import { addWorkoutTag, Tag, updateWorkoutTag } from "@/lib/home/workouts/tags";
 
 const form: VitalityState = {
@@ -23,7 +23,7 @@ const form: VitalityState = {
       value: null,
       error: null,
       data: {},
-      handlesOnChange: true
+      handlesChanges: true
    },
    tagSearch: {
       value: "",
@@ -151,7 +151,7 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
 
          if (response.status !== "Error") {
             // Handle success or failure responses
-            handleResponse(response, localDispatch, updateNotifications, () => {
+            processResponse(response, localDispatch, updateNotifications, () => {
                const { options, selected } = globalState.tags.data;
                const returnedTag: Tag = response.body.data as Tag;
 
@@ -318,8 +318,8 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                   data: {
                      ...globalState.tags.data,
                      selected: adding
-                        ? [...globalState.tags.data.selected, tag]
-                        : [...globalState.tags.data.selected].filter(
+                        ? [...globalState.tags.data?.selected, tag]
+                        : [...globalState.tags.data?.selected].filter(
                            (other: Tag) => other !== tag,
                         )
                   }
@@ -434,7 +434,7 @@ export default function Tags(props: TagsProps): JSX.Element {
    // Local state for tag-related inputs
    const [localState, localDispatch] = useReducer(formReducer, form);
 
-   const fetched: boolean = globalState.tags.data.fetched;
+   const fetched: boolean = globalState.tags.data?.fetched;
 
    // Differentiate between selected and unselected options
    const selectedOptions: Set<Tag> = useMemo(() => {
@@ -487,12 +487,12 @@ export default function Tags(props: TagsProps): JSX.Element {
 
       if (response.status !== "Error") {
          // Handle success or failure responses
-         handleResponse(response, localDispatch, updateNotifications, () => {
+         processResponse(response, localDispatch, updateNotifications, () => {
             // Add the new tag to the overall user tag options
             const newOption: Tag = response.body.data as Tag;
 
-            const newOptions: Tag[] = [...globalState.tags.data.options, newOption];
-            const newSelected: Tag[] = [...globalState.tags.data.selected, newOption];
+            const newOptions: Tag[] = [...globalState.tags.data?.options, newOption];
+            const newSelected: Tag[] = [...globalState.tags.data?.selected, newOption];
 
             // Dictionary of tags are essential to ignore deleted tags applied to existing workouts
             const newDictionary: Record<string, Tag> = Object.fromEntries(
@@ -559,10 +559,10 @@ export default function Tags(props: TagsProps): JSX.Element {
             fetched ? (
                <div className = "mx-auto flex w-full flex-col flex-wrap items-center justify-center">
                   {
-                     globalState.tags.data.selected?.length > 0 && (
+                     globalState.tags.data?.selected?.length > 0 && (
                         <ul className = "flex flex-row flex-wrap items-center justify-center pb-2">
                            {
-                              globalState.tags.data.selected.map((selected: Tag) => {
+                              globalState.tags.data?.selected.map((selected: Tag) => {
                                  return (
                                     selected !== undefined && (
                                        <TagContainer

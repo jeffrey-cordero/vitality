@@ -250,7 +250,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                      url.length > 0 && (
                         <div className = "relative">
                            {
-                              input.data.valid && (
+                              input.data?.valid && (
                                  <Button
                                     type = "button"
                                     onClick = { handleResetImageURL }
@@ -262,7 +262,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                               )
                            }
                            {
-                              input.data.valid !== true && (
+                              input.data?.valid !== true && (
                                  <Button
                                     type = "button"
                                     onClick = { handleImageURLUpdates }
@@ -288,10 +288,10 @@ export default function Images(props: VitalityInputProps): JSX.Element {
    const { input } = props;
    const url: string = input.value.trim();
    const isValidResource: boolean = useMemo(() => {
-      return input.data.valid === true && url.length !== 0;
+      return input.data?.valid === true && url.length !== 0;
    }, [
       url,
-      input.data.valid
+      input.data?.valid
    ]);
    const isValidURL: boolean = useMemo(() => {
       return verifyImageURL(url);

@@ -6,9 +6,9 @@ import Button from "@/components/global/button";
 import Modal from "@/components/global/modal";
 
 interface ConfirmationProps {
-  display?: React.ReactNode;
   message: string;
   onConfirmation: () => Promise<void>;
+  display?: React.ReactNode;
   icon?: boolean;
 }
 

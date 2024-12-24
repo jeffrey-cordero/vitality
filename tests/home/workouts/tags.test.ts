@@ -22,7 +22,7 @@ let tagsById: Record<string, Tag> = {};
 describe("Workout Tags Tests", () => {
    const handlePrismaMockMethods = (params: any, method: string): Tag | null => {
       const isInvalidUser = method === "create" ?
-         params.data.user_id !== root.id : params.where.user_id !== root.id;
+         params.data?.user_id !== root.id : params.where.user_id !== root.id;
 
       if (isInvalidUser) {
          throw new PrismaClientKnownRequestError("Foreign key constraint violated", {
@@ -34,7 +34,7 @@ describe("Workout Tags Tests", () => {
       const newTag: Tag = {
          ...params.data,
          id: method === "create" ? MOCK_ID : params.where.id,
-         user_id: method === "create" ? params.data.user_id : params.where.user_id
+         user_id: method === "create" ? params.data?.user_id : params.where.user_id
       };
 
       if (method !== "create") {
