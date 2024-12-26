@@ -232,7 +232,7 @@ function DateFilter(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "h-10 w-full bg-primary text-sm font-semibold text-white xxsm:text-sm"
+               className = "h-10 w-full bg-primary font-semibold text-white text-sm xxsm:text-sm"
             >
                <FontAwesomeIcon
                   icon = { faCalendar }
@@ -474,12 +474,12 @@ export default function Filtering(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
 
    return (
-      <div className = "relative w-auto">
+      <div className = "relative w-full">
          <Heading
             title = "Workouts"
             message = "Create a new workout and let's make today count!"
          />
-         <div className = "mx-auto my-4 flex w-full flex-col gap-2 px-2">
+         <div className = "mx-auto my-4 flex w-full max-w-[35rem] flex-col gap-2 px-2 sm:w-11/12">
             <Input
                id = "search"
                type = "text"

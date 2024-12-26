@@ -24,8 +24,8 @@ function Price(props: PriceProps) {
             <span className = "text-4xl font-semibold tracking-tight text-gray-900 xsm:text-[2.7rem] dark:text-white">
                { price }
             </span>
-            <span className = "text-base text-gray-500 dark:text-gray-400">
-               /month
+            <span className = "text-base font-medium text-gray-500 dark:text-gray-400">
+               / month
             </span>
          </p>
          <ul className = "space-y-3 text-sm/7 font-medium text-gray-500 dark:text-gray-400">

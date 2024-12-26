@@ -102,7 +102,7 @@ function TagColorSelection(props: VitalityChildProps) {
                         clsx(
                            "flex h-[2.7rem] w-full cursor-pointer items-center justify-center rounded-lg border-2 p-1 text-center text-sm text-white transition duration-300 ease-in-out focus:border-0 xxsm:text-sm",
                            {
-                              "scale-[1.07]": localState.tagColor.value === color,
+                              "scale-[1.07] border-gray-700 dark:border-gray-600": localState.tagColor.value === color,
                               "border-white dark:border-slate-800": localState.tagColor.value !== color
                            },
                         )
@@ -119,10 +119,14 @@ function TagColorSelection(props: VitalityChildProps) {
    );
 }
 
-function EditTag(props: TagContainerProps): JSX.Element {
+interface EditTagProps extends TagContainerProps {
+   modalRef: React.MutableRefObject<{ open: () => void; close: () => void; isOpen: () => boolean }>;
+}
+
+function EditTag(props: EditTagProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotifications } = useContext(NotificationContext);
-   const { tag, globalState, globalDispatch, localState, localDispatch } = props;
+   const { tag, globalState, globalDispatch, localState, localDispatch, modalRef } = props;
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
    const updateTag = useCallback(async(method: "update" | "delete") => {
@@ -177,6 +181,8 @@ function EditTag(props: TagContainerProps): JSX.Element {
                message: "Deleted workout tag",
                timer: 1000
             });
+
+            modalRef.current?.close();
          });
       } else {
          // Handle error response by mapping response error to local inputs
@@ -271,6 +277,7 @@ interface TagContainerProps extends VitalityChildProps {
 function TagContainer(props: TagContainerProps): JSX.Element {
    const { tag, selected, globalState, globalDispatch, localDispatch } = props;
    const tagRef = useRef<HTMLLIElement>(null);
+   const editTagModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
 
    // Handle adding or removing a selected tag
    const selectedTag = useCallback((adding: boolean) => {
@@ -319,7 +326,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
       <li
          className = {
             clsx(
-               "relative m-2 rounded-full px-5 py-2 text-[0.75rem] font-bold text-white xxsm:text-[0.8rem]",
+               "relative m-[0.4rem] rounded-full px-5 py-[0.6rem] text-[0.75rem] font-bold text-white xxsm:text-[0.8rem]",
             )
          }
          style = {
@@ -330,7 +337,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
          ref = { tagRef }
          key = { tag.id }
       >
-         <div className = "mx-auto flex max-w-full flex-row flex-wrap items-center justify-center gap-x-2">
+         <div className = "mx-auto flex max-w-full flex-row items-center justify-center gap-x-2">
             <div
                id = { tag.id }
                onClick = { () => !selected && selectedTag(true) }
@@ -341,16 +348,20 @@ function TagContainer(props: TagContainerProps): JSX.Element {
             <div className = "flex flex-row items-center justify-center gap-1">
                {
                   <Modal
+                     ref = { editTagModalRef }
                      display = {
                         <FontAwesomeIcon
                            icon = { faGears }
                            onClick = { editTag }
-                           className = "cursor-pointer pt-1 text-sm hover:opacity-70"
+                           className = "cursor-pointer pt-1 text-sm hover:text-gray-400"
                         />
                      }
                      className = "mt-12 max-h-[90%] max-w-[95%] sm:max-w-xl"
                   >
-                     <EditTag { ...props } />
+                     <EditTag 
+                        modalRef = { editTagModalRef }
+                        { ...props } 
+                     />
                   </Modal>
                }
                {

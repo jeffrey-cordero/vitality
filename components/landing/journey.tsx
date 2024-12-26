@@ -73,7 +73,7 @@ export default function Journey(): JSX.Element {
                         <Link href = "/signup">
                            <Button
                               icon = { faCalendarDays }
-                              className = "h-[2.9rem] whitespace-nowrap bg-primary px-4 py-3 text-sm text-white xxsm:w-40 xxsm:px-2 xxsm:text-base"
+                              className = "h-[2.8rem] whitespace-nowrap bg-primary px-4 py-3 text-sm text-white xxsm:w-40 xxsm:px-2 xxsm:text-base"
                            >
                               Start Today
                            </Button>

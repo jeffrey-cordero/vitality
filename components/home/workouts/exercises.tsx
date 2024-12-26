@@ -2,7 +2,7 @@
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { faArrowRotateLeft, faCaretDown, faCaretRight, faDumbbell, faListCheck, faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faCaretDown, faCaretRight, faDumbbell, faPenNib, faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
@@ -139,7 +139,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
             id = "name"
             type = "text"
             label = "Name"
-            icon = { faDumbbell }
+            icon = { faPenNib }
             input = { localState.name }
             dispatch = { localDispatch }
             onSubmit = { submitCreateExerciseUpdates }
@@ -152,7 +152,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
             ref = { createButtonRef }
             type = "button"
             className = "h-10 w-full border-[1.5px] border-gray-100 bg-green-500 px-4 py-2 font-bold text-white focus:border-green-600 focus:ring-2 focus:ring-green-600 dark:border-0"
-            icon = { faDumbbell }
+            icon = { faPenNib }
             onSubmit = { createExercise }
             onClick = { submitCreateExerciseUpdates }
             isSingleSubmission = { true }
@@ -282,7 +282,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       localDispatch,
       workout.exercises,
       updateNotifications,
-      localState.name.value,
+      localState.name.value
    ]);
 
    const submitExerciseNameUpdates = useCallback(() => {
@@ -302,7 +302,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       processResponse(response, localDispatch, updateNotifications, () => {
          // Update the overall workout exercises from backend response data
          saveExercises(response.body.data as Exercise[]);
-       
+
          // Remove from localStorage as the exercise no longer exists
          window.localStorage.getItem(collapsedId) && window.localStorage.removeItem(collapsedId);
       });
@@ -312,7 +312,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       exercise.id,
       localDispatch,
       saveExercises,
-      updateNotifications,
+      updateNotifications
    ]);
 
    const displayEditExerciseName = useCallback(() => {
@@ -422,11 +422,10 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      type = "text"
                      label = "Name"
                      className = "mb-2"
-                     icon = { faListCheck }
+                     icon = { faPenNib }
                      input = { localState.name }
                      dispatch = { localDispatch }
                      onSubmit = { submitExerciseNameUpdates }
-                     autoComplete = "none"
                      autoFocus
                      scrollIntoView
                      required
@@ -435,7 +434,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      ref = { updateButtonRef }
                      type = "button"
                      className = "my-2 h-10 w-full border-[1.5px] border-gray-100 bg-green-500 px-4 py-2 text-base font-bold text-white focus:border-green-600 focus:ring-2 focus:ring-green-600 dark:border-0"
-                     icon = { faListCheck }
+                     icon = { faPenNib }
                      onSubmit = { updateExerciseName }
                      onClick = { submitExerciseNameUpdates }
                   >
@@ -447,10 +446,10 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   />
                </div>
             ) : (
-               <h1 className = "flex cursor-default items-center justify-start gap-4 text-lg xxsm:text-xl">
+               <h1 className = "flex flex-row flex-nowrap cursor-default items-center justify-start gap-4">
                   <span>
                      <FontAwesomeIcon
-                        className = "cursor-grab touch-none pt-1 text-2xl focus:outline-none"
+                        className = "cursor-grab touch-none pt-[2px] text-2xl focus:outline-none"
                         icon = { isCollapsed ? faCaretRight : faCaretDown }
                         onClick = { () => setIsCollapsed(!isCollapsed) }
                         { ...attributes }
@@ -458,7 +457,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      />
                   </span>
                   <span
-                     className = "cursor-pointer overflow-x-auto whitespace-pre-wrap"
+                     className = "cursor-pointer overflow-x-auto text-[1.1rem] xxsm:text-xl whitespace-nowrap"
                      { ...doubleTap }
                   >
                      { exercise.name }

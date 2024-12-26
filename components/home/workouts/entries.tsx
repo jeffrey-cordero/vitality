@@ -275,7 +275,7 @@ export default function ExerciseEntryContainer(props: ExerciseEntryContainerProp
                </li>
             ) : (
                !isNewEntry && (
-                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pt-2 text-left text-[0.9rem] font-semibold xxsm:pl-8 xxsm:text-base">
+                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pt-2 text-left text-[0.9rem] font-semibold pl-8 xxsm:text-base">
                      <div
                         className = "cursor-grab touch-none pt-1 text-sm"
                         { ...attributes }
