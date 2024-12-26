@@ -57,8 +57,8 @@ export const userSchema = z.object({
    phone: z
       .string()
       .trim()
-      .refine((val) => val === "" || validator.isMobilePhone(val), {
-         message: "Valid phone number is required, if provided"
+      .refine((val) => val === "" || validator.isMobilePhone(val, "en-US"), {
+         message: "Valid U.S. phone number is required"
       })
       .optional()
 });

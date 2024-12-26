@@ -42,13 +42,13 @@ export function formReducer(state: VitalityState, action: VitalityAction<any>): 
       const updateDraft = (update: VitalityUpdateState) => {
          const { id, value } = update;
 
-         // Merge provided state object with existing state object
+         // Merge provided and existing state objects
          draft[id] = {
             ...state[id],
             ...value
          };
 
-         // If data object currently exists, merge it with provided state data object
+         // Merge provided and existing state objects for nested data, if applicable
          state[id].data && (draft[id].data = {
             ...state[id].data,
             ...value.data

@@ -2,7 +2,7 @@
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { faArrowRotateLeft, faCaretDown, faCaretRight, faDumbbell, faPenNib, faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRotateLeft, faCaretDown, faCaretRight, faPenNib, faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
@@ -297,7 +297,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          )
       };
 
-      const response: VitalityResponse<Exercise[]> = await updateExercises(newWorkout);
+      const response: VitalityResponse<Exercise[]> = await updateExercises(user.id, newWorkout);
 
       processResponse(response, localDispatch, updateNotifications, () => {
          // Update the overall workout exercises from backend response data
@@ -307,6 +307,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          window.localStorage.getItem(collapsedId) && window.localStorage.removeItem(collapsedId);
       });
    }, [
+      user,
       workout,
       collapsedId,
       exercise.id,
@@ -446,7 +447,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   />
                </div>
             ) : (
-               <h1 className = "flex flex-row flex-nowrap cursor-default items-center justify-start gap-4">
+               <h1 className = "flex cursor-default flex-row flex-nowrap items-center justify-start gap-4">
                   <span>
                      <FontAwesomeIcon
                         className = "cursor-grab touch-none pt-[2px] text-2xl focus:outline-none"
@@ -457,7 +458,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      />
                   </span>
                   <span
-                     className = "cursor-pointer overflow-x-auto text-[1.1rem] xxsm:text-xl whitespace-nowrap"
+                     className = "cursor-pointer overflow-x-auto whitespace-nowrap text-[1.1rem] xxsm:text-xl"
                      { ...doubleTap }
                   >
                      { exercise.name }
@@ -543,6 +544,7 @@ interface ExercisesProps extends VitalityProps {
 }
 
 export default function Exercises(props: ExercisesProps): JSX.Element {
+   const { user } = useContext(AuthenticationContext);
    const { updateNotifications } = useContext(NotificationContext);
    const { workout, globalState, globalDispatch } = props;
    const [localState, localDispatch] = useReducer(formReducer, form);
@@ -648,7 +650,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                )
             };
 
-            const response: VitalityResponse<Exercise[]> = await updateExercises(newWorkout);
+            const response: VitalityResponse<Exercise[]> = await updateExercises(user.id, newWorkout);
 
             processResponse(response, localDispatch, updateNotifications, () => {
                saveExercises(response.body.data as Exercise[]);

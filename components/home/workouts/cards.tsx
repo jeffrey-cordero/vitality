@@ -33,7 +33,7 @@ function Card(props: CardProps): JSX.Element {
          return (
             tag !== undefined && (
                <div
-                  className = "m-1 max-w-full truncate rounded-full px-4 py-[0.45rem] font-bold text-white text-[0.73rem]"
+                  className = "m-1 max-w-full truncate rounded-full px-4 py-[0.45rem] text-[0.73rem] font-bold text-white"
                   style = {
                      {
                         backgroundColor: tag.color
@@ -70,7 +70,7 @@ function Card(props: CardProps): JSX.Element {
                });
             }
          }
-         className = "relative mx-0 flex h-[26rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-[1.05] focus:scale-[1.05] md:h-[23rem] md:w-72"
+         className = "relative mx-0 flex h-[26rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-105 focus:scale-105 md:h-[23rem] md:w-72"
       >
          <div className = "relative mx-auto size-full">
             {
@@ -95,15 +95,17 @@ function Card(props: CardProps): JSX.Element {
                   </div>
                )
             }
-            <div className = "relative flex size-full flex-col items-center justify-start py-4 overflow-hidden text-center text-black">
-               <h2 className = "max-w-full min-h-[2rem] truncate break-words px-8 mt-2 font-extrabold text-[1.4rem] md:text-[1.3rem]">
-                  { workout.title }
-               </h2>
-               <p className = "font-extrabold text-base md:text-[0.9rem] -translate-y-[0.1rem]">{ date }</p>
+            <div className = "relative flex size-full flex-col items-center justify-start overflow-hidden py-4 text-center text-black">
+               <div className = "relative mx-auto my-2 w-full">
+                  <h2 className = "max-w-full truncate break-words px-8 text-[1.4rem] font-extrabold md:text-[1.3rem]">
+                     { workout.title }
+                  </h2>
+                  <p className = "translate-y-[-2px] text-base font-extrabold md:text-[0.9rem]">{ date }</p>
+               </div>
                <div
                   className = {
                      clsx(
-                        "scrollbar-hide flex max-h-[20rem] w-full max-w-[25rem] flex-row flex-wrap items-center justify-center overflow-auto px-4 my-2 md:max-h-[16rem] gap-y-1",
+                        "scrollbar-hide mb-2 flex max-h-80 w-full max-w-[25rem] flex-row flex-wrap items-center justify-center gap-y-1 overflow-auto px-4 md:max-h-64",
                         {
                            "cursor-all-scroll": workoutTags.length > 0
                         },

@@ -202,6 +202,7 @@ function EditTag(props: EditTagProps): JSX.Element {
    [
       user,
       tag.id,
+      modalRef,
       globalState,
       localDispatch,
       globalDispatch,
@@ -358,9 +359,9 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                      }
                      className = "mt-12 max-h-[90%] max-w-[95%] sm:max-w-xl"
                   >
-                     <EditTag 
+                     <EditTag
                         modalRef = { editTagModalRef }
-                        { ...props } 
+                        { ...props }
                      />
                   </Modal>
                }

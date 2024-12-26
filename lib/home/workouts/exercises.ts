@@ -20,7 +20,7 @@ export type ExerciseEntry = {
   text?: string;
 };
 
-const MAX_NUMBER: number = 2147483647;
+const MAX_ENTRY_NUMBER: number = 2147483647;
 
 const exerciseEntrySchema = z.object({
    id: uuidSchema("entry", "required"),
@@ -33,7 +33,7 @@ const exerciseEntrySchema = z.object({
       .min(0, {
          message: "Hours must be non-negative"
       })
-      .max(MAX_NUMBER, {
+      .max(MAX_ENTRY_NUMBER, {
          message: "Value exceeds the maximum limit for a number"
       })
       .optional()
@@ -63,7 +63,7 @@ const exerciseEntrySchema = z.object({
       .min(0, {
          message: "Weight must be non-negative"
       })
-      .max(MAX_NUMBER, {
+      .max(MAX_ENTRY_NUMBER, {
          message: "Value exceeds the maximum limit for a number"
       })
       .optional()
@@ -73,7 +73,7 @@ const exerciseEntrySchema = z.object({
       .min(0, {
          message: "Repetitions must be non-negative"
       })
-      .max(MAX_NUMBER, {
+      .max(MAX_ENTRY_NUMBER, {
          message: "Value exceeds the maximum limit for a number"
       })
       .optional()
@@ -134,7 +134,7 @@ export async function addExercise(user_id: string, exercise: Exercise): Promise<
          );
       }
 
-      // Exercises must be connected to existing workouts
+      // Exercises must be related to existing workouts
       const existingWorkout = formatDatabaseWorkout(await prisma.workouts.findFirst({
          where: {
             id: exercise.workout_id
@@ -152,9 +152,9 @@ export async function addExercise(user_id: string, exercise: Exercise): Promise<
       }
 
       // Ensure ordering remains within 0th indexing bounds
-      const currentExercisesSize: number = existingWorkout.exercises.length;
+      const totalExercises: number = existingWorkout.exercises.length;
 
-      if (exercise.exercise_order != currentExercisesSize) {
+      if (exercise.exercise_order != totalExercises) {
          return sendErrorMessage(
             "Exercise order must match current workout exercises length",
             null
@@ -236,7 +236,7 @@ export async function updateExercise(user_id: string, exercise: Exercise, method
       }
 
       if (method === "name") {
-         const trimmed = exercise.name.trim();
+         const updates = exercise.name.trim();
 
          const newExercise = await prisma.exercises.update({
             where: {
@@ -244,7 +244,7 @@ export async function updateExercise(user_id: string, exercise: Exercise, method
                workout_id: exercise.workout_id
             },
             data: {
-               name: trimmed
+               name: updates
             },
             include: {
                exercise_entries: {
@@ -261,8 +261,7 @@ export async function updateExercise(user_id: string, exercise: Exercise, method
          );
       } else {
          // Construct create, update, and delete exercise entry arrays
-         const { creating, updating, removing, error, errors } =
-            await getExerciseEntryUpdates(existingExercise, exercise);
+         const { creating, updating, removing, error, errors } = await getEntryOrderUpdates(existingExercise, exercise);
 
          if (error !== null) {
             return sendErrorMessage(error, errors);
@@ -299,7 +298,7 @@ export async function updateExercise(user_id: string, exercise: Exercise, method
    }
 }
 
-export async function getExerciseEntryUpdates(
+export async function getEntryOrderUpdates(
    existingExercise: any,
    newExercise: Exercise
 ): Promise<{
@@ -318,7 +317,7 @@ export async function getExerciseEntryUpdates(
       )
    );
 
-   // Format formatting create/update entries and determine entry ID's to remove
+   // Format create/update/delete entries arrays
    const creating = [];
    const updating = [];
    const removing: string[] = existingExerciseEntries.filter(
@@ -329,8 +328,7 @@ export async function getExerciseEntryUpdates(
       const entry: ExerciseEntry = newExercise.entries[i];
 
       // Handle validating constructing or existing exercise entry fields
-      const fields = entry.id.trim() === ""
-         ? newExerciseEntrySchema.safeParse(entry) : exerciseEntrySchema.safeParse(entry);
+      const fields = entry.id.trim() === "" ? newExerciseEntrySchema.safeParse(entry) : exerciseEntrySchema.safeParse(entry);
 
       if (!fields.success) {
          return {
@@ -349,25 +347,25 @@ export async function getExerciseEntryUpdates(
             errors: null
          };
       } else {
-         const isNewExerciseSet: boolean = !entry.id || entry.id.trim() === "";
+         const isNewEntry: boolean = !entry.id || entry.id.trim() === "";
 
-         const newExerciseSet: ExerciseEntry = {
+         const newExerciseEntry: ExerciseEntry = {
             ...newExercise.entries[i],
             exercise_id: undefined,
-            id: isNewExerciseSet ? undefined : entry.id,
+            id: isNewEntry ? undefined : entry.id,
             entry_order: i,
             text: newExercise.entries[i].text?.trim()
          };
 
-         if (isNewExerciseSet) {
-            creating.push(newExerciseSet);
+         if (isNewEntry) {
+            creating.push(newExerciseEntry);
          } else {
             updating.push({
                where: {
-                  id: newExerciseSet.id,
-                  exercise_id: newExerciseSet.exercise_id
+                  id: newExerciseEntry.id,
+                  exercise_id: newExerciseEntry.exercise_id
                },
-               data: newExerciseSet
+               data: newExerciseEntry
             });
          }
       }
@@ -382,28 +380,28 @@ export async function getExerciseEntryUpdates(
    };
 }
 
-export async function updateExercises(
-   workout: Workout
-): Promise<VitalityResponse<Exercise[]>> {
-   // Validate workout ID and all exercise entries
-   if (!uuidSchema("workout", "required").safeParse(workout.id).success) {
-      return sendErrorMessage("Invalid workout ID fields", {
-         workout_id: ["ID for workout must be in UUID format"]
-      });
-   }
-
-   for (const exercise of workout.exercises) {
-      const fields = exerciseSchema.safeParse(exercise);
-
-      if (!fields.success) {
-         return sendErrorMessage(
-            "Invalid exercise fields",
-            fields.error.flatten().fieldErrors
-         );
-      }
-   }
-
+export async function updateExercises(user_id: string, workout: Workout): Promise<VitalityResponse<Exercise[]>> {
    try {
+      await authorizeAction(user_id);
+
+      // Validate workout ID and all exercise entries
+      if (!uuidSchema("workout", "required").safeParse(workout.id).success) {
+         return sendErrorMessage("Invalid workout ID fields", {
+            workout_id: ["ID for workout must be in UUID format"]
+         });
+      }
+
+      for (const exercise of workout.exercises) {
+         const fields = exerciseSchema.safeParse(exercise);
+
+         if (!fields.success) {
+            return sendErrorMessage(
+               "Invalid exercise fields",
+               fields.error.flatten().fieldErrors
+            );
+         }
+      }
+
       // Ensure workout exists in the database
       const existingWorkout = formatDatabaseWorkout(await prisma.workouts.findFirst({
          where: {
@@ -429,11 +427,8 @@ export async function updateExercises(
          );
       }
 
-      // Construct update and delete exercise arrays
-      const { updating, removing } = await getExercisesUpdates(
-         existingWorkout,
-         workout
-      );
+      // Construct update/deleteMan exercise lists based on new workout exercises
+      const { updating, removing } = await getExerciseOrderUpdates(existingWorkout, workout);
 
       const newWorkout = await prisma.workouts.update({
          where: {
@@ -470,30 +465,23 @@ export async function updateExercises(
    }
 }
 
-export async function getExercisesUpdates(
+export async function getExerciseOrderUpdates(
    existingWorkout: any,
    workout: Workout
 ): Promise<{
-  updating: {
-    where: { id: string; workout_id: string };
-    data: { exercise_order: number };
-  }[];
+  updating: { where: { id: string; workout_id: string }; data: { exercise_order: number } }[];
   removing: { id: { in: string[] }};
 }> {
-   const existingExercisesIds: string[] = existingWorkout.exercises.map(
+   const existingExerciseIds: string[] = existingWorkout.exercises.map(
       (exercise: Exercise) => exercise.id
    );
-   const newExercisesIds: Set<string> = new Set(
+   const newExerciseIds: Set<string> = new Set(
       workout.exercises.map(
          (exercise: Exercise) => exercise.id
       )
    );
 
-   // Format updating exercise entries and determine removing exercise ID's
-   const removing: string[] = existingExercisesIds.filter(
-      (id: string) => !newExercisesIds.has(id)
-   );
-
+   // Format update/delete exercise arrays
    const updating = workout.exercises.map((exercise: Exercise, index: number) => ({
       where: {
          id: exercise.id,
@@ -504,8 +492,12 @@ export async function getExercisesUpdates(
       }
    }));
 
+   const removing: string[] = existingExerciseIds.filter(
+      (id: string) => !newExerciseIds.has(id)
+   );
+
    return {
-      removing:  { id: { in: removing } },
-      updating: updating
+      updating: updating,
+      removing:  { id: { in: removing } }
    };
 }

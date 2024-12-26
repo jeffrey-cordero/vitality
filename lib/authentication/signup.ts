@@ -1,9 +1,12 @@
+
 "use server";
 import bcrypt from "bcryptjs";
+import validator from "validator";
 import { z } from "zod";
 
 import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
 import { userSchema } from "@/lib/global/zod";
+import { normalizePhoneNumber } from "@/lib/authentication/shared";
 import prisma from "@/lib/prisma/client";
 
 export type Registration = {
@@ -47,12 +50,15 @@ export async function signup(registration: Registration): Promise<VitalityRespon
       }
 
       // Check for existing users with the same username, email, and/or phone
+      const emailNormalized = registration.email.trim().toLowerCase();
+      const phoneNormalized = registration.phone ? normalizePhoneNumber(registration.phone) : null;
+
       const conflicts = await prisma.users.findMany({
          where: {
             OR: [
                { username: registration.username.trim() },
-               { email: registration.email.trim() },
-               { phone: registration.phone?.trim() }
+               { email_normalized: emailNormalized },
+               { phone_normalized: phoneNormalized }
             ]
          }
       });
@@ -66,9 +72,11 @@ export async function signup(registration: Registration): Promise<VitalityRespon
                username: registration.username.trim(),
                name: registration.name.trim(),
                email: registration.email.trim(),
+               email_normalized: emailNormalized,
                password: hashedPassword,
                birthday: registration.birthday,
-               phone: registration.phone?.trim()
+               phone: registration.phone?.trim(),
+               phone_normalized: phoneNormalized
             }
          });
 
@@ -79,8 +87,8 @@ export async function signup(registration: Registration): Promise<VitalityRespon
 
          for (const user of conflicts) {
             user.username === registration.username && (errors["username"] = ["Username already taken"]);
-            user.email === registration.email && (errors["email"] = ["Email already taken"]);
-            user.phone === registration.phone && (errors["phone"] = ["Phone number already taken"]);
+            user.email_normalized === emailNormalized && (errors["email"] = ["Email already taken"]);
+            user.phone_normalized === phoneNormalized && (errors["phone"] = ["Phone number already taken"]);
          }
 
          return sendErrorMessage("Account registration conflicts", errors);

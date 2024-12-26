@@ -232,7 +232,7 @@ function DateFilter(props: VitalityProps): JSX.Element {
          display = {
             <Button
                type = "button"
-               className = "h-10 w-full bg-primary font-semibold text-white text-sm xxsm:text-sm"
+               className = "h-10 w-full bg-primary text-sm font-semibold text-white xxsm:text-sm"
             >
                <FontAwesomeIcon
                   icon = { faCalendar }

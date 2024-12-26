@@ -20,8 +20,8 @@ interface SideBarProps {
 
 const landingLinks: SideBarProps[] = [
    { name: "Landing", href: "/", icon: faPlaneArrival },
-   { name: "Log In", href: "/login", icon: faDoorOpen },
    { name: "Sign Up", href: "/signup", icon: faUserPlus },
+   { name: "Log In", href: "/login", icon: faDoorOpen },
    { name: "Theme", href: "\0", icon: null }
 ];
 

@@ -90,7 +90,7 @@ function Row(props: RowProps) {
          }
          onClick = { toggleWorkouts }
       >
-      <div className = "order-3 w-full max-w-[26rem] items-center justify-center px-4 pb-2 text-[1.25rem] font-medium [overflow-wrap:anywhere] lg:order-none lg:w-40 lg:px-6 lg:py-4 lg:text-lg">
+         <div className = "order-3 w-full max-w-[26rem] items-center justify-center px-4 pb-2 text-[1.25rem] font-medium [overflow-wrap:anywhere] lg:order-none lg:w-40 lg:px-6 lg:py-4 lg:text-lg">
             { workout.title }
          </div>
          <div className = "order-1 flex w-full flex-row items-center justify-center gap-3 whitespace-pre-wrap break-all px-4 text-lg font-medium lg:order-none lg:w-40 lg:px-6 lg:py-4 lg:text-lg">

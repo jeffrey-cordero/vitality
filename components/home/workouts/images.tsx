@@ -7,8 +7,7 @@ import { useCallback, useMemo, useState } from "react";
 import Button from "@/components/global/button";
 import { Input, VitalityInputProps } from "@/components/global/input";
 import Modal from "@/components/global/modal";
-import { workoutsImageRegex } from "@/lib/home/workouts/regex";
-import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { verifyImageURL, workoutImagesRegex } from "@/lib/home/workouts/shared";
 
 const images = [
    "bike.png",
@@ -31,7 +30,7 @@ interface FormProps extends VitalityInputProps {
 
 function Form(props: FormProps): JSX.Element {
    const { url, isValidURL, isValidResource, input, dispatch } = props;
-   const [isDefaultImage, setIsDefaultImage] = useState<boolean>(url === "" || workoutsImageRegex.test(url));
+   const [isDefaultImage, setIsDefaultImage] = useState<boolean>(url === "" || workoutImagesRegex.test(url));
 
    const updateImageURL = useCallback(() => {
       dispatch({

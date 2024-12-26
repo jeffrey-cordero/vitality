@@ -12,10 +12,7 @@ export interface VitalityResponse<T> {
    };
  }
 
-export function sendSuccessMessage<T>(
-   message: string,
-   data: T
-): VitalityResponse<T> {
+export function sendSuccessMessage<T>(message: string, data: T): VitalityResponse<T> {
    return {
       status: "Success",
       body: {
@@ -26,10 +23,7 @@ export function sendSuccessMessage<T>(
    };
 }
 
-export function sendErrorMessage<T>(
-   message: string,
-   errors: Record<string, string[] | undefined>
-): VitalityResponse<T> {
+export function sendErrorMessage<T>(message: string, errors: Record<string, string[] | undefined>): VitalityResponse<T> {
    return {
       status: "Error",
       body: {
@@ -40,9 +34,7 @@ export function sendErrorMessage<T>(
    };
 }
 
-export function sendFailureMessage<T>(
-   error: Error
-): VitalityResponse<T> {
+export function sendFailureMessage<T>(error: Error): VitalityResponse<T> {
    // Error logs strictly within a development environment
    process.env.NODE_ENV === "development" && console.error(error);
 

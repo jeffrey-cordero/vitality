@@ -6,8 +6,10 @@ CREATE TABLE "users" (
       password TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
       email_verified BOOLEAN NOT NULL DEFAULT FALSE,
-      phone VARCHAR(22) UNIQUE,
+      email_normalized TEXT UNIQUE NOT NULL,
+      phone VARCHAR(42) UNIQUE,
       phone_verified BOOLEAN DEFAULT FALSE,
+      phone_normalized VARCHAR(42) UNIQUE,
       mail BOOLEAN DEFAULT FALSE,
       sms BOOLEAN DEFAULT FALSE,
       image TEXT DEFAULT ''    

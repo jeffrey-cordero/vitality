@@ -1,5 +1,4 @@
 "use server";
-import { workout_applied_tags } from "@prisma/client";
 import { z } from "zod";
 
 import { authorizeAction } from "@/lib/authentication/session";
@@ -7,6 +6,7 @@ import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityRespo
 import { uuidSchema } from "@/lib/global/zod";
 import { Exercise } from "@/lib/home/workouts/exercises";
 import { formatDatabaseWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
+import { getAppliedTagUpdates } from "@/lib/home/workouts/tags";
 import prisma from "@/lib/prisma/client";
 
 export type Workout = {
@@ -52,9 +52,7 @@ const newWorkoutSchema = workoutsSchema.extend({
    id: uuidSchema("workout", "new")
 });
 
-export async function fetchWorkouts(
-   user_id: string
-): Promise<Workout[]> {
+export async function fetchWorkouts(user_id: string): Promise<Workout[]> {
    try {
       await authorizeAction(user_id);
 
@@ -95,10 +93,7 @@ export async function fetchWorkouts(
    }
 }
 
-export async function addWorkout(
-   user_id: string,
-   workout: Workout,
-): Promise<VitalityResponse<Workout>> {
+export async function addWorkout(user_id: string, workout: Workout): Promise<VitalityResponse<Workout>> {
    try {
       await authorizeAction(user_id);
 
@@ -110,7 +105,7 @@ export async function addWorkout(
          );
       }
 
-      // Create a new workout with basic properties
+      // Create a new workout with the basic properties
       const newWorkout = await prisma.workouts.create({
          data: {
             user_id: user_id,
@@ -152,10 +147,7 @@ export async function addWorkout(
    }
 }
 
-export async function updateWorkout(
-   user_id: string,
-   workout: Workout,
-): Promise<VitalityResponse<Workout>> {
+export async function updateWorkout(user_id: string, workout: Workout): Promise<VitalityResponse<Workout>> {
    try {
       await authorizeAction(user_id);
 
@@ -201,7 +193,7 @@ export async function updateWorkout(
             );
          }
 
-         const { adding, removing } = await getAppliedWorkoutTagUpdates(existingWorkout, workout);
+         const { adding, removing } = await getAppliedTagUpdates(existingWorkout, workout);
 
          const updatedWorkout = await prisma.workouts.update({
             where: {
@@ -256,47 +248,7 @@ export async function updateWorkout(
    }
 }
 
-export async function getAppliedWorkoutTagUpdates(
-   existingWorkout: any,
-   newWorkout: Workout
-): Promise<{
-   existing: string[],
-   adding: string[];
-   removing: string[]
-}> {
-   // Extract existing applied tag IDs
-   const existing: Set<string> = new Set(
-      existingWorkout.workout_applied_tags.map(
-         (tag: workout_applied_tags) => tag.tag_id
-      )
-   );
-
-   // Determine tags ID's to add and remove from existing workout
-   const adding: Set<string> = new Set(newWorkout.tagIds);
-
-   const addingTags: string[] = Array.from(adding).filter(
-      (id: string) => !existing.has(id)
-   );
-
-   const removingTags: string[] = Array.from(existing).filter(
-      (id: string)  => !adding.has(id)
-   );
-
-   const existingTags: string[] = Array.from(existing).filter(
-      (id: string)  => existing.has(id) && adding.has(id)
-   );
-
-   return {
-      existing: existingTags,
-      adding: addingTags,
-      removing: removingTags
-   };
-}
-
-export async function deleteWorkouts(
-   user_id: string,
-   workouts: Workout[],
-): Promise<VitalityResponse<number>> {
+export async function deleteWorkouts(user_id: string, workouts: Workout[]): Promise<VitalityResponse<number>> {
    try {
       await authorizeAction(user_id);
 
@@ -322,7 +274,7 @@ export async function deleteWorkouts(
          return sendErrorMessage("Invalid workout ID fields", errors);
       }
 
-      const batch = await prisma.workouts.deleteMany({
+      const operation = await prisma.workouts.deleteMany({
          where: {
             id: {
                in: ids
@@ -332,8 +284,8 @@ export async function deleteWorkouts(
       });
 
       return sendSuccessMessage(
-         `Deleted ${batch.count} workout${batch.count === 1 ? "" : "s"}`,
-         batch.count,
+         `Deleted ${operation.count} workout${operation.count === 1 ? "" : "s"}`,
+         operation.count,
       );
    } catch (error) {
       return sendFailureMessage(error);

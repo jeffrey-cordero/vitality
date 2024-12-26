@@ -33,7 +33,7 @@ export default function View(props: ViewProps): JSX.Element {
                icon = { faTable }
                onClick = { () => updateView("table") }
                className = {
-                  clsx("text-base transition duration-300 ease-in-out focus:text-primary focus:ring-transparent xxsm:text-lg", {
+                  clsx("text-lg transition duration-300 ease-in-out focus:text-primary focus:ring-transparent xxsm:text-lg", {
                      "scale-105 border-b-4 border-primary rounded-none text-primary": view === "table"
                   })
                }
@@ -44,7 +44,7 @@ export default function View(props: ViewProps): JSX.Element {
                icon = { faPhotoFilm }
                onClick = { () => updateView("cards") }
                className = {
-                  clsx("text-base transition duration-300 ease-in-out focus:text-primary focus:ring-transparent xxsm:text-lg", {
+                  clsx("text-lg transition duration-300 ease-in-out focus:text-primary focus:ring-transparent xxsm:text-lg", {
                      "scale-105 border-b-4 border-b-primary rounded-none text-primary": view === "cards"
                   })
                }
@@ -54,7 +54,7 @@ export default function View(props: ViewProps): JSX.Element {
          </div>
          <div
             id = "workoutsView"
-            className = "mx-auto flex w-full flex-col items-center justify-start px-2 sm:w-11/12 xl:w-10/12 2xl:w-8/12 max-w-[80rem]"
+            className = "mx-auto flex w-full max-w-7xl flex-col items-center justify-start px-2 sm:w-11/12 xl:w-10/12 2xl:w-8/12"
          >
             {
                workouts.length === 0 ? (
