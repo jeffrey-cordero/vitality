@@ -1,6 +1,6 @@
 "use server";
+import { workout_applied_tags } from "@prisma/client";
 import { z } from "zod";
-import { workout_applied_tags } from '@prisma/client';
 
 import { authorizeAction } from "@/lib/authentication/session";
 import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";

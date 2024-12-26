@@ -8,7 +8,8 @@ import Form from "@/components/home/workouts/form";
 import Pagination from "@/components/home/workouts/pagination";
 import View from "@/components/home/workouts/view";
 import { formReducer, VitalityState } from "@/lib/global/reducer";
-import { fetchWorkoutTags } from "@/lib/home/workouts/tags";
+import { emptyWorkout } from "@/lib/home/workouts/shared";
+import { fetchWorkoutTags, Tag } from "@/lib/home/workouts/tags";
 import { fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
 
 const form: VitalityState = {
@@ -60,14 +61,7 @@ const form: VitalityState = {
    workout: {
       id: "workout",
       value: {
-         id: "",
-         user_id: "",
-         title: "",
-         date: new Date(),
-         image: "",
-         description: "",
-         exercises: [],
-         tagIds: []
+         ...emptyWorkout
       },
       error: null,
       data: {
@@ -95,45 +89,47 @@ export default function Page(): JSX.Element {
    const [globalState, globalDispatch] = useReducer(formReducer, form);
    const [view, setView] = useState<"table" | "cards">("table");
 
+   // Search value for workouts based on title
    const search: string = useMemo(() => {
       return globalState.search.value.trim().toLowerCase();
    }, [globalState.search]);
 
-   // Case-insensitive title comparison for workouts search
+   // Case-insensitive workout title search results
    const results: Workout[] = useMemo(() => {
       const filtered: Workout[] = globalState.workouts.data?.filtered;
-      const lower = search.toLowerCase();
+      const lower: string = search.toLowerCase();
 
-      return search === "" ?
-         filtered : filtered.filter((w) => w.title.toLowerCase().includes(lower));
+      return search === "" ? filtered : filtered.filter(
+         (workout) => workout.title.toLowerCase().includes(lower)
+      );
    }, [
-      globalState.workouts.data?.filtered,
-      search
+      search,
+      globalState.workouts.data?.filtered
    ]);
 
-   // Pagination calculations
+   // Pagination calculations for workouts section
    const paging: number = globalState.paging.value;
    const page: number = globalState.page.value;
 
-   const workoutsSection: Workout[] = useMemo(() => {
+   const section: Workout[] = useMemo(() => {
       const low: number = page * paging;
-      const high = low + paging;
+      const high: number = low + paging;
 
       return results.slice(low, high);
    }, [
-      results,
+      page,
       paging,
-      page
+      results
    ]);
 
-   const fetchWorkoutsData = useCallback(async() => {
-      // Fetch user workouts and workout tags for global state
+   const fetchUserWorkouts = useCallback(async() => {
+      // Fetch user workouts and workout tags
       const [workoutsData, tagsData] = await Promise.all([
          fetchWorkouts(user.id),
          fetchWorkoutTags(user.id)
       ]);
 
-      // Ensure paging and page localStorage values align with pagination setup
+      // Ensure paging and page localStorage values align with pagination setup values
       let paging: number = Number.parseInt(window.localStorage.getItem("paging") ?? "10");
 
       if (!(pagingValues.has(paging))) {
@@ -158,7 +154,7 @@ export default function Page(): JSX.Element {
                   selected: [],
                   filtered: [],
                   dictionary: Object.fromEntries(
-                     tagsData.map((tag) => [tag.id, tag]),
+                     tagsData.map((tag: Tag) => [tag.id, tag]),
                   ),
                   fetched: true
                }
@@ -189,19 +185,17 @@ export default function Page(): JSX.Element {
 
    useEffect(() => {
       if (!globalState.workouts.data?.fetched) {
-         setView(
-            window.localStorage.getItem("view") === "cards" ? "cards" : "table",
-         );
+         setView(window.localStorage.getItem("view") === "cards" ? "cards" : "table");
 
-         fetchWorkoutsData();
+         fetchUserWorkouts();
       }
    }, [
       user,
-      fetchWorkoutsData,
-      globalState.workouts.data?.fetched,
+      view,
       globalState.tags,
+      fetchUserWorkouts,
       globalState.workouts,
-      view
+      globalState.workouts.data?.fetched
    ]);
 
    return (
@@ -213,7 +207,7 @@ export default function Page(): JSX.Element {
          <View
             view = { view }
             setView = { setView }
-            workouts = { workoutsSection }
+            workouts = { section }
             globalState = { globalState }
             globalDispatch = { globalDispatch }
          />

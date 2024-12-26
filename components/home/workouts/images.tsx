@@ -23,17 +23,17 @@ const images = [
    "weights.png"
 ];
 
-interface ImagesFormProps extends VitalityInputProps {
+interface FormProps extends VitalityInputProps {
    url: string;
-   isValidResource: boolean;
    isValidURL: boolean;
+   isValidResource: boolean;
 }
 
-function ImagesForm(props: ImagesFormProps): JSX.Element {
+function Form(props: FormProps): JSX.Element {
    const { url, isValidURL, isValidResource, input, dispatch } = props;
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(url === "" || workoutsImageRegex.test(url));
 
-   const handleImageURLUpdates = useCallback(() => {
+   const updateImageURL = useCallback(() => {
       dispatch({
          type: "updateState",
          value: {
@@ -51,39 +51,40 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
       isValidURL
    ]);
 
-   const handleDefaultImageSelection = useCallback(
-      (source: string) => {
-         dispatch({
-            type: "updateState",
-            value: {
-               id: "image",
-               value: {
-                  value: source,
-                  error: null,
-                  data: {
-                     valid: true
-                  }
-               }
-            }
-         });
-      }, [dispatch]);
-
-   const handleImageResourceError = useCallback(() => {
+   const selectDefaultImage = useCallback((source: string) => {
       dispatch({
          type: "updateState",
          value: {
             id: "image",
             value: {
-               error: "Failed to fetch your desired image resource",
+               value: source,
+               error: null,
                data: {
-                  valid: false
+                  valid: true
                }
             }
          }
       });
    }, [dispatch]);
 
-   const handleResetImageURL = useCallback(() => {
+   const updateImageURLInput = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+      dispatch({
+         type: "updateState",
+         value: {
+            id: "image",
+            value: {
+               value: event.target.value,
+               error: null,
+               // URL changes are verified on link submissions
+               data: {
+                  valid: undefined
+               }
+            }
+         }
+      });
+   }, [dispatch]);
+
+   const resetImageURL = useCallback(() => {
       dispatch({
          type: "updateState",
          value: {
@@ -99,34 +100,27 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
       });
    }, [dispatch]);
 
-   const handleImageURLChanges = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-      // Ensure any changes to URL are verified on a new submission
+   const displayImageResourceErrors = () => {
       dispatch({
          type: "updateState",
          value: {
             id: "image",
             value: {
-               value: event.target.value,
-               error: null,
+               error: "Failed to fetch your desired image resource",
                data: {
-                  valid: undefined
+                  valid: false
                }
             }
          }
       });
-   }, [dispatch]);
+   };
 
    return (
       <div className = "flex flex-col py-2">
          <div className = "mb-4 mt-2 flex flex-wrap items-center justify-center gap-3 text-center text-base">
             <Button
                icon = { faCameraRetro }
-               onClick = {
-                  (event: React.MouseEvent) => {
-                     event.stopPropagation();
-                     setIsDefaultImage(true);
-                  }
-               }
+               onClick = { () => setIsDefaultImage(true) }
                className = {
                   clsx("transition duration-300 ease-in-out focus:text-primary focus:ring-transparent", {
                      "scale-105 border-b-4 border-b-primary rounded-none": isDefaultImage
@@ -137,12 +131,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
             </Button>
             <Button
                icon = { faPaperclip }
-               onClick = {
-                  (event: React.MouseEvent) => {
-                     event.stopPropagation();
-                     setIsDefaultImage(false);
-                  }
-               }
+               onClick = { () => setIsDefaultImage(false) }
                className = {
                   clsx("transition duration-300 ease-in-out focus:text-primary focus:ring-transparent", {
                      "scale-105 border-b-4 border-b-primary rounded-none": !isDefaultImage
@@ -180,13 +169,13 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  alt = "workout-image"
                                  className = {
                                     clsx(
-                                       "cursor-pointer rounded-xl object-cover object-center shadow-inner", {
-                                          "border-primary border-[4px] shadow-2xl scale-[1.03] transition duration-300 ease-in-out": isSelected
+                                       "cursor-pointer rounded-xl object-cover object-center shadow-inner transition duration-300 ease-in-out", {
+                                          "border-primary border-[4px] shadow-2xl scale-[1.07]": isSelected
                                        }
                                     )
                                  }
-                                 onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && !isSelected ? handleDefaultImageSelection(source) : handleResetImageURL() }
-                                 onClick = { () => !isSelected ? handleDefaultImageSelection(source) : handleResetImageURL() }
+                                 onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && !isSelected ? selectDefaultImage(source) : resetImageURL() }
+                                 onClick = { () => !isSelected ? selectDefaultImage(source) : resetImageURL() }
                               />
                            </div>
                         );
@@ -195,7 +184,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                </div>
             ) : (
                <div
-                  onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && url.length > 0 && handleImageURLUpdates() }
+                  onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && url.length > 0 && updateImageURL() }
                   className = "relative mx-auto size-full"
                >
                   {
@@ -208,7 +197,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                                  quality = { 100 }
                                  sizes = "100%"
                                  src = { url }
-                                 onError = { handleImageResourceError }
+                                 onError = { displayImageResourceErrors }
                                  alt = "workout-image"
                                  className = {
                                     clsx(
@@ -222,7 +211,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                   }
                   <Input
                      { ...props }
-                     onChange = { handleImageURLChanges }
+                     onChange = { updateImageURLInput }
                   />
                   {
                      url.length > 0 && (
@@ -231,7 +220,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                               input.data?.valid && (
                                  <Button
                                     type = "button"
-                                    onClick = { handleResetImageURL }
+                                    onClick = { resetImageURL }
                                     className = "mt-2 h-10 w-full bg-red-500 px-4 py-2 font-semibold text-white focus:ring-red-700"
                                     icon = { faTrashCan }
                                  >
@@ -243,7 +232,7 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
                               input.data?.valid !== true && (
                                  <Button
                                     type = "button"
-                                    onClick = { handleImageURLUpdates }
+                                    onClick = { updateImageURL }
                                     className = "mt-2 h-10 w-full bg-primary font-semibold text-white placeholder:text-transparent"
                                     icon = { faPaperclip }
                                  >
@@ -262,15 +251,10 @@ function ImagesForm(props: ImagesFormProps): JSX.Element {
    );
 }
 
-export default function Images(props: VitalityInputProps): JSX.Element {
+export default function ImageForm(props: VitalityInputProps): JSX.Element {
    const { input } = props;
    const url: string = input.value.trim();
-   const isValidResource: boolean = useMemo(() => {
-      return input.data?.valid === true && url.length !== 0;
-   }, [
-      url,
-      input.data?.valid
-   ]);
+   const isValidResource: boolean = input.data?.valid === true && url.length !== 0;
    const isValidURL: boolean = useMemo(() => {
       return verifyImageURL(url);
    }, [url]);
@@ -308,7 +292,7 @@ export default function Images(props: VitalityInputProps): JSX.Element {
             }
             className = "mt-12 max-h-[90%] max-w-[95%] sm:max-w-xl"
          >
-            <ImagesForm
+            <Form
                { ...props }
                url = { url }
                isValidResource = { isValidResource }

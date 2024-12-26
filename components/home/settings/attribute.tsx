@@ -65,8 +65,7 @@ export function GeneralAttribute(props: AttributeProps) {
          type: "updateState",
          value: {
             id: id,
-            input: {
-               ...input,
+            value: {
                value: "",
                error: null
             }
@@ -74,7 +73,6 @@ export function GeneralAttribute(props: AttributeProps) {
       });
    }, [
       id,
-      input,
       globalDispatch
    ]);
 
@@ -96,10 +94,8 @@ export function GeneralAttribute(props: AttributeProps) {
             type: "updateState",
             value: {
                id: id,
-               input: {
-                  ...input,
+               value: {
                   data: {
-                     ...input.data,
                      valid: id === "image" ? true : undefined,
                      verified: id === "email" || id === "phone" ? false : undefined,
                      stored: updatingStored
@@ -345,7 +341,7 @@ interface SliderProps extends VitalityProps {
 export function SliderAttribute(props: SliderProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotifications } = useContext(NotificationContext);
-   const { id, icon, label, onChange, checked, globalState, globalDispatch } = props;
+   const { id, icon, label, onChange, checked, globalDispatch } = props;
 
    const handleUpdatePreference = useCallback(async() => {
       const response: VitalityResponse<void> = await updatePreference(user.id, id, !checked);
@@ -355,8 +351,7 @@ export function SliderAttribute(props: SliderProps): JSX.Element {
             type: "updateState",
             value: {
                id: id,
-               input: {
-                  ...globalState[id],
+               value: {
                   value: !checked
                }
             }
@@ -367,7 +362,6 @@ export function SliderAttribute(props: SliderProps): JSX.Element {
       id,
       user,
       checked,
-      globalState,
       globalDispatch,
       updateNotifications
    ]);

@@ -32,7 +32,6 @@ const form: VitalityState = {
    }
 };
 
-// Default tag colors
 const colors = {
    "Dark gray": "rgb(55, 55, 55)",
    "Gray": "rgb(90, 90, 90)",
@@ -45,60 +44,56 @@ const colors = {
    "Pink": "rgb(105, 49, 76)",
    "Red": "rgb(110, 54, 48)"
 };
+const values = Object.values(colors);
+let randomColor: string = values[Math.floor(Math.random() * values.length)];
 
-const colorValues = Object.values(colors);
-let randomColor: string = colorValues[Math.floor(Math.random() * colorValues.length)];
-
-interface CreateTagContainerProps extends VitalityChildProps {
+interface CreateTagProps extends VitalityChildProps {
    onSubmit: () => void;
 }
 
-function CreateTagContainer(props: CreateTagContainerProps) {
+function CreateTag(props: CreateTagProps) {
    const { localState, onSubmit } = props;
    const search: string = localState.tagSearch.value;
 
    return (
-
       <div
          tabIndex = { 0 }
-         className = "mx-auto mb-2 mt-4 flex max-w-full cursor-pointer flex-row flex-wrap items-center justify-center gap-x-2 rounded-full px-5 py-[0.6rem] text-sm font-bold text-white transition duration-300 ease-in-out hover:scale-[1.03] focus:scale-[1.03] focus:outline-blue-500"
+         className = "mx-auto mb-2 mt-4 flex max-w-full cursor-pointer flex-row flex-wrap items-center justify-center gap-x-2 rounded-full px-5 py-[0.6rem] text-sm font-bold text-white  focus:outline-blue-500"
          style = { { backgroundColor: randomColor } }
          onClick = { onSubmit }
          onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && onSubmit() }
       >
          <p className = "mx-auto line-clamp-1 max-w-full cursor-pointer text-ellipsis break-all text-center">{ search }</p>
          <FontAwesomeIcon icon = { faTags } />
-
       </div>
    );
 }
 
-function TagColorInput(props: VitalityChildProps) {
+function TagColorSelection(props: VitalityChildProps) {
    const { localState, localDispatch } = props;
 
    const names = useMemo(() => {
       return Object.keys(colors);
    }, []);
 
-   const handleColorChange = useCallback(
-      (color: string) => {
-         localDispatch({
-            type: "updateState",
+   const updateColor = useCallback((color: string) => {
+      localDispatch({
+         type: "updateState",
+         value: {
+            id: "tagColor",
             value: {
-               id: "tagColor",
-               value: {
-                  value: color,
-                  error: null
-               }
+               value: color,
+               error: null
             }
-         });
-      }, [localDispatch]);
+         }
+      });
+   }, [localDispatch]);
 
    return (
       <div className = "relative mx-auto flex w-full flex-col gap-1">
          {
             names.map((name: string) => {
-               const color = colors[name];
+               const color: string = colors[name];
 
                return (
                   <Button
@@ -112,7 +107,7 @@ function TagColorInput(props: VitalityChildProps) {
                            },
                         )
                      }
-                     onClick = { () => handleColorChange(color) }
+                     onClick = { () => updateColor(color) }
                      key = { name }
                   >
                      { name }
@@ -124,107 +119,93 @@ function TagColorInput(props: VitalityChildProps) {
    );
 }
 
-function EditTagContainer(props: TagContainerProps): JSX.Element {
+function EditTag(props: TagContainerProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotifications } = useContext(NotificationContext);
    const { tag, globalState, globalDispatch, localState, localDispatch } = props;
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
-   const handleTagUpdates = useCallback(
-      async(method: "update" | "delete") => {
-         const payload: Tag = {
-            user_id: user.id,
-            id: tag.id,
-            title: localState.tagTitle.value.trim(),
-            color: localState.tagColor.value.trim()
-         };
+   const updateTag = useCallback(async(method: "update" | "delete") => {
+      const payload: Tag = {
+         user_id: user.id,
+         id: tag.id,
+         title: localState.tagTitle.value.trim(),
+         color: localState.tagColor.value.trim()
+      };
 
-         const response: VitalityResponse<Tag> = await updateWorkoutTag(
-            user.id,
-            payload,
-            method,
-         );
+      const response: VitalityResponse<Tag> = await updateWorkoutTag(user.id, payload, method);
 
-         if (response.status !== "Error") {
-            // Handle success or failure responses
-            processResponse(response, localDispatch, updateNotifications, () => {
-               const { options, selected } = globalState.tags.data;
-               const returnedTag: Tag = response.body.data as Tag;
+      if (response.status !== "Error") {
+         // Handle success or failure responses
+         processResponse(response, localDispatch, updateNotifications, () => {
+            const { options, selected } = globalState.tags.data;
+            const returnedTag: Tag = response.body.data as Tag;
 
-               const mapOrFilter =
-                  method === "update"
-                     ? (tag: Tag) =>
-                        tag && tag.id === returnedTag.id ? returnedTag : tag
-                     : (tag: Tag) => tag !== undefined && tag.id !== returnedTag.id;
+            const mapOrFilter = method === "update" ?  (tag: Tag) => tag && tag.id === returnedTag.id ? returnedTag : tag
+               : (tag: Tag) => tag !== undefined && tag.id !== returnedTag.id;
 
-               const newTags: Tag[] =
-                  method === "update"
-                     ? [...options.map(mapOrFilter)]
-                     : [...options.filter(mapOrFilter)];
-               const newSelected: Tag[] =
-                  method === "update"
-                     ? [...selected.map(mapOrFilter)]
-                     : [...selected.filter(mapOrFilter)];
+            const newTags: Tag[] = method === "update" ? [...options.map(mapOrFilter)] : [...options.filter(mapOrFilter)];
+            const newSelected: Tag[] = method === "update" ? [...selected.map(mapOrFilter)] : [...selected.filter(mapOrFilter)];
 
-               // Holds valid existing workout tags to account for removals in other tag view containers
-               const newDictionary: Record<string, Tag> = Object.fromEntries(
-                  newTags.map((tag) => [tag.id, tag]),
-               );
+            // Update existing workout tags dictionary
+            const newDictionary: Record<string, Tag> = Object.fromEntries(
+               newTags.map((tag) => [tag.id, tag]),
+            );
 
-               if (method === "update") {
-                  newDictionary[returnedTag.id] = returnedTag;
-               } else {
-                  delete newDictionary[returnedTag.id];
-               }
+            if (method === "update") {
+               newDictionary[returnedTag.id] = returnedTag;
+            } else {
+               delete newDictionary[returnedTag.id];
+            }
 
-               globalDispatch({
-                  type: "updateState",
+            globalDispatch({
+               type: "updateState",
+               value: {
+                  id: "tags",
                   value: {
-                     id: "tags",
-                     value: {
-                        data: {
-                           options: newTags,
-                           selected: newSelected,
-                           dictionary: newDictionary
-                        }
+                     data: {
+                        options: newTags,
+                        selected: newSelected,
+                        dictionary: newDictionary
                      }
                   }
-               });
-
-               method === "delete" && updateNotifications({
-                  status: "Success",
-                  message: "Deleted workout tag",
-                  timer: 1000
-               });
-            });
-         } else {
-            // Handle error response uniquely by mapping response identifiers to local state identifiers
-            localDispatch({
-               type: "updateStates",
-               value: {
-                  tagTitle: {
-                     error: response.body.errors["title"]?.[0] ?? null
-                  },
-                  tagColor: {
-                     error: response.body.errors["color"]?.[0] ?? null
-                  }
                }
             });
-         }
-      },
-      [
-         user,
-         globalDispatch,
-         globalState,
-         localDispatch,
-         localState.tagColor,
-         localState.tagTitle,
-         tag.id,
-         updateNotifications
-      ],
+
+            method === "delete" && updateNotifications({
+               status: "Success",
+               message: "Deleted workout tag",
+               timer: 1000
+            });
+         });
+      } else {
+         // Handle error response by mapping response error to local inputs
+         localDispatch({
+            type: "updateStates",
+            value: {
+               tagTitle: {
+                  error: response.body.errors["title"]?.[0] ?? null
+               },
+               tagColor: {
+                  error: response.body.errors["color"]?.[0] ?? null
+               }
+            }
+         });
+      }
+   },
+   [
+      user,
+      tag.id,
+      globalState,
+      localDispatch,
+      globalDispatch,
+      updateNotifications,
+      localState.tagColor,
+      localState.tagTitle
+   ],
    );
 
-   const handleSubmitUpdates = useCallback(() => {
+   const submitTagUpdates = useCallback(() => {
       updateButtonRef.current?.submit();
    }, []);
 
@@ -246,12 +227,12 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
             icon = { faTag }
             input = { localState.tagTitle }
             dispatch = { localDispatch }
-            onSubmit = { handleSubmitUpdates }
+            onSubmit = { submitTagUpdates }
             autoFocus
             required
          />
          <div className = "flex flex-col items-center justify-center gap-1">
-            <TagColorInput { ...props } />
+            <TagColorSelection { ...props } />
             {
                localState.tagColor.error !== null && (
                   <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 opacity-0">
@@ -268,14 +249,14 @@ function EditTagContainer(props: TagContainerProps): JSX.Element {
                type = "submit"
                className = "h-10 w-full bg-primary text-white"
                icon = { faPenToSquare }
-               onSubmit = { () => handleTagUpdates("update") }
-               onClick = { handleSubmitUpdates }
+               onSubmit = { () => updateTag("update") }
+               onClick = { submitTagUpdates }
             >
                Update
             </Button>
             <Confirmation
                message = "Delete this tag?"
-               onConfirmation = { async() => await handleTagUpdates("delete") }
+               onConfirmation = { async() => await updateTag("delete") }
             />
          </div>
       </div>
@@ -292,31 +273,29 @@ function TagContainer(props: TagContainerProps): JSX.Element {
    const tagRef = useRef<HTMLLIElement>(null);
 
    // Handle adding or removing a selected tag
-   const handleTagSelect = useCallback(
-      (adding: boolean) => {
-         globalDispatch({
-            type: "updateState",
+   const selectedTag = useCallback((adding: boolean) => {
+      globalDispatch({
+         type: "updateState",
+         value: {
+            id: "tags",
             value: {
-               id: "tags",
-               value: {
-                  data: {
-                     selected: adding
-                        ? [...globalState.tags.data?.selected, tag]
-                        : [...globalState.tags.data?.selected].filter(
-                           (other: Tag) => other !== tag,
-                        )
-                  }
+               data: {
+                  selected: adding ? [...globalState.tags.data?.selected, tag]
+                     : [...globalState.tags.data?.selected].filter(
+                        (other: Tag) => other !== tag,
+                     )
                }
             }
-         });
-      }, [
-         globalDispatch,
-         globalState.tags,
-         tag
-      ]);
+         }
+      });
+   }, [
+      tag,
+      globalDispatch,
+      globalState.tags
+   ]);
 
-   const handleTagEdits = useCallback(() => {
-      // Update edit tag information globalState
+   const editTag = useCallback(() => {
+      // Update editing tag inputs in local state
       localDispatch({
          type: "updateStates",
          value: {
@@ -331,9 +310,9 @@ function TagContainer(props: TagContainerProps): JSX.Element {
          }
       });
    }, [
-      localDispatch,
       tag.color,
-      tag.title
+      tag.title,
+      localDispatch
    ]);
 
    return (
@@ -354,15 +333,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
          <div className = "mx-auto flex max-w-full flex-row flex-wrap items-center justify-center gap-x-2">
             <div
                id = { tag.id }
-               onClick = {
-                  (event) => {
-                     event.stopPropagation();
-
-                     if (!selected) {
-                        handleTagSelect(true);
-                     }
-                  }
-               }
+               onClick = { () => !selected && selectedTag(true) }
                className = "mx-auto line-clamp-1 max-w-full cursor-pointer text-ellipsis break-all text-center"
             >
                { tag.title }
@@ -373,21 +344,19 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                      display = {
                         <FontAwesomeIcon
                            icon = { faGears }
-                           onClick = { handleTagEdits }
+                           onClick = { editTag }
                            className = "cursor-pointer pt-1 text-sm hover:opacity-70"
                         />
                      }
                      className = "mt-12 max-h-[90%] max-w-[95%] sm:max-w-xl"
                   >
-                     <EditTagContainer
-                        { ...props }
-                     />
+                     <EditTag { ...props } />
                   </Modal>
                }
                {
                   selected && (
                      <FontAwesomeIcon
-                        onMouseDown = { () => handleTagSelect(false) }
+                        onMouseDown = { () => selectedTag(false) }
                         icon = { faXmark }
                         className = "cursor-pointer text-base hover:text-red-500"
                      />
@@ -403,31 +372,32 @@ interface TagsProps extends VitalityProps {
    onReset?: () => void;
 }
 
-export default function Tags(props: TagsProps): JSX.Element {
+export default function TagsForm(props: TagsProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotifications } = useContext(NotificationContext);
    const { globalState, globalDispatch, onReset } = props;
-
    // Fetch overall and selected tags lists
    const { options, selected } = globalState.tags.data;
-
-   // Local state for tag-related inputs
    const [localState, localDispatch] = useReducer(formReducer, form);
 
+   // Determine if tags have been fetched from the server
    const fetched: boolean = globalState.tags.data?.fetched;
 
-   // Differentiate between selected and unselected options
-   const selectedOptions: Set<Tag> = useMemo(() => {
+   // Differentiate between selected and unselected tags
+   const selectedTags: Set<Tag> = useMemo(() => {
       return new Set<Tag>(selected);
    }, [selected]);
 
    const searchOptions = useMemo(() => {
-      return options.filter((tag: Tag) => !selectedOptions.has(tag));
+      return options.filter(
+         (tag: Tag) => !selectedTags.has(tag)
+      );
    }, [
       options,
-      selectedOptions
+      selectedTags
    ]);
 
+   // Search value for tags based on title
    const search: string = useMemo(() => {
       return localState.tagSearch.value.trim();
    }, [localState.tagSearch]);
@@ -436,14 +406,16 @@ export default function Tags(props: TagsProps): JSX.Element {
    const searchResults: Tag[] = useMemo(() => {
       const lower = search.toLowerCase();
 
-      return search === "" ?
-         searchOptions : searchOptions.filter((t) => t.title.toLowerCase().includes(lower));
+      return search === "" ? searchOptions
+         : searchOptions.filter(
+            (tag: Tag) => tag.title.toLowerCase().includes(lower)
+         );
    }, [
-      searchOptions,
-      search
+      search,
+      searchOptions
    ]);
 
-   // Tags by title to determine if search pattern exists or may be used for a new tag
+   // Determine if search pattern already exists or may be used for a new workout tag
    const tagsByTitle: { [title: string]: Tag } = useMemo(() => {
       const titles = {};
 
@@ -454,8 +426,8 @@ export default function Tags(props: TagsProps): JSX.Element {
       return titles;
    }, [options]);
 
-   const handleTagCreation = useCallback(async() => {
-      // Default tags have gray color option
+   const createTag = useCallback(async() => {
+      // Default tags have a random color assigned
       const tag: Tag = {
          user_id: user.id,
          id: "",
@@ -474,7 +446,7 @@ export default function Tags(props: TagsProps): JSX.Element {
             const newOptions: Tag[] = [...globalState.tags.data?.options, newOption];
             const newSelected: Tag[] = [...globalState.tags.data?.selected, newOption];
 
-            // Dictionary of tags are essential to ignore deleted tags applied to existing workouts
+            // Update existing workout tags dictionary
             const newDictionary: Record<string, Tag> = Object.fromEntries(
                newOptions.map((tag) => [tag.id, tag]),
             );
@@ -493,11 +465,11 @@ export default function Tags(props: TagsProps): JSX.Element {
                }
             });
 
-            // Fetch a new random color
-            randomColor = colorValues[Math.floor(Math.random() * colorValues.length)];
+            // New random color for the next tag creation
+            randomColor = values[Math.floor(Math.random() * values.length)];
          });
       } else {
-         // Handle error response uniquely by mapping response identifiers to local state identifiers
+         // Handle error response by mapping response errors to local
          localDispatch({
             type: "updateStates",
             value: {
@@ -508,26 +480,26 @@ export default function Tags(props: TagsProps): JSX.Element {
          });
       }
    }, [
-      globalDispatch,
-      localDispatch,
-      localState.tagSearch,
-      globalState.tags,
       user,
-      updateNotifications
+      localDispatch,
+      globalDispatch,
+      globalState.tags,
+      updateNotifications,
+      localState.tagSearch
    ]);
 
-   const handleCreateOrSelectTag = useCallback(() => {
+   const createOrSelectTag = useCallback(() => {
       const existingTag: Tag = tagsByTitle[search];
 
       if (!existingTag) {
-         handleTagCreation();
+         createTag();
       } else {
          document.getElementById(existingTag.id)?.click();
       }
    }, [
       search,
-      tagsByTitle,
-      handleTagCreation
+      createTag,
+      tagsByTitle
    ]);
 
    return (
@@ -576,7 +548,7 @@ export default function Tags(props: TagsProps): JSX.Element {
                         label = "Tags"
                         icon = { faTag }
                         dispatch = { localDispatch }
-                        onSubmit = { handleCreateOrSelectTag }
+                        onSubmit = { createOrSelectTag }
                         autoFocus = { onReset !== undefined }
                      />
                   </div>
@@ -604,11 +576,11 @@ export default function Tags(props: TagsProps): JSX.Element {
                   }
                   {
                      search.length >= 3 && search.length <= 30 && !tagsByTitle[search] && (
-                        <CreateTagContainer
+                        <CreateTag
                            { ...props }
                            localState = { localState }
                            localDispatch = { localDispatch }
-                           onSubmit = { () => handleTagCreation() }
+                           onSubmit = { () => createTag() }
                         />
                      )
                   }

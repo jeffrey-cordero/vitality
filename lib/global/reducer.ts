@@ -42,8 +42,6 @@ export function formReducer(state: VitalityState, action: VitalityAction<any>): 
       const updateDraft = (update: VitalityUpdateState) => {
          const { id, value } = update;
 
-         console.log(id, value);
-
          // Merge provided state object with existing state object
          draft[id] = {
             ...state[id],

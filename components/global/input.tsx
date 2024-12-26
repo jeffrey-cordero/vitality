@@ -26,8 +26,8 @@ export function Input(props: VitalityInputProps): JSX.Element {
       scrollIntoView && inputRef.current?.scrollIntoView({ behavior: "instant", block: "center" });
    }, [
       autoFocus,
-      scrollIntoView,
-      input.error
+      input.error,
+      scrollIntoView
    ]);
 
    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -47,10 +47,10 @@ export function Input(props: VitalityInputProps): JSX.Element {
          });
       }
    }, [
-      dispatch,
-      input,
       id,
-      onChange
+      input,
+      onChange,
+      dispatch
    ]);
 
    const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -85,8 +85,8 @@ export function Input(props: VitalityInputProps): JSX.Element {
          }
       });
    }, [
-      dispatch,
       id,
+      dispatch,
       inputType
    ]);
 

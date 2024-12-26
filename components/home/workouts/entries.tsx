@@ -1,26 +1,32 @@
-import { closestCenter, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-
-import { Exercise, ExerciseEntry, isEmptyExerciseEntry, updateExercise } from "@/lib/home/workouts/exercises";
-import { ExerciseProps } from "@/components/home/workouts/exercises";
-import { useCallback, useContext, useRef, useState } from "react";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { processResponse, VitalityResponse } from "@/lib/global/response";
-import { useDoubleTap } from "use-double-tap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCircleNotch, faDumbbell, faPersonRunning, faStopwatch, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { Input } from "@/components/global/input";
-import TextArea from "@/components/global/textarea";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useCallback, useContext, useRef, useState } from "react";
+import { useDoubleTap } from "use-double-tap";
+
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import Button from "@/components/global/button";
 import Confirmation from "@/components/global/confirmation";
+import { Input } from "@/components/global/input";
+import TextArea from "@/components/global/textarea";
+import { ExerciseProps } from "@/components/home/workouts/exercises";
+import { processResponse, VitalityResponse } from "@/lib/global/response";
+import { Exercise, ExerciseEntry, isEmptyExerciseEntry, updateExercise } from "@/lib/home/workouts/exercises";
 
-interface ExerciseEntryProps extends ExerciseProps {
+interface ExerciseEntryContainerProps extends ExerciseProps {
    entry: ExerciseEntry | undefined;
    reset: () => void;
 }
 
-export default function ExerciseEntryContainer(props: ExerciseEntryProps): JSX.Element {
+function parseExerciseEntryNumber(value: any): number | null {
+   const isEmpty: boolean = typeof value === "string" && value.trim().length === 0;
+   const number: number = +value;
+
+   return (isEmpty || isNaN(number) || number < 0) ? null : number;
+};
+
+export default function ExerciseEntryContainer(props: ExerciseEntryContainerProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotifications } = useContext(NotificationContext);
    const { workout, exercise, entry, localState, localDispatch, onBlur, reset, saveExercises } = props;
@@ -30,13 +36,13 @@ export default function ExerciseEntryContainer(props: ExerciseEntryProps): JSX.E
    // Interning exercise entry form inputs
    const isNewEntry: boolean = entry === undefined;
    const editingExerciseId: string = localState.exerciseId.value;
-   const editingEntryId: string = localState.exerciseId.data?.setId;
-   const displayEditEntry = isEditing && exercise.id === editingExerciseId && (isNewEntry ? editingEntryId === "" : entry.id === editingEntryId);
+   const editingEntryId: string = localState.exerciseId.data?.entryId;
+   const displayEditEntryInputs = isEditing && exercise.id === editingExerciseId && (isNewEntry ? editingEntryId === "" : entry.id === editingEntryId);
 
    // Prevent drag and drop mechanisms when creating or editing an exercise entry
    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
       id: entry?.id,
-      disabled: isNewEntry || displayEditEntry
+      disabled: isNewEntry || displayEditEntryInputs
    });
 
    const style = {
@@ -44,42 +50,19 @@ export default function ExerciseEntryContainer(props: ExerciseEntryProps): JSX.E
       transition
    };
 
-   const constructExerciseEntry = useCallback(() => {
-      // Helper method to format the entry inputs for the backend methods
-      const parseSetNumber = (value: any) => {
-         const isEmpty: boolean = typeof value === "string" && value.trim().length === 0;
-         const number: number = +value;
-
-         return (isEmpty || isNaN(number) || number < 0) ? null : number;
-      };
-
-      return {
-         ...entry,
+   const updateExerciseEntry = async(method: "add" | "update" | "delete") => {
+      const newEntry: ExerciseEntry = {
          id: isNewEntry ? "" : entry.id,
          exercise_id: exercise.id,
-         set_order: isNewEntry ? exercise.entries.length : entry.entry_order,
-         weight: parseSetNumber(localState.weight.value),
-         repetitions: parseSetNumber(localState.repetitions.value),
-         hours: parseSetNumber(localState.hours.value),
-         minutes: parseSetNumber(localState.minutes.value),
-         seconds: parseSetNumber(localState.seconds.value),
+         entry_order: isNewEntry ? exercise.entries.length : entry.entry_order,
+         weight: parseExerciseEntryNumber(localState.weight.value),
+         repetitions: parseExerciseEntryNumber(localState.repetitions.value),
+         hours: parseExerciseEntryNumber(localState.hours.value),
+         minutes: parseExerciseEntryNumber(localState.minutes.value),
+         seconds: parseExerciseEntryNumber(localState.seconds.value),
          text: localState.text.value.trim()
       };
-   }, [
-      entry,
-      isNewEntry,
-      exercise.id,
-      exercise.entries.length,
-      localState.hours.value,
-      localState.minutes.value,
-      localState.repetitions.value,
-      localState.seconds.value,
-      localState.text.value,
-      localState.weight.value
-   ]);
 
-   const updateExerciseEntry = useCallback(async(method: "add" | "update" | "delete") => {
-      const newEntry: ExerciseEntry = constructExerciseEntry();
       let response: VitalityResponse<Exercise>;
 
       if (await isEmptyExerciseEntry(newEntry)) {
@@ -98,10 +81,10 @@ export default function ExerciseEntryContainer(props: ExerciseEntryProps): JSX.E
          response = await updateExercise(user.id, newExercise, "entries");
       } else {
          // Update or delete entry from array of exercise entries
-         const newEntries: ExerciseEntry[] =
-            method === "update"
-               ? [...exercise.entries].map((e) => (e.id === newEntry.id ? newEntry : e))
-               : [...exercise.entries].filter((e) => e.id !== newEntry.id);
+         const newEntries: ExerciseEntry[] = method === "update" ?
+            [...exercise.entries].map((entry) => (entry.id === newEntry.id ? newEntry : entry))
+            : [...exercise.entries].filter((entry) => entry.id !== newEntry.id);
+
          const newExercise: Exercise = {
             ...exercise,
             entries: newEntries
@@ -117,39 +100,23 @@ export default function ExerciseEntryContainer(props: ExerciseEntryProps): JSX.E
          );
 
          saveExercises(newExercises);
-
-         method === "delete" && updateNotifications({
-            status: "Success",
-            message: "Delete entry",
-            timer: 1000
-         });
-
-         onBlur();
+         onBlur !== undefined ? onBlur() : setIsEditing(false);
       });
-   }, [
-      user,
-      exercise,
-      constructExerciseEntry,
-      localDispatch,
-      saveExercises,
-      updateNotifications,
-      workout.exercises,
-      onBlur
-   ]);
+   };
 
    const submitExerciseEntryUpdates = useCallback(() => {
       updateButtonRef.current?.submit();
    }, []);
 
    const editExerciseEntry = useCallback(() => {
-      // Update inputs to match entry props
+      // Update inputs to match exercise entry values
       localDispatch({
          type: "updateStates",
          value: {
             exerciseId: {
                value: exercise.id,
                data: {
-                  setId: entry?.id ?? ""
+                  entryId: entry?.id ?? ""
                }
             },
             weight: {
@@ -182,9 +149,9 @@ export default function ExerciseEntryContainer(props: ExerciseEntryProps): JSX.E
       // Display inputs
       setIsEditing(true);
    }, [
+      entry,
       exercise.id,
-      localDispatch,
-      entry
+      localDispatch
    ]);
 
    const doubleTap = useDoubleTap(editExerciseEntry);
@@ -196,7 +163,7 @@ export default function ExerciseEntryContainer(props: ExerciseEntryProps): JSX.E
          className = "mx-auto w-full"
       >
          {
-            displayEditEntry ? (
+            displayEditEntryInputs ? (
                <li className = "relative mx-auto mt-10 flex w-full flex-col items-stretch justify-start gap-2 px-2 text-center font-medium sm:px-8">
                   <FontAwesomeIcon
                      icon = { faArrowRotateLeft }
@@ -308,7 +275,7 @@ export default function ExerciseEntryContainer(props: ExerciseEntryProps): JSX.E
                </li>
             ) : (
                !isNewEntry && (
-                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pt-2 text-left text-[0.9rem] font-semibold [overflow-wrap:anywhere] xxsm:pl-8 xxsm:text-base">
+                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pt-2 text-left text-[0.9rem] font-semibold xxsm:pl-8 xxsm:text-base">
                      <div
                         className = "cursor-grab touch-none pt-1 text-sm"
                         { ...attributes }
@@ -317,7 +284,7 @@ export default function ExerciseEntryContainer(props: ExerciseEntryProps): JSX.E
                         <FontAwesomeIcon icon = { faCircleNotch } />
                      </div>
                      <div
-                        className = "flex cursor-pointer flex-col gap-2 pl-2"
+                        className = "flex cursor-pointer flex-col gap-2 overflow-x-auto pl-2"
                         { ...doubleTap }
                      >
                         {
@@ -364,7 +331,7 @@ export default function ExerciseEntryContainer(props: ExerciseEntryProps): JSX.E
                                     className = "self-start pt-1 text-primary"
                                     icon = { faAlignJustify }
                                  />
-                                 <p className = "[overflow-wrap:anywhere] ">{ entry.text }</p>
+                                 <p>{ entry.text }</p>
                               </div>
                            )
                         }

@@ -18,9 +18,10 @@ interface ViewProps extends VitalityProps {
 
 export default function View(props: ViewProps): JSX.Element {
    const { view, setView, workouts, globalState, globalDispatch } = props;
+   // Determine if the workouts have been fetched from the server
    const fetched: boolean = globalState.workouts.data?.fetched;
 
-   const toggleView = useCallback((view: "table" | "cards") => {
+   const updateView = useCallback((view: "table" | "cards") => {
       setView(view);
       window.localStorage.setItem("view", view);
    }, [setView]);
@@ -30,7 +31,7 @@ export default function View(props: ViewProps): JSX.Element {
          <div className = "flex items-center justify-start gap-4 text-left">
             <Button
                icon = { faTable }
-               onClick = { () => toggleView("table") }
+               onClick = { () => updateView("table") }
                className = {
                   clsx("text-base transition duration-300 ease-in-out focus:text-primary focus:ring-transparent xxsm:text-lg", {
                      "scale-105 border-b-4 border-primary rounded-none text-primary": view === "table"
@@ -41,7 +42,7 @@ export default function View(props: ViewProps): JSX.Element {
             </Button>
             <Button
                icon = { faPhotoFilm }
-               onClick = { () => toggleView("cards") }
+               onClick = { () => updateView("cards") }
                className = {
                   clsx("text-base transition duration-300 ease-in-out focus:text-primary focus:ring-transparent xxsm:text-lg", {
                      "scale-105 border-b-4 border-b-primary rounded-none text-primary": view === "cards"

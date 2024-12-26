@@ -12,31 +12,31 @@ import { formReducer, VitalityState } from "@/lib/global/reducer";
 import { processResponse, VitalityResponse } from "@/lib/global/response";
 import { verifyAttribute } from "@/lib/home/settings/service";
 
-const verification: VitalityState = {
+const form: VitalityState = {
    "0": {
+      id: "0",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    "1": {
+      id: "1",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    "2": {
+      id: "2",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    "3": {
+      id: "3",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    empty: {
+      id: "empty",
       value: false,
-      error: null,
-      data: {}
+      error: null
    }
 };
 
@@ -47,8 +47,8 @@ interface VerifyAttributeProps extends AttributeProps {
 export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const { updateNotifications } = useContext(NotificationContext);
-   const { attribute, input, icon, globalState, globalDispatch } = props;
-   const [localState, localDispatch] = useReducer(formReducer, verification);
+   const { attribute, input, icon, globalDispatch } = props;
+   const [localState, localDispatch] = useReducer(formReducer, form);
    const verificationModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
@@ -78,7 +78,6 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
       const codes = {
          ...localState,
          empty: {
-            ...localState.empty,
             value: false
          }
       };
@@ -95,7 +94,6 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
          }
 
          codes[i] = {
-            ...localState[i],
             value: value,
             error: isEmpty ? "\0" : null
          };
@@ -103,7 +101,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
 
       if (codes.empty.value === true) {
          localDispatch({
-            type: "initializeState",
+            type: "updateStates",
             value: codes
          });
       } else {
@@ -114,10 +112,8 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                type: "updateState",
                value: {
                   id: attribute,
-                  input: {
-                     ...globalState[attribute],
+                  value: {
                      data: {
-                        ...globalState[attribute].data,
                         verified: true
                      }
                   }
@@ -137,7 +133,6 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
       user,
       attribute,
       localState,
-      globalState,
       globalDispatch,
       updateNotifications
    ]);

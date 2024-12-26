@@ -17,28 +17,23 @@ function Card(props: CardProps): JSX.Element {
    const { workout, globalState, globalDispatch } = props;
    const [isValidImage, setIsValidImage] = useState<boolean>(true);
 
+   const date = useMemo(() => {
+      return workout.date.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1");
+   }, [workout.date]);
+
    useEffect(() => {
       setIsValidImage(verifyImageURL(workout.image));
    }, [workout.image]);
 
-   const formattedDate = useMemo(() => {
-      return workout.date.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1");
-   }, [workout.date]);
-
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
-
+         // Workout tag may be undefined in dictionary due to deletion
          const tag: Tag | undefined = globalState.tags.data?.dictionary[tagId];
 
          return (
-            // Workout tag may be undefined in global state dictionary due to a potential removal or error
             tag !== undefined && (
                <div
-                  className = {
-                     clsx(
-                        "m-1 max-w-full truncate rounded-full px-4 py-[0.45rem] text-[0.8rem] font-bold text-white md:text-[0.73rem]",
-                     )
-                  }
+                  className = "m-1 max-w-full truncate rounded-full px-4 py-[0.45rem] text-[0.8rem] font-bold text-white md:text-[0.73rem]"
                   style = {
                      {
                         backgroundColor: tag.color
@@ -104,7 +99,7 @@ function Card(props: CardProps): JSX.Element {
                <h2 className = "max-w-full truncate break-words px-6 pt-2 text-[1.5rem] font-extrabold md:text-[1.4rem]">
                   { workout.title }
                </h2>
-               <p className = "text-sm font-extrabold md:text-[0.85rem]">{ formattedDate }</p>
+               <p className = "text-sm font-extrabold md:text-[0.85rem]">{ date }</p>
                <div
                   className = {
                      clsx(
@@ -142,7 +137,6 @@ export default function Cards(props: CardsProps): JSX.Element {
                   />
                ))
             }
-
          </div>
       </div>
    );

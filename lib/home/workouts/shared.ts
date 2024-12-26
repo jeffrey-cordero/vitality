@@ -1,6 +1,17 @@
+import { Exercise } from "@/lib/home/workouts/exercises";
 import { base64ImageRegex, urlRegex, workoutsImageRegex } from "@/lib/home/workouts/regex";
 import { Workout } from "@/lib/home/workouts/workouts";
-import { Exercise } from "@/lib/home/workouts/exercises";
+
+export const emptyWorkout: Workout = {
+   id: "",
+   user_id: "",
+   title: "",
+   date: new Date(),
+   image: "",
+   description: "",
+   tagIds: [],
+   exercises: []
+};
 
 export function verifyImageURL(url: string): boolean {
    return url.trim().length === 0 || urlRegex.test(url) || workoutsImageRegex.test(url) || base64ImageRegex.test(url);
@@ -17,7 +28,9 @@ export function formatDatabaseWorkout(workout: any): Workout {
       tagIds: workout.workout_applied_tags?.map(
          (applied: any) => applied.tag_id,
       ) ?? [],
-      exercises: workout.exercises ?? []
+      exercises: workout.exercises?.map(
+         (exercise: any) => formatDatabaseExercise(exercise)
+      ) ?? []
    };
 }
 

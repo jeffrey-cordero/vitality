@@ -16,64 +16,65 @@ import { deleteAccount } from "@/lib/home/settings/service";
 
 const form: VitalityState = {
    username: {
+      id: "username",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    oldPassword: {
+      id: "oldPassword",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    newPassword: {
+      id: "newPassword",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    confirmPassword: {
+      id: "confirmPassword",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    name: {
+      id: "name",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    birthday: {
+      id: "birthday",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    email: {
+      id: "email",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    phone: {
+      id: "phone",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    image: {
+      id: "image",
       value: "",
       error: null,
+      handlesChanges: true,
       data: {
          valid: undefined,
          fetched: false,
          stored: ""
-      },
-      handlesChanges: true
+      }
    },
    mail: {
+      id: "mail",
       value: false,
-      error: null,
-      data: {}
+      error: null
    },
    sms: {
+      id: "sms",
       value: false,
-      error: null,
-      data: {}
+      error: null
    }
 };
 
@@ -91,31 +92,27 @@ export default function Form(): JSX.Element {
       const attributes: User = await fetchAttributes(user.id);
 
       globalDispatch({
-         type: "initializeState",
+         type: "updateStates",
          value: {
             username: {
-               ...globalState.username,
                value: attributes.username,
                data: {
                   stored: attributes.username
                }
             },
             name: {
-               ...globalState.name,
                value: attributes.name,
                data: {
                   stored: attributes.name
                }
             },
             birthday: {
-               ...globalState.birthday,
                value: attributes.birthday.toISOString().split("T")[0],
                data: {
                   stored: attributes.birthday.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1")
                }
             },
             email: {
-               ...globalState.email,
                value: attributes.email,
                data: {
                   stored: attributes.email,
@@ -123,7 +120,6 @@ export default function Form(): JSX.Element {
                }
             },
             phone: {
-               ...globalState.phone,
                value: attributes.phone ?? "",
                data: {
                   stored: attributes.phone ?? "",
@@ -131,36 +127,22 @@ export default function Form(): JSX.Element {
                }
             },
             image: {
-               ...globalState.image,
                value: attributes.image,
                data: {
-                  ...globalState.image.data,
                   valid: true,
                   fetched: true,
                   stored: attributes.image
                }
             },
             mail: {
-               ...globalState.mail,
                value: attributes.mail
             },
             sms: {
-               ...globalState.sms,
                value: attributes.sms
             }
          }
       });
-   }, [
-      user,
-      globalState.username,
-      globalState.name,
-      globalState.birthday,
-      globalState.email,
-      globalState.phone,
-      globalState.image,
-      globalState.mail,
-      globalState.sms
-   ]);
+   }, [user]);
 
    const handleImageURLOnChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
       // Ensure any changes to user image URL are verified on a new submission
@@ -168,38 +150,31 @@ export default function Form(): JSX.Element {
          type: "updateState",
          value: {
             id: "image",
-            input: {
-               ...globalState.image,
+            value: {
                value: event.target.value,
                error: null,
                data: {
-                  ...globalState.image.data,
                   valid: undefined
                }
             }
          }
       });
-   }, [
-      globalDispatch,
-      globalState.image
-   ]);
+   }, [globalDispatch]);
 
    const handleVerifyImageResource = useCallback((valid: boolean) => {
       globalDispatch({
          type: "updateState",
          value: {
             id: "image",
-            input: {
-               ...globalState.image,
+            value: {
                error: valid ? null : "Failed to fetch your desired image resource",
                data: {
-                  ...globalState.image.data,
                   valid: valid
                }
             }
          }
       });
-   }, [globalState.image]);
+   }, []);
 
    const handleLogOut = useCallback(async() => {
       await endSession();

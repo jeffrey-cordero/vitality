@@ -15,46 +15,44 @@ interface PaginationProps extends VitalityProps {
 
 export default function Pagination(props: PaginationProps): JSX.Element {
    const { workouts, globalState, globalDispatch } = props;
-   // Total workout pages and current page index
    const pages: number = Math.ceil(workouts.length / globalState.paging.value);
    const page: number = globalState.page.value;
 
-   const pagination: number[] = Array.from({ length: pages }, (_, index) => index + 1);
-   const lowIndex: number = Math.max(0, page === pages - 1 ? page - 2 : page - 1);
-   const highIndex: number = Math.min(pages, page === 0 ? page + 3 : page + 2);
+   const low: number = Math.max(0, page === pages - 1 ? page - 2 : page - 1);
+   const high: number = Math.min(pages, page === 0 ? page + 3 : page + 2);
+   const paginationArray: number[] = Array.from({ length: pages }, (_, index) => index + 1);
 
-   const handlePageClick = useCallback(
-      (page: number) => {
-         globalDispatch({
-            type: "updateState",
+   const updatePage = useCallback((page: number) => {
+      globalDispatch({
+         type: "updateState",
+         value: {
+            id: "page",
             value: {
-               id: "page",
-               value: {
-                  value: page
-               }
+               value: page
             }
-         });
+         }
+      });
 
-         window.localStorage.setItem("page", String(page));
-      }, [globalDispatch]);
+      window.localStorage.setItem("page", String(page));
+   }, [globalDispatch]);
 
-   const handleLeftClick = () => {
-      handlePageClick(Math.max(0, page - 1));
+   const leftClick = () => {
+      updatePage(Math.max(0, page - 1));
    };
 
-   const handleRightClick = () => {
-      handlePageClick(Math.min(pages - 1, page + 1));
+   const rightClick = () => {
+      updatePage(Math.min(pages - 1, page + 1));
    };
 
-   const handleEntriesOnChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
+   const updateEntriesPerPage = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
       globalDispatch({
          type: "updateStates",
          value: {
             paging: {
                value: Number.parseInt(event.target.value)
             },
+            // Reset to the initial page when entries are changed
             page: {
-               // Reset to the initial page
                value: 0
             }
          }
@@ -71,17 +69,17 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                <FontAwesomeIcon
                   tabIndex = { 0 }
                   icon = { faAnglesLeft }
-                  onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && handleLeftClick() }
+                  onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && leftClick() }
                   className = "cursor-pointer text-xl text-primary hover:text-primary/60 focus:border-transparent focus:text-primary/60 focus:outline-0"
-                  onClick = { handleLeftClick }
+                  onClick = { leftClick }
                />
                {
-                  lowIndex > 0 && (
+                  low > 0 && (
                      <div className = "hidden flex-row items-center justify-center xsm:flex">
                         <Button
                            tabIndex = { 0 }
                            key = "min"
-                           onClick = { () => handlePageClick(0) }
+                           onClick = { () => updatePage(0) }
                            className = "h-10 w-12 rounded-lg text-lg focus:text-primary focus:ring-transparent"
                         >
                            1
@@ -91,14 +89,14 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   )
                }
                {
-                  pagination.slice(lowIndex, highIndex).map((index) => {
+                  paginationArray.slice(low, high).map((index) => {
                      const isSelected: boolean = index === page + 1;
 
                      return (
                         <Button
                            tabIndex = { 0 }
                            key = { index }
-                           onClick = { () => handlePageClick(index - 1) }
+                           onClick = { () => updatePage(index - 1) }
                            className = {
                               clsx("h-10 w-12 rounded-lg text-lg focus:text-primary focus:ring-transparent", {
                                  "font-bold text-primary border-primary border-2 bg-sky-100 focus:bg-sky-200": isSelected,
@@ -113,13 +111,13 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   })
                }
                {
-                  highIndex < pages && (
+                  high < pages && (
                      <div className = "hidden flex-row items-center justify-center xsm:flex">
                         <div key = "higher">...</div>
                         <Button
                            tabIndex = { 0 }
                            key = "min"
-                           onClick = { () => handlePageClick(pages - 1) }
+                           onClick = { () => updatePage(pages - 1) }
                            className = "h-10 w-12 rounded-lg text-lg focus:text-primary focus:ring-transparent"
                         >
                            { pages }
@@ -130,9 +128,9 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                <FontAwesomeIcon
                   tabIndex = { 0 }
                   icon = { faAnglesRight }
-                  onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && handleRightClick() }
+                  onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && rightClick() }
                   className = "cursor-pointer text-xl text-primary hover:text-primary/60 focus:border-transparent focus:text-primary/60 focus:outline-0"
-                  onClick = { handleRightClick }
+                  onClick = { rightClick }
                />
             </div>
             <div className = "mt-4 flex flex-col items-center justify-center xsm:flex-row">
@@ -144,10 +142,10 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                      icon = { faFileLines }
                      input = { globalState.page }
                      value = { page + 1 }
-                     values = { pagination }
+                     values = { paginationArray }
                      dispatch = { globalDispatch }
                      className = "mx-auto size-full"
-                     onChange = { (event) => handlePageClick(event.target.value - 1) }
+                     onChange = { (event) => updatePage(event.target.value - 1) }
                   />
                </div>
                <div className = "mx-auto h-16 w-44">
@@ -160,7 +158,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                      values = { [5, 10, 25, 50, 100, 500, 1000] }
                      dispatch = { globalDispatch }
                      className = "mx-auto size-full"
-                     onChange = { (event) => handleEntriesOnChange(event) }
+                     onChange = { (event) => updateEntriesPerPage(event) }
                   />
                </div>
             </div>

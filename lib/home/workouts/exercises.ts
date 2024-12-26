@@ -135,14 +135,14 @@ export async function addExercise(user_id: string, exercise: Exercise): Promise<
       }
 
       // Exercises must be connected to existing workouts
-      const existingWorkout = await prisma.workouts.findFirst({
+      const existingWorkout = formatDatabaseWorkout(await prisma.workouts.findFirst({
          where: {
             id: exercise.workout_id
          },
          include: {
             exercises: true
          }
-      });
+      }));
 
       if (!existingWorkout) {
          return sendErrorMessage(
@@ -201,11 +201,11 @@ export async function updateExercise(user_id: string, exercise: Exercise, method
       }
 
       // Validate existing workout and exercise entries
-      const existingWorkout = await prisma.workouts.findFirst({
+      const existingWorkout = formatDatabaseWorkout(await prisma.workouts.findFirst({
          where: {
             id: exercise.workout_id
          }
-      });
+      }));
 
       if (!existingWorkout) {
          return sendErrorMessage(
@@ -214,7 +214,7 @@ export async function updateExercise(user_id: string, exercise: Exercise, method
          );
       }
 
-      const existingExercise = await prisma.exercises.findFirst({
+      const existingExercise = formatDatabaseExercise(await prisma.exercises.findFirst({
          where: {
             id: exercise.id,
             workout_id: exercise.workout_id
@@ -226,7 +226,7 @@ export async function updateExercise(user_id: string, exercise: Exercise, method
                }
             }
          }
-      });
+      }));
 
       if (!existingExercise) {
          return sendErrorMessage(
@@ -309,7 +309,7 @@ export async function getExerciseEntryUpdates(
   error: null | string;
   errors: null | Record<string, string[] | undefined>
 }> {
-   const existingExerciseEntries: string[] = existingExercise?.sets.map(
+   const existingExerciseEntries: string[] = existingExercise?.entries.map(
       (entry: ExerciseEntry) => entry.id
    );
    const newExerciseEntries: Set<string> = new Set(
@@ -405,7 +405,7 @@ export async function updateExercises(
 
    try {
       // Ensure workout exists in the database
-      const existingWorkout = await prisma.workouts.findFirst({
+      const existingWorkout = formatDatabaseWorkout(await prisma.workouts.findFirst({
          where: {
             id: workout.id
          },
@@ -420,7 +420,7 @@ export async function updateExercises(
                }
             }
          }
-      });
+      }));
 
       if (!existingWorkout) {
          return sendErrorMessage(

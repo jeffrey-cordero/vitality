@@ -65,6 +65,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             status: "Failure",
             message: error.message
          });
+
          setUser(undefined);
       }
       setFetched(true);
