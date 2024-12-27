@@ -6,6 +6,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import Confirmation from "@/components/global/confirmation";
+import { normalizeDate } from "@/lib/authentication/shared";
 import { VitalityProps } from "@/lib/global/reducer";
 import { processResponse, VitalityResponse } from "@/lib/global/response";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
@@ -24,7 +25,7 @@ function Row(props: RowProps) {
    const isSelected: boolean = selected.has(workout);
 
    const date = useMemo(() => {
-      return workout.date.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1");
+      return normalizeDate(workout.date);
    }, [workout.date]);
 
    useEffect(() => {

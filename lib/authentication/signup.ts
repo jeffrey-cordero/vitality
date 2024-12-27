@@ -1,12 +1,11 @@
 
 "use server";
 import bcrypt from "bcryptjs";
-import validator from "validator";
 import { z } from "zod";
 
+import { normalizePhoneNumber } from "@/lib/authentication/shared";
 import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
 import { userSchema } from "@/lib/global/zod";
-import { normalizePhoneNumber } from "@/lib/authentication/shared";
 import prisma from "@/lib/prisma/client";
 
 export type Registration = {
@@ -49,16 +48,17 @@ export async function signup(registration: Registration): Promise<VitalityRespon
          });
       }
 
-      // Check for existing users with the same username, email, and/or phone
-      const emailNormalized = registration.email.trim().toLowerCase();
-      const phoneNormalized = registration.phone ? normalizePhoneNumber(registration.phone) : null;
+      // Check for existing users with the same username, email, and/or phone with normalized values
+      const normalizedUsername = registration.username.trim();
+      const normalizedEmail = registration.email.trim().toLowerCase();
+      const normalizedPhone = registration.phone ? normalizePhoneNumber(registration.phone) : undefined;
 
       const conflicts = await prisma.users.findMany({
          where: {
             OR: [
-               { username: registration.username.trim() },
-               { email_normalized: emailNormalized },
-               { phone_normalized: phoneNormalized }
+               { username: normalizedUsername },
+               { email_normalized: normalizedEmail },
+               { phone_normalized: normalizedPhone }
             ]
          }
       });
@@ -69,14 +69,14 @@ export async function signup(registration: Registration): Promise<VitalityRespon
 
          await prisma.users.create({
             data: {
-               username: registration.username.trim(),
+               username: normalizedUsername,
                name: registration.name.trim(),
                email: registration.email.trim(),
-               email_normalized: emailNormalized,
+               email_normalized: normalizedEmail,
                password: hashedPassword,
                birthday: registration.birthday,
                phone: registration.phone?.trim(),
-               phone_normalized: phoneNormalized
+               phone_normalized: normalizedPhone
             }
          });
 
@@ -87,8 +87,8 @@ export async function signup(registration: Registration): Promise<VitalityRespon
 
          for (const user of conflicts) {
             user.username === registration.username && (errors["username"] = ["Username already taken"]);
-            user.email_normalized === emailNormalized && (errors["email"] = ["Email already taken"]);
-            user.phone_normalized === phoneNormalized && (errors["phone"] = ["Phone number already taken"]);
+            user.email_normalized === normalizedEmail && (errors["email"] = ["Email already taken"]);
+            user.phone_normalized === normalizedPhone && (errors["phone"] = ["Phone number already taken"]);
          }
 
          return sendErrorMessage("Account registration conflicts", errors);

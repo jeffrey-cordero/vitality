@@ -72,8 +72,8 @@ export default function SignUp(): JSX.Element {
       processResponse(response, dispatch, updateNotifications, () => {
          // Display notification with login button for redirection
          updateNotifications({
-            status: "Success",
-            message: "Successfully registered",
+            status: response.status,
+            message: response.body.message,
             timer: undefined,
             children: (
                <Link href = "/home">

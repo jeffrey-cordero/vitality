@@ -1,36 +1,28 @@
-import { faCameraRetro, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faCameraRetro, faImage, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import Image from "next/image";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import Button from "@/components/global/button";
 import { Input, VitalityInputProps } from "@/components/global/input";
 import Modal from "@/components/global/modal";
-import { verifyImageURL, workoutImagesRegex } from "@/lib/home/workouts/shared";
+import { settingsImagesRegex, workoutImagesRegex } from "@/lib/global/regex";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
 
-const images = [
-   "bike.png",
-   "cardio.png",
-   "default.png",
-   "hike.png",
-   "legs.png",
-   "lift.png",
-   "machine.png",
-   "run.png",
-   "swim.png",
-   "weights.png"
-];
-
-interface FormProps extends VitalityInputProps {
+interface FormProps extends ImageFormProps, VitalityInputProps {
    url: string;
    isValidURL: boolean;
    isValidResource: boolean;
+   onSubmit?: () => Promise<void>;
 }
 
 function Form(props: FormProps): JSX.Element {
-   const { url, isValidURL, isValidResource, input, dispatch } = props;
-   const [isDefaultImage, setIsDefaultImage] = useState<boolean>(url === "" || workoutImagesRegex.test(url));
+   const { page, images, url, isValidURL, isValidResource, input, dispatch, onSubmit } = props;
+   const [isDefaultImage, setIsDefaultImage] = useState<boolean>(
+      url === "" || page === "workouts" ? workoutImagesRegex.test(url) : settingsImagesRegex.test(url)
+   );
+   const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
    const updateImageURL = useCallback(() => {
       dispatch({
@@ -38,16 +30,16 @@ function Form(props: FormProps): JSX.Element {
          value: {
             id: "image",
             value: {
-               error: isValidURL ? null : "Invalid image URL",
+               error: verifyImageURL(url) ? null : "Invalid image URL",
                data: {
-                  valid: isValidURL
+                  valid: verifyImageURL(url)
                }
             }
          }
       });
    }, [
-      dispatch,
-      isValidURL
+      url,
+      dispatch
    ]);
 
    const selectDefaultImage = useCallback((source: string) => {
@@ -148,7 +140,7 @@ function Form(props: FormProps): JSX.Element {
                >
                   {
                      images.map((image) => {
-                        const source: string = `/workouts/${image}`;
+                        const source: string = `/${page}/${image}`;
                         const isSelected: boolean = url === source;
 
                         return (
@@ -165,11 +157,11 @@ function Form(props: FormProps): JSX.Element {
                                  sizes = "100%"
                                  src = { source }
                                  key = { source }
-                                 alt = "workout-image"
+                                 alt = { `${page}-image` }
                                  className = {
                                     clsx(
-                                       "cursor-pointer rounded-xl object-cover object-center shadow-inner transition duration-300 ease-in-out", {
-                                          "border-primary border-[4px] shadow-2xl scale-[1.07]": isSelected
+                                       "cursor-pointer rounded-xl object-cover object-center transition duration-300 ease-in-out", {
+                                          "border-primary border-[4px] scale-[1.07]": isSelected
                                        }
                                     )
                                  }
@@ -182,10 +174,7 @@ function Form(props: FormProps): JSX.Element {
                   }
                </div>
             ) : (
-               <div
-                  onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && url.length > 0 && updateImageURL() }
-                  className = "relative mx-auto size-full"
-               >
+               <div className = "relative mx-auto size-full">
                   {
                      isValidResource && isValidURL && (
                         <div className = "my-6 flex items-center justify-center">
@@ -200,7 +189,7 @@ function Form(props: FormProps): JSX.Element {
                                  alt = "workout-image"
                                  className = {
                                     clsx(
-                                       "scale-105 cursor-default rounded-xl border-4 border-primary object-cover object-center shadow-md transition duration-300 ease-in-out",
+                                       "scale-105 cursor-default rounded-xl object-cover object-center shadow-md transition duration-300 ease-in-out",
                                     )
                                  }
                               />
@@ -211,6 +200,11 @@ function Form(props: FormProps): JSX.Element {
                   <Input
                      { ...props }
                      onChange = { updateImageURLInput }
+                     onSubmit = {
+                        onSubmit === undefined ? updateImageURL : () => {
+                           setTimeout(() => updateButtonRef.current?.submit());
+                        }
+                     }
                   />
                   {
                      url.length > 0 && (
@@ -228,7 +222,7 @@ function Form(props: FormProps): JSX.Element {
                               )
                            }
                            {
-                              input.data?.valid !== true && (
+                              input.data?.valid !== true && onSubmit === undefined && (
                                  <Button
                                     type = "button"
                                     onClick = { updateImageURL }
@@ -246,12 +240,32 @@ function Form(props: FormProps): JSX.Element {
                </div>
             )
          }
+         {
+            onSubmit && (
+               <Button
+                  ref = { updateButtonRef }
+                  className = "mt-2 h-[41.6px] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white xxsm:text-base"
+                  icon = { faImage }
+                  onClick = { () => updateButtonRef.current?.submit() }
+                  onSubmit = { onSubmit }
+               >
+                  Update
+               </Button>
+            )
+         }
       </div>
    );
 }
 
-export default function ImageForm(props: VitalityInputProps): JSX.Element {
-   const { input } = props;
+interface ImageFormProps extends VitalityInputProps {
+   page: "workouts" | "settings";
+   images: string[];
+   display?: React.ReactNode
+   onSubmit?: () => Promise<void>
+}
+
+export default function ImageForm(props: ImageFormProps): JSX.Element {
+   const { input, display } = props;
    const url: string = input.value.trim();
    const isValidResource: boolean = input.data?.valid === true && url.length !== 0;
    const isValidURL: boolean = useMemo(() => {
@@ -259,35 +273,40 @@ export default function ImageForm(props: VitalityInputProps): JSX.Element {
    }, [url]);
 
    return (
-      <div className = "relative">
+      <div
+         id = "image-form-container"
+         className = "relative"
+      >
          <Modal
             display = {
-               <div className = "relative">
-                  <Button
-                     className = {
-                        clsx(
-                           "h-[2.6rem] w-full border-[1.5px] px-4 py-2 text-sm font-semibold placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 xxsm:text-base dark:border-0 dark:bg-gray-700/50",
-                           {
-                              "border-[2px] dark:border-[2px] border-red-500 text-red-500": input.error
-                           },
+               display ?? (
+                  <div className = "relative">
+                     <Button
+                        className = {
+                           clsx(
+                              "h-[2.6rem] w-full border-[1.5px] px-4 py-2 text-sm font-semibold placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 xxsm:text-base dark:border-0 dark:bg-gray-700/50",
+                              {
+                                 "border-[2px] dark:border-[2px] border-red-500 text-red-500": input.error
+                              },
+                           )
+                        }
+                     >
+                        <FontAwesomeIcon
+                           icon = { isValidURL ? faPenToSquare : faPaperclip }
+                        />
+                        { isValidResource ? "Edit Image" : "Add Image" }
+                     </Button>
+                     {
+                        input.error !== null && (
+                           <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 text-center opacity-0">
+                              <p className = "input-error font-bold text-red-500">
+                                 { input.error }
+                              </p>
+                           </div>
                         )
                      }
-                  >
-                     <FontAwesomeIcon
-                        icon = { isValidURL ? faPenToSquare : faPaperclip }
-                     />
-                     { isValidResource ? "Edit Image" : "Add Image" }
-                  </Button>
-                  {
-                     input.error !== null && (
-                        <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 text-center opacity-0">
-                           <p className = "input-error font-bold text-red-500">
-                              { input.error }
-                           </p>
-                        </div>
-                     )
-                  }
-               </div>
+                  </div>
+               )
             }
             className = "mt-12 max-h-[90%] max-w-[95%] sm:max-w-xl"
          >

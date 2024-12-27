@@ -7,10 +7,12 @@ export const root = {
    username: "root",
    password: "$Vc$10$O1sZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
    email: "root@gmail.com",
-   phone: "1234567890",
+   phone: "1914001001",
    image: "",
    email_verified: false,
+   email_normalized: "root@gmail.com",
    phone_verified: false,
+   phone_normalized: "(914) 001-001",
    mail: false,
    sms: false
 };
@@ -22,10 +24,12 @@ export const user = {
    username: "user",
    password: "$Ac$10$O033ZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
    email: "user@gmail.com",
-   phone: "1234567891",
+   phone: "1914001002",
    image: "",
    email_verified: true,
+   email_normalized: "user@gmail.com",
    phone_verified: true,
+   phone_normalized: "(914) 001-002",
    mail: false,
    sms: false
 };

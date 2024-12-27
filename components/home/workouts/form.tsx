@@ -5,12 +5,12 @@ import { useCallback, useContext, useEffect, useReducer, useRef, useState } from
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import Button from "@/components/global/button";
 import Confirmation from "@/components/global/confirmation";
+import ImageForm from "@/components/global/images";
 import { Input } from "@/components/global/input";
 import Modal from "@/components/global/modal";
 import TextArea from "@/components/global/textarea";
 import Exercises from "@/components/home/workouts/exercises";
 import { filterWorkout } from "@/components/home/workouts/filtering";
-import ImageForm from "@/components/home/workouts/images";
 import TagsForm from "@/components/home/workouts/tags";
 import { formReducer, VitalityProps, VitalityState } from "@/lib/global/reducer";
 import { processResponse, VitalityResponse } from "@/lib/global/response";
@@ -345,6 +345,21 @@ export default function Form(props: VitalityProps): JSX.Element {
                      icon = { faLink }
                      input = { localState.image }
                      dispatch = { localDispatch }
+                     page = "workouts"
+                     images = {
+                        [
+                           "bike.png",
+                           "cardio.png",
+                           "default.png",
+                           "hike.png",
+                           "legs.png",
+                           "lift.png",
+                           "machine.png",
+                           "run.png",
+                           "swim.png",
+                           "weights.png"
+                        ]
+                     }
                   />
                   <TextArea
                      id = "description"

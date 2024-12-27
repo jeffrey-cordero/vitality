@@ -13,22 +13,22 @@ import { processResponse, VitalityResponse } from "@/lib/global/response";
 import { verifyAttribute } from "@/lib/home/settings/service";
 
 const form: VitalityState = {
-   "0": {
+   0: {
       id: "0",
       value: "",
       error: null
    },
-   "1": {
+   1: {
       id: "1",
       value: "",
       error: null
    },
-   "2": {
+   2: {
       id: "2",
       value: "",
       error: null
    },
-   "3": {
+   3: {
       id: "3",
       value: "",
       error: null
@@ -45,6 +45,7 @@ interface VerifyAttributeProps extends AttributeProps {
 }
 
 export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Element {
+   // Mock verification component for email and phone until actual verification is implemented during deployment stage
    const { user } = useContext(AuthenticationContext);
    const { updateNotifications } = useContext(NotificationContext);
    const { attribute, input, icon, globalDispatch } = props;
@@ -52,8 +53,8 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
    const verificationModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
-   const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>, index: number) => {
-      // Update verification code input and remove empty error, if any
+   const updateVerificationInput = useCallback((event: ChangeEvent<HTMLInputElement>, index: number) => {
+      // Update verification code input and remove the potential empty error, if applicable
       localDispatch({
          type: "updateStates",
          value: {
@@ -73,20 +74,19 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
       localState.empty
    ]);
 
-   const handleVerificationCode = useCallback(async() => {
+   const submitVerificationCode = useCallback(async() => {
       // Ensure non-empty verification inputs
       const codes = {
          ...localState,
          empty: {
+            ...localState.empty,
             value: false
          }
       };
 
       for (let i = 0; i <= 3; i++) {
-         // Fetch the most up-to-date value within the DOM
-         const value: string = (document.getElementById(`verification-${i}`) as HTMLInputElement).value;
-
          // All verification inputs must be non-empty
+         const value: string = localState[i].value;
          const isEmpty: boolean = value.trim() === "";
 
          if (isEmpty) {
@@ -99,13 +99,8 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
          };
       }
 
-      if (codes.empty.value === true) {
-         localDispatch({
-            type: "updateStates",
-            value: codes
-         });
-      } else {
-         const response: VitalityResponse<void> = await verifyAttribute(user.id, `${attribute}_verified`);
+      if (!codes.empty.value) {
+         const response: VitalityResponse<boolean> = await verifyAttribute(user.id, `${attribute}_verified`);
 
          processResponse(response, localDispatch, updateNotifications, () => {
             globalDispatch({
@@ -127,6 +122,11 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
             });
 
             verificationModalRef.current?.close();
+         });
+      } else {
+         localDispatch({
+            type: "updateStates",
+            value: codes
          });
       }
    }, [
@@ -164,7 +164,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                className = "mt-6 text-5xl text-primary"
             />
             <div className = "relative mx-auto flex items-center justify-center text-center">
-               <p className = "text-sm font-bold xxsm:text-base">
+               <p className = "px-1 text-sm font-bold xxsm:text-base">
                   { `A one-time verification code has been sent to your ${attribute}, please enter it below to complete the process` }
                </p>
             </div>
@@ -185,7 +185,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                                     "border-red-500 border-2 dark:border-2 focus:border-red-500 focus:ring-red-500 error" : input.error === "\0"
                                  })
                               }
-                              onChange = { (event: ChangeEvent<HTMLInputElement>) => handleInputChange(event, index) }
+                              onChange = { (event: ChangeEvent<HTMLInputElement>) => updateVerificationInput(event, index) }
                               type = "text"
                               maxLength = { 1 }
                               onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => event.key === "Enter" && handleSubmitUpdates() }
@@ -209,7 +209,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                type = "submit"
                className = "h-[2.6rem] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white hover:bg-primary/80 xxsm:text-base"
                icon = { icon }
-               onSubmit = { handleVerificationCode }
+               onSubmit = { submitVerificationCode }
                onClick = { handleSubmitUpdates }
                isSingleSubmission = { true }
             >

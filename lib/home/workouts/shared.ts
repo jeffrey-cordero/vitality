@@ -1,9 +1,6 @@
+import { base64ImageRegex, settingsImagesRegex, urlRegex, workoutImagesRegex } from "@/lib/global/regex";
 import { Exercise } from "@/lib/home/workouts/exercises";
 import { Workout } from "@/lib/home/workouts/workouts";
-
-export const urlRegex = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp|svg))$/i;
-export const workoutImagesRegex = /^\/workouts\/(bike|cardio|default|hike|legs|lift|machine|run|swim|weights)\.png$/;
-export const base64ImageRegex = /^data:image\/(jpeg|png|gif|bmp|webp);base64,[A-Za-z0-9+/=]+$/;
 
 export const emptyWorkout: Workout = {
    id: "",
@@ -17,7 +14,7 @@ export const emptyWorkout: Workout = {
 };
 
 export function verifyImageURL(url: string): boolean {
-   return url.trim().length === 0 || urlRegex.test(url) || workoutImagesRegex.test(url) || base64ImageRegex.test(url);
+   return url.trim().length === 0 || urlRegex.test(url) || workoutImagesRegex.test(url) || settingsImagesRegex.test(url) || base64ImageRegex.test(url);
 }
 
 export function formatDatabaseWorkout(workout: any): Workout {

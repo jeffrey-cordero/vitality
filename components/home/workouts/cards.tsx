@@ -4,6 +4,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
+import { normalizeDate } from "@/lib/authentication/shared";
 import { VitalityProps } from "@/lib/global/reducer";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
 import { Tag } from "@/lib/home/workouts/tags";
@@ -18,7 +19,7 @@ function Card(props: CardProps): JSX.Element {
    const [isValidImage, setIsValidImage] = useState<boolean>(true);
 
    const date = useMemo(() => {
-      return workout.date.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1");
+      return normalizeDate(workout.date);
    }, [workout.date]);
 
    useEffect(() => {

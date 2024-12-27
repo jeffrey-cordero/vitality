@@ -1,18 +1,20 @@
-import { faAt, faCakeCandles, faComments, faImage, faMoon, faPaperPlane, faPenToSquare, faPhone, faSignature, faUserLock, faUserSecret, faUserXmark } from "@fortawesome/free-solid-svg-icons";
+import { faAt, faCakeCandles, faComments, faLink, faMoon, faPaperPlane, faPenToSquare, faPhone, faSignature, faUserLock, faUserSecret, faUserXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { users as User } from "@prisma/client";
 import Image from "next/image";
-import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useContext, useEffect, useReducer } from "react";
 
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import Heading from "@/components/global/heading";
+import ImageForm from "@/components/global/images";
 import Loading from "@/components/global/loading";
 import { AccountAction, GeneralAttribute, PasswordAttribute, SliderAttribute } from "@/components/home/settings/attribute";
 import { fetchAttributes } from "@/lib/authentication/authorize";
 import { endSession } from "@/lib/authentication/session";
+import { normalizeDate } from "@/lib/authentication/shared";
 import { formReducer, VitalityState } from "@/lib/global/reducer";
 import { processResponse } from "@/lib/global/response";
-import { deleteAccount } from "@/lib/home/settings/service";
+import { deleteAccount, updateAttribute } from "@/lib/home/settings/service";
 
 const form: VitalityState = {
    username: {
@@ -82,13 +84,9 @@ export default function Form(): JSX.Element {
    const { user, theme, updateTheme } = useContext(AuthenticationContext);
    const { updateNotifications } = useContext(NotificationContext);
    const [globalState, globalDispatch] = useReducer(formReducer, form);
-   const [isEditingImage, setIsEditingImage] = useState<boolean>(false);
+   const imageURL: string = globalState.image.data?.stored.trim();
 
-   const imageURL: string = useMemo(() => {
-      return globalState.image.data?.stored.trim();
-   }, [globalState.image.data?.stored]);
-
-   const handleFetchAttributes = useCallback(async() => {
+   const fetchAttributeData = useCallback(async() => {
       const attributes: User = await fetchAttributes(user.id);
 
       globalDispatch({
@@ -109,7 +107,7 @@ export default function Form(): JSX.Element {
             birthday: {
                value: attributes.birthday.toISOString().split("T")[0],
                data: {
-                  stored: attributes.birthday.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1")
+                  stored: normalizeDate(attributes.birthday)
                }
             },
             email: {
@@ -144,24 +142,7 @@ export default function Form(): JSX.Element {
       });
    }, [user]);
 
-   const handleImageURLOnChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-      // Ensure any changes to user image URL are verified on a new submission
-      globalDispatch({
-         type: "updateState",
-         value: {
-            id: "image",
-            value: {
-               value: event.target.value,
-               error: null,
-               data: {
-                  valid: undefined
-               }
-            }
-         }
-      });
-   }, [globalDispatch]);
-
-   const handleVerifyImageResource = useCallback((valid: boolean) => {
+   const verifyImageResource = useCallback((valid: boolean) => {
       globalDispatch({
          type: "updateState",
          value: {
@@ -176,27 +157,66 @@ export default function Form(): JSX.Element {
       });
    }, []);
 
-   const handleLogOut = useCallback(async() => {
+   const submitUpdateImage = useCallback(async() => {
+      const image: string = globalState.image.value.trim();
+
+      processResponse(await updateAttribute(user.id, "image", image), globalDispatch, updateNotifications, async() => {
+         globalDispatch({
+            type: "updateState",
+            value: {
+               id: "image",
+               value: {
+                  value: image,
+                  error: null,
+                  data: {
+                     valid: true,
+                     stored: image
+                  }
+               }
+            }
+         });
+
+         // Close the image form modal after a successful submission
+         const imageForm = document.getElementById("image-form-container");
+         (imageForm?.getElementsByClassName("modal-close").item(0) as SVGElement)?.dispatchEvent(
+            new MouseEvent("click", {
+               bubbles: true,
+               cancelable: true,
+               view: window
+            }),
+         );
+      });
+   }, [
+      user,
+      updateNotifications,
+      globalState.image.value
+   ]);
+
+   const logout = useCallback(async() => {
       await endSession();
       window.location.reload();
    }, []);
 
-   const handleDeleteAccount = useCallback(async() => {
+   const submitDeleteAccount = useCallback(async() => {
       processResponse(await deleteAccount(user.id), globalDispatch, updateNotifications, async() => {
-         await handleLogOut();
+         // Remove all local storage data and end the session permanently
+         window.localStorage.clear();
+         await logout();
       });
    }, [
       user,
-      handleLogOut,
+      logout,
       updateNotifications
    ]);
 
    useEffect(() => {
-      !globalState.image.data?.fetched && handleFetchAttributes();
+      if (!globalState.image.data?.fetched) {
+         fetchAttributeData();
+      }
    });
 
    return (
-      <div className = "relative mx-auto mb-8 w-full px-2 text-left xsm:mb-16 xsm:w-11/12 sm:w-3/4 2xl:w-1/2">
+      <div className = "relative mx-auto mb-8 w-full px-2 text-left xsm:mb-16 sm:w-11/12 lg:w-3/4 2xl:w-1/2">
          {
             globalState.image.data?.fetched ? (
                <div className = "flex flex-col items-center justify-center gap-6">
@@ -205,46 +225,52 @@ export default function Form(): JSX.Element {
                         title = "Profile"
                         message = "Customize your profile with a personal touch"
                      />
-                     {
-                        !isEditingImage ? (
-                           <div className = "relative flex flex-col items-center justify-center gap-4">
-                              <div className = "relative flex size-32 flex-col items-center justify-center overflow-hidden rounded-full border-[3px] border-primary shadow-md min-[225px]:size-40 xxsm:size-44">
-                                 <Image
-                                    fill
-                                    priority
-                                    tabIndex = { 0 }
-                                    quality = { 100 }
-                                    sizes = "100%"
-                                    src = { imageURL === "" || globalState.image.data?.valid === false ? "/settings/default.png" : imageURL }
-                                    alt = "workout-image"
-                                    className = "bg-gray-50 object-cover object-center shadow-md dark:bg-gray-200"
-                                    onLoad = { () => globalState.image.data?.valid === false && handleVerifyImageResource(true) }
-                                    onErrorCapture = { () => handleVerifyImageResource(false) }
-                                 />
-                              </div>
+                     <div className = "relative flex flex-col items-center justify-center gap-4">
+                        <div className = "relative flex size-32 flex-col items-center justify-center overflow-hidden rounded-full border-[3px] border-primary min-[225px]:size-36 xxsm:size-40">
+                           <Image
+                              fill
+                              priority
+                              tabIndex = { 0 }
+                              quality = { 100 }
+                              sizes = "100%"
+                              src = { imageURL === "" || globalState.image.data?.valid === false ? "/settings/default.png" : imageURL }
+                              alt = "workout-image"
+                              className = "bg-transparent object-cover object-center"
+                              onLoad = { () => globalState.image.data?.valid === false && verifyImageResource(true) }
+                              onErrorCapture = { () => verifyImageResource(false) }
+                           />
+                        </div>
+                        <ImageForm
+                           id = "image"
+                           type = "text"
+                           label = "URL"
+                           icon = { faLink }
+                           input = { globalState.image }
+                           dispatch = { globalDispatch }
+                           onSubmit = { submitUpdateImage }
+                           display = {
                               <FontAwesomeIcon
                                  icon = { faPenToSquare }
                                  className = "z-10 mb-2 cursor-pointer text-lg text-primary hover:text-primary/80 xxsm:text-xl xsm:mb-6"
-                                 onClick = { () => setIsEditingImage(true) }
                               />
-                           </div>
-
-                        ) : (
-                           <GeneralAttribute
-                              id = "image"
-                              type = "text"
-                              label = "Image"
-                              icon = { faImage }
-                              input = { globalState.image }
-                              dispatch = { globalDispatch }
-                              onBlur = { () => setIsEditingImage(false) }
-                              onChange = { handleImageURLOnChange }
-                              globalState = { globalState }
-                              globalDispatch = { globalDispatch }
-                              editOnly
-                           />
-                        )
-                     }
+                           }
+                           page = "settings"
+                           images = {
+                              [
+                                 "one.png",
+                                 "two.png",
+                                 "three.png",
+                                 "four.png",
+                                 "five.png",
+                                 "six.png",
+                                 "seven.png",
+                                 "eight.png",
+                                 "nine.png",
+                                 "ten.png"
+                              ]
+                           }
+                        />
+                     </div>
                      <GeneralAttribute
                         id = "name"
                         type = "text"
@@ -349,7 +375,7 @@ export default function Form(): JSX.Element {
                         message = "Log out of your account?"
                         icon = { faUserLock }
                         label = "Log Out"
-                        onConfirmation = { handleLogOut }
+                        onConfirmation = { logout }
                         globalState = { globalState }
                         globalDispatch = { globalDispatch }
                      />
@@ -358,7 +384,7 @@ export default function Form(): JSX.Element {
                         message = "Permanently delete your account?"
                         icon = { faUserXmark }
                         label = "Delete Account"
-                        onConfirmation = { handleDeleteAccount }
+                        onConfirmation = { submitDeleteAccount }
                         globalState = { globalState }
                         globalDispatch = { globalDispatch }
                      />
