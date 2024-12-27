@@ -1,4 +1,4 @@
-import { faCameraRetro, faImage, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faCameraRetro, faImages, faPaperclip, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import Image from "next/image";
@@ -147,7 +147,7 @@ function Form(props: FormProps): JSX.Element {
                         return (
                            <div
                               id = { source }
-                              className = "relative size-64 sm:size-48"
+                              className = "relative size-36 xxsm:size-48 xsm:size-64 sm:size-48"
                               key = { source }
                            >
                               <Image
@@ -179,7 +179,7 @@ function Form(props: FormProps): JSX.Element {
                   {
                      isValidResource && isValidURL && (
                         <div className = "my-6 flex items-center justify-center">
-                           <div className = "relative size-64">
+                           <div className = "relative size-36 xxsm:size-48 xsm:size-64">
                               <Image
                                  fill
                                  priority
@@ -190,7 +190,7 @@ function Form(props: FormProps): JSX.Element {
                                  alt = "workout-image"
                                  className = {
                                     clsx(
-                                       "scale-105 cursor-default rounded-xl object-cover object-center shadow-md transition duration-300 ease-in-out",
+                                       "scale-105 cursor-default rounded-xl object-cover object-center transition duration-300 ease-in-out",
                                     )
                                  }
                               />
@@ -247,7 +247,7 @@ function Form(props: FormProps): JSX.Element {
                <Button
                   ref = { updateButtonRef }
                   className = "mt-2 h-[41.6px] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white xxsm:text-base"
-                  icon = { faImage }
+                  icon = { faImages }
                   onClick = { () => updateButtonRef.current?.submit() }
                   onSubmit = { onSubmit }
                >

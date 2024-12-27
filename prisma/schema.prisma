@@ -20,22 +20,23 @@ model exercises {
 }
 
 model users {
-  id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name             String         @db.VarChar(200)
-  birthday         DateTime       @db.Date
-  username         String         @unique @db.VarChar(30)
-  password         String
-  email            String         @unique
-  email_verified   Boolean        @default(false)
-  email_normalized String         @unique
-  phone            String?        @unique @db.VarChar(22)
-  phone_verified   Boolean?       @default(false)
-  phone_normalized String?        @unique @db.VarChar(22)
-  mail             Boolean?       @default(false)
-  sms              Boolean?       @default(false)
-  image            String?        @default("")
-  workout_tags     workout_tags[]
-  workouts         workouts[]
+  id                  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String         @db.VarChar(200)
+  birthday            DateTime       @db.Date
+  username            String         @unique @db.VarChar(30)
+  username_normalized String         @unique @db.VarChar(30)
+  password            String
+  email               String         @unique
+  email_verified      Boolean        @default(false)
+  email_normalized    String         @unique
+  phone               String?        @unique @db.VarChar(42)
+  phone_verified      Boolean?       @default(false)
+  phone_normalized    String?        @unique @db.VarChar(42)
+  mail                Boolean?       @default(false)
+  sms                 Boolean?       @default(false)
+  image               String?        @default("")
+  workout_tags        workout_tags[]
+  workouts            workouts[]
 
   @@index([email], map: "users_email_index")
 }

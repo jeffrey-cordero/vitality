@@ -5,14 +5,15 @@ export const root = {
    name: "root",
    birthday: new Date(),
    username: "root",
+   username_normalized: "root",
    password: "$Vc$10$O1sZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
    email: "root@gmail.com",
-   phone: "1914001001",
+   phone: "19145550001",
    image: "",
    email_verified: false,
    email_normalized: "root@gmail.com",
    phone_verified: false,
-   phone_normalized: "(914) 001-001",
+   phone_normalized: "(914) 555-0001",
    mail: false,
    sms: false
 };
@@ -22,14 +23,15 @@ export const user = {
    name: "user",
    birthday: new Date(),
    username: "user",
+   username_normalized: "user",
    password: "$Ac$10$O033ZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
    email: "user@gmail.com",
-   phone: "1914001002",
+   phone: "19145550002",
    image: "",
    email_verified: true,
    email_normalized: "user@gmail.com",
    phone_verified: true,
-   phone_normalized: "(914) 001-002",
+   phone_normalized: "(914) 555-0002",
    mail: false,
    sms: false
 };
@@ -41,7 +43,7 @@ export const VALID_REGISTRATION: Registration = {
    password: "ValidPassword1!",
    confirmPassword: "ValidPassword1!",
    email: "user@gmail.com",
-   phone: "1234567890"
+   phone: "19145550003"
 };
 
 export const INVALID_PASSWORD_MESSAGE = "Password must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character (@$!%*#?&)";
@@ -73,7 +75,7 @@ export const invalidRegistrations = [
          phone: "27382738273971238"
       },
       errors: {
-         phone: ["Valid phone number is required, if provided"]
+         phone: ["Valid U.S. phone number is required"]
       }
    },
    {

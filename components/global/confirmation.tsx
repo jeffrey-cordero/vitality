@@ -41,11 +41,11 @@ export default function Confirmation(props: ConfirmationProps): JSX.Element {
             )
          }
       >
-         <div className = "relative flex flex-col items-center justify-between gap-3 pb-2 pt-4">
+         <div className = "relative flex flex-col items-center justify-between gap-3 pb-1 pt-4">
             <p className = "px-2 text-[1.1rem] font-bold">
                { message }
             </p>
-            <div className = "mx-auto flex w-full flex-col items-center justify-center gap-1 sm:flex-row">
+            <div className = "mx-auto flex w-full flex-col items-center justify-center gap-2 sm:flex-row">
                <Button
                   type = "button"
                   icon = { faRotateBack }

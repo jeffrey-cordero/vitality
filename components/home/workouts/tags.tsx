@@ -59,7 +59,7 @@ function CreateTag(props: CreateTagProps) {
    return (
       <div
          tabIndex = { 0 }
-         className = "mx-auto mb-2 mt-4 flex max-w-full cursor-pointer flex-row flex-wrap items-center justify-center gap-x-2 rounded-full px-5 py-[0.6rem] text-sm font-bold text-white  focus:outline-blue-500"
+         className = "mx-auto mb-2 mt-4 flex max-w-full cursor-pointer flex-row flex-wrap items-center justify-center gap-x-2 rounded-full px-5 py-[0.6rem] text-sm font-bold text-white focus:outline-blue-500"
          style = { { backgroundColor: randomColor } }
          onClick = { onSubmit }
          onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && onSubmit() }

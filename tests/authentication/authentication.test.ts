@@ -8,11 +8,11 @@ import { invalidPasswords, invalidRegistrations, root, user, VALID_REGISTRATION 
 import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
 import { prismaMock } from "@/tests/singleton";
 
-const EXISTING_USERS = [root, user];
+const EXISTING_USERS: users[] = [root, user];
 
 describe("Authentication Tests", () => {
    describe("Registration", () => {
-      test("Register with invalid fields", async() => {
+      test("Should fail registration when fields are invalid", async() => {
          for (const { registration, errors } of invalidRegistrations) {
             await expect(signup(registration)).resolves.toEqual({
                status: "Error",
@@ -25,7 +25,7 @@ describe("Authentication Tests", () => {
          }
       });
 
-      test("Register with password errors", async() => {
+      test("Should fail registration when passwords are invalid or mismatched", async() => {
          for (const { password, confirmPassword, errors } of invalidPasswords) {
             const registration = {
                ...VALID_REGISTRATION,
@@ -44,12 +44,13 @@ describe("Authentication Tests", () => {
          }
       });
 
-      test("Handle database errors during registration", async() => {
+      test("Should fail registration when a database conflict or error occurs", async() => {
          // @ts-ignore
          prismaMock.users.findMany.mockResolvedValue(
             EXISTING_USERS as unknown as users[]
          );
 
+         // Normalized values for each attribute should be used for conflict checks
          const conflictRegistrations = [
             {
                registration: {
@@ -65,8 +66,8 @@ describe("Authentication Tests", () => {
             {
                registration: {
                   ...VALID_REGISTRATION,
-                  username: "root",
-                  email: "user@gmail.com",
+                  username: "ROOT",
+                  email: "USER@gmail.com",
                   phone: ""
                },
                errors: {
@@ -79,7 +80,7 @@ describe("Authentication Tests", () => {
                   ...VALID_REGISTRATION,
                   username: "root",
                   email: "user@gmail.com",
-                  phone: "1234567891"
+                  phone: root.phone
                },
                errors: {
                   username: ["Username already taken"],
@@ -123,7 +124,7 @@ describe("Authentication Tests", () => {
          simulateDatabaseError("users", "create", async() => signup(uniqueRegistration));
       });
 
-      test("Sign up with valid fields", async() => {
+      test("Should succeed in registration with valid fields", async() => {
          const registration = {
             ...VALID_REGISTRATION,
             username: "unique",
@@ -170,26 +171,28 @@ describe("Authentication Tests", () => {
          });
       });
 
-      test("Fetch existing and missing users", async() => {
-         expect(await fetchUser(root.username)).toEqual(root);
-         expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
-            where: { username: root.username }
-         } as any);
-
+      test("Should fail to fetch user if user does not exist", async() => {
          expect(await fetchUser(MOCK_ID)).toBeNull();
          expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
             where: { username: MOCK_ID }
          } as any);
       });
 
-      test("Handle database errors when fetching user", async() => {
+      test("Should fail fetching user when a database error occurs", async() => {
          prismaMock.users.findFirst.mockRejectedValueOnce(
             new Error("Database connection error")
          );
          expect(await fetchUser(root.username)).toBeNull();
       });
 
-      test("Attempt authorization with invalid credentials", async() => {
+      test("Should succeed in fetching user when user exists", async() => {
+         expect(await fetchUser(root.username)).toEqual(root);
+         expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
+            where: { username: root.username }
+         } as any);
+      });
+
+      test("Should fail authorization with invalid credentials", async() => {
          // Mock invalid password comparison
          bcrypt.compare.mockResolvedValue(false);
 
@@ -205,7 +208,17 @@ describe("Authentication Tests", () => {
          );
       });
 
-      test("Authorize with valid credentials", async() => {
+      test("Should fail authorization when a database error occurs", async() => {
+         prismaMock.users.findFirst.mockRejectedValueOnce(
+            new Error("Database connection error")
+         );
+
+         const credentials = { username: root.username, password: root.password };
+
+         expect(await authorizeServerSession(credentials)).toBeNull();
+      });
+
+      test("Should succeed in authorization with valid credentials", async() => {
          // Mock valid password comparison
          bcrypt.compare.mockResolvedValue(true);
 
@@ -217,16 +230,6 @@ describe("Authentication Tests", () => {
             email: root.email
          });
          expect(bcrypt.compare).toHaveBeenCalledWith(root.password, root.password);
-      });
-
-      test("Handle database errors during authorization", async() => {
-         prismaMock.users.findFirst.mockRejectedValueOnce(
-            new Error("Database connection error")
-         );
-
-         const credentials = { username: root.username, password: root.password };
-
-         expect(await authorizeServerSession(credentials)).toBeNull();
       });
    });
 });

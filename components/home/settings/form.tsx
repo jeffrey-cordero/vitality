@@ -1,4 +1,4 @@
-import { faAt, faCakeCandles, faComments, faLink, faMoon, faPaperPlane, faPenToSquare, faPhone, faSignature, faUserLock, faUserSecret, faUserXmark } from "@fortawesome/free-solid-svg-icons";
+import { faAt, faCakeCandles, faComments, faLink, faMoon, faPaperPlane, faPenToSquare, faPersonWalkingLuggage, faPhone, faSignature, faUserSecret, faUserXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { users as User } from "@prisma/client";
 import Image from "next/image";
@@ -219,7 +219,7 @@ export default function Form(): JSX.Element {
       <div className = "relative mx-auto mb-8 w-full px-2 text-left xsm:mb-16 sm:w-11/12 lg:w-3/4 2xl:w-1/2">
          {
             globalState.image.data?.fetched ? (
-               <div className = "flex flex-col items-center justify-center gap-6">
+               <div className = "flex flex-col items-center justify-center gap-7">
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
                         title = "Profile"
@@ -251,7 +251,7 @@ export default function Form(): JSX.Element {
                            display = {
                               <FontAwesomeIcon
                                  icon = { faPenToSquare }
-                                 className = "z-10 mb-2 cursor-pointer text-lg text-primary hover:text-primary/80 xxsm:text-xl xsm:mb-6"
+                                 className = "z-10 cursor-pointer text-lg text-primary hover:text-primary/80 xxsm:text-xl"
                               />
                            }
                            page = "settings"
@@ -271,123 +271,131 @@ export default function Form(): JSX.Element {
                            }
                         />
                      </div>
-                     <GeneralAttribute
-                        id = "name"
-                        type = "text"
-                        label = "Name"
-                        icon = { faSignature }
-                        input = { globalState.name }
-                        dispatch = { globalDispatch }
-                        globalState = { globalState }
-                        globalDispatch = { globalDispatch }
-                     />
-                     <GeneralAttribute
-                        id = "birthday"
-                        type = "date"
-                        label = "Birthday"
-                        icon = { faCakeCandles }
-                        input = { globalState.birthday }
-                        dispatch = { globalDispatch }
-                        globalState = { globalState }
-                        globalDispatch = { globalDispatch }
-                     />
+                     <div className = "relative mx-auto mt-4 flex w-full flex-col items-stretch justify-center gap-11 sm:gap-6">
+                        <GeneralAttribute
+                           id = "name"
+                           type = "text"
+                           label = "Name"
+                           icon = { faSignature }
+                           input = { globalState.name }
+                           dispatch = { globalDispatch }
+                           globalState = { globalState }
+                           globalDispatch = { globalDispatch }
+                        />
+                        <GeneralAttribute
+                           id = "birthday"
+                           type = "date"
+                           label = "Birthday"
+                           icon = { faCakeCandles }
+                           input = { globalState.birthday }
+                           dispatch = { globalDispatch }
+                           globalState = { globalState }
+                           globalDispatch = { globalDispatch }
+                        />
+                     </div>
                   </div>
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
                         title = "Security"
                         message = "Secure your account with tailored protection"
                      />
-                     <GeneralAttribute
-                        id = "username"
-                        type = "text"
-                        label = "Username"
-                        icon = { faUserSecret }
-                        input = { globalState.username }
-                        dispatch = { globalDispatch }
-                        globalState = { globalState }
-                        globalDispatch = { globalDispatch }
-                     />
-                     <GeneralAttribute
-                        id = "email"
-                        type = "email"
-                        label = "Email"
-                        icon = { faAt }
-                        input = { globalState.email }
-                        dispatch = { globalDispatch }
-                        globalState = { globalState }
-                        globalDispatch = { globalDispatch }
-                     />
-                     <GeneralAttribute
-                        id = "phone"
-                        type = "tel"
-                        label = "Phone"
-                        icon = { faPhone }
-                        input = { globalState.phone }
-                        dispatch = { globalDispatch }
-                        globalState = { globalState }
-                        globalDispatch = { globalDispatch }
-                     />
-                     <PasswordAttribute
-                        globalState = { globalState }
-                        globalDispatch = { globalDispatch }
-                     />
+                     <div className = "relative mx-auto flex w-full flex-col items-stretch justify-center gap-11 sm:gap-6">
+                        <GeneralAttribute
+                           id = "username"
+                           type = "text"
+                           label = "Username"
+                           icon = { faUserSecret }
+                           input = { globalState.username }
+                           dispatch = { globalDispatch }
+                           globalState = { globalState }
+                           globalDispatch = { globalDispatch }
+                        />
+                        <GeneralAttribute
+                           id = "email"
+                           type = "email"
+                           label = "Email"
+                           icon = { faAt }
+                           input = { globalState.email }
+                           dispatch = { globalDispatch }
+                           globalState = { globalState }
+                           globalDispatch = { globalDispatch }
+                        />
+                        <GeneralAttribute
+                           id = "phone"
+                           type = "tel"
+                           label = "Phone"
+                           icon = { faPhone }
+                           input = { globalState.phone }
+                           dispatch = { globalDispatch }
+                           globalState = { globalState }
+                           globalDispatch = { globalDispatch }
+                        />
+                        <PasswordAttribute
+                           globalState = { globalState }
+                           globalDispatch = { globalDispatch }
+                        />
+                     </div>
                   </div>
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
                         title = "Preferences"
                         message = "Craft your personalized experience"
                      />
-                     <SliderAttribute
-                        id = { null }
-                        label = "Dark Mode"
-                        icon = { faMoon }
-                        globalState = { globalState }
-                        globalDispatch = { globalDispatch }
-                        checked = { theme === "dark" }
-                        onChange = { () => updateTheme(theme === "dark" ? "light" : "dark") }
-                     />
-                     <SliderAttribute
-                        id = "mail"
-                        label = "Email Notifications"
-                        icon = { faPaperPlane }
-                        globalState = { globalState }
-                        globalDispatch = { globalDispatch }
-                        checked = { globalState.mail.value === true }
-                        onChange = { undefined }
-                     />
-                     <SliderAttribute
-                        id = "sms"
-                        label = "SMS Notifications"
-                        icon = { faComments }
-                        globalState = { globalState }
-                        globalDispatch = { globalDispatch }
-                        checked = { globalState.sms.value === true }
-                        onChange = { undefined }
-                     />
+                     <div className = "relative mx-auto flex w-full flex-col items-stretch justify-center gap-11 sm:gap-6">
+                        <SliderAttribute
+                           id = { null }
+                           label = "Dark Mode"
+                           icon = { faMoon }
+                           globalState = { globalState }
+                           globalDispatch = { globalDispatch }
+                           checked = { theme === "dark" }
+                           onChange = { () => updateTheme(theme === "dark" ? "light" : "dark") }
+                        />
+                        <SliderAttribute
+                           id = "mail"
+                           label = "Email Notifications"
+                           icon = { faPaperPlane }
+                           globalState = { globalState }
+                           globalDispatch = { globalDispatch }
+                           checked = { globalState.mail.value === true }
+                           onChange = { undefined }
+                        />
+                        <SliderAttribute
+                           id = "sms"
+                           label = "SMS Notifications"
+                           icon = { faComments }
+                           globalState = { globalState }
+                           globalDispatch = { globalDispatch }
+                           checked = { globalState.sms.value === true }
+                           onChange = { undefined }
+                        />
+                     </div>
                   </div>
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading
                         title = "Actions"
                         message = "Control your account with essential actions"
                      />
-                     <AccountAction
-                        action = "session"
-                        message = "Log out of your account?"
-                        icon = { faUserLock }
-                        label = "Log Out"
-                        onConfirmation = { logout }
-                        globalState = { globalState }
-                        globalDispatch = { globalDispatch }
-                     />
-                     <AccountAction
-                        action = "delete"
-                        message = "Permanently delete your account?"
-                        icon = { faUserXmark }
-                        label = "Delete Account"
-                        onConfirmation = { submitDeleteAccount }
-                        globalState = { globalState }
-                        globalDispatch = { globalDispatch }
-                     />
+                     <div className = "relative mx-auto flex w-full flex-col items-stretch justify-center gap-11 sm:gap-6">
+                        <AccountAction
+                           action = "session"
+                           message = "Log out?"
+                           icon = { faPersonWalkingLuggage }
+                           label = "Log Out"
+                           onConfirmation = { logout }
+                           globalState = { globalState }
+                           globalDispatch = { globalDispatch }
+                        />
+                        <AccountAction
+                           action = "delete"
+                           message = "Permanently delete your account?"
+                           icon = { faUserXmark }
+                           label = "Delete Account"
+                           onConfirmation = { submitDeleteAccount }
+                           globalState = { globalState }
+                           globalDispatch = { globalDispatch }
+                        />
+                     </div>
                   </div>
                </div>
             ) : (

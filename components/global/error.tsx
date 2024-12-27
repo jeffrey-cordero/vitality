@@ -10,7 +10,7 @@ export default function Error(props: ErrorProps): JSX.Element {
 
    return (
       message !== null && (
-         <div className = {clsx("mx-auto mb-1 mt-3 flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 text-center opacity-0 text-sm xxsm:text-base", className)}>
+         <div className = { clsx("mx-auto mb-1 mt-3 flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 text-center text-sm opacity-0 xxsm:text-base", className) }>
             <p className = "input-error font-bold text-red-500">
                { message.trim() }
             </p>

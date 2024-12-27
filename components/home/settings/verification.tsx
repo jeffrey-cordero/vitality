@@ -196,9 +196,9 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                   })
                }
             </div>
-            <Error 
-               className="mt-0 mb-0"
-               message = { localState.empty.value ? "Invalid verification code" : null } 
+            <Error
+               className = "my-0"
+               message = { localState.empty.value ? "Invalid verification code" : null }
             />
             <Button
                ref = { updateButtonRef }

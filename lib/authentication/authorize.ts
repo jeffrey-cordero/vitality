@@ -14,7 +14,7 @@ export async function fetchAttributes(id: string): Promise<User | null> {
          }
       });
 
-      // Remove password hash value for data integrity if a user is found
+      // Remove hashed password from user object
       return user !== null ? { ...user, password: "*".repeat(user.password.length) } : null;
    } catch (error) {
       return null;

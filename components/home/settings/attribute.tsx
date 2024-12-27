@@ -28,14 +28,14 @@ function AttributeContainer(props: AttributeContainerProps): JSX.Element {
 
    return (
       <div className = "relative mx-auto w-full">
-         <div className = "my-4 flex flex-col items-center justify-center gap-4 sm:my-1 sm:flex-row sm:justify-between sm:gap-6">
+         <div className = "flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-between sm:gap-6">
             <div
                className = "flex flex-col items-center justify-center gap-4 sm:flex-row"
                { ...doubleTap }
             >
                <FontAwesomeIcon
                   icon = { icon }
-                  className = "w-8 text-lg text-primary xxsm:text-xl"
+                  className = "w-8 text-xl text-primary xxsm:text-2xl"
                />
                <h2 className = "max-w-full text-center text-base font-semibold [overflow-wrap:anywhere] xxsm:text-[17.6px] sm:text-left">
                   { label }

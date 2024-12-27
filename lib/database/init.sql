@@ -3,6 +3,7 @@ CREATE TABLE "users" (
       name VARCHAR(200) NOT NULL,
       birthday DATE NOT NULL,
       username VARCHAR(30) UNIQUE NOT NULL,
+      username_normalized VARCHAR(30) UNIQUE NOT NULL,
       password TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
       email_verified BOOLEAN NOT NULL DEFAULT FALSE,

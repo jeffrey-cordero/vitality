@@ -49,14 +49,14 @@ export async function signup(registration: Registration): Promise<VitalityRespon
       }
 
       // Check for existing users with the same username, email, and/or phone with normalized values
-      const normalizedUsername = registration.username.trim();
+      const normalizedUsername = registration.username.toLowerCase().trim();
       const normalizedEmail = registration.email.trim().toLowerCase();
       const normalizedPhone = registration.phone ? normalizePhoneNumber(registration.phone) : undefined;
 
       const conflicts = await prisma.users.findMany({
          where: {
             OR: [
-               { username: normalizedUsername },
+               { username_normalized: normalizedUsername },
                { email_normalized: normalizedEmail },
                { phone_normalized: normalizedPhone }
             ]
@@ -69,7 +69,8 @@ export async function signup(registration: Registration): Promise<VitalityRespon
 
          await prisma.users.create({
             data: {
-               username: normalizedUsername,
+               username: registration.username.trim(),
+               username_normalized: normalizedUsername,
                name: registration.name.trim(),
                email: registration.email.trim(),
                email_normalized: normalizedEmail,
@@ -86,7 +87,7 @@ export async function signup(registration: Registration): Promise<VitalityRespon
          const errors = {};
 
          for (const user of conflicts) {
-            user.username === registration.username && (errors["username"] = ["Username already taken"]);
+            user.username_normalized === normalizedUsername && (errors["username"] = ["Username already taken"]);
             user.email_normalized === normalizedEmail && (errors["email"] = ["Email already taken"]);
             user.phone_normalized === normalizedPhone && (errors["phone"] = ["Phone number already taken"]);
          }
