@@ -151,7 +151,7 @@ export function GeneralAttribute(props: AttributeProps) {
                   <Button
                      ref = { updateButtonRef }
                      type = "submit"
-                     className = "mt-2 h-10 w-full bg-primary text-white"
+                     className = "mt-3 h-10 w-full bg-primary text-white"
                      icon = { icon }
                      onClick = { submitPasswordUpdates }
                      onSubmit = { submitUpdateAttribute }

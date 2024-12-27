@@ -1,8 +1,6 @@
 "use client";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faAnglesRight, faBars,
-   faBrain,
-   faBullseye, faDoorOpen,    faDumbbell, faGears, faHeartCircleBolt, faHouse, faMoon, faPlaneArrival, faRightFromBracket, faShuffle, faSun, faUserPlus, faUtensils } from "@fortawesome/free-solid-svg-icons";
+import { faAnglesRight, faBars, faBrain, faBullseye, faDoorOpen, faDumbbell, faGears, faHeartCircleBolt, faHouse, faMoon, faPlaneArrival, faRightFromBracket, faShuffle, faSun, faUserPlus, faUtensils } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import Link from "next/link";
@@ -43,13 +41,13 @@ function SideBarLinks(): JSX.Element {
    const [links, setLinks] = useState<SideBarProps[]>(homeLinks);
    const pathname = usePathname();
 
-   // Update sidebar links based on current user and localStorage state
+   // Update sidebar links based on current user presence
    useEffect(() => {
       fetched && setLinks(user === undefined ? landingLinks : homeLinks);
    }, [
       user,
-      fetched,
-      links
+      links,
+      fetched
    ]);
 
    return (
@@ -109,7 +107,12 @@ function SideBarLinks(): JSX.Element {
 }
 
 export function SideBar(): JSX.Element {
-   const [visibleSideBar, setVisibleSideBar] = useState<boolean>(false);
+   // Sidebar visibility state is stored in local storage for persistence
+   const [visibleSideBar, setVisibleSideBar] = useState<boolean>(window.localStorage.getItem("visibleSideBar") === "true");
+
+   useEffect(() => {
+      window.localStorage.setItem("visibleSideBar", visibleSideBar.toString());
+   }, [visibleSideBar]);
 
    return (
       <div className = "relative">
@@ -140,7 +143,7 @@ export function SideBar(): JSX.Element {
                   )
                }
             >
-               <div className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-[0.6rem] py-3 shadow-md xxsm:px-3 xxsm:py-4 dark:bg-slate-800">
+               <div className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-[.6rem] py-3 shadow-md xxsm:px-3 xxsm:py-4 dark:bg-slate-800">
                   <div className = "flex flex-col justify-center space-x-2 space-y-2 text-center">
                      <div className = "flex size-full flex-col items-center justify-between text-center">
                         <SideBarLinks />

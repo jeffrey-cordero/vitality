@@ -6,6 +6,7 @@ import { ChangeEvent, useCallback, useContext, useReducer, useRef } from "react"
 
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import Button from "@/components/global/button";
+import Error from "@/components/global/error";
 import Modal from "@/components/global/modal";
 import { AttributeProps } from "@/components/home/settings/attribute";
 import { formReducer, VitalityState } from "@/lib/global/reducer";
@@ -195,15 +196,10 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                   })
                }
             </div>
-            {
-               localState.empty.value === true && (
-                  <div className = "relative mx-auto flex animate-fadeIn items-center justify-center gap-2 px-2 text-center text-base opacity-0">
-                     <p className = "input-error font-bold text-red-500">
-                        Invalid verification code
-                     </p>
-                  </div>
-               )
-            }
+            <Error 
+               className="mt-0 mb-0"
+               message = { localState.empty.value ? "Invalid verification code" : null } 
+            />
             <Button
                ref = { updateButtonRef }
                type = "submit"

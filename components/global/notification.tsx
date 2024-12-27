@@ -35,6 +35,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
    };
 
    if (timer !== undefined) {
+      // Start timer for removing notification after a set duration, if applicable
       setTimeout(() => {
          removeNotification();
       }, timer);

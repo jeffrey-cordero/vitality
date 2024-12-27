@@ -23,7 +23,7 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
    const confirmTimeOut = useRef<NodeJS.Timeout>(null);
    const buttonRef = useRef(null);
 
-   const handleSubmit = useCallback(async() => {
+   const invokeSubmission = useCallback(async() => {
       // Cancel any pending response submission timeout for single submission buttons
       if (isSingleSubmission) {
          clearTimeout(submitTimeOut.current);
@@ -50,7 +50,7 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
       isSingleSubmission
    ]);
 
-   const handleConfirmation = useCallback(async() => {
+   const invokeConfirmation = useCallback(async() => {
       // Cancel any pending response submission timeout
       clearTimeout(confirmTimeOut.current);
 
@@ -67,15 +67,15 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
       onConfirmation
    ]);
 
-   const handleOnClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+   const onClickHandler = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
       // Always call the defined onClick method and blur the element
       onClick?.call(this, event);
       buttonRef.current?.blur();
    }, [onClick]);
 
    useImperativeHandle(ref, () => ({
-      submit: handleSubmit,
-      confirm: handleConfirmation
+      submit: invokeSubmission,
+      confirm: invokeConfirmation
    }));
 
    return (
@@ -88,7 +88,7 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
                className
             )
          }
-         onClick = { handleOnClick }
+         onClick = { onClickHandler }
       >
          {
             icon && (

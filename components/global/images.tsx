@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import Button from "@/components/global/button";
+import Error from "@/components/global/error";
 import { Input, VitalityInputProps } from "@/components/global/input";
 import Modal from "@/components/global/modal";
 import { settingsImagesRegex, workoutImagesRegex } from "@/lib/global/regex";
@@ -24,24 +25,6 @@ function Form(props: FormProps): JSX.Element {
    );
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
-   const updateImageURL = useCallback(() => {
-      dispatch({
-         type: "updateState",
-         value: {
-            id: "image",
-            value: {
-               error: verifyImageURL(url) ? null : "Invalid image URL",
-               data: {
-                  valid: verifyImageURL(url)
-               }
-            }
-         }
-      });
-   }, [
-      url,
-      dispatch
-   ]);
-
    const selectDefaultImage = useCallback((source: string) => {
       dispatch({
          type: "updateState",
@@ -58,6 +41,24 @@ function Form(props: FormProps): JSX.Element {
       });
    }, [dispatch]);
 
+   const verifyImageURLInput = useCallback(() => {
+      dispatch({
+         type: "updateState",
+         value: {
+            id: "image",
+            value: {
+               error: isValidURL ? null : "Invalid image URL",
+               data: {
+                  valid: isValidURL
+               }
+            }
+         }
+      });
+   }, [
+      dispatch,
+      isValidURL
+   ]);
+
    const updateImageURLInput = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
       dispatch({
          type: "updateState",
@@ -66,7 +67,6 @@ function Form(props: FormProps): JSX.Element {
             value: {
                value: event.target.value,
                error: null,
-               // URL changes are verified on link submissions
                data: {
                   valid: undefined
                }
@@ -91,7 +91,7 @@ function Form(props: FormProps): JSX.Element {
       });
    }, [dispatch]);
 
-   const displayImageResourceErrors = () => {
+   const displayImageResourceError = () => {
       dispatch({
          type: "updateState",
          value: {
@@ -136,10 +136,11 @@ function Form(props: FormProps): JSX.Element {
             isDefaultImage ? (
                <div
                   tabIndex = { 0 }
-                  className = "relative flex flex-wrap items-center justify-center gap-6 py-4"
+                  className = "relative flex flex-wrap items-center justify-center gap-8 py-4"
                >
                   {
                      images.map((image) => {
+                        // Default images are provided for the workouts and settings pages respectively
                         const source: string = `/${page}/${image}`;
                         const isSelected: boolean = url === source;
 
@@ -185,7 +186,7 @@ function Form(props: FormProps): JSX.Element {
                                  quality = { 100 }
                                  sizes = "100%"
                                  src = { url }
-                                 onError = { displayImageResourceErrors }
+                                 onError = { displayImageResourceError }
                                  alt = "workout-image"
                                  className = {
                                     clsx(
@@ -201,7 +202,8 @@ function Form(props: FormProps): JSX.Element {
                      { ...props }
                      onChange = { updateImageURLInput }
                      onSubmit = {
-                        onSubmit === undefined ? updateImageURL : () => {
+                        onSubmit === undefined ? verifyImageURLInput : () => {
+                           // Apply timeout to ensure the image URL is verified before submitting the form
                            setTimeout(() => updateButtonRef.current?.submit());
                         }
                      }
@@ -225,7 +227,7 @@ function Form(props: FormProps): JSX.Element {
                               input.data?.valid !== true && onSubmit === undefined && (
                                  <Button
                                     type = "button"
-                                    onClick = { updateImageURL }
+                                    onClick = { verifyImageURLInput }
                                     className = "mt-2 h-10 w-full bg-primary font-semibold text-white placeholder:text-transparent"
                                     icon = { faPaperclip }
                                  >
@@ -296,15 +298,7 @@ export default function ImageForm(props: ImageFormProps): JSX.Element {
                         />
                         { isValidResource ? "Edit Image" : "Add Image" }
                      </Button>
-                     {
-                        input.error !== null && (
-                           <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 text-center opacity-0">
-                              <p className = "input-error font-bold text-red-500">
-                                 { input.error }
-                              </p>
-                           </div>
-                        )
-                     }
+                     <Error message = { input.error } />
                   </div>
                )
             }

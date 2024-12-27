@@ -176,7 +176,7 @@ export default function Form(): JSX.Element {
             }
          });
 
-         // Close the image form modal after a successful submission
+         // Close the image form modal after a successful submission, assuming a valid image resource
          const imageForm = document.getElementById("image-form-container");
          (imageForm?.getElementsByClassName("modal-close").item(0) as SVGElement)?.dispatchEvent(
             new MouseEvent("click", {

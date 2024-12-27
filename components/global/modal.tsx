@@ -16,19 +16,19 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
    const modalRef = useRef(null);
 
    // Allow parent components to handle opening/closing the model
-   const handleOnOpen = (event: any) => {
+   const openModal = (event: any) => {
       onClick?.call(null, event);
       setOpen(true);
    };
 
-   const handleOnClose = useCallback(() => {
+   const closeModal = useCallback(() => {
       onClose?.call(null);
       setOpen(false);
    }, [onClose]);
 
    useImperativeHandle(ref, () => ({
-      close: handleOnClose,
-      open: handleOnOpen,
+      close: closeModal,
+      open: openModal,
       isOpen: () => open
    }));
 
@@ -49,7 +49,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
    return (
       <div className = "relative">
          <div
-            onClick = { disabled !== true ? handleOnOpen : undefined }
+            onClick = { disabled !== true ? openModal : undefined }
          >
             { display }
          </div>
@@ -75,7 +75,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                            const target = event.target as HTMLElement;
 
                            if (event.key === "Escape" && target.classList.contains("modal")) {
-                              handleOnClose();
+                              closeModal();
                            }
                         }
                      }
@@ -86,7 +86,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                            onClick = {
                               (event) => {
                                  event.stopPropagation();
-                                 handleOnClose();
+                                 closeModal();
                               }
                            }
                            icon = { faXmark }

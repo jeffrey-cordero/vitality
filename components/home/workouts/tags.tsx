@@ -6,6 +6,7 @@ import { useCallback, useContext, useMemo, useReducer, useRef } from "react";
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
 import Button from "@/components/global/button";
 import Confirmation from "@/components/global/confirmation";
+import Error from "@/components/global/error";
 import { Input } from "@/components/global/input";
 import Loading from "@/components/global/loading";
 import Modal from "@/components/global/modal";
@@ -240,15 +241,7 @@ function EditTag(props: EditTagProps): JSX.Element {
          />
          <div className = "flex flex-col items-center justify-center gap-1">
             <TagColorSelection { ...props } />
-            {
-               localState.tagColor.error !== null && (
-                  <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 opacity-0">
-                     <p className = "input-error font-bold text-red-500">
-                        { localState.tagColor.error }
-                     </p>
-                  </div>
-               )
-            }
+            <Error message = { localState.tagColor.error } />
          </div>
          <div className = "flex flex-col gap-2">
             <Button

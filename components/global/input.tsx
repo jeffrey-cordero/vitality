@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import { ChangeEvent, Dispatch, useCallback, useEffect, useRef } from "react";
 
+import Error from "@/components/global/error";
 import { VitalityAction, VitalityInputState } from "@/lib/global/reducer";
 
 export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
@@ -30,7 +31,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
       scrollIntoView
    ]);
 
-   const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+   const inputChangeHandler = useCallback((event: ChangeEvent<HTMLInputElement>) => {
       // handlesChanges defined implies state management is handled via the parent component
       if (input.handlesChanges) {
          onChange?.call(null, event);
@@ -53,7 +54,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
       dispatch
    ]);
 
-   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+   const keyDownHandler = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
       if (inputRef.current && event.key === "Escape") {
          // Focus the top-most modal in the DOM when blurring input element, if applicable
          inputRef.current?.blur();
@@ -70,7 +71,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
       }
    }, [onSubmit]);
 
-   const handlePasswordIconClick = useCallback(() => {
+   const passwordIconHandler = useCallback(() => {
       inputRef.current?.focus();
 
       dispatch({
@@ -108,8 +109,8 @@ export function Input(props: VitalityInputProps): JSX.Element {
                         "border-red-500 border-2 dark:border-2 focus:border-red-500 focus:ring-red-500 error": input.error !== null
                      }, className)
                }
-               onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event) }
-               onChange = { (event: ChangeEvent<HTMLInputElement>) => handleInputChange(event) }
+               onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => keyDownHandler(event) }
+               onChange = { (event: ChangeEvent<HTMLInputElement>) => inputChangeHandler(event) }
                onBlur = { onBlur ?? undefined }
                disabled = { disabled ?? false }
             />
@@ -117,7 +118,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                (inputType === "password" || passwordIconRef.current !== null) && (
                   <button
                      tabIndex = { 0 }
-                     onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && handlePasswordIconClick() }
+                     onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && passwordIconHandler() }
                      type = "button"
                      className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
                   >
@@ -129,7 +130,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                               "text-primary" : input.data?.type && input.data?.type !== "password"
                            })
                         }
-                        onClick = { handlePasswordIconClick }
+                        onClick = { passwordIconHandler }
                      />
                   </button>
                )
@@ -177,15 +178,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                { label }
             </label>
          </div>
-         {
-            input.error !== null && (
-               <div className = "relative mx-auto my-3 flex animate-fadeIn items-center justify-center gap-2 px-2 text-center text-base opacity-0">
-                  <p className = "input-error font-bold text-red-500">
-                     { input.error.trim() }
-                  </p>
-               </div>
-            )
-         }
+         <Error message = { input.error } />
       </div>
    );
 }
