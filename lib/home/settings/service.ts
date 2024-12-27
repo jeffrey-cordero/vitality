@@ -178,9 +178,9 @@ export async function updateAttribute<T extends keyof User>(user_id: string, att
       }
 
       if (attribute === "username" || attribute === "email" || attribute === "phone") {
-         // Valid no conflict attribute value
+         // Validate no conflicts in unique attribute value
          const attributeMapping: Record<string, (_value: string) => [string, string]> = {
-            username: (value: string) => ["username", value.trim()],
+            username: (value: string) => ["username_normalized", value.toLowerCase().trim()],
             email: (value: string) => ["email_normalized", value.toLowerCase().trim()],
             phone: (value: string) => ["phone_normalized", normalizePhoneNumber(value)]
          };
@@ -198,9 +198,8 @@ export async function updateAttribute<T extends keyof User>(user_id: string, att
                [attribute]: [`${attribute[0].toUpperCase() + attribute.substring(1)} is already taken`]
             });
          } else {
-            // Update the unique user attribute value, but only update to false verification attribute for updates in email or phone
+            // Update the unique user attribute value, but only update to false verification attribute for updates in email or phone number
             const updates: boolean = conflict?.id !== user_id;
-            const isVerificationAttribute: boolean = normalizedAttribute !== "username";
             const verificationAttribute = normalizedAttribute === "email_normalized" ? "email_verified" : "phone_verified";
 
             await prisma.users.update({
@@ -210,7 +209,7 @@ export async function updateAttribute<T extends keyof User>(user_id: string, att
                data: {
                   [attribute]: value,
                   [normalizedAttribute]: normalizedValue,
-                  [verificationAttribute]: isVerificationAttribute && updates ? false : undefined
+                  [verificationAttribute]: normalizedAttribute !== "username" && updates ? false : undefined
                }
             });
 

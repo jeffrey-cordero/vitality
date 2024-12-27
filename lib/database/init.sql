@@ -16,6 +16,9 @@ CREATE TABLE "users" (
       image TEXT DEFAULT ''    
 );
 
+CREATE INDEX "users_username_normalized_index" ON "users" (username_normalized);
+CREATE INDEX "users_email_normalized_index" ON "users" (email_normalized);
+CREATE INDEX "users_phone_normalized_index" ON "users" (phone_normalized);
 CREATE index "users_email_index" ON "users" (email);
 
 CREATE TABLE "verification_token" (
