@@ -170,15 +170,15 @@ export async function updateAttribute<T extends keyof User>(user_id: string, att
       const attributeSchema = updateSchema.shape[attribute.toLowerCase()];
       const field = attributeSchema.safeParse(value);
 
+      // Invalid attribute value
       if (!field.success) {
-         // Invalid attribute value
          return sendErrorMessage("Invalid user attribute", {
             [attribute]: [field.error.errors[0].message]
          });
       }
 
       if (attribute === "username" || attribute === "email" || attribute === "phone") {
-         // Validate no conflicts in unique attribute value
+         // Handle normalized attribute values for username, email, and phone
          const attributeMapping: Record<string, (_value: string) => [string, string]> = {
             username: (value: string) => ["username_normalized", value.toLowerCase().trim()],
             email: (value: string) => ["email_normalized", value.toLowerCase().trim()],
@@ -199,8 +199,8 @@ export async function updateAttribute<T extends keyof User>(user_id: string, att
             });
          } else {
             // Verification should update to false for email and phone changes
-            const updatesVerification: boolean = conflict !== null;
-            const verificationAttribute = normalizedAttribute === "email_normalized" ? "email_verified" : "phone_verified";
+            const verificationAttribute = attribute === "email" ? "email_verified" : "phone_verified";
+            const updatesVerificationAttribute: boolean = attribute !== "username" && conflict === null;
 
             await prisma.users.update({
                where: {
@@ -209,14 +209,14 @@ export async function updateAttribute<T extends keyof User>(user_id: string, att
                data: {
                   [attribute]: value,
                   [normalizedAttribute]: normalizedValue,
-                  [verificationAttribute]: updatesVerification ? false : undefined
+                  [verificationAttribute]: updatesVerificationAttribute ? false : undefined
                }
             });
 
             return sendSuccessMessage(`Updated ${attribute}`, true);
          }
       } else {
-         // Update the general user attribute value
+         // Handle basic user attributes
          await prisma.users.update({
             where: {
                id: user_id

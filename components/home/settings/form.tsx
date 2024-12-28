@@ -14,7 +14,7 @@ import { endSession } from "@/lib/authentication/session";
 import { normalizeDate } from "@/lib/authentication/shared";
 import { formReducer, VitalityState } from "@/lib/global/reducer";
 import { processResponse } from "@/lib/global/response";
-import { deleteAccount, updateAttribute } from "@/lib/home/settings/service";
+import { deleteAccount, updateAttribute } from "@/lib/home/settings/settings";
 
 const form: VitalityState = {
    username: {

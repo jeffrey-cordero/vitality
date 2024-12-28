@@ -11,7 +11,7 @@ import Modal from "@/components/global/modal";
 import { AttributeProps } from "@/components/home/settings/attribute";
 import { formReducer, VitalityState } from "@/lib/global/reducer";
 import { processResponse, VitalityResponse } from "@/lib/global/response";
-import { verifyAttribute } from "@/lib/home/settings/service";
+import { verifyAttribute } from "@/lib/home/settings/settings";
 
 const form: VitalityState = {
    0: {

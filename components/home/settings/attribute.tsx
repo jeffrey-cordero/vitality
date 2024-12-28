@@ -13,7 +13,7 @@ import VerifyAttribute from "@/components/home/settings/verification";
 import { normalizeDate } from "@/lib/authentication/shared";
 import { VitalityProps } from "@/lib/global/reducer";
 import { processResponse, VitalityResponse } from "@/lib/global/response";
-import { updateAttribute, updatePassword, updatePreference } from "@/lib/home/settings/service";
+import { updateAttribute, updatePassword, updatePreference } from "@/lib/home/settings/settings";
 
 interface AttributeContainerProps {
    icon: IconDefinition;
