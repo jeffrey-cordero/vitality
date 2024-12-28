@@ -45,7 +45,7 @@ describe("Authentication Tests", () => {
          }
       });
 
-      test("Should fail registration when a database conflict or error occurs", async() => {
+      test("Should fail registering when a database conflict or error occurs", async() => {
          // @ts-ignore
          prismaMock.users.findMany.mockResolvedValue(
             EXISTING_USERS as unknown as users[]

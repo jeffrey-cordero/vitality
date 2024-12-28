@@ -288,7 +288,7 @@ describe("Workout Exercises Tests", () => {
          await testExerciseFieldErrors("create");
       });
 
-      test("Should fail to create exercise when a database conflict or error occurs", async() => {
+      test("Should fail creating exercise when a database conflict or error occurs", async() => {
          await testExerciseTableErrors("create");
       });
 
@@ -335,7 +335,7 @@ describe("Workout Exercises Tests", () => {
          await testExerciseFieldErrors("update");
       });
 
-      test("Should fail to update exercise when a database conflict or error occurs", async() => {
+      test("Should fail updating exercise when a database conflict or error occurs", async() => {
          await testExerciseTableErrors("update");
       });
 
@@ -520,7 +520,7 @@ describe("Workout Exercises Tests", () => {
          simulateDatabaseError("workouts", "update", async() => await updateExercises(workout.user_id, workout));
       });
 
-      test("Should fail to update exercise ordering when a database conflict or error occurs", async() => {
+      test("Should fail updating exercise ordering when a database conflict or error occurs", async() => {
          // Missing workout
          workout = {
             ...MOCK_WORKOUT,

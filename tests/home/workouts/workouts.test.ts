@@ -1,6 +1,7 @@
 import { expect } from "@jest/globals";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
+import { normalizeDate } from "@/lib/authentication/shared";
 import { formatDatabaseWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
 import { addWorkout, deleteWorkouts, fetchWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
 import { root } from "@/tests/authentication/data";
@@ -306,7 +307,7 @@ describe("Workouts Tests", () => {
          await testFieldErrors("create");
       });
 
-      test("Should fail to create workout when a database conflict or error occurs", async() => {
+      test("Should fail creating  workout when a database conflict or error occurs", async() => {
          await testDatabaseErrors("create");
       });
 
@@ -347,6 +348,7 @@ describe("Workouts Tests", () => {
             }
          });
          expect(verifyImageURL(workout.image)).toBe(true);
+         expect(normalizeDate(workout.date)).toBe("11/20/2024");
          expect(prismaMock.workouts.create).toHaveBeenCalledWith({
             data: {
                user_id: workout.user_id,
@@ -390,7 +392,7 @@ describe("Workouts Tests", () => {
          await testFieldErrors("update");
       });
 
-      test("Should fail to update workout when a database conflict or error occurs", async() => {
+      test("Should fail updating workout when a database conflict or error occurs", async() => {
          await testDatabaseErrors("update");
       });
 
@@ -517,7 +519,7 @@ describe("Workouts Tests", () => {
          expect(await deleteWorkouts(workout.user_id, [workout])).toEqual(errors);
       });
 
-      test("Should fail to delete workout(s) when a database conflict or error occurs", async() => {
+      test("Should fail deleting workout(s) when a database conflict or error occurs", async() => {
          // Missing user caught at bulk deletion
          workout = {
             ...MOCK_WORKOUT,

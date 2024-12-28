@@ -198,8 +198,8 @@ export async function updateAttribute<T extends keyof User>(user_id: string, att
                [attribute]: [`${attribute[0].toUpperCase() + attribute.substring(1)} is already taken`]
             });
          } else {
-            // Update the unique user attribute value, but only update to false verification attribute for updates in email or phone number
-            const updates: boolean = conflict?.id !== user_id;
+            // Verification should update to false for email and phone changes
+            const updatesVerification: boolean = conflict !== null;
             const verificationAttribute = normalizedAttribute === "email_normalized" ? "email_verified" : "phone_verified";
 
             await prisma.users.update({
@@ -209,11 +209,11 @@ export async function updateAttribute<T extends keyof User>(user_id: string, att
                data: {
                   [attribute]: value,
                   [normalizedAttribute]: normalizedValue,
-                  [verificationAttribute]: normalizedAttribute !== "username" && updates ? false : undefined
+                  [verificationAttribute]: updatesVerification ? false : undefined
                }
             });
 
-            return sendSuccessMessage(`Updated ${attribute}`, updates);
+            return sendSuccessMessage(`Updated ${attribute}`, true);
          }
       } else {
          // Update the general user attribute value

@@ -14,7 +14,7 @@ import { filterWorkout } from "@/components/home/workouts/filtering";
 import TagsForm from "@/components/home/workouts/tags";
 import { formReducer, VitalityProps, VitalityState } from "@/lib/global/reducer";
 import { processResponse, VitalityResponse } from "@/lib/global/response";
-import { emptyWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
 import { Tag } from "@/lib/home/workouts/tags";
 import { addWorkout, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
 
@@ -233,8 +233,14 @@ export default function Form(props: VitalityProps): JSX.Element {
             id: "workout",
             value: {
                value: {
-                  ...emptyWorkout,
-                  user_id: user.id
+                  id: "",
+                  user_id: user.id,
+                  title: "",
+                  date: new Date(),
+                  image: "",
+                  description: "",
+                  tagIds: [],
+                  exercises: []
                },
                data: {
                   display: false
@@ -406,8 +412,14 @@ export default function Form(props: VitalityProps): JSX.Element {
                         id: "workout",
                         value: {
                            value: {
-                              ...emptyWorkout,
-                              user_id: user.id
+                              id: "",
+                              user_id: user.id,
+                              title: "",
+                              date: new Date(),
+                              image: "",
+                              description: "",
+                              tagIds: [],
+                              exercises: []
                            },
                            data: {
                               display: true

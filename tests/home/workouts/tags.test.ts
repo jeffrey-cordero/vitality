@@ -229,7 +229,7 @@ describe("Workout Tags Tests", () => {
          await testFieldErrors("create");
       });
 
-      test("Should fail to create workout tag when a database conflict or error occurs", async() => {
+      test("Should fail creating workout tag when a database conflict or error occurs", async() => {
          await testDatabaseErrors("create");
       });
 
@@ -277,7 +277,7 @@ describe("Workout Tags Tests", () => {
          await testFieldErrors("update");
       });
 
-      test("Should fail to update workout tag when a database conflict or error occurs", async() => {
+      test("Should fail updating workout tag when a database conflict or error occurs", async() => {
          await testDatabaseErrors("update");
       });
 
@@ -336,7 +336,7 @@ describe("Workout Tags Tests", () => {
          await testFieldErrors("delete");
       });
 
-      test("Should fail to delete workout tag when a database conflict or error occurs", async() => {
+      test("Should fail deleting workout tag when a database conflict or error occurs", async() => {
          await testDatabaseErrors("delete");
       });
 

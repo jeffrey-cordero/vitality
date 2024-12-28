@@ -8,7 +8,7 @@ export const root = {
    username_normalized: "root",
    password: "$Vc$10$O1sZuWf8KWsRcyVDGHQdUOkPma0pPkdM24PNZfB0vo/S/qUMo8.zS",
    email: "root@gmail.com",
-   phone: "19145550001",
+   phone: "9145550001",
    image: "",
    email_verified: false,
    email_normalized: "root@gmail.com",

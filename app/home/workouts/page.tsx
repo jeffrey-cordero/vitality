@@ -8,7 +8,6 @@ import Form from "@/components/home/workouts/form";
 import Pagination from "@/components/home/workouts/pagination";
 import View from "@/components/home/workouts/view";
 import { formReducer, VitalityState } from "@/lib/global/reducer";
-import { emptyWorkout } from "@/lib/home/workouts/shared";
 import { fetchWorkoutTags, Tag } from "@/lib/home/workouts/tags";
 import { fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
 
@@ -61,7 +60,14 @@ const form: VitalityState = {
    workout: {
       id: "workout",
       value: {
-         ...emptyWorkout
+         id: "",
+         user_id: "",
+         title: "",
+         date: new Date(),
+         image: "",
+         description: "",
+         tagIds: [],
+         exercises: []
       },
       error: null,
       data: {

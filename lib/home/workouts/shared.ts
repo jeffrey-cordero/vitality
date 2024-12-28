@@ -2,17 +2,6 @@ import { avatarImagesRegex, base64ImageRegex, urlRegex, workoutImagesRegex } fro
 import { Exercise } from "@/lib/home/workouts/exercises";
 import { Workout } from "@/lib/home/workouts/workouts";
 
-export const emptyWorkout: Workout = {
-   id: "",
-   user_id: "",
-   title: "",
-   date: new Date(),
-   image: "",
-   description: "",
-   tagIds: [],
-   exercises: []
-};
-
 export function verifyImageURL(url: string): boolean {
    return url.trim().length === 0 || urlRegex.test(url) || workoutImagesRegex.test(url) || avatarImagesRegex.test(url) || base64ImageRegex.test(url);
 }
