@@ -39,6 +39,9 @@ model users {
   workouts            workouts[]
 
   @@index([email], map: "users_email_index")
+  @@index([email_normalized], map: "users_email_normalized_index")
+  @@index([phone_normalized], map: "users_phone_normalized_index")
+  @@index([username_normalized], map: "users_username_normalized_index")
 }
 
 model verification_token {

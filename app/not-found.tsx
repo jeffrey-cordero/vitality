@@ -10,7 +10,7 @@ export default function NotFound(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const router = useRouter();
 
-   // Redirect to the workouts page or landing page as a placeholder until additional pages are implemented
+   // Re-direct to the workouts page or landing page as a placeholder until additional pages are implemented
    useEffect(() => {
       setTimeout(() => {
          router.push(user?.id !== undefined ? "/home/workouts" : "/");

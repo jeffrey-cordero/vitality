@@ -16,7 +16,7 @@ import { formReducer, VitalityProps, VitalityState } from "@/lib/global/reducer"
 import { processResponse, VitalityResponse } from "@/lib/global/response";
 import { emptyWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
 import { Tag } from "@/lib/home/workouts/tags";
-import { addWorkout, deleteWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
+import { addWorkout, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
 
 const form: VitalityState = {
    title: {
@@ -46,9 +46,9 @@ const form: VitalityState = {
 };
 
 export default function Form(props: VitalityProps): JSX.Element {
-   const { globalState, globalDispatch } = props;
    const { user } = useContext(AuthenticationContext);
    const { updateNotifications } = useContext(NotificationContext);
+   const { globalState, globalDispatch } = props;
    const [localState, localDispatch] = useReducer(formReducer, form);
    const [displayingFormModal, setDisplayingFormModal] = useState<boolean>(false);
    const displayFormModal: boolean = globalState.workout.data?.display;
@@ -112,15 +112,8 @@ export default function Form(props: VitalityProps): JSX.Element {
       };
 
       // Determine whether to add, update, or delete workout based on method provided
-      let response: VitalityResponse<Workout | number>;
-
-      if (isNewWorkout) {
-         response = await addWorkout(user.id, payload);
-      } else if (method === "update") {
-         response = await updateWorkout(user.id, payload);
-      } else {
-         response = await deleteWorkouts(user.id, [payload]);
-      }
+      const response: VitalityResponse<Workout> = method === "add"
+         ? await addWorkout(user.id, payload) : await updateWorkout(user.id, payload, method);
 
       processResponse(response, localDispatch, updateNotifications, () => {
          const newWorkout: Workout | null = method === "delete" ? payload : (response.body.data as Workout);

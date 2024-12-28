@@ -8,7 +8,7 @@ import Button from "@/components/global/button";
 import Error from "@/components/global/error";
 import { Input, VitalityInputProps } from "@/components/global/input";
 import Modal from "@/components/global/modal";
-import { settingsImagesRegex, workoutImagesRegex } from "@/lib/global/regex";
+import { avatarImagesRegex, workoutImagesRegex } from "@/lib/global/regex";
 import { verifyImageURL } from "@/lib/home/workouts/shared";
 
 interface FormProps extends ImageFormProps, VitalityInputProps {
@@ -21,7 +21,7 @@ interface FormProps extends ImageFormProps, VitalityInputProps {
 function Form(props: FormProps): JSX.Element {
    const { page, images, url, isValidURL, isValidResource, input, dispatch, onSubmit } = props;
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(
-      url === "" || page === "workouts" ? workoutImagesRegex.test(url) : settingsImagesRegex.test(url)
+      url === "" || page === "workouts" ? workoutImagesRegex.test(url) : avatarImagesRegex.test(url)
    );
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 

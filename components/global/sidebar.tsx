@@ -1,6 +1,6 @@
 "use client";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faAnglesRight, faBars, faBrain, faBullseye, faDoorOpen, faDumbbell, faGears, faHeartCircleBolt, faHouse, faMoon, faPlaneArrival, faRightFromBracket, faShuffle, faSun, faUserPlus, faUtensils } from "@fortawesome/free-solid-svg-icons";
+import { faAnglesRight, faBars, faDoorOpen, faDumbbell, faGears, faHome, faMoon, faPlaneArrival, faRightFromBracket, faSun, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import Link from "next/link";
@@ -18,19 +18,14 @@ interface SideBarProps {
 
 const landingLinks: SideBarProps[] = [
    { name: "Landing", href: "/", icon: faPlaneArrival },
-   { name: "Sign Up", href: "/signup", icon: faUserPlus },
    { name: "Log In", href: "/login", icon: faDoorOpen },
+   { name: "Sign Up", href: "/signup", icon: faUserPlus },
    { name: "Theme", href: "\0", icon: null }
 ];
 
 const homeLinks: SideBarProps[] = [
-   { name: "Home", href: "#", icon: faHouse },
+   { name: "Home", href: "/home", icon: faHome },
    { name: "Workouts", href: "/home/workouts", icon: faDumbbell },
-   { name: "Nutrition", href: "#", icon: faUtensils },
-   { name: "Mood", href: "#", icon: faBrain },
-   { name: "Health", href: "#", icon: faHeartCircleBolt },
-   { name: "Goals", href: "#", icon: faBullseye },
-   { name: "Progress", href: "#", icon: faShuffle },
    { name: "Settings", href: "/home/settings", icon: faGears },
    { name: "Theme", href: "\0", icon: null },
    { name: "Sign Out", href: "\0", icon: faRightFromBracket }
@@ -67,8 +62,7 @@ function SideBarLinks(): JSX.Element {
                            {
                               "bg-sky-100 dark:bg-slate-700 text-primary": pathname === link.href,
                               "hover:text-yellow-400": isTheme,
-                              "text-red-500 hover:text-red-600": isSignOut,
-                              "opacity-30": link.href === "#"
+                              "text-red-500 hover:text-red-600": isSignOut
                            },
                         )
                      }
@@ -93,7 +87,7 @@ function SideBarLinks(): JSX.Element {
                      <FontAwesomeIcon
                         icon = { isTheme ? theme === "dark" ? faMoon : faSun : link.icon }
                         className = {
-                           clsx("text-[1.4rem] xxsm:text-[1.6rem]", {
+                           clsx("text-[1.6rem]", {
                               "text-yellow-400 hover:text-yellow-500": isTheme
                            })
                         }
@@ -135,15 +129,15 @@ export function SideBar(): JSX.Element {
                id = "sideBarLinks"
                className = {
                   clsx(
-                     "group relative top-[-15px] m-0 w-[4.3rem] transition-all duration-1000 ease-in-out xxsm:w-20",
+                     "group relative top-[-15px] m-0 w-20 transition-all duration-1000 ease-in-out",
                      {
-                        "left-[-5rem]": !visibleSideBar,
+                        "left-[-6.5rem]": !visibleSideBar,
                         "left-[10px]": visibleSideBar
                      },
                   )
                }
             >
-               <div className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-[.6rem] py-3 shadow-md xxsm:px-3 xxsm:py-4 dark:bg-slate-800">
+               <div className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-3 py-4 shadow-md dark:bg-slate-800">
                   <div className = "flex flex-col justify-center space-x-2 space-y-2 text-center">
                      <div className = "flex size-full flex-col items-center justify-between text-center">
                         <SideBarLinks />

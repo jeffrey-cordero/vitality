@@ -208,6 +208,7 @@ export async function getAppliedTagUpdates(
       (id: string)  => existing.has(id) && adding.has(id)
    );
 
+   // Return formatted tag ID arrays
    return {
       existing: existingTags,
       adding: addingTags,

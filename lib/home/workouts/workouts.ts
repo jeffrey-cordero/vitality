@@ -147,7 +147,7 @@ export async function addWorkout(user_id: string, workout: Workout): Promise<Vit
    }
 }
 
-export async function updateWorkout(user_id: string, workout: Workout): Promise<VitalityResponse<Workout>> {
+export async function updateWorkout(user_id: string, workout: Workout, method: "update" | "delete"): Promise<VitalityResponse<Workout>> {
    try {
       await authorizeAction(user_id);
 
@@ -193,55 +193,69 @@ export async function updateWorkout(user_id: string, workout: Workout): Promise<
             );
          }
 
-         const { adding, removing } = await getAppliedTagUpdates(existingWorkout, workout);
+         if (method === "update") {
+            const { adding, removing } = await getAppliedTagUpdates(existingWorkout, workout);
 
-         const updatedWorkout = await prisma.workouts.update({
-            where: {
-               id: workout.id,
-               user_id: user_id
-            },
-            data: {
-               title: workout.title.trim(),
-               date: workout.date,
-               description: workout.description?.trim(),
-               image: workout.image?.trim(),
-               workout_applied_tags: {
-                  deleteMany: {
-                     tag_id: { in: removing }
-                  },
-                  createMany: {
-                     data: adding.map(
-                        (tagId: string) => ({ tag_id: tagId })
-                     )
-                  }
-               }
-            },
-            include: {
-               workout_applied_tags: {
-                  select: {
-                     workout_id: true,
-                     tag_id: true
+            const updatedWorkout = await prisma.workouts.update({
+               where: {
+                  id: workout.id,
+                  user_id: user_id
+               },
+               data: {
+                  title: workout.title.trim(),
+                  date: workout.date,
+                  description: workout.description?.trim(),
+                  image: workout.image?.trim(),
+                  workout_applied_tags: {
+                     deleteMany: {
+                        tag_id: { in: removing }
+                     },
+                     createMany: {
+                        data: adding.map(
+                           (tagId: string) => ({ tag_id: tagId })
+                        )
+                     }
                   }
                },
-               exercises: {
-                  include: {
-                     exercise_entries: {
-                        orderBy: {
-                           entry_order: "asc"
-                        }
+               include: {
+                  workout_applied_tags: {
+                     select: {
+                        workout_id: true,
+                        tag_id: true
                      }
                   },
-                  orderBy: {
-                     exercise_order: "asc"
+                  exercises: {
+                     include: {
+                        exercise_entries: {
+                           orderBy: {
+                              entry_order: "asc"
+                           }
+                        }
+                     },
+                     orderBy: {
+                        exercise_order: "asc"
+                     }
                   }
                }
-            }
-         });
+            });
 
-         return sendSuccessMessage(
-            "Successfully updated workout",
-            formatDatabaseWorkout(updatedWorkout),
-         );
+            return sendSuccessMessage(
+               "Successfully updated workout",
+               formatDatabaseWorkout(updatedWorkout),
+            );
+         } else {
+            const deletedWorkout = await prisma.workouts.delete({
+               where: {
+                  id: workout.id,
+                  user_id: user_id
+               }
+            });
+
+            return sendSuccessMessage(
+               "Successfully deleted workout",
+               formatDatabaseWorkout(deletedWorkout)
+            );
+         }
       }
    } catch (error) {
       return sendFailureMessage(error);
@@ -263,7 +277,7 @@ export async function deleteWorkouts(user_id: string, workouts: Workout[]): Prom
 
       for (const workout of workouts) {
          if (!uuidSchema("workout", "required").safeParse(workout.id).success) {
-            errors["id"] = ["ID for all workouts must be in UUID format"];
+            errors["id"] = ["ID for workout must be in UUID format"];
             break;
          }
 
@@ -271,7 +285,7 @@ export async function deleteWorkouts(user_id: string, workouts: Workout[]): Prom
       }
 
       if (Object.keys(errors).length > 0) {
-         return sendErrorMessage("Invalid workout ID fields", errors);
+         return sendErrorMessage("Invalid workout fields", errors);
       }
 
       const operation = await prisma.workouts.deleteMany({

@@ -261,7 +261,7 @@ export async function updateExercise(user_id: string, exercise: Exercise, method
          );
       } else {
          // Construct create, update, and delete exercise entry arrays
-         const { creating, updating, removing, error, errors } = await getEntryOrderUpdates(existingExercise, exercise);
+         const { creating, updating, removing, error, errors } = await getExerciseEntryOrderUpdates(existingExercise, exercise);
 
          if (error !== null) {
             return sendErrorMessage(error, errors);
@@ -298,7 +298,7 @@ export async function updateExercise(user_id: string, exercise: Exercise, method
    }
 }
 
-export async function getEntryOrderUpdates(
+export async function getExerciseEntryOrderUpdates(
    existingExercise: any,
    newExercise: Exercise
 ): Promise<{
@@ -386,7 +386,7 @@ export async function updateExercises(user_id: string, workout: Workout): Promis
 
       // Validate workout ID and all exercise entries
       if (!uuidSchema("workout", "required").safeParse(workout.id).success) {
-         return sendErrorMessage("Invalid workout ID fields", {
+         return sendErrorMessage("Invalid workout fields", {
             workout_id: ["ID for workout must be in UUID format"]
          });
       }

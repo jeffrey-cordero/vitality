@@ -3,6 +3,7 @@ import { users } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { authorizeServerSession, fetchUser } from "@/lib/authentication/authorize";
+import { normalizePhoneNumber } from "@/lib/authentication/shared";
 import { signup } from "@/lib/authentication/signup";
 import { invalidPasswords, invalidRegistrations, root, user, VALID_REGISTRATION } from "@/tests/authentication/data";
 import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
@@ -50,7 +51,7 @@ describe("Authentication Tests", () => {
             EXISTING_USERS as unknown as users[]
          );
 
-         // Normalized values for each attribute should be used for conflict checks
+         // Normalized values for each attribute should be used for comparison
          const conflictRegistrations = [
             {
                registration: {
@@ -101,7 +102,7 @@ describe("Authentication Tests", () => {
             });
          }
 
-         // Remove existing mock users
+         // Remove existing mock users for database error simulation
          prismaMock.users.findMany.mockResolvedValue([] as unknown as users[]);
 
          const uniqueRegistration = {
@@ -111,16 +112,6 @@ describe("Authentication Tests", () => {
             phone: ""
          };
 
-         await expect(signup(uniqueRegistration)).resolves.toEqual({
-            status: "Success",
-            body: {
-               data: null,
-               message: "Successfully registered",
-               errors: {}
-            }
-         });
-         expect(prismaMock.users.create).toHaveBeenCalled();
-
          simulateDatabaseError("users", "create", async() => signup(uniqueRegistration));
       });
 
@@ -129,7 +120,7 @@ describe("Authentication Tests", () => {
             ...VALID_REGISTRATION,
             username: "unique",
             email: "unique@gmail.com",
-            phone: ""
+            phone: "19145550004"
          };
 
          await expect(signup(registration)).resolves.toEqual({
@@ -140,18 +131,21 @@ describe("Authentication Tests", () => {
                errors: {}
             }
          });
-         // @ts-ignore
+
          expect(prismaMock.users.create).toHaveBeenCalledWith({
             data: {
                username: registration.username.trim(),
+               username_normalized: registration.username.toLowerCase().trim(),
                name: registration.name.trim(),
                email: registration.email.trim(),
+               email_normalized: registration.email.toLowerCase().trim(),
                password: await bcrypt.hash(
                   registration.password,
                   await bcrypt.genSaltSync(10)
                ),
                birthday: registration.birthday,
-               phone: undefined
+               phone: registration.phone.trim(),
+               phone_normalized: normalizePhoneNumber(registration.phone.trim())
             }
          } as any);
       });

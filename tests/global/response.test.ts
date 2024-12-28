@@ -12,33 +12,31 @@ const updateNotifications: (_notification: NotificationProps) => void = jest.fn(
 
 let response: VitalityResponse<any>;
 
-describe("Backend Response Tests", () => {
+describe("Response Tests", () => {
    describe("Success response", () => {
-      test("Handle successful backend response", () => {
+      test("Should handle successful backend responses gracefully", () => {
          // Ensure the success method is called
-         response = sendSuccessMessage(
-            "Successfully processed request",
-            Number.MAX_VALUE
-         );
+         response = sendSuccessMessage("Successfully processed request", null);
 
          processResponse(response, dispatch, updateNotifications, successMethod);
 
          expect(response).toEqual({
             status: "Success",
             body: {
-               data: Number.MAX_VALUE,
+               data: null,
                message: "Successfully processed request",
                errors: {}
             }
          });
          expect(successMethod).toHaveBeenCalled();
          expect(dispatch).not.toHaveBeenCalled();
+         expect(updateNotifications).not.toHaveBeenCalled();
       });
    });
 
    describe("Error response", () => {
-      test("Handle backend error response", () => {
-         // Mock DOM methods to ensure error elements are target
+      test("Should handle backend response errors gracefully", () => {
+         // Mock DOM methods to ensure error elements are visible post-response
          const mockElement = Object.assign(document.createElement("p"), {
             className: "input-error",
             scrollIntoView: jest.fn()
@@ -64,20 +62,20 @@ describe("Backend Response Tests", () => {
             }
          });
          expect(dispatch).toHaveBeenCalledWith({
-            type: "updateErrors",
+            type: "processResponse",
             value: response
          });
          expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
             behavior: "smooth",
             block: "center"
          });
-         expect(successMethod).not.toHaveBeenCalled();
          expect(updateNotifications).not.toHaveBeenCalled();
+         expect(successMethod).not.toHaveBeenCalled();
       });
    });
 
    describe("Failure response", () => {
-      test("Handle failure backend responses gracefully", () => {
+      test("Should handle failed backend responses gracefully", () => {
          // Mock console.error and node environment for failure message logging
          jest.spyOn(console, "error").mockImplementation();
          Object.defineProperty(process.env, "NODE_ENV", {
@@ -85,7 +83,8 @@ describe("Backend Response Tests", () => {
             configurable: true
          });
 
-         response = sendFailureMessage(new Error("Database connection error"));
+         const error = new Error("Database connection error");
+         response = sendFailureMessage(error);
 
          processResponse(response, dispatch, updateNotifications, successMethod);
 
@@ -101,7 +100,7 @@ describe("Backend Response Tests", () => {
             status: "Failure",
             message: "Something went wrong. Please try again."
          });
-         expect(console.error).toHaveBeenCalled();
+         expect(console.error).toHaveBeenCalledWith(error);
          expect(dispatch).not.toHaveBeenCalled();
          expect(successMethod).not.toHaveBeenCalled();
       });

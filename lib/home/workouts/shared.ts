@@ -1,4 +1,4 @@
-import { base64ImageRegex, settingsImagesRegex, urlRegex, workoutImagesRegex } from "@/lib/global/regex";
+import { avatarImagesRegex, base64ImageRegex, urlRegex, workoutImagesRegex } from "@/lib/global/regex";
 import { Exercise } from "@/lib/home/workouts/exercises";
 import { Workout } from "@/lib/home/workouts/workouts";
 
@@ -14,11 +14,11 @@ export const emptyWorkout: Workout = {
 };
 
 export function verifyImageURL(url: string): boolean {
-   return url.trim().length === 0 || urlRegex.test(url) || workoutImagesRegex.test(url) || settingsImagesRegex.test(url) || base64ImageRegex.test(url);
+   return url.trim().length === 0 || urlRegex.test(url) || workoutImagesRegex.test(url) || avatarImagesRegex.test(url) || base64ImageRegex.test(url);
 }
 
 export function formatDatabaseWorkout(workout: any): Workout {
-   return {
+   return workout !== null ? {
       id: workout.id,
       user_id: workout.user_id,
       title: workout.title,
@@ -31,15 +31,15 @@ export function formatDatabaseWorkout(workout: any): Workout {
       exercises: workout.exercises?.map(
          (exercise: any) => formatDatabaseExercise(exercise)
       ) ?? []
-   };
+   } : null;
 }
 
 export function formatDatabaseExercise(exercise: any): Exercise {
-   return {
+   return exercise !== null ? {
       id: exercise.id,
       workout_id: exercise.workout_id,
       name: exercise.name,
       exercise_order: exercise.exercise_order,
-      entries: exercise.exercise_entries
-   };
+      entries: exercise.exercise_entries ?? []
+   } : null;
 }
