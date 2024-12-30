@@ -179,7 +179,7 @@ describe("Settings Tests", () => {
          // verifyAttributeUpdates(attribute, value, expects updates, expects verification changes, requires normalization, expects normalized updates?)
 
          // Update general attributes (new value, same value)
-         verifyAttributeUpdates("image", "/settings/one.png", true, false, false);
+         verifyAttributeUpdates("image", "/home/settings/one.png", true, false, false);
          verifyAttributeUpdates("image", root.image, false, false, false);
 
          verifyAttributeUpdates("birthday", new Date(), true, false, false);

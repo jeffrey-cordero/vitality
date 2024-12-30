@@ -240,7 +240,7 @@ export default function Form(): JSX.Element {
                               tabIndex = { 0 }
                               quality = { 100 }
                               sizes = "100%"
-                              src = { imageURL === "" || globalState.image.data?.valid === false ? "/settings/default.png" : imageURL }
+                              src = { imageURL === "" || globalState.image.data?.valid === false ? "/home/settings/default.png" : imageURL }
                               alt = "workout-image"
                               className = "bg-transparent object-cover object-center"
                               onLoad = { () => globalState.image.data?.valid === false && verifyImageResource(true) }

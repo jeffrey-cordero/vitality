@@ -174,7 +174,7 @@ function Form(props: FormProps): JSX.Element {
                   {
                      (page === "workouts" ? workoutImages : avatarImages).map((image) => {
                         // Default images are provided for the workouts and settings pages respectively
-                        const source: string = `/${page}/${image}`;
+                        const source: string = `/home/${page}/${image}`;
                         const isSelected: boolean = url === source;
 
                         return (

@@ -8,7 +8,7 @@ export const workout: Workout = {
    title: "Workout #1",
    date: new Date("2024-11-13T00:00:00.000Z"),
    description: "A great workout on 11/13/2024",
-   image: "/workouts/hike.png",
+   image: "/home/workouts/hike.png",
    tagIds: [
       "00a78cd1-1969-4403-8a83-444895e76956",
       "bb3fcb1b-d4fc-42ba-b885-e507ed027f3b",
@@ -112,7 +112,7 @@ export const workouts = [
       title: "Workout #2",
       date: new Date("2024-11-10T00:00:00.000Z"),
       description: "A great workout on 11/10/2024",
-      image: "/workouts/weights.png",
+      image: "/home/workouts/weights.png",
       workout_applied_tags: [
          {
             workout_id: "dd29ecb7-a142-4f15-b828-6379cf4a8815",

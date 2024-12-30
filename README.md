@@ -134,6 +134,15 @@ The following outlines the organization of the project folder structure, providi
     - Database migration files.
   - `schema.prisma`
     - Defines the database schema.
+- `public/`
+  - `favicon.ico`
+    - The website's favicon, displayed in the browser tab.
+  - `fonts/`
+    - Contains font files and configurations applied throughout the project.
+  - `global/`
+    - Contains globally used assets.
+  - `home/`
+    - Contains the default images offered in the settings and workouts section of the application
 - `tests/`
   - `authentication/`
     - Tests for authentication-related components and logic.
