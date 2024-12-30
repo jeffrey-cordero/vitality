@@ -69,83 +69,85 @@ If you encounter any issues or need further assistance, feel free to submit a Gi
 
 ## Development
 
-**Install Dependencies:**
+### Environment
 
-```bash
-npm install
+Ensure the `docker-compose.yaml` file is configured correctly for development instead of a production environment. Change the command in the app container from:
+
+  ```yaml
+    command: sh -c "npm run start"
 ```
 
-**Create Project Build:**
+to:
 
-```bash
-npm run build
-```
+  ```yaml
+  command: sh -c "npm run dev"
+  ```
 
-**Start Development:**
+This ensures the development environment starts correctly when using the `docker compose up`.
 
-```bash
-docker compose up
-```
+### Processes
 
-**Pause Development:**
+1. **Pause Development**
 
 ```bash
 docker compose stop
 ```
 
-**Restart Development (Clear Containers, Networks, Volumes):**
+2. **Reset Development (Containers, Networks, Volumes):**
 
 ```bash
 docker compose down -v --remove-orphans
 ```
 
-### Logs
 
-**View Real-time Logs for All Containers:**
+### Logging
+
+1. **View live logs**
 
 ```bash
 docker compose logs -f
 ```
 
-**View Recent Logs for All Containers:**
+2. **View most recent logs**
 
 ```bash
 docker compose logs
 ```
 
-**View Recent Logs for Specific Container:**
+3. **View most recent logs for specific containers**
 
 ```bash
-docker logs <container-name>
+docker logs <vitality_app | vitality_postgres | vitality_nginx>
 ```
 
-## Database
+### Database
 
-**Access Database via Docker Container:**
+1. **Access Database via Docker**
 
 ```bash
 docker exec -it vitality_postgres psql -U postgres -d vitality
 ```
 
-**Access Database via Prisma ORM:**
+2. **Access Database via Prisma ORM**
 
 ```bash
 docker exec -it vitality_app npx prisma studio
 ```
 
-**Make Schema Changes (Development):**
+3. **Apply updates to SQL Schema**
 
-- Edit `tests/init.sql`
-- Apply changes to Prisma ORM:
+   1. Update `/lib/database/init.sql`
+   2. Reset development
+   3. Apply changes to Prisma ORM
 
 ```bash
 docker exec -it vitality_app npx prisma db pull
 ```
 
-**Apply Migrations with Prisma ORM:**
+4. **Apply Migrations with Prisma ORM:**
 
-- Modify the model in `prisma/schema.prisma`
-- Apply migrations with:
+- Modify the model(s) in `prisma/schema.prisma`
+- Apply migration:
 
 ```bash
 docker exec -it vitality_app npx prisma migrate dev --name <migration-name>
@@ -153,7 +155,7 @@ docker exec -it vitality_app npx prisma migrate dev --name <migration-name>
 
 ## Testing
 
-**Run Unit Tests:**
+1. **Run Unit Tests**
 
 ```bash
 npm run tests
@@ -161,7 +163,7 @@ npm run tests
 
 ## Linting
 
-**Fix Linting Errors:**
+1. **Fix Linting Errors**
 
 ```bash
 npm run lint
