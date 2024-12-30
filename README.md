@@ -69,7 +69,84 @@ If you encounter any issues or need further assistance, feel free to submit a Gi
 
 ## Development
 
-### Environment
+### Folder Structure
+
+The following outlines the organization of the project folder structure, providing a brief description of purpose and contents of each folder. This structure is designed to help maintain the separation of concerns, making it easier to locate specific functionality and manage the project efficiently.
+
+- `/`
+  - `auth.config.ts` & `auth.ts`
+    - Configuration and authentication-related logic for the application ([NextAuth.js](https://next-auth.js.org/)).
+  - `next.config.js`
+    - Configuration for Next.js, including custom settings for the app.
+  - `middleware.ts`
+    - Middleware for handling Next.js requests and responses.
+  - `docker-compose.yaml`
+    - Docker Compose configuration for managing multi-container applications.
+  - `nginx.conf`
+    - Nginx configuration for reverse proxy setup and other related configurations.
+  - `jest.config.js`
+    - Jest configuration for running unit tests.
+  - `next-env.d.ts`
+    - TypeScript environment definitions for Next.js (created during build stage).
+  - `package-lock.json` & `package.json`
+    - Dependency management files for the project.
+  - `tailwind.config.ts`
+    - Configuration for Tailwind CSS in the project.
+  - `postcss.config.js`
+    - Configuration for PostCSS, used in processing CSS.
+  - `tsconfig.json`
+    - TypeScript configuration file for the project.
+- `app`
+  - `home/`
+    - Home page-related components, including feedback, settings, and workouts.
+  - `login/`
+    - Login page.
+  - `signup/`
+    - Signup page.
+  - `layout.tsx`
+    - Main layout file for the application.
+  - `not-found.tsx`
+    - Handles "not found" page when a route doesn't exist.
+- `components`
+  - `authentication/`
+    - Login and signup components.
+  - `global/`
+    - Global reusable components, such as buttons, footers, modals, and form elements.
+  - `home/`
+    - Components specific to the home page, including feedback, settings, and workouts.
+  - `landing/`
+    - Landing page components like testimonials, pricing, and highlights.
+- `lib/`
+  - `authentication/`
+    - Functions for login, signup, and session management.
+  - `database/`
+    - Database initialization SQL files.
+  - `global/`
+    - Shared utilities like reducers, regex functions, and response handlers.
+  - `home/`
+    - Logic for handling home-related features such as feedback, settings, and workouts.
+  - `landing/`
+    - Landing page-related logic (e.g., testimonials).
+  - `prisma/`
+    - Prisma client initialization.
+- `prisma/`
+  - `migrations/`
+    - Database migration files.
+  - `schema.prisma`
+    - Defines the database schema.
+- `tests/`
+  - `authentication/`
+    - Tests for authentication-related components and logic.
+  - `global/`
+    - Global tests for utilities and response handling.
+  - `home/`
+    - Tests for components related to the home page.
+  - `shared.ts`
+    - Shared test utilities or mock data.
+  - `singleton.ts`
+    - Mock prisma client following the singleton pattern.
+
+### Processes
 
 Ensure the `docker-compose.yaml` file is configured correctly for development instead of a production environment. Change the command in the app container from:
 
@@ -85,9 +162,13 @@ to:
 
 This ensures the development environment starts correctly when using the `docker compose up`.
 
-### Processes
+1. **Start Development**
 
-1. **Pause Development**
+```bash
+docker compose up
+```
+
+2. **Pause Development**
 
 ```bash
 docker compose stop
