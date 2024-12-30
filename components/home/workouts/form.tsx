@@ -150,6 +150,7 @@ export default function Form(props: VitalityProps): JSX.Element {
             type: "updateStates",
             value: {
                workout: {
+                  value: isNewWorkout ? newWorkout : workout,
                   data: {
                      display: method === "delete" ? false : formModalRef.current?.isOpen()
                   }
