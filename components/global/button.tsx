@@ -54,7 +54,7 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
             setDisplaySubmitted(false);
             onBlur?.call(null);
          });
-      }, 500);
+      }, 250);
    }, [
       onBlur,
       onSubmit,

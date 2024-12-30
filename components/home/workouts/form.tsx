@@ -51,6 +51,7 @@ export default function Form(props: VitalityProps): JSX.Element {
    const { globalState, globalDispatch } = props;
    const [localState, localDispatch] = useReducer(formReducer, form);
    const [displayingFormModal, setDisplayingFormModal] = useState<boolean>(false);
+   const [modalLocked, setModalLocked] = useState<boolean>(false);
    const displayFormModal: boolean = globalState.workout.data?.display;
    const formModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
@@ -115,6 +116,11 @@ export default function Form(props: VitalityProps): JSX.Element {
       const response: VitalityResponse<Workout> = method === "add"
          ? await addWorkout(user.id, payload) : await updateWorkout(user.id, payload, method);
 
+      if (response.status !== "Success") {
+         // Unlock modal for non-successful responses
+         setModalLocked(false);
+      }
+
       processResponse(response, localDispatch, updateNotifications, () => {
          const newWorkout: Workout | null = method === "delete" ? payload : (response.body.data as Workout);
 
@@ -150,9 +156,9 @@ export default function Form(props: VitalityProps): JSX.Element {
             type: "updateStates",
             value: {
                workout: {
-                  value: isNewWorkout ? newWorkout : workout,
+                  value: newWorkout,
                   data: {
-                     display: method === "delete" ? false : formModalRef.current?.isOpen()
+                     display: method === "delete" ? false : true
                   }
                },
                workouts: {
@@ -168,6 +174,9 @@ export default function Form(props: VitalityProps): JSX.Element {
             }
          });
 
+         // Unlock modal after updating global state
+         setModalLocked(false);
+
          if (method === "delete") {
             formModalRef.current?.close();
 
@@ -181,6 +190,10 @@ export default function Form(props: VitalityProps): JSX.Element {
    };
 
    const submitWorkoutUpdates = useCallback(() => {
+      // Lock modal to prevent state mismanagement
+      setModalLocked(true);
+
+      // Submit workout updates to the server
       updateButtonRef.current?.submit();
    }, []);
 
@@ -310,6 +323,7 @@ export default function Form(props: VitalityProps): JSX.Element {
             ref = { formModalRef }
             onClose = { closeWorkoutForm }
             onClick = { displayWorkoutForm }
+            locked = { modalLocked }
          >
             <div className = "relative">
                <div className = "flex flex-col items-center justify-center gap-2 text-center">

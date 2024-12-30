@@ -8,10 +8,11 @@ interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
    children: React.ReactNode;
    onClose?: () => void;
    disabled?: boolean;
+   locked?: boolean;
 }
 
 const Modal = forwardRef(function Modal(props: ModalProps, ref) {
-   const { display, children, className, onClick, onClose, disabled } = props;
+   const { display, children, className, onClick, onClose, disabled, locked } = props;
    const [open, setOpen] = useState<boolean>(false);
    const modalRef = useRef(null);
 
@@ -22,9 +23,14 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
    };
 
    const closeModal = useCallback(() => {
+      if (locked) return;
+
       onClose?.call(null);
       setOpen(false);
-   }, [onClose]);
+   }, [
+      locked,
+      onClose
+   ]);
 
    useImperativeHandle(ref, () => ({
       close: closeModal,
