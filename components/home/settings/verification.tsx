@@ -182,7 +182,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                            <input
                               id = { `verification-${index}` }
                               className = {
-                                 clsx("flex size-full flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-2 text-center text-lg outline-none focus:border-[1.5px] focus:border-primary dark:border-0 dark:bg-gray-700/50", {
+                                 clsx("flex size-full flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-2 text-center text-lg outline-none focus:border-[1.5px] focus:border-primary dark:border-0 dark:bg-gray-700/50 disabled:pointer-events-none disabled:opacity-50", {
                                     "border-red-500 border-2 dark:border-2 focus:border-red-500 focus:ring-red-500 error" : input.error === "\0"
                                  })
                               }
@@ -208,6 +208,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                onSubmit = { submitVerificationCode }
                onClick = { handleSubmitUpdates }
                isSingleSubmission = { true }
+               inputIds={ ["verification-0", "verification-1", "verification-2", "verification-3"] }
             >
                Verify
             </Button>

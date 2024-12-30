@@ -125,11 +125,22 @@ export default function Form(props: VitalityProps): JSX.Element {
             )
          );
 
-         const newWorkouts: Workout[] = updateWorkouts(payload, globalState.workouts.value, newWorkout, method);
-
+         const newWorkouts: Workout[] = updateWorkouts(workout, globalState.workouts.value, newWorkout, method);
          const newFiltered: Workout[] = [...newWorkouts].filter(
-            (workout) => filterWorkout(globalState, workout, filteredTagIds, "update")
+            (workout: Workout) => filterWorkout(globalState, workout, filteredTagIds, "update")
          );
+         let newSelected: Set<Workout> = globalState.workouts.data?.selected ?? new Set();
+
+         if (globalState.workouts.data?.selected.has(workout)) {
+            // Update selected workout reference, if applicable
+            newSelected = new Set(
+               Array.from(globalState.workouts.data?.selected).map(
+                  (workout: Workout) => workout.id === newWorkout.id ? newWorkout : workout
+               )
+            );
+
+            method === "delete" && newSelected.delete(newWorkout);
+         }
 
          // Account for current visible workouts page and total pages
          const pages: number = Math.ceil(newWorkouts.length / globalState.paging.value);
@@ -139,7 +150,6 @@ export default function Form(props: VitalityProps): JSX.Element {
             type: "updateStates",
             value: {
                workout: {
-                  value: newWorkout,
                   data: {
                      display: method === "delete" ? false : formModalRef.current?.isOpen()
                   }
@@ -147,7 +157,8 @@ export default function Form(props: VitalityProps): JSX.Element {
                workouts: {
                   value: newWorkouts,
                   data: {
-                     filtered: newFiltered
+                     filtered: newFiltered,
+                     selected: newSelected
                   }
                },
                page: {
@@ -303,9 +314,9 @@ export default function Form(props: VitalityProps): JSX.Element {
                <div className = "flex flex-col items-center justify-center gap-2 text-center">
                   <FontAwesomeIcon
                      icon = { faPersonRunning }
-                     className = "mt-6 text-[3.5rem] text-primary sm:text-6xl"
+                     className = "mt-6 text-[3.6rem] text-primary xxsm:text-[3.7rem]"
                   />
-                  <h1 className = "mb-2 text-2xl font-bold sm:text-3xl">
+                  <h1 className = "text-[1.7rem] font-bold xxsm:text-[1.9rem]">
                      { isNewWorkout ? "New" : "Edit" } Workout
                   </h1>
                </div>
@@ -345,20 +356,6 @@ export default function Form(props: VitalityProps): JSX.Element {
                      input = { localState.image }
                      dispatch = { localDispatch }
                      page = "workouts"
-                     images = {
-                        [
-                           "bike.png",
-                           "cardio.png",
-                           "default.png",
-                           "hike.png",
-                           "legs.png",
-                           "lift.png",
-                           "machine.png",
-                           "run.png",
-                           "swim.png",
-                           "weights.png"
-                        ]
-                     }
                   />
                   <TextArea
                      id = "description"
@@ -377,6 +374,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      onSubmit = { () => updateWorkoutState(isNewWorkout ? "add" : "update") }
                      onClick = { submitWorkoutUpdates }
                      isSingleSubmission = { isNewWorkout ? true : undefined }
+                     inputIds={ ["title", "date", "tagSearch", "image-form-button", "image", "description"] }
                   >
                      { isNewWorkout ? "Create" : "Update" }
                   </Button>

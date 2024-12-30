@@ -255,20 +255,6 @@ export default function Form(): JSX.Element {
                               />
                            }
                            page = "settings"
-                           images = {
-                              [
-                                 "one.png",
-                                 "two.png",
-                                 "three.png",
-                                 "four.png",
-                                 "five.png",
-                                 "six.png",
-                                 "seven.png",
-                                 "eight.png",
-                                 "nine.png",
-                                 "ten.png"
-                              ]
-                           }
                         />
                      </div>
                      <div className = "relative mx-auto mt-4 flex w-full flex-col items-stretch justify-center gap-11 sm:gap-6">

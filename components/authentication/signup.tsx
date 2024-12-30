@@ -72,14 +72,14 @@ export default function SignUp(): JSX.Element {
       processResponse(response, dispatch, updateNotifications, () => {
          // Display notification with login button for redirection
          updateNotifications({
-            status: response.status,
-            message: response.body.message,
+            status: "Success",
+            message: "Account created successfully!",
             timer: undefined,
             children: (
                <Link href = "/home">
                   <Button
                      type = "button"
-                     className = "h-8 bg-green-600 px-4 py-3 text-sm text-white focus:border-green-800 focus:ring-2 focus:ring-green-800 xsm:px-6 dark:border-0"
+                     className = "h-[2.2rem] bg-green-500/90 px-5 py-3 text-sm text-white focus:border-green-700 focus:ring-2 focus:ring-green-700 xxsm:text-[0.95rem] dark:border-0"
                      icon = { faDoorOpen }
                      onClick = {
                         async() => {
@@ -100,13 +100,13 @@ export default function SignUp(): JSX.Element {
       });
    }, [
       state.name,
+      state.phone,
+      state.email,
       state.username,
       state.password,
-      state.confirmPassword,
-      state.email,
       state.birthday,
-      state.phone,
-      updateNotifications
+      updateNotifications,
+      state.confirmPassword
    ]);
 
    const submitRegistration = useCallback(() => {
@@ -119,7 +119,7 @@ export default function SignUp(): JSX.Element {
             title = "Sign Up"
             message = "Create an account to get started"
          />
-         <div className = "mx-auto mt-12 w-11/12 sm:w-3/4 xl:w-5/12">
+         <div className = "mx-auto mt-12 w-11/12 sm:w-3/4 lg:w-7/12 2xl:w-5/12">
             <form className = "relative mx-auto flex w-full flex-col items-stretch justify-center gap-3">
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
@@ -218,6 +218,7 @@ export default function SignUp(): JSX.Element {
                   onSubmit = { register }
                   onClick = { submitRegistration }
                   isSingleSubmission = { true }
+                  inputIds = { ["username", "password", "confirmPassword", "name", "birthday", "email", "phone"] }
                >
                   Sign Up
                </Button>

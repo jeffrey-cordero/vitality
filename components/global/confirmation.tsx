@@ -61,6 +61,7 @@ export default function Confirmation(props: ConfirmationProps): JSX.Element {
                   className = "h-[2.3rem] w-full border-[1.5px] border-gray-100 bg-red-500 px-5 py-2 text-base font-bold text-white focus:border-red-500 focus:ring-red-700 sm:w-32 dark:border-0"
                   onClick = { () => confirmButtonRef.current?.confirm() }
                   onConfirmation = { onConfirmation }
+                  onBlur = { () => confirmModalRef.current?.close() }
                >
                   Confirm
                </Button>

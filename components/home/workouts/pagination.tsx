@@ -72,6 +72,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && leftClick() }
                   className = "cursor-pointer text-xl text-primary hover:text-primary/60 focus:border-transparent focus:text-primary/60 focus:outline-0"
                   onClick = { leftClick }
+                  aria-hidden = { false }
                />
                {
                   low > 0 && (
@@ -131,6 +132,7 @@ export default function Pagination(props: PaginationProps): JSX.Element {
                   onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && rightClick() }
                   className = "cursor-pointer text-xl text-primary hover:text-primary/60 focus:border-transparent focus:text-primary/60 focus:outline-0"
                   onClick = { rightClick }
+                  aria-hidden = { false }
                />
             </div>
             <div className = "mt-4 flex flex-col items-center justify-center xsm:flex-row">

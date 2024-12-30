@@ -2,6 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faCircleNotch, faDumbbell, faPersonRunning, faStopwatch, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
 import { useCallback, useContext, useRef, useState } from "react";
 import { useDoubleTap } from "use-double-tap";
 
@@ -39,10 +40,10 @@ export default function ExerciseEntryContainer(props: ExerciseEntryContainerProp
    const editingEntryId: string = localState.exerciseId.data?.entryId;
    const displayEditEntryInputs = isEditing && exercise.id === editingExerciseId && (isNewEntry ? editingEntryId === "" : entry.id === editingEntryId);
 
-   // Prevent drag and drop mechanisms when creating or editing an exercise entry
+   // Prevent drag and drop mechanisms when creating or editing an exercise entry or when there is only one entry
    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
       id: entry?.id,
-      disabled: isNewEntry || displayEditEntryInputs
+      disabled: isNewEntry || displayEditEntryInputs || exercise.entries.length === 1
    });
 
    const style = {
@@ -261,6 +262,7 @@ export default function ExerciseEntryContainer(props: ExerciseEntryContainerProp
                      onSubmit = { async() => await updateExerciseEntry(isNewEntry ? "add" : "update") }
                      onClick = { submitExerciseEntryUpdates }
                      isSingleSubmission = { isNewEntry ? true : undefined }
+                     inputIds={ ["weight", "repetitions", "hours", "minutes", "seconds", "text"] }
                   >
                      { isNewEntry ? "Create" : "Update" }
                   </Button>
@@ -275,9 +277,13 @@ export default function ExerciseEntryContainer(props: ExerciseEntryContainerProp
                </li>
             ) : (
                !isNewEntry && (
-                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pl-8 pt-2 text-left text-[0.9rem] font-semibold xxsm:text-base">
+                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pt-2 text-left text-[0.95rem] font-semibold xxsm:text-base">
                      <div
-                        className = "cursor-grab touch-none pt-1 text-sm"
+                        className = {
+                           clsx("cursor-default touch-none pt-1 text-sm", {
+                              "cursor-grab": exercise.entries.length > 1
+                           })
+                        }
                         { ...attributes }
                         { ...listeners }
                      >

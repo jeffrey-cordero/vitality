@@ -213,7 +213,8 @@ export async function updateAttribute<T extends keyof User>(user_id: string, att
                }
             });
 
-            return sendSuccessMessage(`Updated ${attribute}`, true);
+            // True implies that the normalized attribute is updated, otherwise null implies updates to non-normalized attribute
+            return sendSuccessMessage(`Updated ${attribute}`, conflict === null ? true : null);
          }
       } else {
          // Handle basic user attributes

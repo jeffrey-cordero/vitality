@@ -30,7 +30,7 @@ function AttributeContainer(props: AttributeContainerProps): JSX.Element {
       <div className = "relative mx-auto w-full">
          <div className = "flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-between sm:gap-6">
             <div
-               className = "flex flex-col items-center justify-center gap-4 sm:flex-row"
+               className = "flex cursor-pointer flex-col items-center justify-center gap-4 sm:flex-row"
                { ...doubleTap }
             >
                <FontAwesomeIcon
@@ -98,7 +98,7 @@ export function GeneralAttribute(props: AttributeProps) {
                value: {
                   data: {
                      valid: id === "image" ? true : undefined,
-                     verified: id === "email" || id === "phone" ? updates ? false : input.data?.verified : undefined,
+                     verified: id === "email" || id === "phone" ? updates !== null ? false : input.data?.verified : undefined,
                      stored: updatingStored
                   }
                }
@@ -144,6 +144,7 @@ export function GeneralAttribute(props: AttributeProps) {
                   />
                   <Input
                      { ...props }
+                     id = { id }
                      onSubmit = { submitPasswordUpdates }
                      onBlur = { undefined }
                      autoComplete = { id }
@@ -156,6 +157,7 @@ export function GeneralAttribute(props: AttributeProps) {
                      onClick = { submitPasswordUpdates }
                      onSubmit = { submitUpdateAttribute }
                      isSingleSubmission = { isUniqueAttribute ? true : undefined }
+                     inputIds = { [id] }
                   >
                      Update
                   </Button>
@@ -312,6 +314,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                         onSubmit = { submitUpdatePassword }
                         onClick = { submitPasswordUpdates }
                         isSingleSubmission = { true }
+                        inputIds = { ["oldPassword", "newPassword", "confirmPassword"] }
                      >
                         Update
                      </Button>

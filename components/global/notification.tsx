@@ -56,8 +56,8 @@ export default function Notification(props: NotificationProps): JSX.Element {
                         clsx(
                            "flex w-full items-center rounded-lg border-l-8 bg-white pl-4 dark:bg-slate-800",
                            {
-                              "border-l-green-600": status === "Success",
-                              "border-l-red-600": status !== "Success"
+                              "border-l-green-500": status === "Success",
+                              "border-l-red-500": status !== "Success"
                            },
                         )
                      }
@@ -67,15 +67,15 @@ export default function Notification(props: NotificationProps): JSX.Element {
                            icon = { icon }
                            className = {
                               clsx("text-3xl", {
-                                 "text-green-600": status === "Success",
-                                 "text-red-600": status !== "Success"
+                                 "text-green-500": status === "Success",
+                                 "text-red-500": status !== "Success"
                               })
                            }
                         />
                      </div>
-                     <div className = "flex w-full items-center justify-between px-4 pb-3 pt-[16px]">
+                     <div className = "flex w-full items-center justify-between px-4 pb-3 pt-[20px]">
                         <div className = "relative">
-                           <div className = "my-2 flex flex-col gap-2 whitespace-pre-wrap break-words pl-1 pr-6 text-[0.95rem] font-bold xsm:text-base">
+                           <div className = "my-2 flex flex-col gap-2 whitespace-pre-wrap break-words pr-1 text-[0.95rem] font-bold xsm:text-base">
                               <p>{ message }</p>
                               { children }
                            </div>

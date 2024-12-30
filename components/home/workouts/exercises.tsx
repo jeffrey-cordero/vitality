@@ -156,6 +156,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
             onSubmit = { createExercise }
             onClick = { submitCreateExerciseUpdates }
             isSingleSubmission = { true }
+            inputIds={ ["name"] }
          >
             Create
          </Button>
@@ -195,10 +196,10 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       collapsedId
    ]);
 
-   // Prevent drag and drop mechanisms when editing an exercise name or adding a new entry
+   // Prevent drag and drop mechanisms when editing an exercise name or adding a new entry or if there is only one exercise
    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
       id: exercise.id,
-      disabled: displayEditNameInput || addEntry
+      disabled: displayEditNameInput || addEntry || workout.exercises.length === 1
    });
 
    const style = {
@@ -234,7 +235,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          }
 
          if (oldIndex !== undefined && newIndex !== undefined) {
-            // Reorder entries for the current exercise
+            // Optimistic ordering update as ordering is not critical
             const newExercise: Exercise = {
                ...exercise,
                entries: arrayMove(exercise.entries, oldIndex, newIndex).map(
@@ -242,20 +243,17 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                )
             };
 
-            const response: VitalityResponse<Exercise> = await updateExercise(
+            const newExercises: Exercise[] = [...workout.exercises].map(
+               (e) => e.id === exercise.id ? newExercise : e,
+            );
+
+            saveExercises(newExercises);
+
+            updateExercise(
                user.id,
                newExercise,
                "entries",
             );
-
-            processResponse(response, localDispatch, updateNotifications, () => {
-               // Submit changes to global state from response data
-               const newExercises: Exercise[] = [...workout.exercises].map(
-                  (e) => e.id === exercise.id ? response.body.data as Exercise : e,
-               );
-
-               saveExercises(newExercises);
-            });
          }
       }
    };
@@ -427,6 +425,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      input = { localState.name }
                      dispatch = { localDispatch }
                      onSubmit = { submitExerciseNameUpdates }
+                     autoComplete = "none"
                      autoFocus
                      scrollIntoView
                      required
@@ -438,6 +437,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      icon = { faPenNib }
                      onSubmit = { updateExerciseName }
                      onClick = { submitExerciseNameUpdates }
+                     inputIds={ ["name"] }
                   >
                      Update
                   </Button>
@@ -450,15 +450,21 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                <h1 className = "flex cursor-default flex-row flex-nowrap items-center justify-start gap-4">
                   <span>
                      <FontAwesomeIcon
-                        className = "cursor-grab touch-none pt-[2px] text-2xl focus:outline-none"
+                        className = {
+                           clsx("cursor-default touch-none pt-[2px] text-2xl focus:outline-none", {
+                              "cursor-grab": workout.exercises.length > 1,
+                              "cursor-pointer": workout.exercises.length === 1
+                           })
+                        }
                         icon = { isCollapsed ? faCaretRight : faCaretDown }
                         onClick = { () => setIsCollapsed(!isCollapsed) }
+                        aria-hidden = { false }
                         { ...attributes }
                         { ...listeners }
                      />
                   </span>
                   <span
-                     className = "cursor-pointer overflow-x-auto whitespace-nowrap text-[1.1rem] xxsm:text-xl"
+                     className = "cursor-pointer overflow-x-auto whitespace-nowrap text-[1.2rem] xxsm:text-xl"
                      { ...doubleTap }
                   >
                      { exercise.name }
@@ -545,7 +551,6 @@ interface ExercisesProps extends VitalityProps {
 
 export default function Exercises(props: ExercisesProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotifications } = useContext(NotificationContext);
    const { workout, globalState, globalDispatch } = props;
    const [localState, localDispatch] = useReducer(formReducer, form);
    const [addExercise, setAddExercise] = useState<boolean>(false);
@@ -642,7 +647,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
          }
 
          if (oldIndex !== undefined && newIndex !== undefined) {
-            // Re-order exercises for the current workout
+            // Optimistic ordering update as ordering is not critical
             const newWorkout = {
                ...workout,
                exercises: arrayMove(exercises, oldIndex, newIndex).map(
@@ -650,11 +655,8 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                )
             };
 
-            const response: VitalityResponse<Exercise[]> = await updateExercises(user.id, newWorkout);
-
-            processResponse(response, localDispatch, updateNotifications, () => {
-               saveExercises(response.body.data as Exercise[]);
-            });
+            saveExercises(newWorkout.exercises);
+            updateExercises(user.id, newWorkout);
          }
       }
    };

@@ -11,10 +11,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: IconDefinition;
   iconStyling?: string
   isSingleSubmission?: boolean;
+  inputIds?: string[];
 }
 
 const Button = forwardRef(function Button(props: ButtonProps, ref) {
-   const { children, className, icon, iconStyling, onClick, onSubmit, onConfirmation, onBlur, isSingleSubmission, ...rest } = props;
+   const { children, className, icon, iconStyling, onClick, onSubmit, onConfirmation, onBlur, isSingleSubmission, inputIds, ...rest } = props;
    const [displaySubmitted, setDisplaySubmitted] = useState<boolean>(false);
    const [displayConfirmed, setDisplayConfirmed] = useState<boolean>(false);
    const savedIconRef = useRef<SVGSVGElement>(null);
@@ -33,6 +34,11 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
       // Display the submit icon with a bouncing animation temporarily
       setDisplaySubmitted(true);
 
+      inputIds?.forEach(
+         // Disable the form inputs
+         (id: string) => (document.getElementById(id) as HTMLFormElement)?.setAttribute("disabled", "true")
+      );
+
       submitTimeOut.current = setTimeout(async() => {
          // Cancel any pending update icon removal timeout and submit response
          clearTimeout(revertTimeOut.current);
@@ -40,6 +46,11 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
          await onSubmit();
 
          revertTimeOut.current = setTimeout(() => {
+            inputIds?.forEach(
+               // Enable the form inputs
+               (id: string) => (document.getElementById(id) as HTMLFormElement)?.removeAttribute("disabled")
+            );
+
             setDisplaySubmitted(false);
             onBlur?.call(null);
          });
@@ -47,6 +58,7 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
    }, [
       onBlur,
       onSubmit,
+      inputIds,
       isSingleSubmission
    ]);
 

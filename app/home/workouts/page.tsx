@@ -38,11 +38,11 @@ const form: VitalityState = {
       error: null,
       handlesChanges: true,
       data: {
-         options: [],
-         selected: [],
-         filtered: [],
-         dictionary: {},
-         fetched: false
+         options: [], // Options post-filtering of selected tags
+         selected: [], // Selected tags
+         filtered: [], // Cached tag filtering
+         dictionary: {}, // Tag dictionary
+         fetched: false // Fetched tags
       }
    },
    workouts: {
@@ -50,11 +50,11 @@ const form: VitalityState = {
       value: [],
       error: null,
       data: {
-         selected: new Set<Workout>(),
-         appliedDateFiltering: false,
-         appliedTagsFiltering: false,
-         filtered: [],
-         fetched: false
+         selected: new Set<Workout>(), // Selected workouts
+         appliedDateFiltering: false, // Applied date filtering
+         appliedTagsFiltering: false, // Applied tags filtering
+         filtered: [], // Visible workouts post-filtering
+         fetched: false // Fetched workouts
       }
    },
    workout: {

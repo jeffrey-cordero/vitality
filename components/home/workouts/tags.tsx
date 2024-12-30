@@ -64,7 +64,7 @@ function CreateTag(props: CreateTagProps) {
          onClick = { onSubmit }
          onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && onSubmit() }
       >
-         <p className = "mx-auto line-clamp-1 max-w-full cursor-pointer text-ellipsis break-all text-center">{ search }</p>
+         <p className = "mx-auto line-clamp-1 max-w-full cursor-pointer text-ellipsis break-all text-center text-[0.8rem] xxsm:text-[0.85rem]">{ search }</p>
          <FontAwesomeIcon icon = { faTags } />
       </div>
    );
@@ -103,7 +103,7 @@ function TagColorSelection(props: VitalityChildProps) {
                         clsx(
                            "flex h-[2.7rem] w-full cursor-pointer items-center justify-center rounded-lg border-2 p-1 text-center text-sm text-white transition duration-300 ease-in-out focus:border-0 xxsm:text-sm",
                            {
-                              "scale-[1.07] border-gray-700 dark:border-gray-600": localState.tagColor.value === color,
+                              "scale-[1.07] border-gray-200 dark:border-slate-700": localState.tagColor.value === color,
                               "border-white dark:border-slate-800": localState.tagColor.value !== color
                            },
                         )
@@ -219,12 +219,12 @@ function EditTag(props: EditTagProps): JSX.Element {
 
    return (
       <div className = "flex flex-col items-stretch justify-center gap-3 text-center text-black dark:text-white">
-         <div className = "flex flex-col items-center justify-center gap-3 text-center">
+         <div className = "flex flex-col items-center justify-center gap-2 text-center">
             <FontAwesomeIcon
-               icon = { faTag }
-               className = "mt-6 text-5xl text-primary"
+               icon = { faTags }
+               className = "mt-6 text-[2.6rem] text-primary xxsm:text-[2.7rem]"
             />
-            <h1 className = "mb-2 px-2 text-2xl font-bold">
+            <h1 className = "text-[1.5rem] font-bold xxsm:text-[1.6rem]">
                Edit Tag
             </h1>
          </div>
@@ -251,11 +251,12 @@ function EditTag(props: EditTagProps): JSX.Element {
                icon = { faPenToSquare }
                onSubmit = { () => updateTag("update") }
                onClick = { submitTagUpdates }
+               inputIds={ ["tagTitle"]}
             >
                Update
             </Button>
             <Confirmation
-               message = "Delete this tag?"
+               message = "Delete workout tag?"
                onConfirmation = { async() => await updateTag("delete") }
             />
          </div>
@@ -320,7 +321,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
       <li
          className = {
             clsx(
-               "relative m-[0.4rem] rounded-full px-5 py-[0.6rem] text-[0.75rem] font-bold text-white xxsm:text-[0.8rem]",
+               "relative m-[0.4rem] rounded-full px-5 py-[0.6rem] text-[0.8rem] font-bold text-white xxsm:text-[0.85rem]",
             )
          }
          style = {
@@ -347,7 +348,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                         <FontAwesomeIcon
                            icon = { faGears }
                            onClick = { editTag }
-                           className = "cursor-pointer pt-1 text-sm hover:text-gray-400"
+                           className = "cursor-pointer pt-1 text-sm hover:text-gray-300"
                         />
                      }
                      className = "mt-12 max-h-[90%] max-w-[95%] sm:max-w-xl"

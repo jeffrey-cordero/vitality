@@ -145,13 +145,15 @@ describe("Settings Tests", () => {
             value: any,
             attributeUpdates: boolean,
             verificationUpdates: boolean,
-            isNormalized: boolean
+            isNormalized: boolean,
+            normalizedUpdates?: boolean
          ) => {
             // Helper method to verify that a user attribute changes and if verification status changes
             expect(await updateAttribute(root.id, attribute as any, value)).toEqual({
                status: "Success",
                body: {
-                  data: attributeUpdates,
+                  // For normalized values, data should be true if verification status changes, false if no changes, and null otherwise
+                  data: isNormalized ? normalizedUpdates : attributeUpdates,
                   message: attributeUpdates ? `Updated ${attribute}` : `No updates for ${attribute}`,
                   errors: {}
                }
@@ -173,8 +175,8 @@ describe("Settings Tests", () => {
                }
             } as any);
          };
-         
-         // verifyAttributeUpdates(attribute, value, expects updates, expects verification changes, requires normalization)
+
+         // verifyAttributeUpdates(attribute, value, expects updates, expects verification changes, requires normalization, expects normalized updates?)
 
          // Update general attributes (new value, same value)
          verifyAttributeUpdates("image", "/settings/one.png", true, false, false);
@@ -187,17 +189,17 @@ describe("Settings Tests", () => {
          verifyAttributeUpdates("name", root.name, false, false, false);
 
          // Update attributes requiring normalization (same value, new non-normalized value, new value)
-         verifyAttributeUpdates("username", root.username, false, false, true);
-         verifyAttributeUpdates("username", root.username.toUpperCase(), true, false, true);
-         verifyAttributeUpdates("username", "new-username", true, false, true);
+         verifyAttributeUpdates("username", root.username, false, false, true, false);
+         verifyAttributeUpdates("username", root.username.toUpperCase(), true, false, true, null);
+         verifyAttributeUpdates("username", "new-username", true, false, true, true);
 
-         verifyAttributeUpdates("email", root.email, false, false, true);
-         verifyAttributeUpdates("email", root.email.toUpperCase(), true, false, true);
-         verifyAttributeUpdates("email", "new-email@gmail.com", true, true, true);
+         verifyAttributeUpdates("email", root.email, false, false, true, false);
+         verifyAttributeUpdates("email", root.email.toUpperCase(), true, false, true, null);
+         verifyAttributeUpdates("email", "new-email@gmail.com", true, true, true, true);
 
-         verifyAttributeUpdates("phone", root.phone, false, false, true);
-         verifyAttributeUpdates("phone", root.phone.startsWith("1") ? root.phone.substring(1) : "1" + root.phone, true, false, true);
-         verifyAttributeUpdates("phone", "9145550004", true, true, true);
+         verifyAttributeUpdates("phone", root.phone, false, false, true, false);
+         verifyAttributeUpdates("phone", root.phone.startsWith("1") ? root.phone.substring(1) : "1" + root.phone, true, false, true, null);
+         verifyAttributeUpdates("phone", "9145550004", true, true, true, true);
       });
    });
 

@@ -2,7 +2,7 @@ import { faCameraRetro, faImages, faPaperclip, faPenToSquare, faTrashCan } from 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import Image from "next/image";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import Button from "@/components/global/button";
 import Error from "@/components/global/error";
@@ -18,10 +18,36 @@ interface FormProps extends ImageFormProps, VitalityInputProps {
    onSubmit?: () => Promise<void>;
 }
 
+const workoutImages: string[] = [
+   "bike.png",
+   "cardio.png",
+   "default.png",
+   "hike.png",
+   "legs.png",
+   "lift.png",
+   "machine.png",
+   "run.png",
+   "swim.png",
+   "weights.png"
+];
+
+const avatarImages: string[] = [
+   "one.png",
+   "two.png",
+   "three.png",
+   "four.png",
+   "five.png",
+   "six.png",
+   "seven.png",
+   "eight.png",
+   "nine.png",
+   "ten.png"
+];
+
 function Form(props: FormProps): JSX.Element {
-   const { page, images, url, isValidURL, isValidResource, input, dispatch, onSubmit } = props;
+   const { page, url, isValidURL, isValidResource, input, dispatch, onSubmit } = props;
    const [isDefaultImage, setIsDefaultImage] = useState<boolean>(
-      url === "" || page === "workouts" ? workoutImagesRegex.test(url) : avatarImagesRegex.test(url)
+      (url === "") || (page === "workouts" ? workoutImagesRegex.test(url) : avatarImagesRegex.test(url))
    );
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
@@ -39,6 +65,8 @@ function Form(props: FormProps): JSX.Element {
             }
          }
       });
+
+      document.getElementById(source)?.scrollIntoView({ behavior: "smooth", block: "center" });
    }, [dispatch]);
 
    const verifyImageURLInput = useCallback(() => {
@@ -106,6 +134,11 @@ function Form(props: FormProps): JSX.Element {
       });
    };
 
+   useEffect(() => {
+      // Scroll to the selected default image
+      isDefaultImage && document.getElementById(url)?.scrollIntoView({ behavior: "smooth", block: "center" });
+   });
+
    return (
       <div className = "flex flex-col py-2">
          <div className = "mb-4 mt-2 flex flex-wrap items-center justify-center gap-3 text-center text-base">
@@ -136,10 +169,10 @@ function Form(props: FormProps): JSX.Element {
             isDefaultImage ? (
                <div
                   tabIndex = { 0 }
-                  className = "relative flex flex-wrap items-center justify-center gap-8 py-4"
+                  className = "relative flex flex-wrap items-center justify-center gap-5 py-4 xxsm:gap-6"
                >
                   {
-                     images.map((image) => {
+                     (page === "workouts" ? workoutImages : avatarImages).map((image) => {
                         // Default images are provided for the workouts and settings pages respectively
                         const source: string = `/${page}/${image}`;
                         const isSelected: boolean = url === source;
@@ -147,7 +180,7 @@ function Form(props: FormProps): JSX.Element {
                         return (
                            <div
                               id = { source }
-                              className = "relative size-36 xxsm:size-48 xsm:size-64 sm:size-48"
+                              className = "relative size-32 min-[275px]:size-40 xxsm:size-44 min-[425px]:size-72 sm:size-48"
                               key = { source }
                            >
                               <Image
@@ -179,7 +212,7 @@ function Form(props: FormProps): JSX.Element {
                   {
                      isValidResource && isValidURL && (
                         <div className = "my-6 flex items-center justify-center">
-                           <div className = "relative size-36 xxsm:size-48 xsm:size-64">
+                           <div className = "relative size-32 min-[275px]:size-40 xxsm:size-44 min-[425px]:size-72">
                               <Image
                                  fill
                                  priority
@@ -250,6 +283,8 @@ function Form(props: FormProps): JSX.Element {
                   icon = { faImages }
                   onClick = { () => updateButtonRef.current?.submit() }
                   onSubmit = { onSubmit }
+                  isSingleSubmission = { true }
+                  inputIds = { [ "image" ] }
                >
                   Update
                </Button>
@@ -261,7 +296,6 @@ function Form(props: FormProps): JSX.Element {
 
 interface ImageFormProps extends VitalityInputProps {
    page: "workouts" | "settings";
-   images: string[];
    display?: React.ReactNode
    onSubmit?: () => Promise<void>
 }
@@ -284,6 +318,7 @@ export default function ImageForm(props: ImageFormProps): JSX.Element {
                display ?? (
                   <div className = "relative">
                      <Button
+                        id = "image-form-button"
                         className = {
                            clsx(
                               "h-[2.6rem] w-full border-[1.5px] px-4 py-2 text-sm font-semibold placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 xxsm:text-base dark:border-0 dark:bg-gray-700/50",

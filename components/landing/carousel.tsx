@@ -40,7 +40,7 @@ export default function Carousel(props: CarouselProps): JSX.Element {
                      key = { index }
                      className = {
                         clsx(
-                           "flex shrink-0 items-center justify-center rounded-2xl p-4",
+                           "flex shrink-0 items-center justify-center rounded-2xl p-2",
                            {
                               "opacity-100": index === currentIndex,
                               "opacity-15": index !== currentIndex

@@ -1,4 +1,4 @@
-import { faArrowLeft, faArrowRight, faArrowsUpDown, faBan, faCalendar, faMagnifyingGlass, faTag, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faArrowRight, faArrowsUpDown, faBan, faCalendar, faMagnifyingGlass, faTag, faTags, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useMemo, useRef } from "react";
 
@@ -238,17 +238,21 @@ function DateFilter(props: VitalityProps): JSX.Element {
                   icon = { faCalendar }
                   className = "text-base"
                />
-               Filter by Date
+               Date Filter
             </Button>
          }
          className = "max-w-xl"
       >
-         <div className = "flex flex-col items-stretch justify-center gap-2 text-center">
-            <FontAwesomeIcon
-               icon = { faCalendar }
-               className = "mt-6 text-3xl text-primary xxsm:text-4xl"
-            />
-            <h1 className = "text-xl font-bold xxsm:mb-2 xxsm:text-2xl">Filter by Date</h1>
+         <div className = "flex flex-col items-stretch justify-center text-center">
+            <div className = "flex flex-col items-center justify-center gap-2 text-center">
+               <FontAwesomeIcon
+                  icon = { faCalendar }
+                  className = "mt-6 text-[2.6rem] text-primary xxsm:text-[2.7rem]"
+               />
+               <h1 className = "text-[1.5rem] font-bold xxsm:text-[1.6rem]">
+                  Filter by Date
+               </h1>
+            </div>
             <div className = "relative mt-8">
                <FontAwesomeIcon
                   icon = { faBan }
@@ -436,17 +440,21 @@ function TagsFilter(props: VitalityProps): JSX.Element {
                   icon = { faTag }
                   className = "text-base text-white"
                />
-               Filter by Tags
+               Tags Filter
             </Button>
          }
          className = "max-w-xl"
       >
-         <div className = "flex flex-col items-stretch justify-center gap-2 text-center">
-            <FontAwesomeIcon
-               icon = { faTag }
-               className = "mt-6 text-3xl text-primary xxsm:text-4xl"
-            />
-            <h1 className = "text-xl font-bold xxsm:mb-2 xxsm:text-2xl">Filter by Tags</h1>
+         <div className = "flex flex-col items-stretch justify-center text-center">
+            <div className = "flex flex-col items-center justify-center gap-2 text-center">
+               <FontAwesomeIcon
+                  icon = { faTags }
+                  className = "mt-6 text-[2.6rem] text-primary xxsm:text-[2.7rem]"
+               />
+               <h1 className = "text-[1.5rem] font-bold xxsm:text-[1.6rem]">
+                  Filter by Tags
+               </h1>
+            </div>
             <div className = "relative">
                <div className = "mx-auto my-2 w-full">
                   <TagsForm
@@ -479,7 +487,7 @@ export default function Filtering(props: VitalityProps): JSX.Element {
             title = "Workouts"
             message = "Create a new workout and let's make today count!"
          />
-         <div className = "mx-auto my-4 flex w-full max-w-[35rem] flex-col gap-2 px-2 sm:w-11/12">
+         <div className = "mx-auto my-4 flex w-full max-w-[35rem] flex-col gap-2 px-2 min-[550px]:w-11/12">
             <Input
                id = "search"
                type = "text"

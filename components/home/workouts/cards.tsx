@@ -34,7 +34,7 @@ function Card(props: CardProps): JSX.Element {
          return (
             tag !== undefined && (
                <div
-                  className = "m-1 max-w-full truncate rounded-full px-4 py-[0.45rem] text-[0.73rem] font-bold text-white"
+                  className = "m-[0.2rem] max-w-full truncate rounded-full px-4 py-[0.45rem] text-[0.73rem] font-bold text-white"
                   style = {
                      {
                         backgroundColor: tag.color
@@ -71,7 +71,7 @@ function Card(props: CardProps): JSX.Element {
                });
             }
          }
-         className = "relative mx-0 flex h-[26rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-105 focus:scale-105 md:h-[23rem] md:w-72"
+         className = "relative mx-0 flex h-[26rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-[1.03] focus:scale-[1.03] md:h-[23rem] md:w-72"
       >
          <div className = "relative mx-auto size-full">
             {
@@ -98,15 +98,15 @@ function Card(props: CardProps): JSX.Element {
             }
             <div className = "relative flex size-full flex-col items-center justify-start overflow-hidden py-4 text-center text-black">
                <div className = "relative mx-auto my-2 w-full">
-                  <h2 className = "max-w-full truncate break-words px-8 text-[1.4rem] font-extrabold md:text-[1.3rem]">
+                  <h2 className = "max-w-full truncate break-words px-8 text-[1.35rem] font-extrabold md:text-[1.3rem]">
                      { workout.title }
                   </h2>
-                  <p className = "translate-y-[-2px] text-base font-extrabold md:text-[0.9rem]">{ date }</p>
+                  <p className = "translate-y-[-2px] text-[0.95rem] font-extrabold md:text-[0.9rem]">{ date }</p>
                </div>
                <div
                   className = {
                      clsx(
-                        "scrollbar-hide mb-2 flex max-h-80 w-full max-w-[25rem] flex-row flex-wrap items-center justify-center gap-y-1 overflow-auto px-4 md:max-h-64",
+                        "scrollbar-hide mb-2 flex max-h-72 w-full max-w-[25rem] flex-row flex-wrap items-center justify-center gap-y-1 overflow-auto px-4 md:max-h-64",
                         {
                            "cursor-all-scroll": workoutTags.length > 0
                         },

@@ -127,7 +127,7 @@ describe("Authentication Tests", () => {
             status: "Success",
             body: {
                data: null,
-               message: "Successfully registered",
+               message: "Account created successfully!",
                errors: {}
             }
          });

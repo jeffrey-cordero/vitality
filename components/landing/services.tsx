@@ -20,15 +20,15 @@ function Service(props: ServiceProps): JSX.Element {
             cx(
                background,
                color,
-               "flex flex-col items-center justify-center gap-3 size-full h-[11rem] max-w-full mx-auto xsm:max-w-none xsm:size-[10rem] text-center rounded-2xl shadow-md",
+               "flex flex-col items-center justify-center gap-3 max-w-full mx-auto xsm:max-w-none size-[8rem] xsm:size-[9rem] text-center rounded-2xl shadow-md",
             )
          }
       >
          <FontAwesomeIcon
             icon = { icon }
-            className = { cx(color, "text-[2.3rem] xxsm:text-[2.5rem] xsm:text-4xl") }
+            className = { cx(color, "text-[1.9rem] xsm:text-4xl") }
          />
-         <h1 className = "text-[1.3rem] font-bold xxsm:text-[1.5rem] xsm:text-xl">{ title }</h1>
+         <h1 className = "text-[1.2rem] font-bold xsm:text-xl">{ title }</h1>
       </div>
    );
 }
@@ -40,7 +40,7 @@ export default function Services(): JSX.Element {
             title = "Our Services"
             message = "Driven by innovation, we continually explore new ways to elevate your wellness journey"
          />
-         <div className = "container relative mx-auto my-8 grid grid-cols-1 content-center justify-center gap-x-0 gap-y-8 px-2 xsm:grid-cols-2 xsm:gap-y-10 xsm:px-0 md:my-12 md:gap-x-[225px] lg:gap-x-0 xl:grid-cols-3">
+         <div className = "container relative mx-auto my-8 grid grid-cols-1 content-center justify-center gap-x-6 gap-y-8 px-2 min-[325px]:grid-cols-2 xsm:gap-x-0 xsm:gap-y-10 xsm:px-0 md:my-12 md:gap-x-[225px] lg:gap-x-0 xl:grid-cols-3">
             <Service
                background = "bg-white dark:bg-slate-800"
                color = "text-primary"
@@ -54,7 +54,7 @@ export default function Services(): JSX.Element {
                title = "Nutrition"
             />
             <Service
-               background = "bg-white dark:bg-slate-800 xsm:row-start-2 xsm:col-start-2 xl:row-start-1 xl:col-start-3"
+               background = "bg-white dark:bg-slate-800 min-[325px]:row-start-2 min-[325px]:col-start-2 xl:row-start-1 xl:col-start-3"
                color = "text-primary"
                icon = { faWeightScale }
                title = "Weight"

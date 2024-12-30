@@ -120,7 +120,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <html
          lang = "en"
          className = { `m-0 w-full overflow-x-hidden p-0 ${theme === "dark" && "dark"}` }
-         suppressHydrationWarning = { true }
       >
          <head>
             <title>Vitality</title>
@@ -158,6 +157,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   "box-border m-0 p-0 overflow-x-hidden max-w-screen min-h-screen bg-gradient-to-r from-indigo-50 via-white to-indigo-50 dark:from-slate-900 dark:via-gray-900 dark:to-slate-900 text-black dark:text-white"
                )
             }
+            suppressHydrationWarning = { true }
          >
             {
                fetched && (

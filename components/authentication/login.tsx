@@ -55,7 +55,7 @@ export default function Login(): JSX.Element {
             title = "Log In"
             message = "Enter valid credentials to enter"
          />
-         <div className = "mx-auto mt-12 w-11/12 sm:w-3/4 xl:w-5/12">
+         <div className = "mx-auto mt-12 w-11/12 sm:w-3/4 lg:w-7/12 2xl:w-5/12">
             <form className = "relative flex w-full flex-col items-stretch justify-center gap-3">
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
@@ -100,6 +100,7 @@ export default function Login(): JSX.Element {
                   onSubmit = { authenticate }
                   onClick = { submitAuthentication }
                   isSingleSubmission = { true }
+                  inputIds = { ["username", "password"] }
                >
                   Log In
                </Button>

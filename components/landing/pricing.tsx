@@ -17,23 +17,25 @@ function Price(props: PriceProps) {
 
    return (
       <div className = "mx-auto grid w-full max-w-lg grid-cols-1 items-center gap-y-6 px-8 py-10 text-left xxsm:py-4 xsm:px-12">
-         <h3 className = "text-[1.2rem]/7 font-bold text-primary">
-            { type }
-         </h3>
-         <p className = "flex items-baseline gap-x-2">
-            <span className = "text-4xl font-semibold tracking-tight text-gray-900 xsm:text-[2.7rem] dark:text-white">
-               { price }
-            </span>
-            <span className = "text-base font-medium text-gray-500 dark:text-gray-400">
-               / month
-            </span>
-         </p>
-         <ul className = "space-y-3 text-sm/7 font-medium text-gray-500 dark:text-gray-400">
+         <div className = "relative flex flex-col items-start justify-start gap-y-3">
+            <h3 className = "text-[1.2rem]/7 font-bold text-primary">
+               { type }
+            </h3>
+            <p className = "flex items-baseline gap-x-2">
+               <span className = "text-4xl font-semibold tracking-tight text-gray-900 xsm:text-[2.4rem] dark:text-white">
+                  { price }
+               </span>
+               <span className = "text-base font-medium text-gray-500 dark:text-gray-400">
+                  / month
+               </span>
+            </p>
+         </div>
+         <ul className = "space-y-3 text-[0.95rem]/7 font-medium text-gray-500 sm:text-[0.9rem]/7 dark:text-gray-400">
             {
                bullets.map((bullet: string) => {
                   return (
                      <li
-                        className = "flex gap-x-3"
+                        className = "flex items-center justify-start gap-x-3"
                         key = { bullet }
                      >
                         <svg
@@ -77,7 +79,7 @@ export default function Pricing(): JSX.Element {
             message = "Select a plan that best suits your needs and goals"
          />
          <Cards
-            className = "min-h-[29rem]"
+            className = "min-h-[28rem]"
          >
             {
                [

@@ -81,7 +81,7 @@ export async function signup(registration: Registration): Promise<VitalityRespon
             }
          });
 
-         return sendSuccessMessage("Successfully registered", null);
+         return sendSuccessMessage("Account created successfully!", null);
       } else {
          // Account for taken username, email, and/or phone constraints
          const errors = {};
