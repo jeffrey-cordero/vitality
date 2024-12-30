@@ -14,7 +14,7 @@ export const simulateDatabaseError = async(
       status: "Failure",
       body: {
          data: null,
-         message: "Something went wrong. Please try again.",
+         message: "Oops! Something went wrong. Try again later.",
          errors: {
             system: ["Database Error"]
          }

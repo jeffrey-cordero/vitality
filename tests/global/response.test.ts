@@ -92,13 +92,13 @@ describe("Response Tests", () => {
             status: "Failure",
             body: {
                data: null,
-               message: "Something went wrong. Please try again.",
+               message: "Oops! Something went wrong. Try again later.",
                errors: { system: ["Database connection error"] }
             }
          });
          expect(updateNotifications).toHaveBeenCalledWith({
             status: "Failure",
-            message: "Something went wrong. Please try again."
+            message: "Oops! Something went wrong. Try again later."
          });
          expect(console.error).toHaveBeenCalledWith(error);
          expect(dispatch).not.toHaveBeenCalled();

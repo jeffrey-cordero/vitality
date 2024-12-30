@@ -2,91 +2,95 @@
 
 Your all-in-one modern fitness tracker for progress and performance to fuel your fitness goals. Feel free to use any of the related code for your own projects! The application can be accessed [http://localhost/](http://localhost/) after setting up development environment. Note that this project is a work in progress.
 
+## User Guide
+
 ## Development
 
-To install all node module dependencies
+**Install Dependencies:**
 
 ```bash
 npm install
 ```
 
-To start development processes
-
-``` bash
-docker compose up 
-```
-
-To pause development processes
+**Create Project Build:**
 
 ```bash
+npm run build
+```
 
+**Start Development:**
+
+```bash
+docker compose up
+```
+
+**Pause Development:**
+
+```bash
 docker compose stop
 ```
 
-To restart restart development by clearing all associated application containers, networks, and volumes
+**Restart Development (Clear Containers, Networks, Volumes):**
 
 ```bash
-docker compose down -v --remove-orphans 
+docker compose down -v --remove-orphans
 ```
 
 ### Logs
 
-View logs for all service containers in realtime
+**View Real-time Logs for All Containers:**
 
 ```bash
 docker compose logs -f
 ```
 
-View most recent logs for all service containers
+**View Recent Logs for All Containers:**
 
 ```bash
-docker compose logs 
+docker compose logs
 ```
 
-View most recent logs for specific service containers
+**View Recent Logs for Specific Container:**
 
 ```bash
-docker logs <container-name> 
+docker logs <container-name>
 ```
 
 ## Database
 
-Access database through the docker container
+**Access Database via Docker Container:**
 
-``` bash
+```bash
 docker exec -it vitality_postgres psql -U postgres -d vitality
 ```
 
-Access database through the Prisma ORM
+**Access Database via Prisma ORM:**
 
-``` bash
+```bash
 docker exec -it vitality_app npx prisma studio
 ```
 
-Make changes to the default database schema in a development environment through the following steps
+**Make Schema Changes (Development):**
 
-- Make changes in the starter file `tests/init.sql`
-- Run the following command to apply the changes
+- Edit `tests/init.sql`
+- Apply changes to Prisma ORM:
 
 ```bash
 docker exec -it vitality_app npx prisma db pull
-docker exec -it vitality_app npx prisma db push
 ```
 
-Use Prisma ORM to efficiently make migrations while preserving sensitive user information through the following steps
+**Apply Migrations with Prisma ORM:**
 
-- Add the proposed changes to the model located at `prisma/schema.prisma`
-- Run the following command to apply the changes
+- Modify the model in `prisma/schema.prisma`
+- Apply migrations with:
 
-``` bash
+```bash
 docker exec -it vitality_app npx prisma migrate dev --name <migration-name>
 ```
 
 ## Testing
 
-### Jest
-
-Run unit tests
+**Run Unit Tests:**
 
 ```bash
 npm run tests
@@ -94,8 +98,8 @@ npm run tests
 
 ## Linting
 
-View current potential linting errors / warnings based on `.eslintrc.json` specifications
+**Fix Linting Errors:**
 
 ```bash
-npx eslint . --fix
+npm run lint
 ```

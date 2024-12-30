@@ -148,7 +148,7 @@ describe("Workout Tags Tests", () => {
                body: {
                   data: null,
                   message: method === "create" ?
-                     "Something went wrong. Please try again." : "Workout tag does not exist based on user and/or tag ID",
+                     "Oops! Something went wrong. Try again later." : "Workout tag does not exist based on user and/or tag ID",
                   errors: method === "create" ?
                      { system: ["Foreign key constraint violated"] } : {}
                }

@@ -89,7 +89,7 @@ describe("Workouts Tests", () => {
                body: {
                   data: null,
                   message: method === "create" ?
-                     "Something went wrong. Please try again." : "Workout does not exist based on user and/or workout ID",
+                     "Oops! Something went wrong. Try again later." : "Workout does not exist based on user and/or workout ID",
                   errors: method === "create" ?
                      { system: ["Foreign key constraint violated"] } : {}
                }
@@ -534,7 +534,7 @@ describe("Workouts Tests", () => {
             status: "Failure",
             body: {
                data: null,
-               message: "Something went wrong. Please try again.",
+               message: "Oops! Something went wrong. Try again later.",
                errors: {
                   system: [
                      "Foreign key constraint violated"

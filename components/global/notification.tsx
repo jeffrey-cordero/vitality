@@ -1,5 +1,5 @@
 "use client";
-import { faCircleCheck, faTriangleExclamation, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faBomb, faCircleCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import { useContext, useRef } from "react";
@@ -16,7 +16,7 @@ export interface NotificationProps extends React.HTMLAttributes<any> {
 export default function Notification(props: NotificationProps): JSX.Element {
    const { updateNotifications } = useContext(NotificationContext);
    const { status, message, children, timer } = props;
-   const icon = status === "Success" ? faCircleCheck : faTriangleExclamation;
+   const icon = status === "Success" ? faCircleCheck : faBomb;
    const notificationRef = useRef<HTMLDivElement>(null);
 
    const removeNotification = () => {
@@ -62,7 +62,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
                         )
                      }
                   >
-                     <div className = "flex min-h-8 w-full items-center justify-start gap-4 px-4 pb-3 pt-[20px]">
+                     <div className = "flex min-h-8 w-full items-center justify-start gap-4 p-4">
                         <div className = "flex items-center justify-center rounded-full">
                            <FontAwesomeIcon
                               icon = { icon }
@@ -83,7 +83,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      </div>
                   </div>
                </div>
-               <div className = "absolute right-[-3px] top-[-8px] z-50 rounded-e-md p-3.5">
+               <div className = "absolute right-[-5px] top-[-10px] z-50 rounded-e-md p-3.5">
                   <FontAwesomeIcon
                      icon = { faXmark }
                      className = "cursor-pointer text-lg font-bold text-red-500"

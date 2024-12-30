@@ -76,7 +76,7 @@ describe("Settings Tests", () => {
             status: "Failure",
             body: {
                data: null,
-               message: "Something went wrong. Please try again.",
+               message: "Oops! Something went wrong. Try again later.",
                errors: {
                   system: ["Updating user attribute must be valid"]
                }
