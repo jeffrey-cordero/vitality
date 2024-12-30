@@ -11,7 +11,7 @@ export default function Footer(): JSX.Element {
                   <li>
                      <Link
                         className = "hover:text-slate-500"
-                        href = "http://localhost/#"
+                        href = "http://localhost:3000/#"
                      >
                         About
                      </Link>
@@ -19,7 +19,7 @@ export default function Footer(): JSX.Element {
                   <li>
                      <Link
                         className = "hover:text-slate-500"
-                        href = "http://localhost/#"
+                        href = "http://localhost:3000/#"
                      >
                         Privacy
                      </Link>
@@ -27,7 +27,7 @@ export default function Footer(): JSX.Element {
                   <li>
                      <Link
                         className = "hover:text-slate-500"
-                        href = "http://localhost/#"
+                        href = "http://localhost:3000/#"
                      >
                         Policy
                      </Link>
@@ -35,7 +35,7 @@ export default function Footer(): JSX.Element {
                   <li>
                      <Link
                         className = "hover:text-slate-500"
-                        href = "http://localhost/#"
+                        href = "http://localhost:3000/#"
                      >
                         Contact
                      </Link>
