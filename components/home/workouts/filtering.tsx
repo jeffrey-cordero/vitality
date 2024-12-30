@@ -311,6 +311,7 @@ function DateFilter(props: VitalityProps): JSX.Element {
                   icon = { faMagnifyingGlass }
                   onSubmit = { applyDateFilter }
                   onClick = { applyDateFilterUpdates }
+                  inputIds = { ["minDate", "maxDate", "dateFilter"] }
                >
                   Apply
                </Button>
@@ -468,6 +469,7 @@ function TagsFilter(props: VitalityProps): JSX.Element {
                      icon = { faMagnifyingGlass }
                      onSubmit = { applyTagsFilter }
                      onClick = { applyTagsFilterUpdates }
+                     inputIds = { ["tagSearch"    ] }
                   >
                      Apply
                   </Button>

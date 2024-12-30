@@ -156,7 +156,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
             onSubmit = { createExercise }
             onClick = { submitCreateExerciseUpdates }
             isSingleSubmission = { true }
-            inputIds={ ["name"] }
+            inputIds = { ["name"] }
          >
             Create
          </Button>
@@ -437,7 +437,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      icon = { faPenNib }
                      onSubmit = { updateExerciseName }
                      onClick = { submitExerciseNameUpdates }
-                     inputIds={ ["name"] }
+                     inputIds = { ["name"] }
                   >
                      Update
                   </Button>

@@ -36,7 +36,7 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
 
       inputIds?.forEach(
          // Disable the form inputs
-         (id: string) => (document.getElementById(id) as HTMLFormElement)?.setAttribute("disabled", "true")
+         (id: string) => (document.getElementById(id) as HTMLFormElement | HTMLDivElement)?.setAttribute("disabled", "true")
       );
 
       submitTimeOut.current = setTimeout(async() => {
@@ -48,7 +48,7 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
          revertTimeOut.current = setTimeout(() => {
             inputIds?.forEach(
                // Enable the form inputs
-               (id: string) => (document.getElementById(id) as HTMLFormElement)?.removeAttribute("disabled")
+               (id: string) => (document.getElementById(id) as HTMLFormElement | HTMLDivElement)?.removeAttribute("disabled")
             );
 
             setDisplaySubmitted(false);

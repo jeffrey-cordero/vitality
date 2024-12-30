@@ -321,7 +321,7 @@ export default function ImageForm(props: ImageFormProps): JSX.Element {
                         id = "image-form-button"
                         className = {
                            clsx(
-                              "h-[2.6rem] w-full border-[1.5px] px-4 py-2 text-sm font-semibold placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 xxsm:text-base dark:border-0 dark:bg-gray-700/50",
+                              "h-[2.6rem] w-full border-[1.5px] px-4 py-2 text-sm font-semibold placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 xxsm:text-base dark:border-0 dark:bg-gray-700/50",
                               {
                                  "border-[2px] dark:border-[2px] border-red-500 text-red-500": input.error
                               },

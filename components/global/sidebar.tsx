@@ -1,6 +1,6 @@
 "use client";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faAnglesRight, faBars, faDoorOpen, faDumbbell, faGears, faHome, faMoon, faPlaneArrival, faRightFromBracket, faSun, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { faAnglesRight, faBars, faComments, faDoorOpen, faDumbbell, faGears, faHome, faMoon, faPlaneArrival, faRightFromBracket, faSun, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import Link from "next/link";
@@ -26,6 +26,7 @@ const landingLinks: SideBarProps[] = [
 const homeLinks: SideBarProps[] = [
    { name: "Home", href: "/home", icon: faHome },
    { name: "Workouts", href: "/home/workouts", icon: faDumbbell },
+   { name: "Feedback", href: "/home/feedback", icon: faComments },
    { name: "Settings", href: "/home/settings", icon: faGears },
    { name: "Theme", href: "\0", icon: null },
    { name: "Sign Out", href: "\0", icon: faRightFromBracket }

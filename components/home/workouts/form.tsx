@@ -374,7 +374,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      onSubmit = { () => updateWorkoutState(isNewWorkout ? "add" : "update") }
                      onClick = { submitWorkoutUpdates }
                      isSingleSubmission = { isNewWorkout ? true : undefined }
-                     inputIds={ ["title", "date", "tagSearch", "image-form-button", "image", "description"] }
+                     inputIds = { ["title", "date", "tagSearch", "image-form-button", "image", "description"] }
                   >
                      { isNewWorkout ? "Create" : "Update" }
                   </Button>

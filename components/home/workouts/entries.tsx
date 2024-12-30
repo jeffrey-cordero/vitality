@@ -262,7 +262,7 @@ export default function ExerciseEntryContainer(props: ExerciseEntryContainerProp
                      onSubmit = { async() => await updateExerciseEntry(isNewEntry ? "add" : "update") }
                      onClick = { submitExerciseEntryUpdates }
                      isSingleSubmission = { isNewEntry ? true : undefined }
-                     inputIds={ ["weight", "repetitions", "hours", "minutes", "seconds", "text"] }
+                     inputIds = { ["weight", "repetitions", "hours", "minutes", "seconds", "text"] }
                   >
                      { isNewEntry ? "Create" : "Update" }
                   </Button>

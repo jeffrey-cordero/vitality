@@ -78,6 +78,10 @@ function TagColorSelection(props: VitalityChildProps) {
    }, []);
 
    const updateColor = useCallback((color: string) => {
+      // Disable tag color selection if tag search or title is disabled
+      if (document.getElementById("tagSearch")?.hasAttribute("disabled")
+            || document.getElementById("tagTitle").hasAttribute("disabled")) return;
+
       localDispatch({
          type: "updateState",
          value: {
@@ -214,6 +218,8 @@ function EditTag(props: EditTagProps): JSX.Element {
    );
 
    const submitTagUpdates = useCallback(() => {
+      if (document.getElementById("tagSearch")?.hasAttribute("disabled")) return;
+
       updateButtonRef.current?.submit();
    }, []);
 
@@ -251,7 +257,7 @@ function EditTag(props: EditTagProps): JSX.Element {
                icon = { faPenToSquare }
                onSubmit = { () => updateTag("update") }
                onClick = { submitTagUpdates }
-               inputIds={ ["tagTitle"]}
+               inputIds = { ["tagTitle"] }
             >
                Update
             </Button>
@@ -275,7 +281,9 @@ function TagContainer(props: TagContainerProps): JSX.Element {
    const editTagModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
 
    // Handle adding or removing a selected tag
-   const selectedTag = useCallback((adding: boolean) => {
+   const selectTag = useCallback((adding: boolean) => {
+      if (document.getElementById("tagSearch")?.hasAttribute("disabled")) return;
+
       globalDispatch({
          type: "updateState",
          value: {
@@ -335,7 +343,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
          <div className = "mx-auto flex max-w-full flex-row items-center justify-center gap-x-2">
             <div
                id = { tag.id }
-               onClick = { () => !selected && selectedTag(true) }
+               onClick = { () => !selected && selectTag(true) }
                className = "mx-auto line-clamp-1 max-w-full cursor-pointer text-ellipsis break-all text-center"
             >
                { tag.title }
@@ -347,7 +355,16 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                      display = {
                         <FontAwesomeIcon
                            icon = { faGears }
-                           onClick = { editTag }
+                           onClick = {
+                              (event) => {
+                                 if (document.getElementById("tagSearch")?.hasAttribute("disabled")) {
+                                    event.stopPropagation();
+                                    return;
+                                 }
+
+                                 editTag();
+                              }
+                           }
                            className = "cursor-pointer pt-1 text-sm hover:text-gray-300"
                         />
                      }
@@ -362,7 +379,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                {
                   selected && (
                      <FontAwesomeIcon
-                        onMouseDown = { () => selectedTag(false) }
+                        onMouseDown = { () => selectTag(false) }
                         icon = { faXmark }
                         className = "cursor-pointer text-base hover:text-red-500"
                      />
@@ -433,6 +450,8 @@ export default function TagsForm(props: TagsProps): JSX.Element {
    }, [options]);
 
    const createTag = useCallback(async() => {
+      if (document.getElementById("tagSearch")?.hasAttribute("disabled")) return;
+
       // Default tags have a random color assigned
       const tag: Tag = {
          user_id: user.id,
@@ -495,6 +514,8 @@ export default function TagsForm(props: TagsProps): JSX.Element {
    ]);
 
    const createOrSelectTag = useCallback(() => {
+      if (document.getElementById("tagSearch")?.hasAttribute("disabled")) return;
+
       const existingTag: Tag = tagsByTitle[search];
 
       if (!existingTag) {
