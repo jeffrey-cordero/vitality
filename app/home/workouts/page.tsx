@@ -2,6 +2,7 @@
 import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 
 import { AuthenticationContext } from "@/app/layout";
+import Loading from "@/components/global/loading";
 import Main from "@/components/global/main";
 import Filtering from "@/components/home/workouts/filtering";
 import Form from "@/components/home/workouts/form";
@@ -94,6 +95,9 @@ export default function Page(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
    const [globalState, globalDispatch] = useReducer(formReducer, form);
    const [view, setView] = useState<"table" | "cards">("table");
+
+   // Determine if workouts have been fetched from the server
+   const fetched: boolean = globalState.workouts.data?.fetched ?? false;
 
    // Search value for workouts based on title
    const search: string = useMemo(() => {
@@ -206,26 +210,34 @@ export default function Page(): JSX.Element {
 
    return (
       <Main className = "mb-12">
-         <Filtering
-            globalState = { globalState }
-            globalDispatch = { globalDispatch }
-         />
-         <View
-            view = { view }
-            setView = { setView }
-            workouts = { section }
-            globalState = { globalState }
-            globalDispatch = { globalDispatch }
-         />
-         <Form
-            globalState = { globalState }
-            globalDispatch = { globalDispatch }
-         />
-         <Pagination
-            workouts = { results }
-            globalState = { globalState }
-            globalDispatch = { globalDispatch }
-         />
+         {
+            fetched ? (
+               <>
+                  <Filtering
+                     globalState = { globalState }
+                     globalDispatch = { globalDispatch }
+                  />
+                  <View
+                     view = { view }
+                     setView = { setView }
+                     workouts = { section }
+                     globalState = { globalState }
+                     globalDispatch = { globalDispatch }
+                  />
+                  <Form
+                     globalState = { globalState }
+                     globalDispatch = { globalDispatch }
+                  />
+                  <Pagination
+                     workouts = { results }
+                     globalState = { globalState }
+                     globalDispatch = { globalDispatch }
+                  />
+               </>
+            ) : (
+               <Loading />
+            )
+         }
       </Main>
    );
 }

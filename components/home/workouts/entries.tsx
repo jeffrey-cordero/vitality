@@ -169,11 +169,11 @@ export default function ExerciseEntryContainer(props: ExerciseEntryContainerProp
                   <FontAwesomeIcon
                      icon = { faArrowRotateLeft }
                      onClick = { reset }
-                     className = "absolute right-[35px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer pr-2 text-base text-primary sm:pr-8"
+                     className = "absolute right-[35px] top-[-25px] z-10 cursor-pointer pr-2 text-base text-primary sm:pr-8"
                   />
                   <FontAwesomeIcon
                      icon = { faXmark }
-                     className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer pr-2 text-xl text-red-500 sm:pr-8"
+                     className = "absolute right-[10px] top-[-27px] z-10 cursor-pointer pr-2 text-xl text-red-500 sm:pr-8"
                      onClick = {
                         () => {
                            if (isNewEntry) {

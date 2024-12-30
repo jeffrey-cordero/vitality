@@ -128,7 +128,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          />
          <FontAwesomeIcon
             icon = { faXmark }
-            className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer text-xl text-red-500"
+            className = "absolute right-[10px] top-[-27px] z-10 cursor-pointer text-xl text-red-500"
             onClick = {
                () => {
                   onBlur();
@@ -409,11 +409,11 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                            });
                         }
                      }
-                     className = "absolute right-[35px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
+                     className = "absolute right-[35px] top-[-25px] z-10 cursor-pointer text-base text-primary"
                   />
                   <FontAwesomeIcon
                      icon = { faXmark }
-                     className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer text-xl text-red-500"
+                     className = "absolute right-[10px] top-[-27px] z-10 cursor-pointer text-xl text-red-500"
                      onClick = { () => setEditName(false) }
                   />
                   <Input

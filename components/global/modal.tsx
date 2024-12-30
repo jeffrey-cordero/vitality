@@ -90,7 +90,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                               }
                            }
                            icon = { faXmark }
-                           className = "modal-close size-4 shrink-0 cursor-pointer text-xl font-extrabold text-red-500"
+                           className = "modal-close cursor-pointer text-xl font-extrabold text-red-500"
                            fill = "black"
                         />
                      </div>

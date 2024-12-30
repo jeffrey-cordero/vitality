@@ -54,7 +54,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
                   <div
                      className = {
                         clsx(
-                           "flex w-full items-center rounded-lg border-l-8 bg-white pl-4 dark:bg-slate-800",
+                           "flex w-full items-center rounded-lg border-l-8 bg-white dark:bg-slate-800",
                            {
                               "border-l-green-500": status === "Success",
                               "border-l-red-500": status !== "Success"
@@ -62,20 +62,20 @@ export default function Notification(props: NotificationProps): JSX.Element {
                         )
                      }
                   >
-                     <div className = "flex items-center justify-center rounded-full">
-                        <FontAwesomeIcon
-                           icon = { icon }
-                           className = {
-                              clsx("text-3xl", {
-                                 "text-green-500": status === "Success",
-                                 "text-red-500": status !== "Success"
-                              })
-                           }
-                        />
-                     </div>
-                     <div className = "flex w-full items-center justify-between px-4 pb-3 pt-[20px]">
+                     <div className = "flex min-h-8 w-full items-center justify-start gap-4 px-4 pb-3 pt-[20px]">
+                        <div className = "flex items-center justify-center rounded-full">
+                           <FontAwesomeIcon
+                              icon = { icon }
+                              className = {
+                                 clsx("text-3xl", {
+                                    "text-green-500": status === "Success",
+                                    "text-red-500": status !== "Success"
+                                 })
+                              }
+                           />
+                        </div>
                         <div className = "relative">
-                           <div className = "my-2 flex flex-col gap-2 whitespace-pre-wrap break-words pr-1 text-[0.95rem] font-bold xsm:text-base">
+                           <div className = "my-2 flex flex-col gap-2 pr-2 text-[0.95rem] font-bold [overflow-wrap:anywhere] xsm:text-base">
                               <p>{ message }</p>
                               { children }
                            </div>
@@ -83,10 +83,10 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      </div>
                   </div>
                </div>
-               <div className = "absolute right-[-2px] top-[-5px] z-50 rounded-e-md p-3.5">
+               <div className = "absolute right-[-3px] top-[-8px] z-50 rounded-e-md p-3.5">
                   <FontAwesomeIcon
                      icon = { faXmark }
-                     className = "size-4 shrink-0 cursor-pointer text-xl font-bold text-red-500"
+                     className = "cursor-pointer text-lg font-bold text-red-500"
                      fill = "black"
                      onClick = {
                         (event) => {

@@ -381,7 +381,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                      <FontAwesomeIcon
                         onMouseDown = { () => selectTag(false) }
                         icon = { faXmark }
-                        className = "cursor-pointer text-base hover:text-red-500"
+                        className = "cursor-pointer text-lg hover:text-red-500"
                      />
                   )
                }

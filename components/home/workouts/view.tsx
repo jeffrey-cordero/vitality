@@ -4,7 +4,6 @@ import clsx from "clsx";
 import { Dispatch, useCallback } from "react";
 
 import Button from "@/components/global/button";
-import Loading from "@/components/global/loading";
 import Cards from "@/components/home/workouts/cards";
 import Table from "@/components/home/workouts/table";
 import { VitalityProps } from "@/lib/global/reducer";
@@ -18,8 +17,6 @@ interface ViewProps extends VitalityProps {
 
 export default function View(props: ViewProps): JSX.Element {
    const { view, setView, workouts, globalState, globalDispatch } = props;
-   // Determine if the workouts have been fetched from the server
-   const fetched: boolean = globalState.workouts.data?.fetched;
 
    const updateView = useCallback((view: "table" | "cards") => {
       setView(view);
@@ -59,19 +56,13 @@ export default function View(props: ViewProps): JSX.Element {
             {
                workouts.length === 0 ? (
                   <div className = "mx-auto flex h-[50vh] w-full items-center justify-center text-center">
-                     {
-                        fetched ? (
-                           <div className = "flex flex-col gap-6">
-                              <FontAwesomeIcon
-                                 icon = { faMagnifyingGlass }
-                                 className = "text-4xl text-primary"
-                              />
-                              <h1 className = "text-base font-bold">No available workouts</h1>
-                           </div>
-                        ) : (
-                           <Loading />
-                        )
-                     }
+                     <div className = "flex flex-col gap-6">
+                        <FontAwesomeIcon
+                           icon = { faMagnifyingGlass }
+                           className = "text-4xl text-primary"
+                        />
+                        <h1 className = "text-base font-bold">No available workouts</h1>
+                     </div>
                   </div>
                ) : view === "table" ? (
                   <Table

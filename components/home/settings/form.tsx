@@ -13,7 +13,7 @@ import { fetchAttributes } from "@/lib/authentication/authorize";
 import { endSession } from "@/lib/authentication/session";
 import { normalizeDate } from "@/lib/authentication/shared";
 import { formReducer, VitalityState } from "@/lib/global/reducer";
-import { processResponse } from "@/lib/global/response";
+import { processResponse, VitalityResponse } from "@/lib/global/response";
 import { deleteAccount, updateAttribute } from "@/lib/home/settings/settings";
 
 const form: VitalityState = {
@@ -84,6 +84,9 @@ export default function Form(): JSX.Element {
    const { user, theme, updateTheme } = useContext(AuthenticationContext);
    const { updateNotifications } = useContext(NotificationContext);
    const [globalState, globalDispatch] = useReducer(formReducer, form);
+
+   // Determine if attributes have been fetched from the server
+   const fetched: boolean = globalState.image.data?.fetched ?? false;
    const imageURL: string = globalState.image.data?.stored.trim();
 
    const fetchAttributeData = useCallback(async() => {
@@ -159,8 +162,11 @@ export default function Form(): JSX.Element {
 
    const submitUpdateImage = useCallback(async() => {
       const image: string = globalState.image.value.trim();
+      const response: VitalityResponse<boolean> = await updateAttribute(user.id, "image", image);
 
-      processResponse(await updateAttribute(user.id, "image", image), globalDispatch, updateNotifications, async() => {
+      processResponse(response, globalDispatch, updateNotifications, async() => {
+         const updates: boolean = response.body.data;
+
          globalDispatch({
             type: "updateState",
             value: {
@@ -176,9 +182,10 @@ export default function Form(): JSX.Element {
             }
          });
 
-         // Close the image form modal after a successful submission, assuming a valid image resource
+         // Close the image form modal after a successful update
          const imageForm = document.getElementById("image-form-container");
-         (imageForm?.getElementsByClassName("modal-close").item(0) as SVGElement)?.dispatchEvent(
+
+         updates && (imageForm?.getElementsByClassName("modal-close").item(0) as SVGElement)?.dispatchEvent(
             new MouseEvent("click", {
                bubbles: true,
                cancelable: true,
@@ -210,7 +217,7 @@ export default function Form(): JSX.Element {
    ]);
 
    useEffect(() => {
-      if (!globalState.image.data?.fetched) {
+      if (!fetched) {
          fetchAttributeData();
       }
    });
@@ -218,7 +225,7 @@ export default function Form(): JSX.Element {
    return (
       <div className = "relative mx-auto mb-8 w-full px-2 text-left xsm:mb-16 sm:w-11/12 lg:w-3/4 2xl:w-1/2">
          {
-            globalState.image.data?.fetched ? (
+            fetched ? (
                <div className = "flex flex-col items-center justify-center gap-7">
                   <div className = "relative mx-auto flex w-full flex-col items-center justify-center gap-4">
                      <Heading

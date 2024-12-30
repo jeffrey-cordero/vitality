@@ -316,7 +316,16 @@ export default function ImageForm(props: ImageFormProps): JSX.Element {
          <Modal
             display = {
                display ?? (
-                  <div className = "relative">
+                  <div
+                     onClick = {
+                        (event) => {
+                           if (document.getElementById("title")?.hasAttribute("disabled")) {
+                              event.stopPropagation();
+                           }
+                        }
+                     }
+                     className = "relative"
+                  >
                      <Button
                         id = "image-form-button"
                         className = {

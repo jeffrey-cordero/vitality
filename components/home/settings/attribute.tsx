@@ -134,12 +134,12 @@ export function GeneralAttribute(props: AttributeProps) {
                <div className = "relative mt-8">
                   <FontAwesomeIcon
                      icon = { faArrowRotateLeft }
-                     className = "absolute right-[2.1875rem] top-[-1.5625rem] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
+                     className = "absolute right-[2.1875rem] top-[-1.5625rem] z-10 cursor-pointer text-base text-primary"
                      onClick = { resetInput }
                   />
                   <FontAwesomeIcon
                      icon = { faXmark }
-                     className = "absolute right-[.625rem] top-[-1.6875rem] z-10 size-4 shrink-0 cursor-pointer text-lg text-red-500 xxsm:text-xl"
+                     className = "absolute right-[.625rem] top-[-1.6875rem] z-10 cursor-pointer text-xl text-red-500"
                      onClick = { () => { setIsEditing(false); } }
                   />
                   <Input
