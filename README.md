@@ -35,15 +35,13 @@ If you encounter any issues or need further assistance, feel free to submit a Gi
    npm run build
    ```
 
-4. **Start the application with Docker**
+4. **Start the application**
 
    ```bash
    docker-compose up
    ```
 
-## Pages
-
-### Unauthenticated Pages
+### Pages
 
 - `unauthenticated`
   - [Landing](http://localhost:3000/)
@@ -69,129 +67,104 @@ If you encounter any issues or need further assistance, feel free to submit a Gi
 ### Folder Structure
 
 - `/`
-  - Project dependencies and configuration files for Next.js, NextAuth.js, TypeScript, Tailwind CSS, Jest, Nginx, and Docker.
-  - `app`
-    - Layouts for individual pages, authentication workflows, and "not found" pages.
-  - `components`
-    - Reusable React components as well as those tailored to specific pages.
-  - `lib`
-    - Shared utilities, NextAuth.js session management, secure server actions, and database initialization resources.
-  - `prisma`
-    - Prisma ORM migration and schema files.
-  - `public`
-    - Globally and page-specific assets and fonts and configurations
-- `tests/`
-  - `authentication/`
-    - Tests for authentication-related components and logic.
-  - `global/`
-    - Global tests for utilities and response handling.
-  - `home/`
-    - Tests for components related to the home page.
-  - `shared.ts`
-    - Shared test utilities or mock data.
-  - `singleton.ts`
-    - Mock prisma client following the singleton pattern.
+  - Contains dependency and configuration files for Next.js, NextAuth.js, TypeScript, Tailwind CSS, Jest, Nginx, and Docker.
+  - `/app`
+    - Provides layouts for individual pages, authentication workflows, and "not found" pages.
+  - `/components`
+    - Contains reusable React components, as well as page-specific ones.
+  - `/lib`
+    - Includes shared utilities, NextAuth.js session management, secure server actions, and database initialization resources.
+  - `/prisma`
+    - Contains Prisma ORM migration scripts and schema files.
+  - `/public`
+    - Stores global and page-specific assets, fonts, and configuration files.
+  - `/tests`
+    - Includes global and page-specific unit tests, mock data, and a singleton-pattern Prisma ORM client.
 
 ### Processes
 
-Ensure the `docker-compose.yaml` file is configured correctly for development instead of a production environment. Change the command in the app container from:
-
-  ```yaml
-    command: sh -c "npm run start"
-```
-
-to:
+Ensure the `docker-compose.yaml` file is configured for development instead of production. Update the command in the app container from `npm run start` to `npm run dev`.
 
   ```yaml
   command: sh -c "npm run dev"
   ```
 
-This ensures the development environment starts correctly when using the `docker compose up`.
+1. **Start Development Environment**
 
-1. **Start Development**
+   ```bash
+   docker compose up
+   ```
 
-```bash
-docker compose up
-```
+2. **Pause Development Environment**
 
-2. **Pause Development**
+   ```bash
+   docker compose stop
+   ```
 
-```bash
-docker compose stop
-```
+3. **Reset Development Environment**
 
-2. **Reset Development (Containers, Networks, Volumes):**
-
-```bash
-docker compose down -v --remove-orphans
-```
-
+   ```bash
+   docker compose down -v --remove-orphans
+   ```
 
 ### Logging
 
-1. **View live logs**
+1. **View Live Logs**
 
-```bash
-docker compose logs -f
-```
+   ```bash
+   docker compose logs -f
+   ```
 
-2. **View most recent logs**
+2. **View Recent Logs**
 
-```bash
-docker compose logs
-```
+   ```bash
+   docker compose logs
+   ```
 
-3. **View most recent logs for specific containers**
+3. **View Recent Logs for Specific Containers**
 
-```bash
-docker logs <vitality_app | vitality_postgres | vitality_nginx>
-```
+   ```bash
+   docker logs <vitality_app | vitality_postgres | vitality_nginx>
+   ```
 
 ### Database
 
-1. **Access Database via Docker**
+1. **Interactive Access via Docker (PostgreSQL)**
 
-```bash
-docker exec -it vitality_postgres psql -U postgres -d vitality
-```
+   ```bash
+   docker exec -it vitality_postgres psql -U postgres -d vitality
+   ```
 
-2. **Access Database via Prisma ORM**
+2. **Interactive Access via Prisma ORM**
 
-```bash
-docker exec -it vitality_app npx prisma studio
-```
-
-3. **Apply updates to SQL Schema**
-
-   1. Update `/lib/database/init.sql`
-   2. Reset development
-   3. Apply changes to Prisma ORM
-
-```bash
-docker exec -it vitality_app npx prisma db pull
-```
-
-4. **Apply Migrations with Prisma ORM:**
-
-- Modify the model(s) in `prisma/schema.prisma`
-- Apply migration:
-
-```bash
-docker exec -it vitality_app npx prisma migrate dev --name <migration-name>
-```
+   ```bash
+   docker exec -it vitality_app npx prisma studio
+   ```
 
 ## Testing
 
-1. **Run Unit Tests**
+1. **Run All Unit Tests**
 
-```bash
-npm run tests
-```
+   ```bash
+   npm run tests
+   ```
+
+2. **Run Specific Unit Test(s)**
+
+   ```bash
+   npx jest <test-file(s)> --collect-coverage --detectOpenHandles --verbose
+   ```
 
 ## Linting
 
-1. **Fix Linting Errors**
+1. **View Linting Errors**
 
-```bash
-npm run lint
-```
+   ```bash
+   npx eslint . --ignore-pattern 'next-env.**'
+   ```
+
+2. **Fix Linting Errors**
+
+   ```bash
+   npm run lint
+   ```
