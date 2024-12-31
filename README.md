@@ -141,21 +141,7 @@ Ensure the `docker-compose.yaml` file is configured for development instead of p
    docker exec -it vitality_app npx prisma studio
    ```
 
-## Testing
-
-1. **Run All Unit Tests**
-
-   ```bash
-   npm run tests
-   ```
-
-2. **Run Specific Unit Test(s)**
-
-   ```bash
-   npx jest <test-file(s)> --collect-coverage --detectOpenHandles --verbose
-   ```
-
-## Linting
+### Linting
 
 1. **View Linting Errors**
 
@@ -167,4 +153,18 @@ Ensure the `docker-compose.yaml` file is configured for development instead of p
 
    ```bash
    npm run lint
+   ```
+
+### Testing
+
+1. **Run All Unit Tests**
+
+   ```bash
+   npm run tests
+   ```
+
+2. **Run Specific Unit Test(s)**
+
+   ```bash
+   npx jest <test-file(s)> --collect-coverage --detectOpenHandles --verbose
    ```
