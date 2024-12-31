@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import Heading from "@/components/global/heading";
 import Carousel from "@/components/landing/carousel";
-import testimonials from "@/lib/landing/testimonials";
+import testimonials from "@/public/landing/testimonials";
 
 interface TestimonialProps {
   testimonial: string;

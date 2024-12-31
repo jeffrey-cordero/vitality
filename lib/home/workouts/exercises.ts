@@ -2,11 +2,11 @@
 import { z } from "zod";
 
 import { authorizeAction } from "@/lib/authentication/session";
+import prisma from "@/lib/database/client";
 import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
 import { uuidSchema } from "@/lib/global/zod";
 import { formatDatabaseExercise, formatDatabaseWorkout } from "@/lib/home/workouts/shared";
 import { Workout } from "@/lib/home/workouts/workouts";
-import prisma from "@/lib/prisma/client";
 
 export type ExerciseEntry = {
   id: string;

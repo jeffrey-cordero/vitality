@@ -10,13 +10,11 @@ This modern fitness tracker supports workout tracking, with plans for future exp
 - **Docker**
 - **npm**
 
-### Project Setup
+### Setup
 
 After completing the steps below to get the application running on your local machine, you can access it via [http://localhost:3000](http://localhost:3000) in your browser to start tracking your workouts!
 
 If you encounter any issues or need further assistance, feel free to submit a GitHub Issue. Be sure to include detailed information such as steps to reproduce, expected versus actual behavior, and any relevant logs or screenshots.
-
-### Setup Instructions
 
 1. **Clone the repository**
 
@@ -47,102 +45,41 @@ If you encounter any issues or need further assistance, feel free to submit a Gi
 
 ### Unauthenticated Pages
 
-- [Landing](http://localhost:3000/)
-  - Showcases images and sections highlighting current and future app expansions, along with mock testimonials.
+- `unauthenticated`
+  - [Landing](http://localhost:3000/)
+    - Showcases current and upcoming app expansions through engaging sections, complemented by mock testimonials and diverse imagery.
 
-- [Log In](http://localhost:3000/login)
-  - Allows returning users to securely access their accounts.
+  - [Log In](http://localhost:3000/login)
+    - Allows returning users to securely access their accounts.
 
-- [Sign Up](http://localhost:3000/signup)
-  - Enables new users to create an account and quickly get started with the app.
+  - [Sign Up](http://localhost:3000/signup)
+    - Enables new users to create an account and quickly get started with the app.
+- `authenticated`
+  - [Workouts](http://localhost:3000/home/workouts)
+    - Lets users log and filter workouts over time, including exercises with their detailed entries (weight, repetitions, interval, etc.)
 
-### Authenticated Pages
+  - [Settings](http://localhost:3000/home/settings)
+    - Allows users to customize profile attributes, manage application preferences, terminate sessions, and delete accounts.
 
-- [Workouts](http://localhost:3000/home/workouts)
-  - Lets users log and filter workouts over time, including exercises with detailed entries such as weight, repetitions, intervals, and more.
-
-- [Settings](http://localhost:3000/home/settings)
-  - Allows users to customize profile attributes, manage application preferences, terminate sessions, and delete accounts.
-
-- [Feedback](http://localhost:3000/home/feedback)
-  - Allows users to submit feedback, report issues, and suggest improvements.
+  - [Feedback](http://localhost:3000/home/feedback)
+    - Allows users to submit feedback, report issues, and suggest improvements.
 
 ## Development
 
 ### Folder Structure
 
-The following outlines the organization of the project folder structure, providing a brief description of purpose and contents of each folder. This structure is designed to help maintain the separation of concerns, making it easier to locate specific functionality and manage the project efficiently.
-
 - `/`
-  - `auth.config.ts` & `auth.ts`
-    - Configuration and authentication-related logic for the application ([NextAuth.js](https://next-auth.js.org/)).
-  - `next.config.js`
-    - Configuration for Next.js, including custom settings for the app.
-  - `middleware.ts`
-    - Middleware for handling Next.js requests and responses.
-  - `docker-compose.yaml`
-    - Docker Compose configuration for managing multi-container applications.
-  - `nginx.conf`
-    - Nginx configuration for reverse proxy setup and other related configurations.
-  - `jest.config.js`
-    - Jest configuration for running unit tests.
-  - `next-env.d.ts`
-    - TypeScript environment definitions for Next.js (created during build stage).
-  - `package-lock.json` & `package.json`
-    - Dependency management files for the project.
-  - `tailwind.config.ts`
-    - Configuration for Tailwind CSS in the project.
-  - `postcss.config.js`
-    - Configuration for PostCSS, used in processing CSS.
-  - `tsconfig.json`
-    - TypeScript configuration file for the project.
-- `app`
-  - `home/`
-    - Home page-related components, including feedback, settings, and workouts.
-  - `login/`
-    - Login page.
-  - `signup/`
-    - Signup page.
-  - `layout.tsx`
-    - Main layout file for the application.
-  - `not-found.tsx`
-    - Handles "not found" page when a route doesn't exist.
-- `components`
-  - `authentication/`
-    - Login and signup components.
-  - `global/`
-    - Global reusable components, such as buttons, footers, modals, and form elements.
-  - `home/`
-    - Components specific to the home page, including feedback, settings, and workouts.
-  - `landing/`
-    - Landing page components like testimonials, pricing, and highlights.
-- `lib/`
-  - `authentication/`
-    - Functions for login, signup, and session management.
-  - `database/`
-    - Database initialization SQL files.
-  - `global/`
-    - Shared utilities like reducers, regex functions, and response handlers.
-  - `home/`
-    - Logic for handling home-related features such as feedback, settings, and workouts.
-  - `landing/`
-    - Landing page-related logic (e.g., testimonials).
-  - `prisma/`
-    - Prisma client initialization.
-- `prisma/`
-  - `migrations/`
-    - Database migration files.
-  - `schema.prisma`
-    - Defines the database schema.
-- `public/`
-  - `favicon.ico`
-    - The website's favicon, displayed in the browser tab.
-  - `fonts/`
-    - Contains font files and configurations applied throughout the project.
-  - `global/`
-    - Contains globally used assets.
-  - `home/`
-    - Contains the default images offered in the settings and workouts section of the application
+  - Project dependencies and configuration files for Next.js, NextAuth.js, TypeScript, Tailwind CSS, Jest, Nginx, and Docker.
+  - `app`
+    - Layouts for individual pages, authentication workflows, and "not found" pages.
+  - `components`
+    - Reusable React components as well as those tailored to specific pages.
+  - `lib`
+    - Shared utilities, NextAuth.js session management, secure server actions, and database initialization resources.
+  - `prisma`
+    - Prisma ORM migration and schema files.
+  - `public`
+    - Globally and page-specific assets and fonts and configurations
 - `tests/`
   - `authentication/`
     - Tests for authentication-related components and logic.

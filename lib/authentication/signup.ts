@@ -4,9 +4,9 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 import { normalizePhoneNumber } from "@/lib/authentication/shared";
+import prisma from "@/lib/database/client";
 import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
 import { userSchema } from "@/lib/global/zod";
-import prisma from "@/lib/prisma/client";
 
 export type Registration = {
   name: string;

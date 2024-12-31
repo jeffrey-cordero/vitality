@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 import { Credentials } from "@/lib/authentication/login";
-import prisma from "@/lib/prisma/client";
+import prisma from "@/lib/database/client";
 
 export async function fetchAttributes(id: string): Promise<User | null> {
    try {

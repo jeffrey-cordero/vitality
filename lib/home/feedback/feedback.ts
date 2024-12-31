@@ -2,9 +2,9 @@
 import { z } from "zod";
 
 import { authorizeAction } from "@/lib/authentication/session";
+import prisma from "@/lib/database/client";
 import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
 import { uuidSchema } from "@/lib/global/zod";
-import prisma from "@/lib/prisma/client";
 
 export type Feedback = {
    user_id: string;

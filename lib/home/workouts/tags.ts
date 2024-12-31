@@ -3,10 +3,10 @@ import { workout_applied_tags } from "@prisma/client";
 import { z } from "zod";
 
 import { authorizeAction } from "@/lib/authentication/session";
+import prisma from "@/lib/database/client";
 import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
 import { uuidSchema } from "@/lib/global/zod";
 import { Workout } from "@/lib/home/workouts/workouts";
-import prisma from "@/lib/prisma/client";
 
 const colors = new Set([
    "rgb(55, 55, 55)",
