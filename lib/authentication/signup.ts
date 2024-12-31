@@ -96,7 +96,7 @@ export async function signup(registration: Registration): Promise<VitalityRespon
       }
    } catch (error) {
       console.error(error);
-      
+
       return sendFailureMessage(error);
    }
 }
