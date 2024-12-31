@@ -551,7 +551,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                               onClick = {
                                  () => {
                                     // Prevent closing the existing exercise entry input during a submission
-                                    if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+                                    if (document.getElementById("weight")?.getAttribute("disabled") === "true") return;
 
                                     resetExerciseEntry("");
                                     setAddEntry(true);
