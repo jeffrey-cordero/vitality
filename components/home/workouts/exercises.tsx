@@ -112,6 +112,9 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
             icon = { faArrowRotateLeft }
             onClick = {
                () => {
+                  // Prevent resetting the exercise name during a submission
+                  if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
                   localDispatch({
                      type: "updateState",
                      value: {
@@ -131,6 +134,9 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
             className = "absolute right-[10px] top-[-27px] z-10 cursor-pointer text-xl text-red-500"
             onClick = {
                () => {
+                  // Prevent closing the exercise name input during a submission
+                  if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
                   onBlur();
                }
             }
@@ -315,6 +321,9 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    ]);
 
    const displayEditExerciseName = useCallback(() => {
+      // Prevent editing exercise name during a submission
+      if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
       // Update exercise name inputs
       localDispatch({
          type: "updateState",
@@ -339,6 +348,9 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
    ]);
 
    const resetExerciseEntry = useCallback((entryId: string) => {
+      // Prevent resetting entry inputs during a submission
+      if (document.getElementById("weight")?.getAttribute("disabled") === "true") return;
+
       // Reset exercise entry inputs
       localDispatch({
          type: "updateStates",
@@ -397,6 +409,9 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      icon = { faArrowRotateLeft }
                      onClick = {
                         () => {
+                           // Prevent resetting the exercise name during a submission
+                           if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
                            localDispatch({
                               type: "updateState",
                               value: {
@@ -414,7 +429,14 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                   <FontAwesomeIcon
                      icon = { faXmark }
                      className = "absolute right-[10px] top-[-27px] z-10 cursor-pointer text-xl text-red-500"
-                     onClick = { () => setEditName(false) }
+                     onClick = {
+                        () => {
+                        // Prevent closing the exercise name input during a submission
+                           if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
+                           setEditName(false);
+                        }
+                     }
                   />
                   <Input
                      id = "name"
@@ -442,6 +464,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      Update
                   </Button>
                   <Confirmation
+                     isDisabled = { () => document.getElementById("name")?.getAttribute("disabled") === "true" }
                      message = "Delete exercise?"
                      onConfirmation = { deleteExercise }
                   />
@@ -527,6 +550,9 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                               icon = { faPlus }
                               onClick = {
                                  () => {
+                                    // Prevent closing the existing exercise entry input during a submission
+                                    if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
                                     resetExerciseEntry("");
                                     setAddEntry(true);
                                  }
@@ -560,6 +586,9 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
    const exercises: Exercise[] = workout.exercises;
 
    const displayNewExercise = useCallback(() => {
+      // Prevent closing the existing exercise name input during a submission
+      if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
       // Update exercise name inputs
       localDispatch({
          type: "updateState",

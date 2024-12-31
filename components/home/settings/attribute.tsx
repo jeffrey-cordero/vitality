@@ -61,6 +61,9 @@ export function GeneralAttribute(props: AttributeProps) {
    const isUniqueAttribute: boolean = id === "username" || id === "email" || id === "phone";
 
    const resetInput = useCallback(() => {
+      // Prevent resetting the form state during a submission
+      if (document.getElementById(id)?.getAttribute("disabled") === "true") return;
+
       globalDispatch({
          type: "updateState",
          value: {
@@ -140,7 +143,14 @@ export function GeneralAttribute(props: AttributeProps) {
                   <FontAwesomeIcon
                      icon = { faXmark }
                      className = "absolute right-[.625rem] top-[-1.6875rem] z-10 cursor-pointer text-xl text-red-500"
-                     onClick = { () => { setIsEditing(false); } }
+                     onClick = {
+                        () => {
+                        // Prevent closing the input during a submission
+                           if (document.getElementById(id)?.getAttribute("disabled") === "true") return;
+
+                           setIsEditing(false);
+                        }
+                     }
                   />
                   <Input
                      { ...props }
@@ -156,7 +166,7 @@ export function GeneralAttribute(props: AttributeProps) {
                      icon = { icon }
                      onClick = { submitPasswordUpdates }
                      onSubmit = { submitUpdateAttribute }
-                     isSingleSubmission = { isUniqueAttribute ? true : undefined }
+                     isSingleSubmission = { true }
                      inputIds = { [id] }
                   >
                      Update
@@ -262,7 +272,7 @@ export function PasswordAttribute(props: VitalityProps): JSX.Element {
                }
                className = "mt-12 max-h-[90%] max-w-full sm:max-w-xl"
             >
-               <div className = "relative flex flex-col items-center justify-center gap-6 py-2 text-center">
+               <div className = "relative flex flex-col items-center justify-center gap-6 pb-2 text-center">
                   <FontAwesomeIcon
                      icon = { faKey }
                      className = "mt-6 text-5xl text-primary"

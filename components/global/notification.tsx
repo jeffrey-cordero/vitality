@@ -83,7 +83,7 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      </div>
                   </div>
                </div>
-               <div className = "absolute right-[-5px] top-[-10px] z-50 rounded-e-md p-3.5">
+               <div className = "absolute right-[-5px] top-[-8px] z-50 rounded-e-md p-3.5">
                   <FontAwesomeIcon
                      icon = { faXmark }
                      className = "cursor-pointer text-lg font-bold text-red-500"

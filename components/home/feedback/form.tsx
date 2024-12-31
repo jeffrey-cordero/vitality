@@ -84,6 +84,9 @@ export default function Login(): JSX.Element {
                   icon = { faArrowRotateLeft }
                   onClick = {
                      () => {
+                        // Prevent resetting the form state during a submission
+                        if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
                         dispatch({
                            type: "resetState",
                            value: form

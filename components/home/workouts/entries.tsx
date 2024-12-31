@@ -110,6 +110,9 @@ export default function ExerciseEntryContainer(props: ExerciseEntryContainerProp
    }, []);
 
    const editExerciseEntry = useCallback(() => {
+      // Prevent editing exercise entry during a submission
+      if (document.getElementById("weight")?.getAttribute("disabled") === "true") return;
+
       // Update inputs to match exercise entry values
       localDispatch({
          type: "updateStates",
@@ -176,6 +179,9 @@ export default function ExerciseEntryContainer(props: ExerciseEntryContainerProp
                      className = "absolute right-[10px] top-[-27px] z-10 cursor-pointer pr-2 text-xl text-red-500 sm:pr-8"
                      onClick = {
                         () => {
+                           // Prevent closing the entry inputs during a submission
+                           if (document.getElementById("weight")?.getAttribute("disabled") === "true") return;
+
                            if (isNewEntry) {
                               // Remove from DOM for new exercise entry inputs
                               onBlur();
@@ -185,7 +191,6 @@ export default function ExerciseEntryContainer(props: ExerciseEntryContainerProp
                         }
                      }
                   />
-
                   <Input
                      id = "weight"
                      type = "number"
@@ -261,7 +266,7 @@ export default function ExerciseEntryContainer(props: ExerciseEntryContainerProp
                      icon = { faPersonRunning }
                      onSubmit = { async() => await updateExerciseEntry(isNewEntry ? "add" : "update") }
                      onClick = { submitExerciseEntryUpdates }
-                     isSingleSubmission = { isNewEntry ? true : undefined }
+                     isSingleSubmission = { true }
                      inputIds = { ["weight", "repetitions", "hours", "minutes", "seconds", "text"] }
                   >
                      { isNewEntry ? "Create" : "Update" }
@@ -269,6 +274,7 @@ export default function ExerciseEntryContainer(props: ExerciseEntryContainerProp
                   {
                      !isNewEntry && (
                         <Confirmation
+                           isDisabled = { () => document.getElementById("weight")?.getAttribute("disabled") === "true" }
                            message = "Delete entry?"
                            onConfirmation = { () => updateExerciseEntry("delete") }
                         />

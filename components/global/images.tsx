@@ -319,9 +319,8 @@ export default function ImageForm(props: ImageFormProps): JSX.Element {
                   <div
                      onClick = {
                         (event) => {
-                           if (document.getElementById("title")?.hasAttribute("disabled")) {
-                              event.stopPropagation();
-                           }
+                           // Prevent the modal from opening during a submission
+                           if (document.getElementById("title")?.hasAttribute("disabled")) event.stopPropagation();
                         }
                      }
                      className = "relative"

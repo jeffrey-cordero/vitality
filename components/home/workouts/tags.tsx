@@ -78,7 +78,7 @@ function TagColorSelection(props: VitalityChildProps) {
    }, []);
 
    const updateColor = useCallback((color: string) => {
-      // Disable tag color selection if tag search or title is disabled
+      // Prevent selecting tag colors during a submission
       if (document.getElementById("tagSearch")?.hasAttribute("disabled")
             || document.getElementById("tagTitle").hasAttribute("disabled")) return;
 
@@ -218,8 +218,6 @@ function EditTag(props: EditTagProps): JSX.Element {
    );
 
    const submitTagUpdates = useCallback(() => {
-      if (document.getElementById("tagSearch")?.hasAttribute("disabled")) return;
-
       updateButtonRef.current?.submit();
    }, []);
 
@@ -256,12 +254,14 @@ function EditTag(props: EditTagProps): JSX.Element {
                className = "h-10 w-full bg-primary text-white"
                icon = { faPenToSquare }
                onSubmit = { () => updateTag("update") }
+               isSingleSubmission = { true }
                onClick = { submitTagUpdates }
                inputIds = { ["tagTitle"] }
             >
                Update
             </Button>
             <Confirmation
+               isDisabled = { () => document.getElementById("tagTitle")?.getAttribute("disabled") === "true" }
                message = "Delete workout tag?"
                onConfirmation = { async() => await updateTag("delete") }
             />
@@ -282,6 +282,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
 
    // Handle adding or removing a selected tag
    const selectTag = useCallback((adding: boolean) => {
+      // Prevent selecting tag during a submission
       if (document.getElementById("tagSearch")?.hasAttribute("disabled")) return;
 
       globalDispatch({
@@ -357,6 +358,7 @@ function TagContainer(props: TagContainerProps): JSX.Element {
                            icon = { faGears }
                            onClick = {
                               (event) => {
+                                 // Prevent opening of modal to edit a tag during a submission
                                  if (document.getElementById("tagSearch")?.hasAttribute("disabled")) {
                                     event.stopPropagation();
                                     return;
@@ -450,6 +452,7 @@ export default function TagsForm(props: TagsProps): JSX.Element {
    }, [options]);
 
    const createTag = useCallback(async() => {
+      // Prevent creating tag during a submission
       if (document.getElementById("tagSearch")?.hasAttribute("disabled")) return;
 
       // Default tags have a random color assigned
@@ -514,6 +517,7 @@ export default function TagsForm(props: TagsProps): JSX.Element {
    ]);
 
    const createOrSelectTag = useCallback(() => {
+      // Prevent selecting or creating tags during a submission
       if (document.getElementById("tagSearch")?.hasAttribute("disabled")) return;
 
       const existingTag: Tag = tagsByTitle[search];

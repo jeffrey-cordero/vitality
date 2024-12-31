@@ -96,7 +96,7 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
          ref = { buttonRef }
          className = {
             clsx(
-               "flex items-center justify-center gap-2 rounded-lg text-[0.9rem] font-bold outline-none hover:cursor-pointer focus:border-blue-600 focus:ring-2 focus:ring-blue-600 xxsm:text-base",
+               "flex items-center justify-center gap-2 rounded-lg text-[0.9rem] font-bold outline-none hover:cursor-pointer focus:border-blue-600 focus:ring-2 focus:ring-blue-600 disabled:pointer-events-none disabled:opacity-50 xxsm:text-base",
                className
             )
          }

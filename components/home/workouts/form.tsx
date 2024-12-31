@@ -50,8 +50,8 @@ export default function Form(props: VitalityProps): JSX.Element {
    const { updateNotifications } = useContext(NotificationContext);
    const { globalState, globalDispatch } = props;
    const [localState, localDispatch] = useReducer(formReducer, form);
-   const [displayingFormModal, setDisplayingFormModal] = useState<boolean>(false);
-   const [modalLocked, setModalLocked] = useState<boolean>(false);
+   const [isDisplayingModal, setIsDisplayingModal] = useState<boolean>(false);
+   const [isModalLocked, setIsModalLocked] = useState<boolean>(false);
    const displayFormModal: boolean = globalState.workout.data?.display;
    const formModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
@@ -117,8 +117,8 @@ export default function Form(props: VitalityProps): JSX.Element {
          ? await addWorkout(user.id, payload) : await updateWorkout(user.id, payload, method);
 
       if (response.status !== "Success") {
-         // Unlock modal for non-successful responses
-         setModalLocked(false);
+         // Unlock modal for failed responses
+         setIsModalLocked(false);
       }
 
       processResponse(response, localDispatch, updateNotifications, () => {
@@ -174,8 +174,8 @@ export default function Form(props: VitalityProps): JSX.Element {
             }
          });
 
-         // Unlock modal after updating global state
-         setModalLocked(false);
+         // Unlock modal for successful responses after submitting workout updates
+         setIsModalLocked(false);
 
          if (method === "delete") {
             formModalRef.current?.close();
@@ -190,8 +190,8 @@ export default function Form(props: VitalityProps): JSX.Element {
    };
 
    const submitWorkoutUpdates = useCallback(() => {
-      // Lock modal to prevent state mismanagement
-      setModalLocked(true);
+      // Lock modal to prevent state race conditions
+      setIsModalLocked(true);
 
       // Submit workout updates to the server
       updateButtonRef.current?.submit();
@@ -274,13 +274,16 @@ export default function Form(props: VitalityProps): JSX.Element {
          }
       });
 
-      setDisplayingFormModal(false);
+      setIsDisplayingModal(false);
    }, [
       user,
       globalDispatch
    ]);
 
    const resetWorkoutForm = useCallback(() => {
+      // Prevent resetting the form state during a submission
+      if (document.getElementById("title")?.getAttribute("disabled") === "true") return;
+
       // Reset tag selection and workout property inputs
       globalDispatch({
          type: "updateState",
@@ -304,15 +307,15 @@ export default function Form(props: VitalityProps): JSX.Element {
    ]);
 
    useEffect(() => {
-      if (displayFormModal && !displayingFormModal) {
+      if (displayFormModal && !isDisplayingModal) {
          // Open workout form modal if not already displayed
          formModalRef.current?.open();
-         setDisplayingFormModal(true);
+         setIsDisplayingModal(true);
       }
    }, [
       displayFormModal,
       displayWorkoutForm,
-      displayingFormModal
+      isDisplayingModal
    ]);
 
    return (
@@ -323,7 +326,7 @@ export default function Form(props: VitalityProps): JSX.Element {
             ref = { formModalRef }
             onClose = { closeWorkoutForm }
             onClick = { displayWorkoutForm }
-            locked = { modalLocked }
+            locked = { isModalLocked }
          >
             <div className = "relative">
                <div className = "flex flex-col items-center justify-center gap-2 text-center">
@@ -388,7 +391,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      className = "h-10 bg-primary text-white"
                      onSubmit = { () => updateWorkoutState(isNewWorkout ? "add" : "update") }
                      onClick = { submitWorkoutUpdates }
-                     isSingleSubmission = { isNewWorkout ? true : undefined }
+                     isSingleSubmission = { true }
                      inputIds = { ["title", "date", "tagSearch", "image-form-button", "image", "description"] }
                   >
                      { isNewWorkout ? "Create" : "Update" }
@@ -396,6 +399,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                   {
                      !isNewWorkout && (
                         <Confirmation
+                           disabled = { isModalLocked }
                            message = "Delete workout?"
                            onConfirmation = { async() => await updateWorkoutState("delete") }
                         />

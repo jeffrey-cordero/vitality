@@ -159,7 +159,7 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
          className = "mt-12 max-h-[90%] max-w-full sm:max-w-xl"
          disabled = { input.data?.verified }
       >
-         <div className = "relative flex flex-col items-center justify-center gap-4 py-2 text-center">
+         <div className = "relative flex flex-col items-center justify-center gap-4 pb-2 text-center">
             <FontAwesomeIcon
                icon = { faShieldHalved }
                className = "mt-6 text-5xl text-primary"
@@ -169,49 +169,58 @@ export default function VerifyAttribute(props: VerifyAttributeProps): JSX.Elemen
                   { `A one-time verification code has been sent to your ${attribute}, please enter it below to complete the process` }
                </p>
             </div>
-            <div className = "mx-auto flex w-full flex-row flex-wrap items-center justify-center gap-3">
-               {
-                  Array.from({ length: 4 }, (_, index) => {
-                     const input = localState[index];
-
-                     return (
-                        <div
-                           className = "size-12 font-bold xsm:size-14"
-                           key = { index }
-                        >
-                           <input
-                              id = { `verification-${index}` }
-                              className = {
-                                 clsx("flex size-full flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-2 text-center text-lg outline-none focus:border-[1.5px] focus:border-primary disabled:pointer-events-none disabled:opacity-50 dark:border-0 dark:bg-gray-700/50", {
-                                    "border-red-500 border-2 dark:border-2 focus:border-red-500 focus:ring-red-500 error" : input.error === "\0"
-                                 })
-                              }
-                              onChange = { (event: ChangeEvent<HTMLInputElement>) => updateVerificationInput(event, index) }
-                              type = "text"
-                              maxLength = { 1 }
-                              onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => event.key === "Enter" && handleSubmitUpdates() }
-                           />
-                        </div>
-                     );
+            <div
+               className = {
+                  clsx( "relative flex flex-col items-center justify-center", {
+                     "gap-2": localState.empty.value,
+                     "gap-6": !localState.empty.value
                   })
                }
-            </div>
-            <Error
-               className = "my-0"
-               message = { localState.empty.value ? "Invalid verification code" : null }
-            />
-            <Button
-               ref = { updateButtonRef }
-               type = "submit"
-               className = "h-[2.6rem] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white hover:bg-primary/80 xxsm:text-base"
-               icon = { icon }
-               onSubmit = { submitVerificationCode }
-               onClick = { handleSubmitUpdates }
-               isSingleSubmission = { true }
-               inputIds = { ["verification-0", "verification-1", "verification-2", "verification-3"] }
             >
-               Verify
-            </Button>
+               <div className = "mx-auto flex w-full flex-row flex-wrap items-center justify-center gap-3">
+                  {
+                     Array.from({ length: 4 }, (_, index) => {
+                        const input = localState[index];
+
+                        return (
+                           <div
+                              className = "size-12 font-bold xsm:size-14"
+                              key = { index }
+                           >
+                              <input
+                                 id = { `verification-${index}` }
+                                 className = {
+                                    clsx("flex size-full flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-2 text-center text-lg outline-none focus:border-[1.5px] focus:border-primary disabled:pointer-events-none disabled:opacity-50 dark:border-0 dark:bg-gray-700/50", {
+                                       "border-red-500 border-2 dark:border-2 focus:border-red-500 focus:ring-red-500 error" : input.error === "\0"
+                                    })
+                                 }
+                                 onChange = { (event: ChangeEvent<HTMLInputElement>) => updateVerificationInput(event, index) }
+                                 type = "text"
+                                 maxLength = { 1 }
+                                 onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => event.key === "Enter" && handleSubmitUpdates() }
+                              />
+                           </div>
+                        );
+                     })
+                  }
+               </div>
+               <Error
+                  className = "my-0"
+                  message = { localState.empty.value ? "Invalid verification code" : null }
+               />
+               <Button
+                  ref = { updateButtonRef }
+                  type = "submit"
+                  className = "h-[2.6rem] whitespace-nowrap rounded-md bg-primary p-5 text-sm font-bold text-white hover:bg-primary/80 xxsm:text-base"
+                  icon = { icon }
+                  onSubmit = { submitVerificationCode }
+                  onClick = { handleSubmitUpdates }
+                  isSingleSubmission = { true }
+                  inputIds = { ["verification-0", "verification-1", "verification-2", "verification-3"] }
+               >
+                  Verify
+               </Button>
+            </div>
             <div>
                <p className = "text-sm font-bold xxsm:text-base">
                   Didn&apos;t receive code?{ " " }

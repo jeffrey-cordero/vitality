@@ -79,7 +79,7 @@ export default function SignUp(): JSX.Element {
                <Link href = "/home">
                   <Button
                      type = "button"
-                     className = "h-[2.2rem] bg-green-500/90 px-5 py-3 text-sm text-white focus:border-green-700 focus:ring-2 focus:ring-green-700 xxsm:text-[0.95rem] dark:border-0"
+                     className = "h-[2.2rem] bg-green-500 px-5 py-3 text-sm text-white focus:border-green-600 focus:ring-2 focus:ring-green-600 xxsm:text-[0.95rem] dark:border-0"
                      icon = { faDoorOpen }
                      onClick = {
                         async() => {
@@ -96,6 +96,12 @@ export default function SignUp(): JSX.Element {
                   </Button>
                </Link>
             )
+         });
+
+         // Reset the form state after successful registration
+         dispatch({
+            type: "resetState",
+            value: form
          });
       });
    }, [
@@ -124,11 +130,15 @@ export default function SignUp(): JSX.Element {
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
                   onClick = {
-                     () =>
+                     () => {
+                        // Prevent resetting the form state during a submission
+                        if (document.getElementById("username")?.getAttribute("disabled") === "true") return;
+
                         dispatch({
                            type: "resetState",
                            value: form
-                        })
+                        });
+                     }
                   }
                   className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                />
