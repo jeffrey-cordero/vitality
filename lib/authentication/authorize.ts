@@ -17,6 +17,8 @@ export async function fetchAttributes(id: string): Promise<User | null> {
       // Remove hashed password from user object
       return user !== null ? { ...user, password: "*".repeat(user.password.length) } : null;
    } catch (error) {
+      console.error(error);
+
       return null;
    }
 }
@@ -29,6 +31,8 @@ export async function fetchUser(username: string): Promise<User | null> {
          }
       });
    } catch (error) {
+      console.error(error);
+
       return null;
    }
 }

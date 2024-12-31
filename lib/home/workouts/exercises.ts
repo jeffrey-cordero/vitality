@@ -183,6 +183,8 @@ export async function addExercise(user_id: string, exercise: Exercise): Promise<
          return sendSuccessMessage("Successfully added new exercise", formatDatabaseExercise(newExercise));
       }
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }
@@ -294,6 +296,8 @@ export async function updateExercise(user_id: string, exercise: Exercise, method
          );
       }
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }
@@ -461,6 +465,8 @@ export async function updateExercises(user_id: string, workout: Workout): Promis
          formatDatabaseWorkout(newWorkout).exercises
       );
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }

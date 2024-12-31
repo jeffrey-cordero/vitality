@@ -35,9 +35,6 @@ export function sendErrorMessage<T>(message: string, errors: Record<string, stri
 }
 
 export function sendFailureMessage<T>(error: Error): VitalityResponse<T> {
-   // Error logs strictly within a development environment
-   process.env.NODE_ENV === "development" && console.error(error);
-
    return {
       status: "Failure",
       body: {
@@ -59,7 +56,7 @@ export function processResponse(
    if (response.status === "Success") {
       // Call the success method provided
       successMethod.call(null);
-   } else if (response.status === "Error" && Object.keys(response.body.errors).length > 0) {
+   } else if (response.status === "Error") {
       // Update state to display all errors found within the response
       dispatch({
          type: "processResponse",

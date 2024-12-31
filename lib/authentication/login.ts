@@ -18,6 +18,8 @@ export async function login(credentials: Credentials): Promise<VitalityResponse<
 
       await signIn("credentials", userCredentials);
    } catch (error) {
+      console.error(error);
+
       if (error instanceof AuthError) {
          switch (error.type) {
             case "CallbackRouteError":

@@ -59,6 +59,8 @@ export async function fetchWorkoutTags(user_id: string): Promise<Tag[]> {
          }
       });
    } catch (error) {
+      console.error(error);
+
       return [];
    }
 }
@@ -98,6 +100,8 @@ export async function addWorkoutTag(user_id: string, tag: Tag): Promise<Vitality
 
       return sendSuccessMessage("Successfully created workout tag", newTag);
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }
@@ -178,6 +182,8 @@ export async function updateWorkoutTag(user_id: string, tag: Tag, method: "updat
             );
       }
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }
