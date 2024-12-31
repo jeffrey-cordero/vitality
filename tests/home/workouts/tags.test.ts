@@ -1,11 +1,11 @@
 import { expect } from "@jest/globals";
-import { root } from "@/tests/authentication/data";
-import { prismaMock } from "@/tests/singleton";
-import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { getAppliedWorkoutTagUpdates } from "@/lib/home/workouts/workouts";
-import { workout, tags } from "@/tests/home/workouts/data";
-import { addWorkoutTag, fetchWorkoutTags, Tag, updateWorkoutTag } from "@/lib/home/workouts/tags";
+
+import { addWorkoutTag, fetchWorkoutTags, getAppliedTagUpdates, Tag, updateWorkoutTag } from "@/lib/home/workouts/tags";
+import { root } from "@/tests/authentication/data";
+import { tags, workout } from "@/tests/home/workouts/data";
+import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
+import { prismaMock } from "@/tests/singleton";
 
 const MOCK_WORKOUT_TAG: Tag = {
    id: "",
@@ -15,41 +15,42 @@ const MOCK_WORKOUT_TAG: Tag = {
 };
 
 let tag: Tag;
-let tagsByTitle: Record<string, Tag> = {};
 let tagsById: Record<string, Tag> = {};
+let tagsByTitle: Record<string, Tag> = {};
 
 describe("Workout Tags Tests", () => {
-   const handlePrismaMockMethods = (params: any, method: string): Tag | null => {
-      const isInvalidUser = method === "create" ?
-         params.data.user_id !== root.id : params.where.user_id !== root.id;
+   const applyTagTableMethods = (params: any, method: string): Tag | null => {
+      const isInvalidUser = method === "create" ? params.data?.user_id !== root.id : params.where.user_id !== root.id;
 
       if (isInvalidUser) {
+         // Account for invalid user ID provided
          throw new PrismaClientKnownRequestError("Foreign key constraint violated", {
             code: "P2003",
             clientVersion: "5.22.0"
          });
+      } else {
+         // Account for successful database operation
+         const newTag: Tag = {
+            ...params.data,
+            id: method === "create" ? MOCK_ID : params.where.id,
+            user_id: method === "create" ? params.data?.user_id : params.where.user_id
+         };
+
+         if (method !== "create") {
+            delete tagsByTitle[tagsById[params.where.id]?.title || ""];
+            delete tagsById[params.where.id];
+         }
+
+         if (method !== "delete") {
+            tagsByTitle[newTag.title] = newTag;
+            tagsById[newTag.id] = newTag;
+         }
+
+         return newTag;
       }
-
-      const newTag: Tag = {
-         ...params.data,
-         id: method === "create" ? MOCK_ID : params.where.id,
-         user_id: method === "create" ? params.data.user_id : params.where.user_id
-      };
-
-      if (method !== "create") {
-         delete tagsByTitle[tagsById[params.where.id]?.title || ""];
-         delete tagsById[params.where.id];
-      }
-
-      if (method !== "delete") {
-         tagsByTitle[newTag.title] = newTag;
-         tagsById[newTag.id] = newTag;
-      }
-
-      return newTag;
    };
 
-   const handleFieldErrors = async(method: "create" | "update" | "delete") => {
+   const testFieldErrors = async(method: "create" | "update" | "delete") => {
       const invalidWorkoutTags = [
          {
             tag: {
@@ -74,17 +75,16 @@ describe("Workout Tags Tests", () => {
                color: "rgb(73, 47, 100)"
             },
             errors: {
-               id: method === "create" ?
-                  ["ID for workout tag must be empty or undefined"] : ["ID for workout tag must be in UUID format"],
+               id: method === "create"
+                  ? ["ID for workout tag must be empty or undefined"] : ["ID for workout tag must be in UUID format"],
                title: ["Title must be at most 30 characters"]
             }
          }
       ];
 
       for (const { tag, errors } of invalidWorkoutTags) {
-         expect(
-            method === "create" ?
-               await addWorkoutTag(root.id, tag) : await updateWorkoutTag(root.id, tag, method)
+         expect(method === "create" ?
+            await addWorkoutTag(root.id, tag) : await updateWorkoutTag(root.id, tag, method)
          ).toEqual({
             status: "Error",
             body: {
@@ -99,17 +99,7 @@ describe("Workout Tags Tests", () => {
       expect(prismaMock.workout_tags[method]).not.toHaveBeenCalled();
    };
 
-   const handleDatabaseErrors = async(method: "create" | "update" | "delete") => {
-      // Delete method should correspond to a successful response for final test scenario
-      const expectedRemoval = {
-         status: "Success",
-         body: {
-            data: { id: tags[0].id, user_id: root.id },
-            message: "Successfully deleted workout tag",
-            errors: {}
-         }
-      };
-
+   const testDatabaseErrors = async(method: "create" | "update" | "delete") => {
       const invalidWorkoutTags = [
          {
             tag: {
@@ -127,21 +117,40 @@ describe("Workout Tags Tests", () => {
                      { title: ["Workout tag title already exists"] } : { }
                }
             }
-         }, {
+         },
+         {
             tag: {
                ...MOCK_WORKOUT_TAG,
                id: method === "create" ? "" : tags[0].id,
+               title: tags[0].title
+            },
+            expected: {
+               status: method === "delete" ? "Success" : "Error",
+               body: {
+                  // Assume tag record is return successfully for delete operation
+                  data: method === "delete" ? expect.any(Object) : null,
+                  message: method === "delete" ?
+                     "Successfully deleted workout tag" : "Workout tag title already exists",
+                  errors: method === "delete" ?
+                     {} : { title: ["Workout tag title already exists"] }
+               }
+            }
+         },
+         {
+            tag: {
+               ...MOCK_WORKOUT_TAG,
+               id: method === "create" ? "" : MOCK_ID,
                title: method === "update" ? tags[1].title : "New Workout Tag Title",
                user_id: method === "create" ? MOCK_ID : root.id
             },
-            expected: method === "delete" ? expectedRemoval : {
+            expected: {
                status: method === "create" ? "Failure" : "Error",
                body: {
                   data: null,
                   message: method === "create" ?
-                     "Something went wrong. Please try again." : "Workout tag title already exists",
+                     "Oops! Something went wrong. Try again later." : "Workout tag does not exist based on user and/or tag ID",
                   errors: method === "create" ?
-                     { system: ["Foreign key constraint violated"] } : { title: ["Workout tag title already exists"] }
+                     { system: ["Foreign key constraint violated"] } : {}
                }
             }
          }
@@ -164,7 +173,7 @@ describe("Workout Tags Tests", () => {
    };
 
    beforeEach(() => {
-      // Initialize mock tag mappings
+      // Reset tag mappings
       tagsByTitle = Object.fromEntries(tags.map(tag => [tag.title, tag]));
       tagsById = Object.fromEntries(tags.map(tag => [tag.id, tag]));
 
@@ -184,26 +193,21 @@ describe("Workout Tags Tests", () => {
 
       // @ts-ignore
       ["create", "update", "delete"].forEach((method) => {
-         prismaMock.workout_tags[method].mockImplementation(async(params) =>
-            handlePrismaMockMethods(params, method)
-         );
+         prismaMock.workout_tags[method].mockImplementation(async(params) => {
+            return applyTagTableMethods(params, method);
+         });
       });
    });
 
    describe("Fetch workout tags", () => {
-      test("Fetch workout tags for existing and missing users", async() => {
-         expect(await fetchWorkoutTags(root.id)).toEqual(tags);
-         expect(prismaMock.workout_tags.findMany).toHaveBeenCalledWith({
-            where: { user_id: root.id }
-         } as any);
-
+      test("Should return empty array if user does not exist", async() => {
          expect(await fetchWorkoutTags(MOCK_ID)).toEqual([]);
          expect(prismaMock.workout_tags.findMany).toHaveBeenCalledWith({
             where: { user_id: MOCK_ID }
          } as any);
       });
 
-      test("Handle database errors when fetching workout tags", async() => {
+      test("Should fail fetching workout tags when a database error occurs", async() => {
          // @ts-ignore
          prismaMock.workout_tags.findMany.mockRejectedValue(
             new Error("Database Error")
@@ -211,18 +215,25 @@ describe("Workout Tags Tests", () => {
          expect(await fetchWorkoutTags(root.id)).toEqual([]);
          expect(await fetchWorkoutTags(MOCK_ID)).toEqual([]);
       });
+
+      test("Should fetch workout tags for existing users", async() => {
+         expect(await fetchWorkoutTags(root.id)).toEqual(tags);
+         expect(prismaMock.workout_tags.findMany).toHaveBeenCalledWith({
+            where: { user_id: root.id }
+         } as any);
+      });
    });
 
    describe("Create workout tag", () => {
-      test("Create workout tag with errors", async() => {
-         await handleFieldErrors("create");
+      test("Should fail to create workout tag when fields are invalid", async() => {
+         await testFieldErrors("create");
       });
 
-      test("Handle database constraints when creating workout tag", async() => {
-         await handleDatabaseErrors("create");
+      test("Should fail creating workout tag when a database conflict or error occurs", async() => {
+         await testDatabaseErrors("create");
       });
 
-      test("Create valid workout tag", async() => {
+      test("Should succeed in creating workout tag with valid fields", async() => {
          tag = {
             ...MOCK_WORKOUT_TAG,
             user_id: root.id,
@@ -262,15 +273,15 @@ describe("Workout Tags Tests", () => {
    });
 
    describe("Update workout tag", () => {
-      test("Update workout tag with errors", async() => {
-         await handleFieldErrors("update");
+      test("Should fail to update workout tag when fields are invalid", async() => {
+         await testFieldErrors("update");
       });
 
-      test("Handle database constraints when updating workout tag", async() => {
-         await handleDatabaseErrors("update");
+      test("Should fail updating workout tag when a database conflict or error occurs", async() => {
+         await testDatabaseErrors("update");
       });
 
-      test("Update valid workout tag", async() => {
+      test("Should succeed in updating workout tag with valid fields", async() => {
          tag = {
             ...MOCK_WORKOUT_TAG,
             id: tags[0].id,
@@ -305,8 +316,7 @@ describe("Workout Tags Tests", () => {
                title: tags[0].title,
                user_id: tag.user_id.trim()
             }
-         })
-         ).toBeNull();
+         })).toBeNull();
          expect(tagsByTitle[tags[0].title]).toBeUndefined();
          expect(prismaMock.workout_tags.update).toHaveBeenCalledWith({
             where: {
@@ -322,15 +332,15 @@ describe("Workout Tags Tests", () => {
    });
 
    describe("Delete workout tag", () => {
-      test("Delete workout tag with errors", async() => {
-         await handleFieldErrors("delete");
+      test("Should fail to delete workout tag when fields are invalid", async() => {
+         await testFieldErrors("delete");
       });
 
-      test("Handle database constraints when deleting workout tag", async() => {
-         await handleDatabaseErrors("delete");
+      test("Should fail deleting workout tag when a database conflict or error occurs", async() => {
+         await testDatabaseErrors("delete");
       });
 
-      test("Delete valid workout tag", async() => {
+      test("Should succeed in deleting workout tag with valid fields", async() => {
          tag = {
             ...MOCK_WORKOUT_TAG,
             id: tags[0].id,
@@ -367,19 +377,9 @@ describe("Workout Tags Tests", () => {
       });
    });
 
-   describe("Update workout tags", () => {
-      test("Update applied workouts tags", async() => {
-         // Mock applied workout tags and workout entries
-         const newTagIds = [
-            "69b62ca8-9222-4d68-b83a-c352c3989a49",
-            "69b62ca8-9222-4d68-b83a-c352c3989a50"
-         ];
-
-         const remainingTagIds = [
-            tags[0].id,
-            tags[1].id
-         ];
-
+   describe("Applied workout tags calculations", () => {
+      test("Should succeed in calculating applied workout tags", async() => {
+         // Applied workout tags calculations with a mock existing workout record
          const existingWorkout = {
             ...workout,
             workout_applied_tags: [
@@ -398,20 +398,34 @@ describe("Workout Tags Tests", () => {
             ]
          };
 
+         const addingTagIds = [
+            "69b62ca8-9222-4d68-b83a-c352c3989a49",
+            "69b62ca8-9222-4d68-b83a-c352c3989a50"
+         ];
+
+         const existingTagIds = [
+            tags[0].id,
+            tags[1].id
+         ];
+
+         const removingTagId = [
+            tags[2].id
+         ];
+
          const newWorkout = {
             ...workout,
             tagIds: [
-               ...newTagIds,
-               ...remainingTagIds
+               ...addingTagIds,
+               ...existingTagIds
             ]
          };
 
          expect(
-            await getAppliedWorkoutTagUpdates(existingWorkout, newWorkout)
+            await getAppliedTagUpdates(existingWorkout, newWorkout)
          ).toEqual({
-            existing: remainingTagIds,
-            adding: newTagIds,
-            removing: [tags[2].id]
+            existing: existingTagIds,
+            adding: addingTagIds,
+            removing: removingTagId
          });
       });
    });

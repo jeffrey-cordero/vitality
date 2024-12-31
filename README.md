@@ -1,101 +1,170 @@
 # Vitality
 
-Your all-in-one modern fitness tracker for progress and performance to fuel your fitness goals. Feel free to use any of the related code for your own projects! The application can be accessed [http://localhost/](http://localhost/) after setting up development environment. Note that this project is a work in progress.
+This modern fitness tracker supports workout tracking, with plans for future expansion to include additional features, as outlined on the mock landing page. The application is set for deployment soon, and the URL will be provided in the repository once publicly available. I look forward to continuing development, exploring new functionalities, and enhancing my skills. Feel free to use any related components or methods for your own projects!
+
+## Getting Started
+
+### Prerequisites
+
+- **Node.js**
+- **Docker**
+- **npm**
+
+### Setup
+
+After completing the steps below to get the application running on your local machine, you can access it via [http://localhost:3000](http://localhost:3000) in your browser to start tracking your workouts!
+
+If you encounter any issues or need further assistance, feel free to submit a GitHub Issue. Be sure to include detailed information such as steps to reproduce, expected versus actual behavior, and any relevant logs or screenshots.
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/jeffrey-asm/vitality
+   cd vitality
+   ```
+
+2. **Install required dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Build the project**
+
+   ```bash
+   npm run build
+   ```
+
+4. **Start the application**
+
+   ```bash
+   docker-compose up
+   ```
+
+### Pages
+
+- `unauthenticated`
+  - [Landing](http://localhost:3000/)
+    - Showcases current and upcoming app expansions through engaging sections, complemented by mock testimonials and diverse imagery.
+
+  - [Log In](http://localhost:3000/login)
+    - Allows returning users to securely access their accounts.
+
+  - [Sign Up](http://localhost:3000/signup)
+    - Enables new users to create an account and quickly get started with the app.
+- `authenticated`
+  - [Workouts](http://localhost:3000/home/workouts)
+    - Lets users log and filter workouts over time, including exercises with their detailed entries (weight, repetitions, interval, etc.)
+
+  - [Settings](http://localhost:3000/home/settings)
+    - Allows users to customize profile attributes, manage application preferences, terminate sessions, and delete accounts.
+
+  - [Feedback](http://localhost:3000/home/feedback)
+    - Allows users to submit feedback, report issues, and suggest improvements.
 
 ## Development
 
-To install all node module dependencies
+### Folder Structure
 
-```bash
-npm install
-```
+- `/`
+  - Contains dependency and configuration files for Next.js, NextAuth.js, TypeScript, Tailwind CSS, Jest, Nginx, and Docker.
+  - `/app`
+    - Provides layouts for individual pages, authentication workflows, and "not found" pages.
+  - `/components`
+    - Contains reusable React components, as well as page-specific ones.
+  - `/lib`
+    - Includes shared utilities, NextAuth.js session management, secure server actions, and database initialization resources.
+  - `/prisma`
+    - Contains Prisma ORM migration scripts and schema files.
+  - `/public`
+    - Stores global and page-specific assets, fonts, and configuration files.
+  - `/tests`
+    - Includes global and page-specific unit tests, mock data, and a singleton-pattern Prisma ORM client.
 
-To start development processes
+### Processes
 
-``` bash
-docker compose up 
-```
+Ensure the `docker-compose.yaml` file is configured for development instead of production. Update the command in the app container from `npm run start` to `npm run dev`.
 
-To pause development processes
+  ```yaml
+  command: sh -c "npm run dev"
+  ```
 
-```bash
+1. **Start Development Environment**
 
-docker compose stop
-```
+   ```bash
+   docker compose up
+   ```
 
-To restart restart development by clearing all associated application containers, networks, and volumes
+2. **Pause Development Environment**
 
-```bash
-docker compose down -v --remove-orphans 
-```
+   ```bash
+   docker compose stop
+   ```
 
-### Logs
+3. **Reset Development Environment**
 
-View logs for all service containers in realtime
+   ```bash
+   docker compose down -v --remove-orphans
+   ```
 
-```bash
-docker compose logs -f
-```
+### Logging
 
-View most recent logs for all service containers
+1. **View Live Logs**
 
-```bash
-docker compose logs 
-```
+   ```bash
+   docker compose logs -f
+   ```
 
-View most recent logs for specific service containers
+2. **View Recent Logs**
 
-```bash
-docker logs <container-name> 
-```
+   ```bash
+   docker compose logs
+   ```
 
-## Database
+3. **View Recent Logs for Specific Containers**
 
-Access database through the docker container
+   ```bash
+   docker logs <vitality_app | vitality_postgres | vitality_nginx>
+   ```
 
-``` bash
-docker exec -it vitality_postgres psql -U postgres -d vitality
-```
+### Database
 
-Access database through the Prisma ORM
+1. **Interactive Access via Docker (PostgreSQL)**
 
-``` bash
-docker exec -it vitality_app npx prisma studio
-```
+   ```bash
+   docker exec -it vitality_postgres psql -U postgres -d vitality
+   ```
 
-Make changes to the default database schema in a development environment through the following steps
+2. **Interactive Access via Prisma ORM**
 
-- Make changes in the starter file `tests/init.sql`
-- Run the following command to apply the changes
+   ```bash
+   docker exec -it vitality_app npx prisma studio
+   ```
 
-```bash
-docker exec -it vitality_app npx prisma db pull
-docker exec -it vitality_app npx prisma db push
-```
+### Linting
 
-Use Prisma ORM to efficiently make migrations while preserving sensitive user information through the following steps
+1. **View Linting Errors**
 
-- Add the proposed changes to the model located at `prisma/schema.prisma`
-- Run the following command to apply the changes
+   ```bash
+   npx eslint . --ignore-pattern 'next-env.**'
+   ```
 
-``` bash
-docker exec -it vitality_app npx prisma migrate dev --name <migration-name>
-```
+2. **Fix Linting Errors**
 
-## Testing
+   ```bash
+   npm run lint
+   ```
 
-### Jest
+### Testing
 
-Run unit tests
+1. **Run All Unit Tests**
 
-```bash
-npm run tests
-```
+   ```bash
+   npm run tests
+   ```
 
-## Linting
+2. **Run Specific Unit Test(s)**
 
-View current potential linting errors / warnings based on `.eslintrc.json` specifications
-
-```bash
-npx eslint . --fix
-```
+   ```bash
+   npx jest <test-file(s)> --collect-coverage --detectOpenHandles --verbose
+   ```

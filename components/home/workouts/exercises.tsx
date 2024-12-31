@@ -1,24 +1,26 @@
 "use client";
-import clsx from "clsx";
-import Button from "@/components/global/button";
-import TextArea from "@/components/global/textarea";
-import Confirmation from "@/components/global/confirmation";
-import { CSS } from "@dnd-kit/utilities";
-import { useDoubleTap } from "use-double-tap";
-import { Input } from "@/components/global/input";
-import { Workout } from "@/lib/home/workouts/workouts";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
-import { VitalityChildProps, VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, TouchSensor } from "@dnd-kit/core";
+import { closestCenter, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { addExercise, updateExercise, Exercise, ExerciseSet, updateExercises, isEmptyExerciseSet } from "@/lib/home/workouts/exercises";
-import { faAlignJustify, faArrowRotateLeft, faArrowUp91, faDumbbell, faStopwatch, faCaretRight, faCaretDown, faCircleNotch, faXmark, faPersonRunning, faPlus, faListCheck } from "@fortawesome/free-solid-svg-icons";
+import { CSS } from "@dnd-kit/utilities";
+import { faArrowRotateLeft, faCaretDown, faCaretRight, faPenNib, faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
+import { useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
+import { useDoubleTap } from "use-double-tap";
+
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import Button from "@/components/global/button";
+import Confirmation from "@/components/global/confirmation";
+import { Input } from "@/components/global/input";
+import ExerciseEntryContainer from "@/components/home/workouts/entries";
+import { formReducer, VitalityChildProps, VitalityProps, VitalityState } from "@/lib/global/reducer";
+import { processResponse, VitalityResponse } from "@/lib/global/response";
+import { addExercise, Exercise, ExerciseEntry, updateExercise, updateExercises } from "@/lib/home/workouts/exercises";
+import { Workout } from "@/lib/home/workouts/workouts";
 
 const form: VitalityState = {
    name: {
+      id: "name",
       value: "",
       error: null,
       data: {
@@ -27,78 +29,80 @@ const form: VitalityState = {
       }
    },
    weight: {
+      id: "weight",
       value: "",
       error: null,
       data: {}
    },
    repetitions: {
+      id: "repetitions",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    hours: {
+      id: "hours",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    minutes: {
+      id: "minutes",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    seconds: {
+      id: "seconds",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    text: {
+      id: "text",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    exerciseId: {
+      id: "exerciseId",
       value: null,
       error: null,
       data: {
-         setId: ""
+         entryId: ""
       }
    }
 };
 
 function CreateExercise(props: ExerciseProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { workout, localState, localDispatch, saveExercises, onBlur } = props;
    const createButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
-   const handleCreateNewExercise = useCallback(async() => {
+   const createExercise = useCallback(async() => {
       const payload: Exercise = {
          id: "",
          workout_id: workout.id,
          name: localState.name.value.trim(),
          exercise_order: workout.exercises.length,
-         sets: []
+         entries: []
       };
 
       const response: VitalityResponse<Exercise> = await addExercise(user.id, payload);
 
-      handleResponse(response, localDispatch, updateNotification, () => {
+      processResponse(response, localDispatch, updateNotifications, () => {
          const newExercises: Exercise[] = [...workout.exercises, response.body.data as Exercise];
          saveExercises(newExercises);
          onBlur();
       });
    }, [
       user,
-      localDispatch,
-      localState.name.value,
-      saveExercises,
-      updateNotification,
-      workout.exercises,
+      onBlur,
       workout.id,
-      onBlur
+      localDispatch,
+      saveExercises,
+      workout.exercises,
+      updateNotifications,
+      localState.name.value
    ]);
 
-   const handleSubmitCreation = useCallback(() => {
+   const submitCreateExerciseUpdates = useCallback(() => {
       createButtonRef.current?.submit();
    }, []);
 
@@ -108,15 +112,17 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
             icon = { faArrowRotateLeft }
             onClick = {
                () => {
+                  // Prevent resetting the exercise name during a submission
+                  if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
                   localDispatch({
                      type: "updateState",
                      value: {
-                        input: {
-                           ...localState.name,
+                        id: "name",
+                        value: {
                            value: "",
                            error: null
-                        },
-                        id: "name"
+                        }
                      }
                   });
                }
@@ -125,9 +131,12 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
          />
          <FontAwesomeIcon
             icon = { faXmark }
-            className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer text-xl text-red-500"
+            className = "absolute right-[10px] top-[-27px] z-10 cursor-pointer text-xl text-red-500"
             onClick = {
                () => {
+                  // Prevent closing the exercise name input during a submission
+                  if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
                   onBlur();
                }
             }
@@ -136,10 +145,10 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
             id = "name"
             type = "text"
             label = "Name"
-            icon = { faDumbbell }
+            icon = { faPenNib }
             input = { localState.name }
             dispatch = { localDispatch }
-            onSubmit = { handleSubmitCreation }
+            onSubmit = { submitCreateExerciseUpdates }
             autoComplete = "none"
             autoFocus
             scrollIntoView
@@ -149,10 +158,11 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
             ref = { createButtonRef }
             type = "button"
             className = "h-10 w-full border-[1.5px] border-gray-100 bg-green-500 px-4 py-2 font-bold text-white focus:border-green-600 focus:ring-2 focus:ring-green-600 dark:border-0"
-            icon = { faDumbbell }
-            onSubmit = { handleCreateNewExercise }
-            onClick = { handleSubmitCreation }
+            icon = { faPenNib }
+            onSubmit = { createExercise }
+            onClick = { submitCreateExerciseUpdates }
             isSingleSubmission = { true }
+            inputIds = { ["name"] }
          >
             Create
          </Button>
@@ -160,389 +170,7 @@ function CreateExercise(props: ExerciseProps): JSX.Element {
    );
 }
 
-interface ExerciseSetProps extends ExerciseProps {
-   set: ExerciseSet | undefined;
-   reset: () => void;
-}
-
-function SetContainer(props: ExerciseSetProps): JSX.Element {
-   const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
-   const { workout, exercise, set, localState, localDispatch, onBlur, reset, saveExercises } = props;
-   const [isEditing, setIsEditing] = useState<boolean>(set === undefined);
-   const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
-
-   // Interning exercise set form inputs
-   const isNewSet: boolean = set === undefined;
-   const editingExerciseId: string = localState.exerciseId.value;
-   const editingSetId: string = localState.exerciseId.data.setId;
-   const displayEditSet = isEditing && exercise.id === editingExerciseId && (isNewSet ? editingSetId === "" : set.id === editingSetId);
-
-   // Prevent drag and drop mechanisms when creating or editing an exercise set
-   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-      id: set?.id,
-      disabled: isNewSet || displayEditSet
-   });
-
-   const style = {
-      transform: CSS.Transform.toString(transform),
-      transition
-   };
-
-   const handleConstructExerciseSet = useCallback(() => {
-      // Helper method to format the set inputs for the backend methods
-      const parseSetNumber = (value: any) => {
-         const isEmpty: boolean = typeof value === "string" && value.trim().length === 0;
-         const number: number = +value;
-
-         return (isEmpty || isNaN(number) || number < 0) ? null : number;
-      };
-
-      return {
-         ...set,
-         id: isNewSet ? "" : set.id,
-         exercise_id: exercise.id,
-         set_order: isNewSet ? exercise.sets.length : set.set_order,
-         weight: parseSetNumber(localState.weight.value),
-         repetitions: parseSetNumber(localState.repetitions.value),
-         hours: parseSetNumber(localState.hours.value),
-         minutes: parseSetNumber(localState.minutes.value),
-         seconds: parseSetNumber(localState.seconds.value),
-         text: localState.text.value.trim()
-      };
-   }, [
-      set,
-      isNewSet,
-      exercise.id,
-      exercise.sets.length,
-      localState.hours.value,
-      localState.minutes.value,
-      localState.repetitions.value,
-      localState.seconds.value,
-      localState.text.value,
-      localState.weight.value
-   ]);
-
-   const handleUpdateSet = useCallback(async(method: "add" | "update" | "delete") => {
-      const newSet: ExerciseSet = handleConstructExerciseSet();
-      let response: VitalityResponse<Exercise>;
-
-      if (await isEmptyExerciseSet(newSet)) {
-         // Prevent empty exercise set submissions
-         return;
-      }
-
-      if (method === "add") {
-         // Add new set to array of exercise sets
-         const newSets: ExerciseSet[] = [...exercise.sets, newSet];
-         const newExercise: Exercise = {
-            ...exercise,
-            sets: newSets
-         };
-
-         response = await updateExercise(user.id, newExercise, "sets");
-      } else {
-         // Update or delete set from array of exercise sets
-         const newSets: ExerciseSet[] =
-            method === "update"
-               ? [...exercise.sets].map((s) => (s.id === newSet.id ? newSet : s))
-               : [...exercise.sets].filter((s) => s.id !== newSet.id);
-         const newExercise: Exercise = {
-            ...exercise,
-            sets: newSets
-         };
-
-         response = await updateExercise(user.id, newExercise, "sets");
-      }
-
-      handleResponse(response, localDispatch, updateNotification, () => {
-         // Update editing exercise
-         const newExercises: Exercise[] = [...workout.exercises].map((e) =>
-            e.id === exercise.id ? response.body.data as Exercise : e,
-         );
-
-         saveExercises(newExercises);
-
-         method === "delete" && updateNotification({
-            status: "Success",
-            message: "Delete entry",
-            timer: 1000
-         });
-
-         onBlur();
-      });
-   }, [
-      user,
-      exercise,
-      handleConstructExerciseSet,
-      localDispatch,
-      saveExercises,
-      updateNotification,
-      workout.exercises,
-      onBlur
-   ]);
-
-   const handleSubmitUpdates = useCallback(() => {
-      updateButtonRef.current?.submit();
-   }, []);
-
-   const handleExerciseSetEdits = useCallback(() => {
-      // Update inputs to match set props
-      localDispatch({
-         type: "initializeState",
-         value: {
-            exerciseId: {
-               ...localState.exerciseId,
-               value: exercise.id,
-               data: {
-                  setId: set?.id ?? ""
-               }
-            },
-            weight: {
-               ...localState.weight,
-               value: set?.weight ?? "",
-               error: null
-            },
-            repetitions: {
-               ...localState.repetitions,
-               value: set?.repetitions ?? "",
-               error: null
-            },
-            hours: {
-               ...localState.hours,
-               value: set?.hours ?? "",
-               error: null
-            },
-            minutes: {
-               ...localState.minutes,
-               value: set?.minutes ?? "",
-               error: null
-            },
-            seconds: {
-               ...localState.seconds,
-               value: set?.seconds ?? "",
-               error: null
-            },
-            text: {
-               ...localState.text,
-               value: set?.text ?? "",
-               error: null
-            }
-         }
-      });
-
-      // Display inputs
-      setIsEditing(true);
-   }, [
-      exercise.id,
-      localDispatch,
-      localState.exerciseId,
-      localState.hours,
-      localState.minutes,
-      localState.repetitions,
-      localState.seconds,
-      localState.text,
-      localState.weight,
-      set?.hours,
-      set?.id,
-      set?.minutes,
-      set?.repetitions,
-      set?.seconds,
-      set?.text,
-      set?.weight
-   ]);
-
-   const doubleTap = useDoubleTap(handleExerciseSetEdits);
-
-   return (
-      <div
-         ref = { setNodeRef }
-         style = { style }
-         className = "mx-auto w-full"
-      >
-         {
-            displayEditSet ? (
-               <li className = "relative mx-auto mt-10 flex w-full flex-col items-stretch justify-start gap-2 px-2 text-center font-medium sm:px-8">
-                  <FontAwesomeIcon
-                     icon = { faArrowRotateLeft }
-                     onClick = { reset }
-                     className = "absolute right-[35px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer pr-2 text-base text-primary sm:pr-8"
-                  />
-                  <FontAwesomeIcon
-                     icon = { faXmark }
-                     className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer pr-2 text-xl text-red-500 sm:pr-8"
-                     onClick = {
-                        () => {
-                           if (isNewSet) {
-                              // Remove from DOM for new exercise set inputs
-                              onBlur();
-                           }
-
-                           setIsEditing(false);
-                        }
-                     }
-                  />
-
-                  <Input
-                     id = "weight"
-                     type = "number"
-                     label = "Weight"
-                     min = "0"
-                     icon = { faDumbbell }
-                     input = { localState.weight }
-                     dispatch = { localDispatch }
-                     onSubmit = { handleSubmitUpdates }
-                     autoFocus
-                  />
-                  <Input
-                     id = "repetitions"
-                     type = "number"
-                     label = "Repetitions"
-                     min = "0"
-                     icon = { faArrowUp91 }
-                     input = { localState.repetitions }
-                     dispatch = { localDispatch }
-                     onSubmit = { handleSubmitUpdates }
-                  />
-                  <div className = "flex flex-col items-start justify-between gap-2 sm:flex-row">
-                     <div className = "mx-auto w-full">
-                        <Input
-                           id = "hours"
-                           type = "number"
-                           label = "Hours"
-                           min = "0"
-                           icon = { faStopwatch }
-                           input = { localState.hours }
-                           dispatch = { localDispatch }
-                           onSubmit = { handleSubmitUpdates }
-                        />
-                     </div>
-                     <div className = "mx-auto w-full">
-                        <Input
-                           id = "minutes"
-                           type = "number"
-                           label = "Minutes"
-                           min = "0"
-                           icon = { faStopwatch }
-                           input = { localState.minutes }
-                           dispatch = { localDispatch }
-                           onSubmit = { handleSubmitUpdates }
-                        />
-                     </div>
-                     <div className = "mx-auto w-full">
-                        <Input
-                           id = "seconds"
-                           type = "number"
-                           label = "Seconds"
-                           min = "0"
-                           icon = { faStopwatch }
-                           input = { localState.seconds }
-                           dispatch = { localDispatch }
-                           onSubmit = { handleSubmitUpdates }
-                           scrollIntoView
-                        />
-                     </div>
-                  </div>
-                  <TextArea
-                     id = "text"
-                     type = "text"
-                     label = "Text"
-                     icon = { faAlignJustify }
-                     input = { localState.text }
-                     dispatch = { localDispatch }
-                  />
-                  <Button
-                     ref = { updateButtonRef }
-                     type = "button"
-                     className = "h-10 w-full border-[1.5px] border-gray-100 bg-green-500 px-4 py-2 font-semibold text-white focus:border-green-700 focus:ring-2 focus:ring-green-700 dark:border-0"
-                     icon = { faPersonRunning }
-                     onSubmit = { () => handleUpdateSet(isNewSet ? "add" : "update") }
-                     onClick = { handleSubmitUpdates }
-                     isSingleSubmission = { isNewSet ? true : undefined }
-                  >
-                     { isNewSet ? "Create" : "Update" }
-                  </Button>
-                  {
-                     !isNewSet && (
-                        <Confirmation
-                           message = "Delete entry?"
-                           onConfirmation = { () => handleUpdateSet("delete") }
-                        />
-                     )
-                  }
-               </li>
-            ) : (
-               !isNewSet && (
-                  <li className = "mx-auto flex w-full flex-row items-start justify-start gap-2 pt-2 text-left text-[0.9rem] font-semibold [overflow-wrap:anywhere] xxsm:pl-8 xxsm:text-base">
-                     <div
-                        className = "cursor-grab touch-none pt-1 text-sm"
-                        { ...attributes }
-                        { ...listeners }
-                     >
-                        <FontAwesomeIcon icon = { faCircleNotch } />
-                     </div>
-                     <div
-                        className = "flex cursor-pointer flex-col gap-2 pl-2"
-                        { ...doubleTap }
-                     >
-                        {
-                           set.weight !== null && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
-                                 <FontAwesomeIcon
-                                    className = "self-start pt-1 text-primary"
-                                    icon = { faDumbbell }
-                                 />
-                                 <p>{ set.weight }</p>
-                              </div>
-                           )
-                        }
-                        {
-                           set.repetitions !== null && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
-                                 <FontAwesomeIcon
-                                    className = "self-start pt-1 text-primary"
-                                    icon = { faArrowUp91 }
-                                 />
-                                 <p>{ set.repetitions }</p>
-                              </div>
-                           )
-                        }
-                        {
-                           (set.hours !== null || set.minutes !== null || set.seconds !== null) && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
-                                 <FontAwesomeIcon
-                                    className = "self-start pt-1 text-primary"
-                                    icon = { faStopwatch }
-                                 />
-                                 <p>
-                                    { String(set.hours ?? 0).padStart(2, "0") }:
-                                    { String(set.minutes ?? 0).padStart(2, "0") }:
-                                    { String(set.seconds ?? 0).padStart(2, "0") }
-                                 </p>
-                              </div>
-                           )
-                        }
-                        {
-                           set.text && (
-                              <div className = "flex flex-row items-center justify-start gap-2 font-semibold">
-                                 <FontAwesomeIcon
-                                    className = "self-start pt-1 text-primary"
-                                    icon = { faAlignJustify }
-                                 />
-                                 <p className = "[overflow-wrap:anywhere] ">{ set.text }</p>
-                              </div>
-                           )
-                        }
-                     </div>
-                  </li>
-               )
-            )
-         }
-      </div>
-   );
-}
-
-interface ExerciseProps extends ExercisesProps, VitalityChildProps {
+export interface ExerciseProps extends ExercisesProps, VitalityChildProps {
    exercise: Exercise;
    onBlur?: () => void;
    saveExercises: (_updatingExercises: Exercise[]) => void;
@@ -550,33 +178,34 @@ interface ExerciseProps extends ExercisesProps, VitalityChildProps {
 
 function ExerciseContainer(props: ExerciseProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { workout, exercise, localState, localDispatch, saveExercises } = props;
    const { id, editing } = localState.name.data;
    const [editName, setEditName] = useState<boolean>(false);
-   const [addSet, setAddSet] = useState<boolean>(false);
+   const [addEntry, setAddEntry] = useState<boolean>(false);
    const [isCollapsed, setIsCollapsed] = useState<boolean>(!!window.localStorage.getItem(`collapsed-${exercise.id}`));
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
    // Interning editing exercise name input
    const collapsedId: string = `collapsed-${exercise.id}`;
    const editingExerciseId: string = localState.exerciseId.value;
-   const editingSetId: string = localState.exerciseId.data.setId;
-   const displayEditName = editing && editName && exercise.id === id;
-   const hideNewSetButton = addSet && exercise.id === editingExerciseId && editingSetId === "";
+   const editingEntryId: string = localState.exerciseId.data?.entryId;
+   const displayEditNameInput = editing && editName && exercise.id === id;
+   const hideNewEntryButton = addEntry && exercise.id === editingExerciseId && editingEntryId === "";
 
    useEffect(() => {
-      // Save collapsed state of exercise into localStorage
-      isCollapsed ? window.localStorage.setItem(collapsedId, "true") : window.localStorage.removeItem(collapsedId);
+      // Save collapsed state of exercise listing into localStorage
+      isCollapsed ?
+         window.localStorage.setItem(collapsedId, "true") : window.localStorage.removeItem(collapsedId);
    }, [
       isCollapsed,
       collapsedId
    ]);
 
-   // Prevent drag and drop mechanisms when editing an exercise name or adding a set
+   // Prevent drag and drop mechanisms when editing an exercise name or adding a new entry or if there is only one exercise
    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
       id: exercise.id,
-      disabled: displayEditName || addSet
+      disabled: displayEditNameInput || addEntry || workout.exercises.length === 1
    });
 
    const style = {
@@ -584,7 +213,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       transition
    };
 
-   // Drag and drop for exercise sets
+   // Drag and drop for exercise entries
    const sensors = useSensors(
       useSensor(TouchSensor),
       useSensor(PointerSensor),
@@ -599,74 +228,72 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       if (active.id !== over?.id) {
          let oldIndex: number, newIndex: number;
 
-         for (const set of exercise.sets) {
-            if (set.id === active.id) {
-               // Original exercise set
-               oldIndex = set.set_order;
+         for (const entry of exercise.entries) {
+            if (entry.id === active.id) {
+               // Original exercise entry
+               oldIndex = entry.entry_order;
             }
 
-            if (set.id === over?.id) {
-               // Swapping exercise set
-               newIndex = set.set_order;
+            if (entry.id === over?.id) {
+               // Swapping exercise entry
+               newIndex = entry.entry_order;
             }
          }
 
          if (oldIndex !== undefined && newIndex !== undefined) {
-            // Reorder exercise sets for the current exercise
+            // Optimistic ordering update as ordering is not critical
             const newExercise: Exercise = {
                ...exercise,
-               sets: arrayMove(exercise.sets, oldIndex, newIndex).map(
-                  (set, index) => ({ ...set, set_order: index })
+               entries: arrayMove(exercise.entries, oldIndex, newIndex).map(
+                  (entry, index) => ({ ...entry, entry_order: index })
                )
             };
 
-            const response: VitalityResponse<Exercise> = await updateExercise(
-               user.id,
-               newExercise,
-               "sets",
+            const newExercises: Exercise[] = [...workout.exercises].map(
+               (e) => e.id === exercise.id ? newExercise : e,
             );
 
-            handleResponse(response, localDispatch, updateNotification, () => {
-               // Submit changes to global state from response data
-               const newExercises: Exercise[] = [...workout.exercises].map(
-                  (e) => e.id === exercise.id ? response.body.data as Exercise : e,
-               );
+            saveExercises(newExercises);
 
-               saveExercises(newExercises);
-            });
+            updateExercise(
+               user.id,
+               newExercise,
+               "entries",
+            );
          }
       }
    };
 
-   const handleUpdateExerciseName = useCallback(async() => {
+   const updateExerciseName = useCallback(async() => {
       const newExercise: Exercise = {
          ...exercise,
          name: localState.name.value.trim()
       };
 
-      handleResponse(await updateExercise(user.id, newExercise, "name"), localDispatch, updateNotification, () => {
+      processResponse(await updateExercise(user.id, newExercise, "name"), localDispatch, updateNotifications, () => {
          // Update the overall workout exercises
          const newExercises: Exercise[] = [...workout.exercises].map((e) =>
             e.id !== exercise.id ? e : newExercise,
          );
 
          saveExercises(newExercises);
+         setEditName(false);
       });
    }, [
       user,
       exercise,
-      localDispatch,
-      localState.name.value,
       saveExercises,
-      updateNotification,
-      workout.exercises
+      localDispatch,
+      workout.exercises,
+      updateNotifications,
+      localState.name.value
    ]);
 
-   const handleSubmitUpdates = useCallback(() => {
+   const submitExerciseNameUpdates = useCallback(() => {
       updateButtonRef.current?.submit();
    }, []);
 
-   const handleDeleteExercise = useCallback(async() => {
+   const deleteExercise = useCallback(async() => {
       const newWorkout = {
          ...workout,
          exercises: [...workout.exercises].filter(
@@ -674,37 +301,35 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          )
       };
 
-      const response: VitalityResponse<Exercise[]> = await updateExercises(newWorkout);
+      const response: VitalityResponse<Exercise[]> = await updateExercises(user.id, newWorkout);
 
-      handleResponse(response, localDispatch, updateNotification, () => {
+      processResponse(response, localDispatch, updateNotifications, () => {
          // Update the overall workout exercises from backend response data
          saveExercises(response.body.data as Exercise[]);
-         updateNotification({
-            status: "Success",
-            message: "Delete exercise",
-            timer: 1000
-         });
 
          // Remove from localStorage as the exercise no longer exists
          window.localStorage.getItem(collapsedId) && window.localStorage.removeItem(collapsedId);
       });
    }, [
+      user,
       workout,
+      collapsedId,
       exercise.id,
       localDispatch,
       saveExercises,
-      updateNotification,
-      collapsedId
+      updateNotifications
    ]);
 
-   const handleDisplayEditName = useCallback(() => {
+   const displayEditExerciseName = useCallback(() => {
+      // Prevent editing exercise name during a submission
+      if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
       // Update exercise name inputs
       localDispatch({
          type: "updateState",
          value: {
             id: "name",
-            input: {
-               ...localState.name,
+            value: {
                value: exercise.name,
                error: null,
                data: {
@@ -718,70 +343,58 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
       setEditName(true);
    }, [
       exercise.id,
-      exercise.name,
       localDispatch,
-      localState.name
+      exercise.name
    ]);
 
-   const handleResetExerciseSet = useCallback((setId: string) => {
-      // Reset exercise set inputs
+   const resetExerciseEntry = useCallback((entryId: string) => {
+      // Prevent resetting entry inputs during a submission
+      if (document.getElementById("weight")?.getAttribute("disabled") === "true") return;
+
+      // Reset exercise entry inputs
       localDispatch({
          type: "updateStates",
          value: {
             exerciseId: {
-               ...localState.exerciseId,
                value: exercise.id,
                data: {
-                  setId: setId
+                  entryId: entryId
                }
             },
             weight: {
-               ...localState.weight,
                value: "",
                error: null
             },
             repetitions: {
-               ...localState.repetitions,
                value: "",
                error: null
             },
             hours: {
-               ...localState.hours,
                value: "",
                error: null
             },
             minutes: {
-               ...localState.minutes,
                value: "",
                error: null
             },
             seconds: {
-               ...localState.seconds,
                value: "",
                error: null
             },
             text: {
-               ...localState.text,
                value: "",
                error: null
             }
          }
       });
 
-      setAddSet(true);
+      setAddEntry(true);
    }, [
       exercise.id,
-      localDispatch,
-      localState.exerciseId,
-      localState.hours,
-      localState.minutes,
-      localState.repetitions,
-      localState.seconds,
-      localState.text,
-      localState.weight
+      localDispatch
    ]);
 
-   const doubleTap = useDoubleTap(handleDisplayEditName);
+   const doubleTap = useDoubleTap(displayEditExerciseName);
 
    return (
       <li
@@ -790,41 +403,50 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
          ref = { setNodeRef }
       >
          {
-            displayEditName ? (
+            displayEditNameInput ? (
                <div className = "relative mt-8">
                   <FontAwesomeIcon
                      icon = { faArrowRotateLeft }
                      onClick = {
                         () => {
+                           // Prevent resetting the exercise name during a submission
+                           if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
                            localDispatch({
                               type: "updateState",
                               value: {
-                                 input: {
-                                    ...localState.name,
+                                 id: "name",
+                                 value: {
                                     value: "",
                                     error: null
-                                 },
-                                 id: "name"
+                                 }
                               }
                            });
                         }
                      }
-                     className = "absolute right-[35px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
+                     className = "absolute right-[35px] top-[-25px] z-10 cursor-pointer text-base text-primary"
                   />
                   <FontAwesomeIcon
                      icon = { faXmark }
-                     className = "absolute right-[10px] top-[-27px] z-10 size-4 shrink-0 cursor-pointer text-xl text-red-500"
-                     onClick = { () => setEditName(false) }
+                     className = "absolute right-[10px] top-[-27px] z-10 cursor-pointer text-xl text-red-500"
+                     onClick = {
+                        () => {
+                        // Prevent closing the exercise name input during a submission
+                           if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
+                           setEditName(false);
+                        }
+                     }
                   />
                   <Input
                      id = "name"
                      type = "text"
                      label = "Name"
                      className = "mb-2"
-                     icon = { faListCheck }
+                     icon = { faPenNib }
                      input = { localState.name }
                      dispatch = { localDispatch }
-                     onSubmit = { handleSubmitUpdates }
+                     onSubmit = { submitExerciseNameUpdates }
                      autoComplete = "none"
                      autoFocus
                      scrollIntoView
@@ -834,30 +456,38 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      ref = { updateButtonRef }
                      type = "button"
                      className = "my-2 h-10 w-full border-[1.5px] border-gray-100 bg-green-500 px-4 py-2 text-base font-bold text-white focus:border-green-600 focus:ring-2 focus:ring-green-600 dark:border-0"
-                     icon = { faListCheck }
-                     onSubmit = { handleUpdateExerciseName }
-                     onClick = { handleSubmitUpdates }
+                     icon = { faPenNib }
+                     onSubmit = { updateExerciseName }
+                     onClick = { submitExerciseNameUpdates }
+                     inputIds = { ["name"] }
                   >
                      Update
                   </Button>
                   <Confirmation
+                     isDisabled = { () => document.getElementById("name")?.getAttribute("disabled") === "true" }
                      message = "Delete exercise?"
-                     onConfirmation = { handleDeleteExercise }
+                     onConfirmation = { deleteExercise }
                   />
                </div>
             ) : (
-               <h1 className = "flex cursor-default items-center justify-start text-lg xxsm:text-xl">
+               <h1 className = "flex cursor-default flex-row flex-nowrap items-center justify-start gap-4">
                   <span>
                      <FontAwesomeIcon
-                        className = "cursor-grab touch-none pt-1 text-2xl focus:outline-none"
+                        className = {
+                           clsx("cursor-default touch-none pt-[2px] text-2xl focus:outline-none", {
+                              "cursor-grab": workout.exercises.length > 1,
+                              "cursor-pointer": workout.exercises.length === 1
+                           })
+                        }
                         icon = { isCollapsed ? faCaretRight : faCaretDown }
                         onClick = { () => setIsCollapsed(!isCollapsed) }
+                        aria-hidden = { false }
                         { ...attributes }
                         { ...listeners }
                      />
                   </span>
                   <span
-                     className = "cursor-pointer whitespace-pre-wrap pl-4 [overflow-wrap:anywhere]"
+                     className = "cursor-pointer overflow-x-auto whitespace-nowrap text-[1.2rem] xxsm:text-xl"
                      { ...doubleTap }
                   >
                      { exercise.name }
@@ -873,39 +503,38 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      collisionDetection = { closestCenter }
                      onDragEnd = { handleDragEnd }
                   >
-
                      <SortableContext
-                        items = { exercise.sets.map((set) => set.id) }
+                        items = { exercise.entries.map((entry) => entry.id) }
                         strategy = { verticalListSortingStrategy }
                      >
 
                         <ul
                            className = {
                               clsx("mx-auto my-1 flex w-full list-disc flex-col gap-2", {
-                                 "hidden" : exercise.sets.length === 0 && !addSet
+                                 "hidden" : exercise.entries.length === 0 && !addEntry
                               })
                            }
                         >
                            {
-                              exercise.sets.map((set: ExerciseSet) => {
+                              exercise.entries.map((entry: ExerciseEntry) => {
                                  return (
-                                    <SetContainer
+                                    <ExerciseEntryContainer
                                        { ...props }
-                                       set = { set }
-                                       onBlur = { () => {} }
-                                       key = { set.id }
-                                       reset = { () => handleResetExerciseSet(set.id) }
+                                       entry = { entry }
+                                       onBlur = { undefined }
+                                       key = { entry.id }
+                                       reset = { () => resetExerciseEntry(entry.id) }
                                     />
                                  );
                               })
                            }
                            {
-                              addSet && (
-                                 <SetContainer
+                              addEntry && (
+                                 <ExerciseEntryContainer
                                     { ...props }
-                                    set = { undefined }
-                                    onBlur = { () => setAddSet(false) }
-                                    reset = { () => handleResetExerciseSet("") }
+                                    entry = { undefined }
+                                    onBlur = { () => setAddEntry(false) }
+                                    reset = { () => resetExerciseEntry("") }
                                  />
                               )
                            }
@@ -913,7 +542,7 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                      </SortableContext>
                   </DndContext>
                   {
-                     !hideNewSetButton && (
+                     !hideNewEntryButton && (
                         <div className = "mx-auto mt-4 w-full px-2 xsm:px-8">
                            <Button
                               type = "button"
@@ -921,8 +550,11 @@ function ExerciseContainer(props: ExerciseProps): JSX.Element {
                               icon = { faPlus }
                               onClick = {
                                  () => {
-                                    handleResetExerciseSet("");
-                                    setAddSet(true);
+                                    // Prevent closing the existing exercise entry input during a submission
+                                    if (document.getElementById("weight")?.getAttribute("disabled") === "true") return;
+
+                                    resetExerciseEntry("");
+                                    setAddEntry(true);
                                  }
                               }
                            >
@@ -944,23 +576,25 @@ interface ExercisesProps extends VitalityProps {
 }
 
 export default function Exercises(props: ExercisesProps): JSX.Element {
-   const { updateNotification } = useContext(NotificationContext);
+   const { user } = useContext(AuthenticationContext);
    const { workout, globalState, globalDispatch } = props;
    const [localState, localDispatch] = useReducer(formReducer, form);
    const [addExercise, setAddExercise] = useState<boolean>(false);
    const { editing } = localState.name.data;
 
-   const displayNewExercise: boolean = addExercise && !editing;
+   const displayNewExerciseInput: boolean = addExercise && !editing;
    const exercises: Exercise[] = workout.exercises;
 
-   const handleDisplayNewExercise = useCallback(() => {
+   const displayNewExercise = useCallback(() => {
+      // Prevent closing the existing exercise name input during a submission
+      if (document.getElementById("name")?.getAttribute("disabled") === "true") return;
+
       // Update exercise name inputs
       localDispatch({
          type: "updateState",
          value: {
             id: "name",
-            input: {
-               ...localState.name,
+            value: {
                value: "",
                error: null,
                data: {
@@ -972,12 +606,9 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
       });
 
       setAddExercise(true);
-   }, [
-      localDispatch,
-      localState.name
-   ]);
+   }, [localDispatch]);
 
-   const handleSaveExercises = useCallback(async(updatingExercises: Exercise[]) => {
+   const saveExercises = useCallback(async(updatingExercises: Exercise[]) => {
       // Update editing workout and overall workouts
       const newWorkout: Workout = {
          ...workout,
@@ -986,7 +617,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
       const newWorkouts: Workout[] = [...globalState.workouts.value].map(
          (workout) => workout.id === newWorkout.id ? newWorkout : workout
       );
-      const newFiltered: Workout[] = [...globalState.workouts.data.filtered].map(
+      const newFiltered: Workout[] = [...globalState.workouts.data?.filtered].map(
          (workout) => (workout.id === newWorkout.id ? newWorkout : workout)
       );
 
@@ -994,14 +625,11 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
          type: "updateStates",
          value: {
             workout: {
-               ...globalState.workout,
                value: newWorkout
             },
             workouts: {
-               ...globalState.workouts,
                value: newWorkouts,
                data: {
-                  ...globalState.workouts.data,
                   filtered: newFiltered
                }
             }
@@ -1010,10 +638,10 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
 
       setAddExercise(false);
    }, [
+      workout,
       globalDispatch,
-      globalState.workout,
-      globalState.workouts,
-      workout
+      globalState.workouts.value,
+      globalState.workouts.data?.filtered
    ]);
 
    // Drag and drop for exercises
@@ -1048,7 +676,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
          }
 
          if (oldIndex !== undefined && newIndex !== undefined) {
-            // Reorder exercises and submit the appropriate changes
+            // Optimistic ordering update as ordering is not critical
             const newWorkout = {
                ...workout,
                exercises: arrayMove(exercises, oldIndex, newIndex).map(
@@ -1056,11 +684,8 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                )
             };
 
-            const response: VitalityResponse<Exercise[]> = await updateExercises(newWorkout);
-
-            handleResponse(response, localDispatch, updateNotification, () => {
-               handleSaveExercises(response.body.data as Exercise[]);
-            });
+            saveExercises(newWorkout.exercises);
+            updateExercises(user.id, newWorkout);
          }
       }
    };
@@ -1085,7 +710,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                               { ...props }
                               localState = { localState }
                               localDispatch = { localDispatch }
-                              saveExercises = { handleSaveExercises }
+                              saveExercises = { saveExercises }
                               exercise = { exercise }
                               key = { exercise.id }
                            />
@@ -1097,13 +722,13 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
          </DndContext>
          <div className = "mx-auto my-2 w-full">
             {
-               displayNewExercise ? (
+               displayNewExerciseInput ? (
                   <CreateExercise
                      { ...props }
                      localState = { localState }
                      localDispatch = { localDispatch }
                      exercise = { null }
-                     saveExercises = { handleSaveExercises }
+                     saveExercises = { saveExercises }
                      onBlur = {
                         () => {
                            setAddExercise(false);
@@ -1116,7 +741,7 @@ export default function Exercises(props: ExercisesProps): JSX.Element {
                         type = "button"
                         className = "h-10 w-full border-[1.5px] border-gray-100 px-4 py-2 font-bold focus:border-blue-500 focus:ring-blue-500 dark:border-0 dark:bg-gray-700/50"
                         icon = { faPlus }
-                        onClick = { handleDisplayNewExercise }
+                        onClick = { displayNewExercise }
                      >
                         Exercise
                      </Button>

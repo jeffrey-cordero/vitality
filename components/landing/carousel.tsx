@@ -14,13 +14,13 @@ export default function Carousel(props: CarouselProps): JSX.Element {
 
    const nextSlide = () => {
       setCurrentIndex(
-         (prevIndex: number) => (prevIndex + 1) % items.length
+         (previousIndex: number) => (previousIndex + 1) % items.length
       );
    };
 
    const prevSlide = () => {
       setCurrentIndex(
-         (prevIndex: number) => (prevIndex - 1 + items.length) % items.length
+         (previousIndex: number) => (previousIndex - 1 + items.length) % items.length
       );
    };
 
@@ -40,7 +40,7 @@ export default function Carousel(props: CarouselProps): JSX.Element {
                      key = { index }
                      className = {
                         clsx(
-                           "flex shrink-0 items-center justify-center rounded-2xl p-4",
+                           "flex shrink-0 items-center justify-center rounded-2xl p-2",
                            {
                               "opacity-100": index === currentIndex,
                               "opacity-15": index !== currentIndex

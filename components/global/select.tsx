@@ -1,8 +1,10 @@
 "use client";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import { ChangeEvent, useCallback, useEffect, useRef } from "react";
+
+import Error from "@/components/global/error";
 import { VitalityInputProps } from "@/components/global/input";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface SelectProps extends VitalityInputProps {
   values: any[];
@@ -20,17 +22,16 @@ export default function Select(props: SelectProps): JSX.Element {
       input.error
    ]);
 
-   const handleSelectChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
-      // handlesOnChange defined implies state management is handled via the parent component
-      if (input.handlesOnChange) {
+   const selectChangeHandler = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
+      // handlesChanges defined implies state management is handled via the parent component
+      if (input.handlesChanges) {
          onChange?.call(null, event);
       } else {
          dispatch({
             type: "updateState",
             value: {
                id: id,
-               input: {
-                  ...input,
+               value: {
                   value: event.target.value,
                   error: null
                }
@@ -38,9 +39,9 @@ export default function Select(props: SelectProps): JSX.Element {
          });
       }
    }, [
-      dispatch,
-      input,
       id,
+      input,
+      dispatch,
       onChange
    ]);
 
@@ -56,7 +57,7 @@ export default function Select(props: SelectProps): JSX.Element {
                   className,
                )
             }
-            onChange = { handleSelectChange }
+            onChange = { selectChangeHandler }
          >
             {
                values.map((value: string) => {
@@ -89,13 +90,7 @@ export default function Select(props: SelectProps): JSX.Element {
             }
             { label }
          </label>
-         {
-            input.error !== null && (
-               <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 opacity-0">
-                  <p className = "input-error font-bold text-red-500"> { input.error } </p>
-               </div>
-            )
-         }
+         <Error message = { input.error } />
       </div>
    );
 }

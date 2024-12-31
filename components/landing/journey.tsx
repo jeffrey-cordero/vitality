@@ -1,19 +1,20 @@
 "use client";
-import Link from "next/link";
+import { faCalendarDays } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
-import Heading from "@/components/global/heading";
+import Link from "next/link";
+
 import Button from "@/components/global/button";
+import Heading from "@/components/global/heading";
 import Counter from "@/components/landing/counter";
-import { faBullseye } from "@fortawesome/free-solid-svg-icons";
 
 export default function Journey(): JSX.Element {
    return (
       <div className = "mx-auto w-full">
          <Heading
             title = "Your Fitness Journey Starts Here"
-            description = "Your ultimate companion for achieving optimal health and fitness"
+            message = "Your ultimate companion for achieving optimal health and fitness"
          />
-         <div className = "relative mx-auto mb-8 mt-2 overflow-hidden md:container">
+         <div className = "relative mx-auto mb-12 mt-4 overflow-hidden md:container xsm:mt-8 sm:my-8 md:my-12">
             <div className = "mx-auto w-full sm:px-4">
                <div className = "flex flex-col items-center justify-center lg:flex-row">
                   <div className = "mt-2 w-full lg:mt-0 lg:w-5/12">
@@ -27,7 +28,7 @@ export default function Journey(): JSX.Element {
                                     height = { 1441 }
                                     quality = { 100 }
                                     src = "/landing/journey.jpg"
-                                    alt = ""
+                                    alt = "exercise-image"
                                     className = "rounded-2xl shadow-sm"
                                  />
                               </div>
@@ -38,7 +39,7 @@ export default function Journey(): JSX.Element {
                                     height = { 960 }
                                     quality = { 100 }
                                     src = "/landing/food.jpg"
-                                    alt = ""
+                                    alt = "food-image"
                                     className = "size-full rounded-2xl shadow-sm"
                                  />
                               </div>
@@ -52,7 +53,7 @@ export default function Journey(): JSX.Element {
                                  height = { 2880 }
                                  quality = { 100 }
                                  src = "/landing/mountains.jpg"
-                                 alt = ""
+                                 alt = "biking-image"
                                  className = "size-full rounded-2xl shadow-sm"
                               />
                            </div>
@@ -62,7 +63,7 @@ export default function Journey(): JSX.Element {
                   <div className = "w-full lg:w-5/12">
                      <div className = "flex flex-col items-center justify-center text-center">
                         <Counter />
-                        <span className = "mx-2 mb-4 block w-10/12 text-[1.6rem] font-bold text-primary xxsm:text-3xl sm:w-4/5">
+                        <span className = "mx-2 mb-3 block w-10/12 text-[1.6rem] font-bold text-primary xxsm:text-3xl sm:w-4/5">
                            Level Up Your Fitness
                         </span>
                         <p className = "mx-auto mb-4 w-10/12 text-[0.9rem] font-normal text-gray-500 xxsm:text-base sm:w-2/3 dark:text-gray-400">
@@ -71,8 +72,8 @@ export default function Journey(): JSX.Element {
                         </p>
                         <Link href = "/signup">
                            <Button
-                              icon = { faBullseye }
-                              className = "h-[2.8rem] w-36 whitespace-nowrap bg-primary p-3 text-base text-white xxsm:w-40"
+                              icon = { faCalendarDays }
+                              className = "h-[2.8rem] whitespace-nowrap bg-primary px-4 py-3 text-sm text-white xxsm:w-40 xxsm:px-2 xxsm:text-base"
                            >
                               Start Today
                            </Button>

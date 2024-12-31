@@ -1,13 +1,14 @@
 "use client";
-import Link from "next/link";
-import clsx from "clsx";
-import { usePathname } from "next/navigation";
-import { AuthenticationContext } from "@/app/layout";
-import { useContext, useEffect, useState } from "react";
-import { endSession } from "@/lib/authentication/session";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faAnglesRight, faPlaneArrival, faUserPlus, faDoorOpen, faGears, faBars, faDumbbell, faRightFromBracket, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faAnglesRight, faBars, faComments, faDoorOpen, faDumbbell, faGears, faHome, faMoon, faPlaneArrival, faRightFromBracket, faSun, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
+
+import { AuthenticationContext } from "@/app/layout";
+import { endSession } from "@/lib/authentication/session";
 
 interface SideBarProps {
   name: string;
@@ -23,7 +24,9 @@ const landingLinks: SideBarProps[] = [
 ];
 
 const homeLinks: SideBarProps[] = [
+   { name: "Home", href: "/home", icon: faHome },
    { name: "Workouts", href: "/home/workouts", icon: faDumbbell },
+   { name: "Feedback", href: "/home/feedback", icon: faComments },
    { name: "Settings", href: "/home/settings", icon: faGears },
    { name: "Theme", href: "\0", icon: null },
    { name: "Sign Out", href: "\0", icon: faRightFromBracket }
@@ -34,13 +37,13 @@ function SideBarLinks(): JSX.Element {
    const [links, setLinks] = useState<SideBarProps[]>(homeLinks);
    const pathname = usePathname();
 
-   // Update sidebar links based on current user and localStorage state
+   // Update sidebar links based on current user presence
    useEffect(() => {
       fetched && setLinks(user === undefined ? landingLinks : homeLinks);
    }, [
       user,
-      fetched,
-      links
+      links,
+      fetched
    ]);
 
    return (
@@ -85,7 +88,7 @@ function SideBarLinks(): JSX.Element {
                      <FontAwesomeIcon
                         icon = { isTheme ? theme === "dark" ? faMoon : faSun : link.icon }
                         className = {
-                           clsx("text-[1.4rem] xxsm:text-[1.6rem]", {
+                           clsx("text-[1.6rem]", {
                               "text-yellow-400 hover:text-yellow-500": isTheme
                            })
                         }
@@ -99,7 +102,12 @@ function SideBarLinks(): JSX.Element {
 }
 
 export function SideBar(): JSX.Element {
-   const [visibleSideBar, setVisibleSideBar] = useState<boolean>(false);
+   // Sidebar visibility state is stored in local storage for persistence
+   const [visibleSideBar, setVisibleSideBar] = useState<boolean>(window.localStorage.getItem("visibleSideBar") === "true");
+
+   useEffect(() => {
+      window.localStorage.setItem("visibleSideBar", visibleSideBar.toString());
+   }, [visibleSideBar]);
 
    return (
       <div className = "relative">
@@ -122,15 +130,15 @@ export function SideBar(): JSX.Element {
                id = "sideBarLinks"
                className = {
                   clsx(
-                     "group relative top-[-15px] m-0 w-[4.3rem] transition-all duration-1000 ease-in-out xxsm:w-20",
+                     "group relative top-[-15px] m-0 w-20 transition-all duration-1000 ease-in-out",
                      {
-                        "left-[-5rem]": !visibleSideBar,
+                        "left-[-6.5rem]": !visibleSideBar,
                         "left-[10px]": visibleSideBar
                      },
                   )
                }
             >
-               <div className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-[0.6rem] py-4 shadow-md xxsm:px-3 dark:bg-slate-800">
+               <div className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-3 py-4 shadow-md dark:bg-slate-800">
                   <div className = "flex flex-col justify-center space-x-2 space-y-2 text-center">
                      <div className = "flex size-full flex-col items-center justify-between text-center">
                         <SideBarLinks />

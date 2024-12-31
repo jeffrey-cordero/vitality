@@ -1,6 +1,6 @@
 import { Tag } from "@/lib/home/workouts/tags";
-import { root } from "@/tests/authentication/data";
 import { Workout } from "@/lib/home/workouts/workouts";
+import { root } from "@/tests/authentication/data";
 
 export const workout: Workout = {
    id: "69b62ca8-9222-4d68-b83a-c352c3989a48",
@@ -8,7 +8,7 @@ export const workout: Workout = {
    title: "Workout #1",
    date: new Date("2024-11-13T00:00:00.000Z"),
    description: "A great workout on 11/13/2024",
-   image: "/workouts/hike.png",
+   image: "/home/workouts/hike.png",
    tagIds: [
       "00a78cd1-1969-4403-8a83-444895e76956",
       "bb3fcb1b-d4fc-42ba-b885-e507ed027f3b",
@@ -20,11 +20,11 @@ export const workout: Workout = {
          workout_id: "69b62ca8-9222-4d68-b83a-c352c3989a48",
          exercise_order: 0,
          name: "Exercise 1",
-         sets: [
+         entries: [
             {
                id: "33b33227-56b1-4f10-844a-660b523e546f",
                exercise_id: "33b33227-56b1-4f10-844a-660b523e546e",
-               set_order: 0,
+               entry_order: 0,
                weight: 225,
                repetitions: 10,
                text: "Text"
@@ -32,7 +32,7 @@ export const workout: Workout = {
             {
                id: "33b33227-56b1-4f10-844a-660b523e546c",
                exercise_id: "33b33227-56b1-4f10-844a-660b523e546e",
-               set_order: 1,
+               entry_order: 1,
                weight: 230,
                repetitions: 5,
                hours: 1,
@@ -43,7 +43,7 @@ export const workout: Workout = {
             {
                id: "33b33227-56b1-4f10-844a-660b523e546h",
                exercise_id: "33b33227-56b1-4f10-844a-660b523e546e",
-               set_order: 2,
+               entry_order: 2,
                weight: 300,
                repetitions: 10,
                text: "Text"
@@ -55,14 +55,14 @@ export const workout: Workout = {
          workout_id: "69b62ca8-9222-4d68-b83a-c352c3989a48",
          exercise_order: 1,
          name: "Exercise 2",
-         sets: []
+         entries: []
       },
       {
          id: "dd29ecb7-a142-4f15-b828-6379cf4a8823",
          workout_id: "69b62ca8-9222-4d68-b83a-c352c2989a48",
          exercise_order: 2,
          name: "Exercise 3",
-         sets: []
+         entries: []
       }
    ]
 };
@@ -112,7 +112,7 @@ export const workouts = [
       title: "Workout #2",
       date: new Date("2024-11-10T00:00:00.000Z"),
       description: "A great workout on 11/10/2024",
-      image: "/workouts/weights.png",
+      image: "/home/workouts/weights.png",
       workout_applied_tags: [
          {
             workout_id: "dd29ecb7-a142-4f15-b828-6379cf4a8815",

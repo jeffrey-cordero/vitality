@@ -1,79 +1,78 @@
-import Modal from "@/components/global/modal";
-import Button from "@/components/global/button";
-import Tags from "@/components/home/workouts/tags";
-import TextArea from "@/components/global/textarea";
-import Images from "@/components/home/workouts/images";
-import Exercises from "@/components/home/workouts/exercises";
-import Confirmation from "@/components/global/confirmation";
-import { Input } from "@/components/global/input";
-import { Tag } from "@/lib/home/workouts/tags";
-import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { faArrowRotateLeft, faBook, faCalendar, faLink, faPenToSquare, faPersonRunning, faPlus, faSignature } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { filterWorkout } from "@/components/home/workouts/filtering";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
+import { useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
+
 import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { VitalityProps, VitalityState, formReducer } from "@/lib/global/state";
-import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { addWorkout, deleteWorkouts, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
-import { faArrowRotateLeft, faPersonRunning, faSignature, faCalendar, faBook, faLink, faPenToSquare, faPlus } from "@fortawesome/free-solid-svg-icons";
+import Button from "@/components/global/button";
+import Confirmation from "@/components/global/confirmation";
+import ImageForm from "@/components/global/images";
+import { Input } from "@/components/global/input";
+import Modal from "@/components/global/modal";
+import TextArea from "@/components/global/textarea";
+import Exercises from "@/components/home/workouts/exercises";
+import { filterWorkout } from "@/components/home/workouts/filtering";
+import TagsForm from "@/components/home/workouts/tags";
+import { formReducer, VitalityProps, VitalityState } from "@/lib/global/reducer";
+import { processResponse, VitalityResponse } from "@/lib/global/response";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { Tag } from "@/lib/home/workouts/tags";
+import { addWorkout, updateWorkout, Workout } from "@/lib/home/workouts/workouts";
 
 const form: VitalityState = {
    title: {
+      id: "title",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    date: {
+      id: "date",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    description: {
+      id: "description",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    image: {
+      id: "image",
       value: "",
       error: null,
+      handlesChanges: true,
       data: {
          valid: undefined
-      },
-      handlesOnChange: true
+      }
    }
 };
 
 export default function Form(props: VitalityProps): JSX.Element {
-   const { globalState, globalDispatch } = props;
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
+   const { globalState, globalDispatch } = props;
    const [localState, localDispatch] = useReducer(formReducer, form);
-   const [displayingFormModal, setDisplayingFormModal] = useState<boolean>(false);
-   const displayFormModal: boolean = globalState.workout.data.display;
+   const [isDisplayingModal, setIsDisplayingModal] = useState<boolean>(false);
+   const [isModalLocked, setIsModalLocked] = useState<boolean>(false);
+   const displayFormModal: boolean = globalState.workout.data?.display;
    const formModalRef = useRef<{ open: () => void; close: () => void; isOpen: () => boolean }>(null);
    const updateButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
-   // Fetching editing workout from global state
+   // Fetch current workout being edited from global state
    const workout: Workout = globalState.workout.value;
    const isNewWorkout: boolean = workout.id?.trim().length === 0;
 
-   const defaultFormDate: string = useMemo(() => {
-      return new Date().toISOString().split("T")[0];
-   }, []);
-
-   const updateWorkouts = (workouts: Workout[], newWorkout: Workout, method: "add" | "update" | "delete") => {
+   const updateWorkouts = (workout: Workout, workouts: Workout[], newWorkout: Workout, method: "add" | "update" | "delete") => {
+      // Helper method to update workouts (overall or filtered) array based on CRUD method based on current editing workout
       if (method === "delete") {
-         // Simple removal
          return [...workouts].filter(
-            (workout) => workout.id !== newWorkout.id,
+            (workout) => workout.id !== newWorkout.id
          );
       } else if (method === "update" && workout.date.getTime() === newWorkout.date.getTime()) {
-         // Simple update in current editing workout without affecting overall workout ordering
+         // No changes in ordering as workout date remains the same
          return [...workouts].map(
             (workout) => workout.id === newWorkout.id ? newWorkout : workout
          );
       } else {
-         // Update or addition requiring changes in workouts ordering
+         // Update workouts array based on new workout date
          const newWorkouts: Workout[] = method === "add" ? [...workouts] : [...workouts].filter(
             (workout) => workout.id !== newWorkout.id
          );
@@ -82,6 +81,7 @@ export default function Form(props: VitalityProps): JSX.Element {
             const workout: Workout = newWorkouts[i];
 
             if (workout.date.getTime() <= newWorkout.date.getTime()) {
+               // Insert new workout at the correct chronological order
                newWorkouts.splice(i, 0, newWorkout);
                return newWorkouts;
             }
@@ -92,7 +92,7 @@ export default function Form(props: VitalityProps): JSX.Element {
       }
    };
 
-   const handleUpdateWorkout = async(method: "add" | "update" | "delete") => {
+   const updateWorkoutState = async(method: "add" | "update" | "delete") => {
       const { selected, dictionary } = globalState.tags.data;
 
       const payload: Workout = {
@@ -100,7 +100,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          id: workout.id,
          title: localState.title.value.trim(),
          date: new Date(localState.date.value),
-         image: localState.image.value,
+         image: localState.image.value.trim(),
          description: localState.description.value.trim(),
          tagIds: selected
             .map(
@@ -112,26 +112,43 @@ export default function Form(props: VitalityProps): JSX.Element {
          exercises: workout.exercises ?? []
       };
 
-      const response: VitalityResponse<Workout | number> = isNewWorkout ? await addWorkout(user.id, payload) :
-         method === "update" ? await updateWorkout(user.id, payload) : await deleteWorkouts(user.id, [payload]);
+      // Determine whether to add, update, or delete workout based on method provided
+      const response: VitalityResponse<Workout> = method === "add"
+         ? await addWorkout(user.id, payload) : await updateWorkout(user.id, payload, method);
 
-      handleResponse(response, localDispatch, updateNotification, () => {
+      if (response.status !== "Success") {
+         // Unlock modal for failed responses
+         setIsModalLocked(false);
+      }
+
+      processResponse(response, localDispatch, updateNotifications, () => {
          const newWorkout: Workout | null = method === "delete" ? payload : (response.body.data as Workout);
 
-         // Fetch selected filtered tags to apply tag filtering
+         // Fetch selected filtered tag id's to apply potential filtering
          const filteredTagIds: Set<string> = new Set(
-            globalState.tags.data.filtered.map(
+            globalState.tags.data?.filtered.map(
                (tag: Tag) => tag.id
             )
          );
 
-         const newWorkouts: Workout[] = updateWorkouts(globalState.workouts.value, newWorkout, method);
-
+         const newWorkouts: Workout[] = updateWorkouts(workout, globalState.workouts.value, newWorkout, method);
          const newFiltered: Workout[] = [...newWorkouts].filter(
-            (workout) => filterWorkout(globalState, workout, filteredTagIds, "update")
+            (workout: Workout) => filterWorkout(globalState, workout, filteredTagIds, "update")
          );
+         let newSelected: Set<Workout> = globalState.workouts.data?.selected ?? new Set();
 
-         // Account for current visible workouts page being discarded
+         if (globalState.workouts.data?.selected.has(workout)) {
+            // Update selected workout reference, if applicable
+            newSelected = new Set(
+               Array.from(globalState.workouts.data?.selected).map(
+                  (workout: Workout) => workout.id === newWorkout.id ? newWorkout : workout
+               )
+            );
+
+            method === "delete" && newSelected.delete(newWorkout);
+         }
+
+         // Account for current visible workouts page and total pages
          const pages: number = Math.ceil(newWorkouts.length / globalState.paging.value);
          const page: number = globalState.page.value;
 
@@ -139,31 +156,31 @@ export default function Form(props: VitalityProps): JSX.Element {
             type: "updateStates",
             value: {
                workout: {
-                  ...globalState.workout,
                   value: newWorkout,
                   data: {
-                     display: method === "delete" ? false : formModalRef.current?.isOpen()
+                     display: method === "delete" ? false : true
                   }
                },
                workouts: {
-                  ...globalState.workouts,
                   value: newWorkouts,
                   data: {
-                     ...globalState.workouts.data,
-                     filtered: newFiltered
+                     filtered: newFiltered,
+                     selected: newSelected
                   }
                },
                page: {
-                  ...globalState.page,
                   value: page >= pages ? Math.max(0, page - 1) : page
                }
             }
          });
 
+         // Unlock modal for successful responses after submitting workout updates
+         setIsModalLocked(false);
+
          if (method === "delete") {
             formModalRef.current?.close();
 
-            updateNotification({
+            updateNotifications({
                status: "Success",
                message: "Deleted workout",
                timer: 1000
@@ -172,94 +189,79 @@ export default function Form(props: VitalityProps): JSX.Element {
       });
    };
 
-   const handleSubmitUpdates = useCallback(() => {
+   const submitWorkoutUpdates = useCallback(() => {
+      // Lock modal to prevent state race conditions
+      setIsModalLocked(true);
+
+      // Submit workout updates to the server
       updateButtonRef.current?.submit();
    }, []);
 
-   const handleDisplayWorkoutForm = useCallback(() => {
+   const displayWorkoutForm = useCallback(() => {
       // Update workout tag selection form inputs
       globalDispatch({
-         type: "initializeState",
+         type: "updateStates",
          value: {
             tags: {
-               ...globalState.tags,
                data: {
-                  ...globalState.tags.data,
-                  selected:
-                     workout.tagIds.map(
-                        (tagId: string) => globalState.tags.data.dictionary[tagId],
-                     ) ?? []
+                  selected: workout.tagIds.map(
+                     (tagId: string) => globalState.tags.data?.dictionary[tagId]
+                  )
                }
-            },
-            tagSearch: {
-               ...globalState.tagSearch,
-               error: null,
-               value: ""
             }
          }
       });
 
       // Update workout property inputs
       localDispatch({
-         type: "initializeState",
+         type: "updateStates",
          value: {
             title: {
-               ...localState.title,
                error: null,
                value: workout.title
             },
             date: {
-               ...localState.date,
                error: null,
-               value: isNewWorkout ? defaultFormDate : workout.date.toISOString().split("T")[0]
+               value: isNewWorkout ?
+                  new Date().toISOString().split("T")[0] : workout.date.toISOString().split("T")[0]
             },
             image: {
-               ...localState.image,
                value: workout.image,
                error: null,
                data: {
-                  ...localState.image.data,
                   valid: verifyImageURL(workout.image) ? true : workout.image !== "" ? false : undefined,
                   error: false
                }
             },
             description: {
-               ...localState.description,
                error: null,
                value: workout.description
             }
          }
       });
    }, [
-      defaultFormDate,
-      globalDispatch,
-      globalState.tagSearch,
-      globalState.tags,
       isNewWorkout,
-      localState.date,
-      localState.description,
-      localState.image,
-      localState.title,
       workout.date,
-      workout.description,
+      workout.title,
       workout.image,
       workout.tagIds,
-      workout.title
+      globalDispatch,
+      workout.description,
+      globalState.tags.data?.dictionary
    ]);
 
-   const handleCloseWorkoutForm = useCallback(() => {
-      // Cleanup form inputs for future submissions
+   const closeWorkoutForm = useCallback(() => {
+      // Cleanup form inputs for future form submissions
       globalDispatch({
          type: "updateState",
          value: {
             id: "workout",
-            input: {
-               ...globalState.workout,
+            value: {
                value: {
                   id: "",
                   user_id: user.id,
                   title: "",
-                  date: "",
+                  date: new Date(),
                   image: "",
                   description: "",
                   tagIds: [],
@@ -272,23 +274,23 @@ export default function Form(props: VitalityProps): JSX.Element {
          }
       });
 
-      setDisplayingFormModal(false);
+      setIsDisplayingModal(false);
    }, [
-      globalDispatch,
-      globalState.workout,
-      user
+      user,
+      globalDispatch
    ]);
 
-   const handleResetWorkoutForm = useCallback(() => {
+   const resetWorkoutForm = useCallback(() => {
+      // Prevent resetting the form state during a submission
+      if (document.getElementById("title")?.getAttribute("disabled") === "true") return;
+
       // Reset tag selection and workout property inputs
       globalDispatch({
          type: "updateState",
          value: {
             id: "tags",
-            input: {
-               ...globalState.tags,
+            value: {
                data: {
-                  ...globalState.tags.data,
                   selected: []
                }
             }
@@ -297,23 +299,23 @@ export default function Form(props: VitalityProps): JSX.Element {
 
       localDispatch({
          type: "resetState",
-         value: {}
+         value: form
       });
    }, [
-      globalDispatch,
       localDispatch,
-      globalState.tags
+      globalDispatch
    ]);
 
    useEffect(() => {
-      if (displayFormModal && !displayingFormModal) {
+      if (displayFormModal && !isDisplayingModal) {
+         // Open workout form modal if not already displayed
          formModalRef.current?.open();
-         setDisplayingFormModal(true);
+         setIsDisplayingModal(true);
       }
    }, [
       displayFormModal,
-      displayingFormModal,
-      handleDisplayWorkoutForm
+      displayWorkoutForm,
+      isDisplayingModal
    ]);
 
    return (
@@ -322,23 +324,24 @@ export default function Form(props: VitalityProps): JSX.Element {
             display = { null }
             className = "max-w-3xl"
             ref = { formModalRef }
-            onClose = { handleCloseWorkoutForm }
-            onClick = { handleDisplayWorkoutForm }
+            onClose = { closeWorkoutForm }
+            onClick = { displayWorkoutForm }
+            locked = { isModalLocked }
          >
             <div className = "relative">
                <div className = "flex flex-col items-center justify-center gap-2 text-center">
                   <FontAwesomeIcon
                      icon = { faPersonRunning }
-                     className = "mt-6 text-[3.5rem] text-primary sm:text-6xl"
+                     className = "mt-6 text-[3.6rem] text-primary xxsm:text-[3.7rem]"
                   />
-                  <h1 className = "mb-2 text-2xl font-bold sm:text-3xl">
+                  <h1 className = "text-[1.7rem] font-bold xxsm:text-[1.9rem]">
                      { isNewWorkout ? "New" : "Edit" } Workout
                   </h1>
                </div>
                <div className = "relative mt-8 flex w-full flex-col items-stretch justify-center gap-2 text-left">
                   <FontAwesomeIcon
                      icon = { faArrowRotateLeft }
-                     onClick = { handleResetWorkoutForm }
+                     onClick = { resetWorkoutForm }
                      className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                   />
                   <Input
@@ -348,7 +351,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      icon = { faSignature }
                      input = { localState.title }
                      dispatch = { localDispatch }
-                     onSubmit = { handleSubmitUpdates }
+                     onSubmit = { submitWorkoutUpdates }
                      autoFocus
                      required
                   />
@@ -359,19 +362,18 @@ export default function Form(props: VitalityProps): JSX.Element {
                      icon = { faCalendar }
                      input = { localState.date }
                      dispatch = { localDispatch }
-                     onSubmit = { handleSubmitUpdates }
+                     onSubmit = { submitWorkoutUpdates }
                      required
                   />
-                  <Tags
-                     { ...props }
-                  />
-                  <Images
+                  <TagsForm { ...props } />
+                  <ImageForm
                      id = "image"
                      type = "text"
                      label = "URL"
                      icon = { faLink }
                      input = { localState.image }
                      dispatch = { localDispatch }
+                     page = "workouts"
                   />
                   <TextArea
                      id = "description"
@@ -379,7 +381,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      label = "Description"
                      icon = { faBook }
                      input = { localState.description }
-                     onSubmit = { handleSubmitUpdates }
+                     onSubmit = { submitWorkoutUpdates }
                      dispatch = { localDispatch }
                   />
                   <Button
@@ -387,17 +389,19 @@ export default function Form(props: VitalityProps): JSX.Element {
                      icon = { faPenToSquare }
                      type = "button"
                      className = "h-10 bg-primary text-white"
-                     onSubmit = { () => handleUpdateWorkout(isNewWorkout ? "add" : "update") }
-                     onClick = { handleSubmitUpdates }
-                     isSingleSubmission = { isNewWorkout ? true : undefined }
+                     onSubmit = { () => updateWorkoutState(isNewWorkout ? "add" : "update") }
+                     onClick = { submitWorkoutUpdates }
+                     isSingleSubmission = { true }
+                     inputIds = { ["title", "date", "tagSearch", "image-form-button", "image", "description"] }
                   >
                      { isNewWorkout ? "Create" : "Update" }
                   </Button>
                   {
                      !isNewWorkout && (
                         <Confirmation
+                           disabled = { isModalLocked }
                            message = "Delete workout?"
-                           onConfirmation = { async() => await handleUpdateWorkout("delete") }
+                           onConfirmation = { async() => await updateWorkoutState("delete") }
                         />
                      )
                   }
@@ -423,8 +427,7 @@ export default function Form(props: VitalityProps): JSX.Element {
                      type: "updateState",
                      value: {
                         id: "workout",
-                        input: {
-                           ...globalState.workout,
+                        value: {
                            value: {
                               id: "",
                               user_id: user.id,

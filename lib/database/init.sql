@@ -3,16 +3,22 @@ CREATE TABLE "users" (
       name VARCHAR(200) NOT NULL,
       birthday DATE NOT NULL,
       username VARCHAR(30) UNIQUE NOT NULL,
+      username_normalized VARCHAR(30) UNIQUE NOT NULL,
       password TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
       email_verified BOOLEAN NOT NULL DEFAULT FALSE,
-      phone VARCHAR(22) UNIQUE,
+      email_normalized TEXT UNIQUE NOT NULL,
+      phone VARCHAR(42) UNIQUE,
       phone_verified BOOLEAN DEFAULT FALSE,
+      phone_normalized VARCHAR(42) UNIQUE,
       mail BOOLEAN DEFAULT FALSE,
       sms BOOLEAN DEFAULT FALSE,
       image TEXT DEFAULT ''    
 );
 
+CREATE INDEX "users_username_normalized_index" ON "users" (username_normalized);
+CREATE INDEX "users_email_normalized_index" ON "users" (email_normalized);
+CREATE INDEX "users_phone_normalized_index" ON "users" (phone_normalized);
 CREATE index "users_email_index" ON "users" (email);
 
 CREATE TABLE "verification_token" (
@@ -41,10 +47,10 @@ CREATE TABLE "exercises" (
 
 CREATE INDEX "exercises_workout_index" ON "exercises" (workout_id);
 
-CREATE TABLE "sets" (
+CREATE TABLE "exercise_entries" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       exercise_id UUID NOT NULL REFERENCES "exercises"(id) ON DELETE CASCADE ON UPDATE CASCADE,
-      set_order INTEGER NOT NULL,
+      entry_order INTEGER NOT NULL,
       weight INTEGER,
       hours INTEGER,
       minutes INTEGER,
@@ -53,7 +59,7 @@ CREATE TABLE "sets" (
       text TEXT
 );
 
-CREATE INDEX "sets_exercise_index" ON "sets" (exercise_id);
+CREATE INDEX "entries_exercise_index" ON "exercise_entries" (exercise_id);
 
 CREATE TABLE "workout_tags" (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -74,3 +80,11 @@ CREATE TABLE "workout_applied_tags" (
 
 CREATE INDEX "workout_tags_workout_index" ON "workout_applied_tags" (workout_id);
 CREATE INDEX "workout_tags_tag_index" ON "workout_applied_tags" (tag_id);
+
+CREATE TABLE "feedback" (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID REFERENCES "users"(id) ON DELETE SET NULL ON UPDATE CASCADE,
+      name VARCHAR(200) NOT NULL,
+      email TEXT NOT NULL,
+      message TEXT NOT NULL
+);

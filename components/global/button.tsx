@@ -1,20 +1,21 @@
-import clsx from "clsx";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faHourglassHalf, faSquareCheck } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children?: React.ReactNode;
+  children: React.ReactNode;
   onSubmit?: () => Promise<void>;
   onConfirmation?: () => Promise<void>;
-  icon?: IconProp;
+  icon?: IconDefinition;
   iconStyling?: string
   isSingleSubmission?: boolean;
+  inputIds?: string[];
 }
 
 const Button = forwardRef(function Button(props: ButtonProps, ref) {
-   const { children, className, icon, iconStyling, onClick, onSubmit, onConfirmation, onBlur, isSingleSubmission, ...rest } = props;
+   const { children, className, icon, iconStyling, onClick, onSubmit, onConfirmation, onBlur, isSingleSubmission, inputIds, ...rest } = props;
    const [displaySubmitted, setDisplaySubmitted] = useState<boolean>(false);
    const [displayConfirmed, setDisplayConfirmed] = useState<boolean>(false);
    const savedIconRef = useRef<SVGSVGElement>(null);
@@ -23,7 +24,7 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
    const confirmTimeOut = useRef<NodeJS.Timeout>(null);
    const buttonRef = useRef(null);
 
-   const handleSubmit = useCallback(async() => {
+   const invokeSubmission = useCallback(async() => {
       // Cancel any pending response submission timeout for single submission buttons
       if (isSingleSubmission) {
          clearTimeout(submitTimeOut.current);
@@ -33,6 +34,11 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
       // Display the submit icon with a bouncing animation temporarily
       setDisplaySubmitted(true);
 
+      inputIds?.forEach(
+         // Disable the form inputs
+         (id: string) => (document.getElementById(id) as HTMLFormElement | HTMLDivElement)?.setAttribute("disabled", "true")
+      );
+
       submitTimeOut.current = setTimeout(async() => {
          // Cancel any pending update icon removal timeout and submit response
          clearTimeout(revertTimeOut.current);
@@ -40,17 +46,23 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
          await onSubmit();
 
          revertTimeOut.current = setTimeout(() => {
+            inputIds?.forEach(
+               // Enable the form inputs
+               (id: string) => (document.getElementById(id) as HTMLFormElement | HTMLDivElement)?.removeAttribute("disabled")
+            );
+
             setDisplaySubmitted(false);
             onBlur?.call(null);
          });
-      }, 750);
+      }, 250);
    }, [
       onBlur,
       onSubmit,
+      inputIds,
       isSingleSubmission
    ]);
 
-   const handleConfirmation = useCallback(async() => {
+   const invokeConfirmation = useCallback(async() => {
       // Cancel any pending response submission timeout
       clearTimeout(confirmTimeOut.current);
 
@@ -67,15 +79,15 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
       onConfirmation
    ]);
 
-   const handleOnClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+   const onClickHandler = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
       // Always call the defined onClick method and blur the element
       onClick?.call(this, event);
       buttonRef.current?.blur();
    }, [onClick]);
 
    useImperativeHandle(ref, () => ({
-      submit: handleSubmit,
-      confirm: handleConfirmation
+      submit: invokeSubmission,
+      confirm: invokeConfirmation
    }));
 
    return (
@@ -84,11 +96,11 @@ const Button = forwardRef(function Button(props: ButtonProps, ref) {
          ref = { buttonRef }
          className = {
             clsx(
-               "flex items-center justify-center gap-2 rounded-lg text-[0.9rem] font-bold outline-none hover:cursor-pointer focus:border-blue-600 focus:ring-2 focus:ring-blue-600 xxsm:text-base",
+               "flex items-center justify-center gap-2 rounded-lg text-[0.9rem] font-bold outline-none hover:cursor-pointer focus:border-blue-600 focus:ring-2 focus:ring-blue-600 disabled:pointer-events-none disabled:opacity-50 xxsm:text-base",
                className
             )
          }
-         onClick = { handleOnClick }
+         onClick = { onClickHandler }
       >
          {
             icon && (

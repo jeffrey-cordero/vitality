@@ -40,7 +40,7 @@
     "scripts/seed/data.js",
     "scripts/seed/seed.js",
     "eslint.config.js"
-  ],
+, "app/home/feedback"  ],
   "exclude": [
     "node_modules"
   ]

@@ -1,8 +1,10 @@
 "use client";
-import clsx from "clsx";
-import { VitalityInputProps } from "@/components/global/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ChangeEvent, useEffect, useRef, useCallback } from "react";
+import clsx from "clsx";
+import { ChangeEvent, useCallback, useEffect, useRef } from "react";
+
+import Error from "@/components/global/error";
+import { VitalityInputProps } from "@/components/global/input";
 
 export default function TextArea(props: VitalityInputProps): JSX.Element {
    const { id, label, icon, onChange, placeholder, required, autoFocus,
@@ -16,17 +18,16 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
       input.error
    ]);
 
-   const handleTextAreaChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
-      // handlesOnChange defined implies state management is handled via the parent component
-      if (input.handlesOnChange) {
+   const textAreaChangeHandler = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
+      // handlesChanges defined implies state management is handled via the parent component
+      if (input.handlesChanges) {
          onChange?.call(null, event);
       } else {
          dispatch({
             type: "updateState",
             value: {
                id: id,
-               input: {
-                  ...input,
+               value: {
                   value: event.target.value,
                   error: null
                }
@@ -34,7 +35,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
          });
       }
 
-      handleTextAreaOverflow();
+      textAreaOverflowHandler();
    }, [
       dispatch,
       input,
@@ -42,7 +43,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
       onChange
    ]);
 
-   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+   const keyDownHandler = useCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (textAreaRef.current && event.key === "Escape") {
          // Focus the top-most modal in the DOM when blurring input element, if applicable
          textAreaRef.current.blur();
@@ -56,7 +57,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
       }
    }, []);
 
-   const handleTextAreaOverflow = () => {
+   const textAreaOverflowHandler = () => {
       const textarea = textAreaRef.current;
 
       if (textarea) {
@@ -67,7 +68,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
 
    useEffect(() => {
       // Handle overflow for large values during the initial render
-      handleTextAreaOverflow();
+      textAreaOverflowHandler();
    }, []);
 
    return (
@@ -85,8 +86,8 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
                   },
                )
             }
-            onKeyDown = { (event: React.KeyboardEvent<HTMLTextAreaElement>) => handleKeyDown(event) }
-            onChange = { (event: ChangeEvent<HTMLTextAreaElement>) => handleTextAreaChange(event) }
+            onKeyDown = { (event: React.KeyboardEvent<HTMLTextAreaElement>) => keyDownHandler(event) }
+            onChange = { (event: ChangeEvent<HTMLTextAreaElement>) => textAreaChangeHandler(event) }
             ref = { textAreaRef }
          />
          <label
@@ -110,13 +111,7 @@ export default function TextArea(props: VitalityInputProps): JSX.Element {
             }
             { label }
          </label>
-         {
-            input.error !== null && (
-               <div className = "mx-auto flex max-w-[90%] animate-fadeIn items-center justify-center gap-2 p-3 opacity-0">
-                  <p className = "input-error font-bold text-red-500"> { input.error } </p>
-               </div>
-            )
-         }
+         <Error message = { input.error } />
       </div>
    );
 }

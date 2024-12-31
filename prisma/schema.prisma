@@ -9,48 +9,40 @@ datasource db {
 }
 
 model exercises {
-  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  workout_id     String   @db.Uuid
-  exercise_order Int
-  name           String   @db.VarChar(50)
-  workouts       workouts @relation(fields: [workout_id], references: [id], onDelete: Cascade)
-  sets           sets[]
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workout_id       String             @db.Uuid
+  exercise_order   Int
+  name             String             @db.VarChar(50)
+  exercise_entries exercise_entries[]
+  workouts         workouts           @relation(fields: [workout_id], references: [id], onDelete: Cascade)
 
   @@index([workout_id], map: "exercises_workout_index")
 }
 
-model sets {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  exercise_id String    @db.Uuid
-  set_order   Int
-  weight      Int?
-  hours       Int?
-  minutes     Int?
-  seconds     Int?
-  repetitions Int?
-  text        String?
-  exercises   exercises @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
-
-  @@index([exercise_id], map: "sets_exercise_index")
-}
-
 model users {
-  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name           String         @db.VarChar(200)
-  birthday       DateTime       @db.Date
-  username       String         @unique @db.VarChar(30)
-  password       String
-  email          String         @unique
-  email_verified Boolean        @default(false)
-  phone          String?        @unique @db.VarChar(22)
-  phone_verified Boolean?       @default(false)
-  mail           Boolean?       @default(false)
-  sms            Boolean?       @default(false)
-  image          String?        @default("")
-  workout_tags   workout_tags[]
-  workouts       workouts[]
+  id                  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String         @db.VarChar(200)
+  birthday            DateTime       @db.Date
+  username            String         @unique @db.VarChar(30)
+  username_normalized String         @unique @db.VarChar(30)
+  password            String
+  email               String         @unique
+  email_verified      Boolean        @default(false)
+  email_normalized    String         @unique
+  phone               String?        @unique @db.VarChar(42)
+  phone_verified      Boolean?       @default(false)
+  phone_normalized    String?        @unique @db.VarChar(42)
+  mail                Boolean?       @default(false)
+  sms                 Boolean?       @default(false)
+  image               String?        @default("")
+  feedback            feedback[]
+  workout_tags        workout_tags[]
+  workouts            workouts[]
 
   @@index([email], map: "users_email_index")
+  @@index([email_normalized], map: "users_email_normalized_index")
+  @@index([phone_normalized], map: "users_phone_normalized_index")
+  @@index([username_normalized], map: "users_username_normalized_index")
 }
 
 model verification_token {
@@ -71,6 +63,21 @@ model workouts {
   users                users                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id], map: "workouts_user_index")
+}
+
+model exercise_entries {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  exercise_id String    @db.Uuid
+  entry_order Int
+  weight      Int?
+  hours       Int?
+  minutes     Int?
+  seconds     Int?
+  repetitions Int?
+  text        String?
+  exercises   exercises @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
+
+  @@index([exercise_id], map: "entries_exercise_index")
 }
 
 model workout_applied_tags {
@@ -95,4 +102,13 @@ model workout_tags {
   @@unique([user_id, title], map: "unique_user_title")
   @@index([title], map: "tags_title_index")
   @@index([user_id], map: "tags_user_index")
+}
+
+model feedback {
+  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id  String? @db.Uuid
+  name     String  @db.VarChar(200)
+  email    String
+  message  String
+  workouts users?  @relation(fields: [user_id], references: [id])
 }

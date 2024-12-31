@@ -1,8 +1,10 @@
 {
   "root": true,
   "extends": ["next/core-web-vitals", "plugin:tailwindcss/recommended"],
-  "plugins": ["react", "tailwindcss", "@typescript-eslint"],
+  "plugins": ["react", "tailwindcss", "simple-import-sort"],
   "rules": {
+   "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
     "indent": ["error", 3, { "SwitchCase": 1 }],
     "quotes": ["error", "double"],
     "jsx-quotes": ["error", "prefer-double"],
@@ -35,14 +37,7 @@
     "react/jsx-curly-newline": ["error", { "multiline": "require", "singleline": "forbid" }],
     "tailwindcss/classnames-order": ["error", { "when": "always" }],
     "tailwindcss/no-custom-classname": ["error", {
-      "whitelist": [
-        "dark",
-        "modal",
-        "notification",
-        "modal-close",
-        "input-error",
-        "password-icon"
-      ]
+      "whitelist": ["dark", "modal", "notification", "modal-close", "input-error", "password-icon" ]
     }]
   }
 }

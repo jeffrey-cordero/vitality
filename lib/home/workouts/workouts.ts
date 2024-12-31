@@ -1,12 +1,13 @@
 "use server";
-import prisma from "@/lib/prisma/client";
 import { z } from "zod";
-import { uuidSchema } from "@/lib/global/zod";
-import { workout_applied_tags } from "@prisma/client";
-import { Exercise } from "@/lib/home/workouts/exercises";
+
 import { authorizeAction } from "@/lib/authentication/session";
-import { formateDatabaseWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
-import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
+import prisma from "@/lib/database/client";
+import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
+import { uuidSchema } from "@/lib/global/zod";
+import { Exercise } from "@/lib/home/workouts/exercises";
+import { formatDatabaseWorkout, verifyImageURL } from "@/lib/home/workouts/shared";
+import { getAppliedTagUpdates } from "@/lib/home/workouts/tags";
 
 export type Workout = {
   id: string;
@@ -32,6 +33,9 @@ const workoutsSchema = z.object({
          required_error: "Date is required",
          invalid_type_error: "Date is required"
       })
+      .min(new Date("1800-01-01"), {
+         message: "Date cannot be earlier than the year 1800" }
+      )
       .max(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), {
          message: "Date must not be after today"
       }),
@@ -48,9 +52,7 @@ const newWorkoutSchema = workoutsSchema.extend({
    id: uuidSchema("workout", "new")
 });
 
-export async function fetchWorkouts(
-   user_id: string
-): Promise<Workout[]> {
+export async function fetchWorkouts(user_id: string): Promise<Workout[]> {
    try {
       await authorizeAction(user_id);
 
@@ -64,7 +66,11 @@ export async function fetchWorkouts(
             },
             exercises: {
                include: {
-                  sets: true
+                  exercise_entries: {
+                     orderBy: {
+                        entry_order: "asc"
+                     }
+                  }
                },
                orderBy: {
                   exercise_order: "asc"
@@ -80,17 +86,14 @@ export async function fetchWorkouts(
       });
 
       return workouts.map(
-         (workout) => formateDatabaseWorkout(workout)
+         (workout) => formatDatabaseWorkout(workout)
       );
    } catch (error) {
       return [];
    }
 }
 
-export async function addWorkout(
-   user_id: string,
-   workout: Workout,
-): Promise<VitalityResponse<Workout>> {
+export async function addWorkout(user_id: string, workout: Workout): Promise<VitalityResponse<Workout>> {
    try {
       await authorizeAction(user_id);
 
@@ -102,7 +105,7 @@ export async function addWorkout(
          );
       }
 
-      // Create a new workout with basic properties
+      // Create a new workout with the basic properties
       const newWorkout = await prisma.workouts.create({
          data: {
             user_id: user_id,
@@ -125,7 +128,11 @@ export async function addWorkout(
             },
             exercises: {
                include: {
-                  sets: true
+                  exercise_entries: {
+                     orderBy: {
+                        entry_order: "asc"
+                     }
+                  }
                },
                orderBy: {
                   exercise_order: "asc"
@@ -134,16 +141,13 @@ export async function addWorkout(
          }
       });
 
-      return sendSuccessMessage("Added new workout", formateDatabaseWorkout(newWorkout));
+      return sendSuccessMessage("Added new workout", formatDatabaseWorkout(newWorkout));
    } catch (error) {
       return sendFailureMessage(error);
    }
 }
 
-export async function updateWorkout(
-   user_id: string,
-   workout: Workout,
-): Promise<VitalityResponse<Workout>> {
+export async function updateWorkout(user_id: string, workout: Workout, method: "update" | "delete"): Promise<VitalityResponse<Workout>> {
    try {
       await authorizeAction(user_id);
 
@@ -169,7 +173,11 @@ export async function updateWorkout(
                },
                exercises: {
                   include: {
-                     sets: true
+                     exercise_entries: {
+                        orderBy: {
+                           entry_order: "asc"
+                        }
+                     }
                   },
                   orderBy: {
                      exercise_order: "asc"
@@ -185,98 +193,76 @@ export async function updateWorkout(
             );
          }
 
-         const { adding, removing } = await getAppliedWorkoutTagUpdates(existingWorkout, workout);
+         if (method === "update") {
+            const { adding, removing } = await getAppliedTagUpdates(existingWorkout, workout);
 
-         const updatedWorkout = await prisma.workouts.update({
-            where: {
-               id: workout.id,
-               user_id: user_id
-            },
-            data: {
-               title: workout.title.trim(),
-               date: workout.date,
-               description: workout.description?.trim(),
-               image: workout.image?.trim(),
-               workout_applied_tags: {
-                  deleteMany: {
-                     tag_id: { in: removing }
-                  },
-                  createMany: {
-                     data: adding.map(
-                        (tagId: string) => ({ tag_id: tagId })
-                     )
-                  }
-               }
-            },
-            include: {
-               workout_applied_tags: {
-                  select: {
-                     workout_id: true,
-                     tag_id: true
+            const updatedWorkout = await prisma.workouts.update({
+               where: {
+                  id: workout.id,
+                  user_id: user_id
+               },
+               data: {
+                  title: workout.title.trim(),
+                  date: workout.date,
+                  description: workout.description?.trim(),
+                  image: workout.image?.trim(),
+                  workout_applied_tags: {
+                     deleteMany: {
+                        tag_id: { in: removing }
+                     },
+                     createMany: {
+                        data: adding.map(
+                           (tagId: string) => ({ tag_id: tagId })
+                        )
+                     }
                   }
                },
-               exercises: {
-                  include: {
-                     sets: true
+               include: {
+                  workout_applied_tags: {
+                     select: {
+                        workout_id: true,
+                        tag_id: true
+                     }
                   },
-                  orderBy: {
-                     exercise_order: "asc"
+                  exercises: {
+                     include: {
+                        exercise_entries: {
+                           orderBy: {
+                              entry_order: "asc"
+                           }
+                        }
+                     },
+                     orderBy: {
+                        exercise_order: "asc"
+                     }
                   }
                }
-            }
-         });
+            });
 
-         return sendSuccessMessage(
-            "Successfully updated workout",
-            formateDatabaseWorkout(updatedWorkout),
-         );
+            return sendSuccessMessage(
+               "Successfully updated workout",
+               formatDatabaseWorkout(updatedWorkout),
+            );
+         } else {
+            const deletedWorkout = await prisma.workouts.delete({
+               where: {
+                  id: workout.id,
+                  user_id: user_id
+               }
+            });
+
+            return sendSuccessMessage(
+               "Successfully deleted workout",
+               formatDatabaseWorkout(deletedWorkout)
+            );
+         }
       }
    } catch (error) {
       return sendFailureMessage(error);
    }
 }
 
-export async function getAppliedWorkoutTagUpdates(
-   existingWorkout: any,
-   newWorkout: Workout
-): Promise<{
-   existing: string[],
-   adding: string[];
-   removing: string[]
-}> {
-   // Extract existing applied tag IDs
-   const existing: Set<string> = new Set(
-      existingWorkout.workout_applied_tags.map(
-         (tag: workout_applied_tags) => tag.tag_id
-      )
-   );
-
-   // Determine tags ID's to add and remove from existing workout
-   const adding: Set<string> = new Set(newWorkout.tagIds);
-
-   const addingTags: string[] = Array.from(adding).filter(
-      (id: string) => !existing.has(id)
-   );
-
-   const removingTags: string[] = Array.from(existing).filter(
-      (id: string)  => !adding.has(id)
-   );
-
-   const existingTags: string[] = Array.from(existing).filter(
-      (id: string)  => existing.has(id) && adding.has(id)
-   );
-
-   return {
-      existing: existingTags,
-      adding: addingTags,
-      removing: removingTags
-   };
-}
-
-export async function deleteWorkouts(
-   user_id: string,
-   workouts: Workout[],
-): Promise<VitalityResponse<number>> {
+export async function deleteWorkouts(user_id: string, workouts: Workout[]): Promise<VitalityResponse<number>> {
    try {
       await authorizeAction(user_id);
 
@@ -291,7 +277,7 @@ export async function deleteWorkouts(
 
       for (const workout of workouts) {
          if (!uuidSchema("workout", "required").safeParse(workout.id).success) {
-            errors["id"] = ["ID for all workouts must be in UUID format"];
+            errors["id"] = ["ID for workout must be in UUID format"];
             break;
          }
 
@@ -299,10 +285,10 @@ export async function deleteWorkouts(
       }
 
       if (Object.keys(errors).length > 0) {
-         return sendErrorMessage("Invalid workout ID fields", errors);
+         return sendErrorMessage("Invalid workout fields", errors);
       }
 
-      const batch = await prisma.workouts.deleteMany({
+      const operation = await prisma.workouts.deleteMany({
          where: {
             id: {
                in: ids
@@ -312,8 +298,8 @@ export async function deleteWorkouts(
       });
 
       return sendSuccessMessage(
-         `Deleted ${batch.count} workout${batch.count === 1 ? "" : "s"}`,
-         batch.count,
+         `Deleted ${operation.count} workout${operation.count === 1 ? "" : "s"}`,
+         operation.count,
       );
    } catch (error) {
       return sendFailureMessage(error);

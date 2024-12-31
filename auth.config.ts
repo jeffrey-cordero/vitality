@@ -1,5 +1,6 @@
-import Credentials from "next-auth/providers/credentials";
 import { NextAuthConfig } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+
 import { authorizeServerSession } from "@/lib/authentication/authorize";
 
 export const authConfig = {
@@ -22,8 +23,8 @@ export const authConfig = {
          return token;
       },
       async session({ session, token }) {
-         session.user.id = token.sub as string;
-         session.user.email = token.email as string;
+         session.user.id = token.sub;
+         session.user.email = token.email;
 
          return session;
       },
@@ -32,15 +33,9 @@ export const authConfig = {
          const isOnHome = request.nextUrl.pathname.startsWith("/home");
 
          if (isOnHome) {
-            if (isLoggedIn) {
-               return true;
-            }
-
-            return false;
-         } else if (isLoggedIn) {
-            return Response.redirect(new URL("/home", request.nextUrl));
+            return isLoggedIn ? true : false;
          } else {
-            return true;
+            return isLoggedIn ? Response.redirect(new URL("/home", request.nextUrl)) : true;
          }
       }
    },

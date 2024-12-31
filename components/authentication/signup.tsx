@@ -1,61 +1,62 @@
 "use client";
-import Heading from "@/components/global/heading";
-import Button from "@/components/global/button";
+import { faArrowRotateLeft, faAt, faCakeCandles, faDoorOpen, faKey, faPhone, faSignature, faUserPlus, faUserSecret } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
+import { useCallback, useContext, useReducer, useRef } from "react";
+
+import { NotificationContext } from "@/app/layout";
+import Button from "@/components/global/button";
+import Heading from "@/components/global/heading";
 import { Input } from "@/components/global/input";
 import { login } from "@/lib/authentication/login";
-import { NotificationContext } from "@/app/layout";
-import { useCallback, useContext, useReducer, useRef } from "react";
-import { VitalityState, formReducer } from "@/lib/global/state";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { signup, Registration } from "@/lib/authentication/signup";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { faArrowRotateLeft, faDoorOpen, faKey, faAt, faPhone, faUserSecret, faCakeCandles, faUserPlus, faSignature } from "@fortawesome/free-solid-svg-icons";
+import { Registration, signup } from "@/lib/authentication/signup";
+import { formReducer, VitalityState } from "@/lib/global/reducer";
+import { processResponse, VitalityResponse } from "@/lib/global/response";
 
-const registration: VitalityState = {
+const form: VitalityState = {
    username: {
+      id: "username",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    password: {
+      id: "password",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    confirmPassword: {
+      id: "confirmPassword",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    name: {
+      id: "name",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    birthday: {
+      id: "birthday",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    email: {
+      id: "email",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    phone: {
+      id: "phone",
       value: "",
-      error: null,
-      data: {}
+      error: null
    }
 };
 
 export default function SignUp(): JSX.Element {
-   const { updateNotification } = useContext(NotificationContext);
-   const [state, dispatch] = useReducer(formReducer, registration);
+   const { updateNotifications } = useContext(NotificationContext);
+   const [state, dispatch] = useReducer(formReducer, form);
    const signupButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
-   const handleRegistration = useCallback(async() => {
+   const register = useCallback(async() => {
       const registration: Registration = {
          name: state.name.value.trim(),
          username: state.username.value.trim(),
@@ -68,17 +69,17 @@ export default function SignUp(): JSX.Element {
 
       const response: VitalityResponse<null> = await signup(registration);
 
-      handleResponse(response, dispatch, updateNotification, () => {
+      processResponse(response, dispatch, updateNotifications, () => {
          // Display notification with login button for redirection
-         updateNotification({
+         updateNotifications({
             status: "Success",
-            message: "Successfully registered",
+            message: "Account created successfully!",
             timer: undefined,
             children: (
                <Link href = "/home">
                   <Button
                      type = "button"
-                     className = "h-8 bg-green-600 px-4 py-3 text-sm text-white focus:border-green-800 focus:ring-2 focus:ring-green-800 xsm:px-6 dark:border-0"
+                     className = "h-[2.2rem] bg-green-500 px-5 py-3 text-sm text-white focus:border-green-600 focus:ring-2 focus:ring-green-600 xxsm:text-[0.95rem] dark:border-0"
                      icon = { faDoorOpen }
                      onClick = {
                         async() => {
@@ -96,19 +97,25 @@ export default function SignUp(): JSX.Element {
                </Link>
             )
          });
+
+         // Reset the form state after successful registration
+         dispatch({
+            type: "resetState",
+            value: form
+         });
       });
    }, [
       state.name,
+      state.phone,
+      state.email,
       state.username,
       state.password,
-      state.confirmPassword,
-      state.email,
       state.birthday,
-      state.phone,
-      updateNotification
+      updateNotifications,
+      state.confirmPassword
    ]);
 
-   const handleSubmitRegistration = useCallback(() => {
+   const submitRegistration = useCallback(() => {
       signupButtonRef.current?.submit();
    }, []);
 
@@ -116,18 +123,22 @@ export default function SignUp(): JSX.Element {
       <div className = "mx-auto mb-12 flex w-full flex-col items-center justify-center text-center">
          <Heading
             title = "Sign Up"
-            description = "Create an account to get started"
+            message = "Create an account to get started"
          />
-         <div className = "mx-auto mt-8 w-11/12 sm:w-3/4 xl:w-5/12">
-            <div className = "relative mx-auto flex w-full flex-col items-stretch justify-center gap-3">
+         <div className = "mx-auto mt-12 w-11/12 sm:w-3/4 lg:w-7/12 2xl:w-5/12">
+            <form className = "relative mx-auto flex w-full flex-col items-stretch justify-center gap-3">
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
                   onClick = {
-                     () =>
+                     () => {
+                        // Prevent resetting the form state during a submission
+                        if (document.getElementById("username")?.getAttribute("disabled") === "true") return;
+
                         dispatch({
                            type: "resetState",
-                           value: {}
-                        })
+                           value: form
+                        });
+                     }
                   }
                   className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                />
@@ -139,7 +150,7 @@ export default function SignUp(): JSX.Element {
                   icon = { faUserSecret }
                   input = { state.username }
                   dispatch = { dispatch }
-                  onSubmit = { handleSubmitRegistration }
+                  onSubmit = { submitRegistration }
                   autoFocus
                   required
                />
@@ -151,7 +162,7 @@ export default function SignUp(): JSX.Element {
                   icon = { faKey }
                   input = { state.password }
                   dispatch = { dispatch }
-                  onSubmit = { handleSubmitRegistration }
+                  onSubmit = { submitRegistration }
                   required
                />
                <Input
@@ -162,7 +173,7 @@ export default function SignUp(): JSX.Element {
                   icon = { faKey }
                   input = { state.confirmPassword }
                   dispatch = { dispatch }
-                  onSubmit = { handleSubmitRegistration }
+                  onSubmit = { submitRegistration }
                   required
                />
                <Input
@@ -173,7 +184,7 @@ export default function SignUp(): JSX.Element {
                   icon = { faSignature }
                   input = { state.name }
                   dispatch = { dispatch }
-                  onSubmit = { handleSubmitRegistration }
+                  onSubmit = { submitRegistration }
                   required
                />
                <Input
@@ -185,7 +196,7 @@ export default function SignUp(): JSX.Element {
                   icon = { faCakeCandles }
                   input = { state.birthday }
                   dispatch = { dispatch }
-                  onSubmit = { handleSubmitRegistration }
+                  onSubmit = { submitRegistration }
                   required
                />
                <Input
@@ -196,7 +207,7 @@ export default function SignUp(): JSX.Element {
                   icon = { faAt }
                   input = { state.email }
                   dispatch = { dispatch }
-                  onSubmit = { handleSubmitRegistration }
+                  onSubmit = { submitRegistration }
                   required
                />
                <Input
@@ -207,20 +218,21 @@ export default function SignUp(): JSX.Element {
                   icon = { faPhone }
                   input = { state.phone }
                   dispatch = { dispatch }
-                  onSubmit = { handleSubmitRegistration }
+                  onSubmit = { submitRegistration }
                />
                <Button
                   ref = { signupButtonRef }
-                  type = "submit"
+                  type = "button"
                   className = "h-[2.6rem] bg-primary text-white"
                   icon = { faUserPlus }
-                  onSubmit = { handleRegistration }
-                  onClick = { handleSubmitRegistration }
+                  onSubmit = { register }
+                  onClick = { submitRegistration }
                   isSingleSubmission = { true }
+                  inputIds = { ["username", "password", "confirmPassword", "name", "birthday", "email", "phone"] }
                >
                   Sign Up
                </Button>
-            </div>
+            </form>
             <p className = "mt-4 px-2">
                Already have an account?{ " " }
                <Link

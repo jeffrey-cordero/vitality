@@ -1,15 +1,16 @@
-import clsx from "clsx";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { faCircleCheck, faCircleXmark, faEye, faEyeSlash, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { VitalityAction, VitalityInputState } from "@/lib/global/state";
+import clsx from "clsx";
 import { ChangeEvent, Dispatch, useCallback, useEffect, useRef } from "react";
-import { faEye, faEyeSlash, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+
+import Error from "@/components/global/error";
+import { VitalityAction, VitalityInputState } from "@/lib/global/reducer";
 
 export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
    label: string;
    input: VitalityInputState;
    dispatch: Dispatch<VitalityAction<any>>;
-   icon?: IconProp;
+   icon?: IconDefinition;
    onSubmit?: () => void;
    scrollIntoView?: boolean;
 }
@@ -17,7 +18,7 @@ export interface VitalityInputProps extends React.InputHTMLAttributes<any> {
 export function Input(props: VitalityInputProps): JSX.Element {
    const { id, label, type, icon, placeholder, className, min, autoFocus, scrollIntoView,
       autoComplete, onChange, onBlur, onSubmit, required, input, dispatch, disabled } = props;
-   const inputType = input.data.type ?? type;
+   const inputType = input.data?.type ?? type;
    const inputRef = useRef<HTMLInputElement>(null);
    const passwordIconRef = useRef<SVGSVGElement | null>(null);
 
@@ -26,21 +27,20 @@ export function Input(props: VitalityInputProps): JSX.Element {
       scrollIntoView && inputRef.current?.scrollIntoView({ behavior: "instant", block: "center" });
    }, [
       autoFocus,
-      scrollIntoView,
-      input.error
+      input.error,
+      scrollIntoView
    ]);
 
-   const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-      // handlesOnChange defined implies state management is handled via the parent component
-      if (input.handlesOnChange) {
+   const inputChangeHandler = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+      // handlesChanges defined implies state management is handled via the parent component
+      if (input.handlesChanges) {
          onChange?.call(null, event);
       } else {
          dispatch({
             type: "updateState",
             value: {
                id: id,
-               input: {
-                  ...input,
+               value: {
                   value: event.target.value,
                   error: null
                }
@@ -48,13 +48,13 @@ export function Input(props: VitalityInputProps): JSX.Element {
          });
       }
    }, [
-      dispatch,
-      input,
       id,
-      onChange
+      input,
+      onChange,
+      dispatch
    ]);
 
-   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+   const keyDownHandler = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
       if (inputRef.current && event.key === "Escape") {
          // Focus the top-most modal in the DOM when blurring input element, if applicable
          inputRef.current?.blur();
@@ -71,26 +71,23 @@ export function Input(props: VitalityInputProps): JSX.Element {
       }
    }, [onSubmit]);
 
-   const handlePasswordIconClick = useCallback(() => {
+   const passwordIconHandler = useCallback(() => {
       inputRef.current?.focus();
 
       dispatch({
          type: "updateState",
          value: {
             id: id,
-            input: {
-               ...input,
+            value: {
                data: {
-                  ...input.data,
                   type: inputType === "password" ? "text" : "password"
                }
             }
          }
       });
    }, [
-      dispatch,
-      input,
       id,
+      dispatch,
       inputType
    ]);
 
@@ -112,8 +109,8 @@ export function Input(props: VitalityInputProps): JSX.Element {
                         "border-red-500 border-2 dark:border-2 focus:border-red-500 focus:ring-red-500 error": input.error !== null
                      }, className)
                }
-               onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(event) }
-               onChange = { (event: ChangeEvent<HTMLInputElement>) => handleInputChange(event) }
+               onKeyDown = { (event: React.KeyboardEvent<HTMLInputElement>) => keyDownHandler(event) }
+               onChange = { (event: ChangeEvent<HTMLInputElement>) => inputChangeHandler(event) }
                onBlur = { onBlur ?? undefined }
                disabled = { disabled ?? false }
             />
@@ -121,7 +118,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                (inputType === "password" || passwordIconRef.current !== null) && (
                   <button
                      tabIndex = { 0 }
-                     onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && handlePasswordIconClick() }
+                     onKeyDown = { (event: React.KeyboardEvent) => event.key === "Enter" && passwordIconHandler() }
                      type = "button"
                      className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
                   >
@@ -130,27 +127,27 @@ export function Input(props: VitalityInputProps): JSX.Element {
                         icon = { inputType == "password" ? faEye : faEyeSlash }
                         className = {
                            clsx("password-icon size-[0.95rem] shrink-0 xxsm:size-4", {
-                              "text-primary" : input.data.type && input.data.type !== "password"
+                              "text-primary" : input.data?.type && input.data?.type !== "password"
                            })
                         }
-                        onClick = { handlePasswordIconClick }
+                        onClick = { passwordIconHandler }
                      />
                   </button>
                )
             }
             {
-               input.data.valid !== undefined && (
+               input.data?.valid !== undefined && (
                   <button
                      tabIndex = { -1 }
                      type = "button"
                      className = "absolute end-0 top-1/2 -translate-y-1/2 rounded-e-md p-4"
                   >
                      <FontAwesomeIcon
-                        icon = { input.data.valid ? faCircleCheck : faCircleXmark }
+                        icon = { input.data?.valid ? faCircleCheck : faCircleXmark }
                         className = {
                            clsx("size-[0.95rem] shrink-0 xxsm:size-4", {
-                              "text-green-500": input.data.valid,
-                              "text-red-500": !(input.data.valid)
+                              "text-green-500": input.data?.valid,
+                              "text-red-500": !(input.data?.valid)
                            })
                         }
                      />
@@ -181,15 +178,7 @@ export function Input(props: VitalityInputProps): JSX.Element {
                { label }
             </label>
          </div>
-         {
-            input.error !== null && (
-               <div className = "relative mx-auto my-3 flex animate-fadeIn items-center justify-center gap-2 px-2 text-center text-base opacity-0">
-                  <p className = "input-error font-bold text-red-500">
-                     { input.error.trim() }
-                  </p>
-               </div>
-            )
-         }
+         <Error message = { input.error } />
       </div>
    );
 }

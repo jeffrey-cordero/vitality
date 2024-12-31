@@ -1,9 +1,10 @@
 "use client";
-import clsx from "clsx";
-import { useRef, useContext } from "react";
-import { NotificationContext } from "@/app/layout";
+import { faBomb, faCircleCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark, faCircleCheck, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import clsx from "clsx";
+import { useContext, useRef } from "react";
+
+import { NotificationContext } from "@/app/layout";
 
 export interface NotificationProps extends React.HTMLAttributes<any> {
   status: "Initial" | "Success" | "Error" | "Failure";
@@ -13,9 +14,9 @@ export interface NotificationProps extends React.HTMLAttributes<any> {
 }
 
 export default function Notification(props: NotificationProps): JSX.Element {
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { status, message, children, timer } = props;
-   const icon = status === "Success" ? faCircleCheck : faTriangleExclamation;
+   const icon = status === "Success" ? faCircleCheck : faBomb;
    const notificationRef = useRef<HTMLDivElement>(null);
 
    const removeNotification = () => {
@@ -23,18 +24,18 @@ export default function Notification(props: NotificationProps): JSX.Element {
       notificationRef.current?.classList.add("animate-fadeOut");
 
       // Remove current notification after the provided timer
-      updateNotification({
-         status: "Initial",
-         message: "remove"
-      });
-
-      // Remove fade- out animation for removing future notifications
       setTimeout(() => {
          notificationRef.current?.classList.remove("animate-fadeOut");
+
+         updateNotifications({
+            status: "Success",
+            message: "remove"
+         });
       }, 1250);
    };
 
    if (timer !== undefined) {
+      // Start timer for removing notification after a set duration, if applicable
       setTimeout(() => {
          removeNotification();
       }, timer);
@@ -44,37 +45,37 @@ export default function Notification(props: NotificationProps): JSX.Element {
       <>
          {
             <div
+               ref = { notificationRef }
                id = "notification"
                className = "fixed left-1/2 top-0 z-50 mx-auto mt-4 min-h-[4.5rem] w-[30rem] max-w-[95%] -translate-x-1/2 animate-fadeIn opacity-0"
                { ...props }
-               ref = { notificationRef }
             >
                <div className = "text-left">
                   <div
                      className = {
                         clsx(
-                           "flex w-full items-center rounded-lg border-l-8 bg-white pl-4 dark:bg-slate-800",
+                           "flex w-full items-center rounded-lg border-l-8 bg-white dark:bg-slate-800",
                            {
-                              "border-l-green-600": status === "Success",
-                              "border-l-red-600": status !== "Success"
+                              "border-l-green-500": status === "Success",
+                              "border-l-red-500": status !== "Success"
                            },
                         )
                      }
                   >
-                     <div className = "flex items-center justify-center rounded-full">
-                        <FontAwesomeIcon
-                           icon = { icon }
-                           className = {
-                              clsx("text-3xl", {
-                                 "text-green-600": status === "Success",
-                                 "text-red-600": status !== "Success"
-                              })
-                           }
-                        />
-                     </div>
-                     <div className = "flex w-full items-center justify-between px-4 pb-3 pt-[16px]">
+                     <div className = "flex min-h-8 w-full items-center justify-start gap-4 p-4">
+                        <div className = "flex items-center justify-center rounded-full">
+                           <FontAwesomeIcon
+                              icon = { icon }
+                              className = {
+                                 clsx("text-3xl", {
+                                    "text-green-500": status === "Success",
+                                    "text-red-500": status !== "Success"
+                                 })
+                              }
+                           />
+                        </div>
                         <div className = "relative">
-                           <div className = "my-2 flex flex-col gap-2 whitespace-pre-wrap break-words pl-1 pr-6 text-[0.95rem] font-bold xsm:text-base">
+                           <div className = "my-2 flex flex-col gap-2 pr-2 text-[0.95rem] font-bold [overflow-wrap:anywhere] xsm:text-base">
                               <p>{ message }</p>
                               { children }
                            </div>
@@ -82,10 +83,10 @@ export default function Notification(props: NotificationProps): JSX.Element {
                      </div>
                   </div>
                </div>
-               <div className = "absolute right-[-2px] top-[-5px] z-50 rounded-e-md p-3.5">
+               <div className = "absolute right-[-5px] top-[-8px] z-50 rounded-e-md p-3.5">
                   <FontAwesomeIcon
                      icon = { faXmark }
-                     className = "size-4 shrink-0 cursor-pointer text-xl font-bold text-red-500"
+                     className = "cursor-pointer text-lg font-bold text-red-500"
                      fill = "black"
                      onClick = {
                         (event) => {

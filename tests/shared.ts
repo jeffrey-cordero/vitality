@@ -2,7 +2,7 @@ import { prismaMock } from "@/tests/singleton";
 
 // Helper function to simulate database error situations
 export const simulateDatabaseError = async(
-   table: "workouts" | "workout_tags" | "exercises" | "users",
+   table: "workouts" | "workout_tags" | "exercises" | "feedback" | "users",
    databaseMethod: "create" | "delete" | "update" | "deleteMany",
    backendMethod: (..._args: any[]) => any) => {
    // @ts-ignore
@@ -14,7 +14,7 @@ export const simulateDatabaseError = async(
       status: "Failure",
       body: {
          data: null,
-         message: "Something went wrong. Please try again.",
+         message: "Oops! Something went wrong. Try again later.",
          errors: {
             system: ["Database Error"]
          }

@@ -1,6 +1,7 @@
 import { Dispatch } from "react";
-import { VitalityAction } from "@/lib/global/state";
+
 import { NotificationProps } from "@/components/global/notification";
+import { VitalityAction } from "@/lib/global/reducer";
 
 export interface VitalityResponse<T> {
    status: "Success" | "Error" | "Failure";
@@ -11,10 +12,7 @@ export interface VitalityResponse<T> {
    };
  }
 
-export function sendSuccessMessage<T>(
-   message: string,
-   data: T
-): VitalityResponse<T> {
+export function sendSuccessMessage<T>(message: string, data: T): VitalityResponse<T> {
    return {
       status: "Success",
       body: {
@@ -25,10 +23,7 @@ export function sendSuccessMessage<T>(
    };
 }
 
-export function sendErrorMessage<T>(
-   message: string,
-   errors: Record<string, string[] | undefined>
-): VitalityResponse<T> {
+export function sendErrorMessage<T>(message: string, errors: Record<string, string[] | undefined>): VitalityResponse<T> {
    return {
       status: "Error",
       body: {
@@ -39,9 +34,7 @@ export function sendErrorMessage<T>(
    };
 }
 
-export function sendFailureMessage<T>(
-   error: Error
-): VitalityResponse<T> {
+export function sendFailureMessage<T>(error: Error): VitalityResponse<T> {
    // Error logs strictly within a development environment
    process.env.NODE_ENV === "development" && console.error(error);
 
@@ -49,7 +42,7 @@ export function sendFailureMessage<T>(
       status: "Failure",
       body: {
          data: null,
-         message: "Something went wrong. Please try again.",
+         message: "Oops! Something went wrong. Try again later.",
          errors: {
             system: [error?.message]
          }
@@ -57,26 +50,19 @@ export function sendFailureMessage<T>(
    };
 }
 
-export function handleResponse(
+export function processResponse(
    response: VitalityResponse<any>,
    dispatch: Dispatch<VitalityAction<any>>,
-   updateNotification: (_notification: NotificationProps) => void,
+   updateNotifications: (_notification: NotificationProps) => void,
    successMethod: () => void
 ): void {
    if (response.status === "Success") {
-      // Remove existing notification, if any
-      updateNotification({
-         status: "Initial",
-         message: ""
-      });
-
-      // Call the success method
+      // Call the success method provided
       successMethod.call(null);
-   } else if (response.status === "Error"
-         && Object.keys(response.body.errors).length > 0) {
+   } else if (response.status === "Error" && Object.keys(response.body.errors).length > 0) {
       // Update state to display all errors found within the response
       dispatch({
-         type: "updateErrors",
+         type: "processResponse",
          value: response
       });
 
@@ -84,8 +70,8 @@ export function handleResponse(
       document.getElementsByClassName("input-error")?.item(0)
          ?.scrollIntoView({ behavior: "smooth", block: "center" });
    } else {
-      // Display failure notification to the user
-      updateNotification({
+      // Display failure or unique error notification to the user
+      updateNotifications({
          status: response.status,
          message: response.body.message,
          timer: undefined

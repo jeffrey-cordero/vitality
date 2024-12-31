@@ -1,15 +1,17 @@
+import { faImage, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import Image from "next/image";
-import Confirmation from "@/components/global/confirmation";
-import { Tag } from "@/lib/home/workouts/tags";
-import { VitalityProps } from "@/lib/global/state";
-import { verifyImageURL } from "@/lib/home/workouts/shared";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { handleResponse, VitalityResponse } from "@/lib/global/response";
-import { deleteWorkouts, Workout } from "@/lib/home/workouts/workouts";
-import { AuthenticationContext, NotificationContext } from "@/app/layout";
-import { faImage, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+
+import { AuthenticationContext, NotificationContext } from "@/app/layout";
+import Confirmation from "@/components/global/confirmation";
+import { normalizeDate } from "@/lib/authentication/shared";
+import { VitalityProps } from "@/lib/global/reducer";
+import { processResponse, VitalityResponse } from "@/lib/global/response";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { Tag } from "@/lib/home/workouts/tags";
+import { deleteWorkouts, Workout } from "@/lib/home/workouts/workouts";
 
 interface RowProps extends VitalityProps {
    workout: Workout;
@@ -19,51 +21,48 @@ interface RowProps extends VitalityProps {
 function Row(props: RowProps) {
    const { workout, globalState, globalDispatch } = props;
    const [isValidImage, setIsValidImage] = useState<boolean>(true);
-   const selected: Set<Workout> = globalState.workouts.data.selected;
+   const selected: Set<Workout> = globalState.workouts.data?.selected;
    const isSelected: boolean = selected.has(workout);
+
+   const date = useMemo(() => {
+      return normalizeDate(workout.date);
+   }, [workout.date]);
 
    useEffect(() => {
       setIsValidImage(verifyImageURL(workout.image));
    }, [workout.image]);
 
-   const formattedDate = useMemo(() => {
-      return workout.date.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1");
-   }, [workout.date]);
-
-   const handleWorkoutToggle = useCallback(() => {
+   const toggleWorkouts = useCallback(() => {
+      // Add or remove desired workout from selected workouts
       const newSelected: Set<Workout> = new Set(selected);
-      // Add or remove desired workout from selected workouts for potential bulk removals
       selected.has(workout) ? newSelected.delete(workout) : newSelected.add(workout);
 
       globalDispatch({
          type: "updateState",
          value: {
             id: "workouts",
-            input: {
-               ...globalState.workouts,
+            value: {
                data: {
-                  ...globalState.workouts.data,
                   selected: newSelected
                }
             }
          }
       });
    }, [
-      globalDispatch,
+      workout,
       selected,
-      globalState.workouts,
-      workout
+      globalDispatch
    ]);
 
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
-         const tag: Tag | undefined = globalState.tags.data.dictionary[tagId];
+         // Workout tag may be undefined in dictionary due to deletion
+         const tag: Tag | undefined = globalState.tags.data?.dictionary[tagId];
 
          return (
-            // Workout tag may be undefined in global state dictionary due to a potential removal or error
             tag !== undefined && (
                <div
-                  className = { clsx("m-1 max-w-full truncate rounded-full px-4 py-[0.2rem] text-[0.8rem] font-bold text-white lg:text-[0.73rem]") }
+                  className = "m-1 max-w-full truncate rounded-full px-4 py-[0.2rem] text-[0.8rem] font-bold text-white lg:text-[0.73rem]"
                   style = {
                      {
                         backgroundColor: tag.color
@@ -78,41 +77,25 @@ function Row(props: RowProps) {
       });
    }, [
       workout,
-      globalState.tags.data.dictionary
+      globalState.tags.data?.dictionary
    ]);
-
-   const handleEditWorkout = useCallback(() => {
-      globalDispatch({
-         type: "updateState",
-         value: {
-            id: "workout",
-            input: {
-               ...globalState.workout,
-               value: workout,
-               data: {
-                  display: true
-               }
-            }
-         }
-      });
-   }, [globalDispatch, globalState.workout, workout]);
 
    return (
       <div
          id = { workout.id }
          className = {
-            clsx("mx-auto flex w-full cursor-pointer flex-col items-center justify-between p-6 text-center text-lg lg:flex-row lg:rounded-none lg:p-6 lg:text-lg", {
+            clsx("mx-auto flex min-h-60 w-full cursor-pointer flex-col items-center justify-between p-6 text-center text-lg lg:flex-row lg:rounded-none lg:p-6 lg:text-lg", {
                "bg-gray-100 dark:bg-gray-700": isSelected,
                "bg-white dark:bg-slate-800": !isSelected
             })
          }
-         onClick = { handleWorkoutToggle }
+         onClick = { toggleWorkouts }
       >
          <div className = "order-3 w-full max-w-[26rem] items-center justify-center px-4 pb-2 text-[1.25rem] font-medium [overflow-wrap:anywhere] lg:order-none lg:w-40 lg:px-6 lg:py-4 lg:text-lg">
             { workout.title }
          </div>
          <div className = "order-1 flex w-full flex-row items-center justify-center gap-3 whitespace-pre-wrap break-all px-4 text-lg font-medium lg:order-none lg:w-40 lg:px-6 lg:py-4 lg:text-lg">
-            { formattedDate }
+            { date }
          </div>
          <div className = "scrollbar-hide order-4 w-full overflow-auto whitespace-pre-wrap break-all px-2 sm:px-12 lg:order-none lg:max-h-48 lg:w-48 lg:p-1">
             <div
@@ -160,7 +143,19 @@ function Row(props: RowProps) {
                   onClick = {
                      (event) => {
                         event.stopPropagation();
-                        handleEditWorkout();
+
+                        globalDispatch({
+                           type: "updateState",
+                           value: {
+                              id: "workout",
+                              value: {
+                                 value: workout,
+                                 data: {
+                                    display: true
+                                 }
+                              }
+                           }
+                        });
                      }
                   }
                >
@@ -183,64 +178,62 @@ interface TableProps extends VitalityProps {
 
 export default function Table(props: TableProps): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const { updateNotification } = useContext(NotificationContext);
+   const { updateNotifications } = useContext(NotificationContext);
    const { workouts, globalState, globalDispatch } = props;
-   const selected: Set<Workout> = globalState.workouts.data.selected;
+   // Selected workouts are stored in global state for potential bulk removals
+   const selected: Set<Workout> = globalState.workouts.data?.selected;
 
    const visibleSelectedWorkouts = useMemo(() => {
-      return new Set<Workout>(workouts.filter(workout => selected.has(workout)));
+      return new Set<Workout>(workouts.filter(
+         (workout) => selected.has(workout))
+      );
    }, [
-      workouts,
-      selected
+      selected,
+      workouts
    ]);
 
-   const handleUpdateSelectedWorkouts = useCallback(
-      (newSelected: Set<Workout>) => {
-         globalDispatch({
-            type: "updateState",
+   const toggleWorkouts = useCallback(() => {
+      // Toggle workouts based on current selection
+      let newSelected: Set<Workout>;
+
+      if (visibleSelectedWorkouts.size === workouts.length) {
+         newSelected = new Set([...Array.from(selected)].filter(
+            (workout) => !visibleSelectedWorkouts.has(workout))
+         );
+      } else {
+         newSelected = new Set([...Array.from(selected), ...workouts]);
+      }
+
+      globalDispatch({
+         type: "updateState",
+         value: {
+            id: "workouts",
             value: {
-               id: "workouts",
-               input: {
-                  ...globalState.workouts,
-                  data: {
-                     ...globalState.workouts.data,
-                     selected: newSelected
-                  }
+               data: {
+                  selected: newSelected
                }
             }
-         });
-      }, [
-         globalDispatch,
-         globalState.workouts
-      ]);
-
-   const handleWorkoutToggle = useMemo(() => {
-      return () => {
-         // Remove or select all visible selected workouts
-         if (visibleSelectedWorkouts.size === workouts.length) {
-            handleUpdateSelectedWorkouts(new Set([...Array.from(selected)].filter(workout => !visibleSelectedWorkouts.has(workout))));
-         } else {
-            handleUpdateSelectedWorkouts(new Set([...Array.from(selected), ...workouts]));
          }
-      };
+      });
+
    }, [
       workouts,
       selected,
-      visibleSelectedWorkouts,
-      handleUpdateSelectedWorkouts
+      globalDispatch,
+      visibleSelectedWorkouts
    ]);
 
-   const handleWorkoutDelete = useCallback(async() => {
+   const submitDeleteWorkouts = useCallback(async() => {
       const response: VitalityResponse<number> = await deleteWorkouts(user.id, Array.from(visibleSelectedWorkouts));
 
-      handleResponse(response, globalDispatch, updateNotification, () => {
-         const newWorkouts: Workout[] = [...globalState.workouts.value].filter((w: Workout) => {
-            return !(visibleSelectedWorkouts.has(w));
-         });
+      processResponse(response, globalDispatch, updateNotifications, () => {
+         const newWorkouts: Workout[] = [...globalState.workouts.value].filter(
+            (workout: Workout) =>  !(visibleSelectedWorkouts.has(workout))
+         );
 
-         const newFiltered: Workout[] = [...globalState.workouts.data.filtered].filter((w: Workout) => {
-            return !(visibleSelectedWorkouts.has(w));
-         });
+         const newFiltered: Workout[] = [...globalState.workouts.data?.filtered].filter(
+            (workout: Workout) => !(visibleSelectedWorkouts.has(workout))
+         );
 
          const newSelected: Set<Workout> = new Set(selected);
 
@@ -248,7 +241,7 @@ export default function Table(props: TableProps): JSX.Element {
             (workout) => newSelected.delete(workout)
          );
 
-         // Account for current page being discard in pagination view
+         // Account for pagination values when deleting workouts
          const pages: number = Math.ceil(newWorkouts.length / globalState.paging.value);
          const page: number = globalState.page.value;
 
@@ -256,22 +249,19 @@ export default function Table(props: TableProps): JSX.Element {
             type: "updateStates",
             value: {
                workouts: {
-                  ...globalState.workouts,
                   value: newWorkouts,
                   data: {
-                     ...globalState.workouts.data,
                      filtered: newFiltered,
                      selected: newSelected
                   }
                },
                page: {
-                  ...globalState.page,
                   value: page >= pages ? Math.max(0, page - 1) : page
                }
             }
          });
 
-         updateNotification({
+         updateNotifications({
             status: response.status,
             message: response.body.message,
             timer: 1000
@@ -279,10 +269,10 @@ export default function Table(props: TableProps): JSX.Element {
       });
    }, [
       user,
-      globalDispatch,
       selected,
       globalState,
-      updateNotification,
+      globalDispatch,
+      updateNotifications,
       visibleSelectedWorkouts
    ]);
 
@@ -295,7 +285,7 @@ export default function Table(props: TableProps): JSX.Element {
                   type = "checkbox"
                   checked = { visibleSelectedWorkouts.size === workouts.length }
                   className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-                  onChange = { () => handleWorkoutToggle() }
+                  onChange = { () => toggleWorkouts() }
                />
             </div>
             <div className = "mx-auto hidden w-full items-center justify-between bg-white lg:flex lg:p-6 dark:bg-slate-800">
@@ -317,7 +307,7 @@ export default function Table(props: TableProps): JSX.Element {
                      type = "checkbox"
                      checked = { visibleSelectedWorkouts.size === workouts.length }
                      className = "size-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-                     onChange = { () => handleWorkoutToggle() }
+                     onChange = { () => toggleWorkouts() }
                   />
                </div>
             </div>
@@ -338,7 +328,7 @@ export default function Table(props: TableProps): JSX.Element {
                visibleSelectedWorkouts.size > 0 && (
                   <Confirmation
                      message = { `Delete ${visibleSelectedWorkouts.size} workout${visibleSelectedWorkouts.size === 1 ? "" : "s"}?` }
-                     onConfirmation = { handleWorkoutDelete }
+                     onConfirmation = { submitDeleteWorkouts }
                      icon
                   />
                )

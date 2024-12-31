@@ -1,9 +1,12 @@
 "use server";
-import prisma from "@/lib/prisma/client";
+import { workout_applied_tags } from "@prisma/client";
 import { z } from "zod";
-import { uuidSchema } from "@/lib/global/zod";
+
 import { authorizeAction } from "@/lib/authentication/session";
-import { sendSuccessMessage, sendErrorMessage, sendFailureMessage, VitalityResponse } from "@/lib/global/response";
+import prisma from "@/lib/database/client";
+import { sendErrorMessage, sendFailureMessage, sendSuccessMessage, VitalityResponse } from "@/lib/global/response";
+import { uuidSchema } from "@/lib/global/zod";
+import { Workout } from "@/lib/home/workouts/workouts";
 
 const colors = new Set([
    "rgb(55, 55, 55)",
@@ -46,9 +49,7 @@ const newWorkoutTagSchema = workoutTagSchema.extend({
    id: uuidSchema("workout tag", "new")
 });
 
-export async function fetchWorkoutTags(
-   user_id: string
-): Promise<Tag[]> {
+export async function fetchWorkoutTags(user_id: string): Promise<Tag[]> {
    try {
       await authorizeAction(user_id);
 
@@ -62,10 +63,7 @@ export async function fetchWorkoutTags(
    }
 }
 
-export async function addWorkoutTag(
-   user_id: string,
-   tag: Tag
-): Promise<VitalityResponse<Tag>> {
+export async function addWorkoutTag(user_id: string, tag: Tag): Promise<VitalityResponse<Tag>> {
    try {
       await authorizeAction(user_id);
 
@@ -104,11 +102,7 @@ export async function addWorkoutTag(
    }
 }
 
-export async function updateWorkoutTag(
-   user_id: string,
-   tag: Tag,
-   method: "update" | "delete"
-): Promise<VitalityResponse<Tag>> {
+export async function updateWorkoutTag(user_id: string, tag: Tag, method: "update" | "delete"): Promise<VitalityResponse<Tag>> {
    try {
       await authorizeAction(user_id);
 
@@ -121,7 +115,7 @@ export async function updateWorkoutTag(
          );
       }
 
-      // Ensure the workout tag already exists
+      // Ensure the workout tag exists
       const existingTag = await prisma.workout_tags.findFirst({
          where: {
             id: tag.id.trim(),
@@ -136,11 +130,11 @@ export async function updateWorkoutTag(
          );
       }
 
-      // Update or remove the workout tag
+      // Update or remove the provided workout tag
       switch (method) {
          case "update":
             // Ensure updating title with a different ID doesn't already exist
-            const workoutTagTitleEntry = await prisma.workout_tags.findFirst({
+            const conflict = await prisma.workout_tags.findFirst({
                where: {
                   title: tag.title.trim(),
                   user_id: user_id,
@@ -150,7 +144,7 @@ export async function updateWorkoutTag(
                }
             });
 
-            if (workoutTagTitleEntry) {
+            if (conflict) {
                return sendErrorMessage(
                   "Workout tag title already exists", {
                      title: ["Workout tag title already exists"]
@@ -186,4 +180,38 @@ export async function updateWorkoutTag(
    } catch (error) {
       return sendFailureMessage(error);
    }
+}
+
+export async function getAppliedTagUpdates(
+   existingWorkout: any,
+   newWorkout: Workout
+): Promise<{existing: string[], adding: string[]; removing: string[]}> {
+   // Extract existing applied workout tag IDs
+   const existing: Set<string> = new Set(
+      existingWorkout.workout_applied_tags.map(
+         (tag: workout_applied_tags) => tag.tag_id
+      )
+   );
+
+   // Format adding, removing, and existing tags arrays
+   const adding: Set<string> = new Set(newWorkout.tagIds);
+
+   const addingTags: string[] = Array.from(adding).filter(
+      (id: string) => !existing.has(id)
+   );
+
+   const removingTags: string[] = Array.from(existing).filter(
+      (id: string)  => !adding.has(id)
+   );
+
+   const existingTags: string[] = Array.from(existing).filter(
+      (id: string)  => existing.has(id) && adding.has(id)
+   );
+
+   // Return formatted tag ID arrays
+   return {
+      existing: existingTags,
+      adding: addingTags,
+      removing: removingTags
+   };
 }

@@ -1,14 +1,14 @@
 import { PrismaClient } from "@prisma/client";
-import { mockDeep, mockReset, DeepMockProxy } from "jest-mock-extended";
-import prisma from "@/lib/prisma/client";
+import { DeepMockProxy, mockDeep, mockReset } from "jest-mock-extended";
 
-jest.mock("@/lib/prisma/client", () => ({
+import prisma from "@/lib/database/client";
+
+jest.mock("@/lib/database/client", () => ({
    __esModule: true,
    default: mockDeep<PrismaClient>()
 }));
 
 jest.mock("@/lib/authentication/session", () => ({
-   // Authorization for server actions in authorized routes (next-auth)
    authorizeAction: jest.fn()
 }));
 

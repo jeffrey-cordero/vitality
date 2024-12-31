@@ -1,75 +1,73 @@
 "use client";
-import Heading from "@/components/global/heading";
-import Button from "@/components/global/button";
+import { faTags } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { useRef } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
+import Button from "@/components/global/button";
+import Heading from "@/components/global/heading";
+import Cards from "@/components/landing/cards";
+
+interface PriceProps {
   price: string;
   type: string;
-  subscription: string;
-  text: string;
+  bullets: string[];
 }
 
-function Card(props: CardProps): JSX.Element {
-   const { children, price, type, text, subscription } = props;
-   const linkRef = useRef<HTMLAnchorElement>(null);
+function Price(props: PriceProps) {
+   const { type, price, bullets } = props;
 
    return (
-      <div
-         className = "relative mx-2 flex h-[32rem] w-[29rem] max-w-full items-center justify-center rounded-2xl bg-white text-center shadow-md xsm:mx-0 xsm:h-[33rem] md:w-80 dark:bg-slate-800"
-      >
-         <div
-            className = "flex size-full justify-center rounded-2xl bg-white text-center dark:bg-slate-800"
-         >
-            <div className = "relative flex flex-col items-center justify-center">
-               <span className = "mb-3 block text-[1.6rem] font-extrabold text-primary xxsm:text-[1.7rem] xsm:text-3xl">
-                  { type }
-               </span>
-               <h2 className = "mx-auto w-10/12 border-b-[3px] border-b-slate-400 pb-2 text-[1.7rem] font-bold xxsm:pb-3 xxsm:text-3xl xsm:w-11/12 xsm:text-4xl">
+      <div className = "mx-auto grid w-full max-w-lg grid-cols-1 items-center gap-y-6 px-8 py-10 text-left xxsm:py-4 xsm:px-12">
+         <div className = "relative flex flex-col items-start justify-start gap-y-3">
+            <h3 className = "text-[1.2rem]/7 font-bold text-primary">
+               { type }
+            </h3>
+            <p className = "flex items-baseline gap-x-2">
+               <span className = "text-4xl font-semibold tracking-tight text-gray-900 xsm:text-[2.4rem] dark:text-white">
                   { price }
-                  <span className = "text-base font-medium">
-                     / { subscription }
-                  </span>
-               </h2>
-               <div className = "my-6 flex h-auto flex-col justify-center gap-6 px-2 font-semibold">
-                  { children }
-               </div>
-               <Link
-                  ref = { linkRef }
-                  href = "/signup"
-               >
-                  <Button
-                     icon = { faWandMagicSparkles }
-                     className = "h-12 w-40 whitespace-nowrap bg-primary p-3 text-[0.95rem] text-white xxsm:w-44 xsm:w-48 xsm:text-base"
-                  >
-                     { text }
-                  </Button>
-               </Link>
-            </div>
+               </span>
+               <span className = "text-base font-medium text-gray-500 dark:text-gray-400">
+                  / month
+               </span>
+            </p>
          </div>
+         <ul className = "space-y-3 text-[0.95rem]/7 font-medium text-gray-500 sm:text-[0.9rem]/7 dark:text-gray-400">
+            {
+               bullets.map((bullet: string) => {
+                  return (
+                     <li
+                        className = "flex items-center justify-start gap-x-3"
+                        key = { bullet }
+                     >
+                        <svg
+                           className = "h-6 w-5 flex-none text-primary"
+                           viewBox = "0 0 20 20"
+                           fill = "currentColor"
+                           aria-hidden = "true"
+                           data-slot = "icon"
+                        >
+                           <path
+                              fillRule = "evenodd"
+                              d = "M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+                              clipRule = "evenodd"
+                           />
+                        </svg>
+                        { bullet }
+                     </li>
+                  );
+               })
+            }
+         </ul>
+         <Link
+            href = "/signup"
+         >
+            <Button
+               icon = { faTags }
+               className = "h-[2.7rem] w-full whitespace-nowrap bg-primary px-4 py-3 text-base text-white xxsm:px-2 xxsm:text-base"
+            >
+               Select
+            </Button>
+         </Link>
       </div>
-   );
-}
-
-interface BulletProps {
-   text: string;
-}
-
-function Bullet(props: BulletProps): JSX.Element {
-   const { text } = props;
-
-   return (
-      <span className = "flex flex-row items-center justify-center gap-[0.4rem] text-[0.9rem] xxsm:text-[0.95rem] xsm:text-base">
-         <FontAwesomeIcon
-            icon = { faCheck }
-            className = "text-xl text-primary"
-         />
-         { text }
-      </span>
    );
 }
 
@@ -78,54 +76,34 @@ export default function Pricing(): JSX.Element {
       <div className = "mx-auto w-full">
          <Heading
             title = "Choose Your Plan"
-            description = "Select a plan that best suits your needs and goals"
+            message = "Select a plan that best suits your needs and goals"
          />
-         <div className = "mx-auto w-full">
-            <div className = "container relative mx-auto my-8 flex flex-row flex-wrap items-center justify-center gap-8 xsm:p-2 xl:flex-nowrap">
-               <Card
-                  type = "Regular"
-                  price = "$0"
-                  subscription = "year"
-                  text = "Select Regular"
-               >
-                  <>
-                     <Bullet text = "Basic Features" />
-                     <Bullet text = "Workout tracking" />
-                     <Bullet text = "Fitness goal setting" />
-                     <Bullet text = "Basic analytics" />
-                     <Bullet text = "Limited support" />
-                  </>
-               </Card>
-               <Card
-                  type = "Member"
-                  price = "$99"
-                  subscription = "year"
-                  text = "Select Member"
-               >
-                  <>
-                     <Bullet text = "All Regular features" />
-                     <Bullet text = "Advanced tracking" />
-                     <Bullet text = "Personalized nutrition" />
-                     <Bullet text = "Enhanced analytics" />
-                     <Bullet text = "Priority support" />
-                  </>
-               </Card>
-               <Card
-                  type = "Veteran"
-                  price = "$199"
-                  subscription = "year"
-                  text = "Select Veteran"
-               >
-                  <>
-                     <Bullet text = "All Member features" />
-                     <Bullet text = "Exclusive workouts" />
-                     <Bullet text = "Personalized coaching" />
-                     <Bullet text = "24/7 premium support" />
-                     <Bullet text = "Early feature access" />
-                  </>
-               </Card>
-            </div>
-         </div>
+         <Cards
+            className = "min-h-[28rem]"
+         >
+            {
+               [
+                  <Price
+                     type = "Regular"
+                     price = "$0"
+                     bullets = { ["Basic Features", "Workout tracking", "Fitness goal setting", "Basic analytics", "Limited support"] }
+                     key = "price-one"
+                  />,
+                  <Price
+                     type = "Member"
+                     price = "$99"
+                     bullets = { ["All Regular features", "Advanced tracking", "Personalized nutrition", "Enhanced analytics", "Priority support" ] }
+                     key = "price-two"
+                  />,
+                  <Price
+                     type = "Veteran"
+                     price = "$199"
+                     bullets = { ["All Member features", "Exclusive workouts", "Personalized coaching", "Early feature access", "24/7 premium support"] }
+                     key = "price-three"
+                  />
+               ]
+            }
+         </Cards>
       </div>
    );
 }

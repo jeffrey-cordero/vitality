@@ -1,12 +1,14 @@
-import clsx from "clsx";
-import Image from "next/image";
-import { Tag } from "@/lib/home/workouts/tags";
-import { VitalityProps } from "@/lib/global/state";
-import { useEffect, useMemo, useState } from "react";
-import { Workout } from "@/lib/home/workouts/workouts";
-import { verifyImageURL } from "@/lib/home/workouts/shared";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
+import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
+
+import { normalizeDate } from "@/lib/authentication/shared";
+import { VitalityProps } from "@/lib/global/reducer";
+import { verifyImageURL } from "@/lib/home/workouts/shared";
+import { Tag } from "@/lib/home/workouts/tags";
+import { Workout } from "@/lib/home/workouts/workouts";
 
 interface CardProps extends CardsProps {
   workout: Workout;
@@ -16,28 +18,23 @@ function Card(props: CardProps): JSX.Element {
    const { workout, globalState, globalDispatch } = props;
    const [isValidImage, setIsValidImage] = useState<boolean>(true);
 
+   const date = useMemo(() => {
+      return normalizeDate(workout.date);
+   }, [workout.date]);
+
    useEffect(() => {
       setIsValidImage(verifyImageURL(workout.image));
    }, [workout.image]);
 
-   const formattedDate = useMemo(() => {
-      return workout.date.toISOString().slice(0, 10).replace(/(\d{4})-(\d{2})-(\d{2})/, "$2/$3/$1");
-   }, [workout.date]);
-
    const workoutTags = useMemo(() => {
       return workout.tagIds.map((tagId: string) => {
-
-         const tag: Tag | undefined = globalState.tags.data.dictionary[tagId];
+         // Workout tag may be undefined in dictionary due to deletion
+         const tag: Tag | undefined = globalState.tags.data?.dictionary[tagId];
 
          return (
-            // Workout tag may be undefined in global state dictionary due to a potential removal or error
             tag !== undefined && (
                <div
-                  className = {
-                     clsx(
-                        "m-1 max-w-full truncate rounded-full px-4 py-[0.45rem] text-[0.8rem] font-bold text-white md:text-[0.73rem]",
-                     )
-                  }
+                  className = "m-[0.2rem] max-w-full truncate rounded-full px-4 py-[0.45rem] text-[0.73rem] font-bold text-white"
                   style = {
                      {
                         backgroundColor: tag.color
@@ -52,7 +49,7 @@ function Card(props: CardProps): JSX.Element {
       });
    }, [
       workout,
-      globalState.tags.data.dictionary
+      globalState.tags.data?.dictionary
    ]);
 
    return (
@@ -64,8 +61,7 @@ function Card(props: CardProps): JSX.Element {
                   type: "updateState",
                   value: {
                      id: "workout",
-                     input: {
-                        ...globalState.workout,
+                     value: {
                         value: workout,
                         data: {
                            display: true
@@ -75,7 +71,7 @@ function Card(props: CardProps): JSX.Element {
                });
             }
          }
-         className = "relative mx-0 flex h-[27rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-[1.03] focus:scale-[1.03] md:h-[23rem] md:w-72"
+         className = "relative mx-0 flex h-[26rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-[1.03] focus:scale-[1.03] md:h-[23rem] md:w-72"
       >
          <div className = "relative mx-auto size-full">
             {
@@ -100,15 +96,17 @@ function Card(props: CardProps): JSX.Element {
                   </div>
                )
             }
-            <div className = "relative flex size-full flex-col items-center justify-start overflow-hidden pt-5 text-center text-black">
-               <h2 className = "max-w-full truncate break-words px-6 pt-2 text-[1.5rem] font-extrabold md:text-[1.4rem]">
-                  { workout.title }
-               </h2>
-               <p className = "text-sm font-extrabold md:text-[0.85rem]">{ formattedDate }</p>
+            <div className = "relative flex size-full flex-col items-center justify-start overflow-hidden py-4 text-center text-black">
+               <div className = "relative mx-auto my-2 w-full">
+                  <h2 className = "max-w-full truncate break-words px-8 text-[1.35rem] font-extrabold md:text-[1.3rem]">
+                     { workout.title }
+                  </h2>
+                  <p className = "translate-y-[-2px] text-[0.95rem] font-extrabold md:text-[0.9rem]">{ date }</p>
+               </div>
                <div
                   className = {
                      clsx(
-                        "scrollbar-hide flex max-h-[18.5rem] w-full max-w-[25rem] flex-row flex-wrap items-center justify-center overflow-auto px-4 py-2 md:max-h-[15.5rem]",
+                        "scrollbar-hide mb-2 flex max-h-72 w-full max-w-[25rem] flex-row flex-wrap items-center justify-center gap-y-1 overflow-auto px-4 md:max-h-64",
                         {
                            "cursor-all-scroll": workoutTags.length > 0
                         },
@@ -142,7 +140,6 @@ export default function Cards(props: CardsProps): JSX.Element {
                   />
                ))
             }
-
          </div>
       </div>
    );

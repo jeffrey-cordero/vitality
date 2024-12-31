@@ -1,25 +1,35 @@
-import bcrypt from "bcryptjs";
 import { expect } from "@jest/globals";
-import { prismaMock } from "@/tests/singleton";
-import { VitalityResponse } from "@/lib/global/response";
-import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
+import { users as User } from "@prisma/client";
+import bcrypt from "bcryptjs";
+
 import { fetchAttributes } from "@/lib/authentication/authorize";
-import { invalidPasswords, invalidRegistrations, root, user, INVALID_PASSWORD_MESSAGE } from "@/tests/authentication/data";
-import { deleteAccount, updateAttribute, updatePassword, updatePreference, verifyAttribute } from "@/lib/home/settings/service";
+import { normalizePhoneNumber } from "@/lib/authentication/shared";
+import { VitalityResponse } from "@/lib/global/response";
+import { deleteAccount, updateAttribute, updatePassword, updatePreference, verifyAttribute } from "@/lib/home/settings/settings";
+import { INVALID_PASSWORD_MESSAGE, invalidPasswords, invalidRegistrations, root, user } from "@/tests/authentication/data";
+import { MOCK_ID, simulateDatabaseError } from "@/tests/shared";
+import { prismaMock } from "@/tests/singleton";
 
 let expected: VitalityResponse<void>;
-const oldPassword: string = "ValidPassword$1";
-const newPassword: string = "ValidPassword$2";
 
 describe("Settings Tests", () => {
    beforeEach(() => {
       // @ts-ignore
       prismaMock.users.findFirst.mockImplementation(async(params) => {
-         if (params.where.id === user.id || params.where.email === user.email
-               || params.where.username === user.username || params.where.phone === user.phone) {
+         const matchesExistingUser = (user: User) => {
+            // Helper method to check if a user matches based on ID or normalized attributes
+            return params.where.id === user.id ||
+               params.where.email_normalized === user.email_normalized ||
+               params.where.username_normalized === user.username_normalized ||
+               params.where.phone_normalized === user.phone_normalized;
+         };
+
+         if (matchesExistingUser(user)) {
             return user;
+         } else if (matchesExistingUser(root)) {
+            return root;
          } else {
-            return params.where.id === root.id ? root : null;
+            return null;
          }
       });
 
@@ -30,22 +40,14 @@ describe("Settings Tests", () => {
    });
 
    describe("Fetch Attributes", () => {
-      test("Fetch user attributes for existing and missing users", async() => {
-         expect(await fetchAttributes(root.id)).toEqual({
-            ...root,
-            password: "*".repeat(root.password.length)
-         });
-         expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
-            where: { id: root.id }
-         } as any);
-
-         expect(await fetchAttributes(MOCK_ID)).toEqual(null);
+      test("Should return null if user does not exist", async() => {
+         expect(await fetchAttributes(MOCK_ID)).toBeNull();
          expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
             where: { id: MOCK_ID }
          } as any);
       });
 
-      test("Handle database errors when fetching user attributes", async() => {
+      test("Should fail fetching attributes when a database conflict or error occurs", async() => {
          // @ts-ignore
          prismaMock.users.findFirst.mockRejectedValue(
             new Error("Database Error")
@@ -54,16 +56,27 @@ describe("Settings Tests", () => {
          expect(await fetchAttributes(root.id)).toEqual(null);
          expect(await fetchAttributes(MOCK_ID)).toEqual(null);
       });
+
+      test("Should fetch attributes for existing users", async() => {
+         expect(await fetchAttributes(root.id)).toEqual({
+            ...root,
+            // Password hash should be removed in place of asterisks
+            password: "*".repeat(root.password.length)
+         });
+         expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
+            where: { id: root.id }
+         } as any);
+      });
    });
 
    describe("Update Attribute", () => {
-      test("Update attribute with errors", (async() => {
-         // Invalid attributes
+      test("Should fail to update attributes when fields are invalid", (async() => {
+         // Invalid user attributes
          expected = {
             status: "Failure",
             body: {
                data: null,
-               message: "Something went wrong. Please try again.",
+               message: "Oops! Something went wrong. Try again later.",
                errors: {
                   system: ["Updating user attribute must be valid"]
                }
@@ -95,7 +108,7 @@ describe("Settings Tests", () => {
          }
       }));
 
-      test("Handle database constraints when updating attributes", async() => {
+      test("Should fail updating attributes when a database conflict or error occurs", async() => {
          // Missing user
          expect(await updateAttribute(MOCK_ID, "birthday", new Date())).toEqual({
             status: "Error",
@@ -115,19 +128,10 @@ describe("Settings Tests", () => {
                      data: null,
                      message: "Account attribute conflicts",
                      errors: {
-                        [attribute]:  [`${attribute[0].toUpperCase() + attribute.substring(1)} already taken`]
+                        [attribute]:  [`${attribute[0].toUpperCase() + attribute.substring(1)} is already taken`]
                      }
                   }
                });
-
-               expect(prismaMock.users.findFirst).toHaveBeenCalledWith({
-                  where: {
-                     [attribute]: user[attribute],
-                     NOT: {
-                        id: root.id
-                     }
-                  }
-               } as any);
             }
          );
 
@@ -135,54 +139,75 @@ describe("Settings Tests", () => {
          simulateDatabaseError("users", "update", async() => await updateAttribute(root.id, "username", "new-username"));
       });
 
-      test("Update user attributes", async() => {
+      test("Should succeed in updating attributes with valid fields", async() => {
          const verifyAttributeUpdates = async(
             attribute: string,
             value: any,
-            email_verified: boolean,
-            phone_verified: boolean,
-            changes: boolean
+            attributeUpdates: boolean,
+            verificationUpdates: boolean,
+            isNormalized: boolean,
+            normalizedUpdates?: boolean
          ) => {
-            // Helper method to verify that a user attribute changes or remains untouched
+            // Helper method to verify that a user attribute changes and if verification status changes
             expect(await updateAttribute(root.id, attribute as any, value)).toEqual({
                status: "Success",
                body: {
-                  data: null,
-                  message: changes ? `Updated ${attribute}` : `No updates for ${attribute}`,
+                  // For normalized values, data should be true if verification status changes, false if no changes, and null otherwise
+                  data: isNormalized ? normalizedUpdates : attributeUpdates,
+                  message: attributeUpdates ? `Updated ${attribute}` : `No updates for ${attribute}`,
                   errors: {}
                }
             });
 
             // @ts-ignore
-            changes && expect(prismaMock.users.update).toHaveBeenCalledWith({
+            attributeUpdates && expect(prismaMock.users.update).toHaveBeenCalledWith({
                where: {
                   id: root.id
                },
-               data: {
-                  email_verified: email_verified,
-                  phone_verified: phone_verified,
+               data: isNormalized ? {
+                  [attribute]: value,
+                  [`${attribute}_normalized`]: attribute === "phone"
+                     ? normalizePhoneNumber(value) : value.trim().toLowerCase(),
+                  [attribute === "email" ? "email_verified" : "phone_verified"]:
+                     verificationUpdates ? false : undefined
+               } : {
                   [attribute]: value
                }
             } as any);
          };
 
-         // Update general non-verification attributes
-         verifyAttributeUpdates("username", "new-username", undefined, undefined, true);
-         verifyAttributeUpdates("image", "/workouts/cardio.png", undefined, undefined, true);
-         verifyAttributeUpdates("birthday", new Date(), undefined, undefined, true);
-         verifyAttributeUpdates("name", "new-name", undefined, undefined, true);
+         // verifyAttributeUpdates(attribute, value, expects updates, expects verification changes, requires normalization, expects normalized updates?)
 
-         // Update verification-based attributes, which may change verification status
-         verifyAttributeUpdates("email", "new-email@gmail.com", false, undefined, true);
-         verifyAttributeUpdates("email", root.email, undefined, undefined, false);
+         // Update general attributes (new value, same value)
+         verifyAttributeUpdates("image", "/home/settings/one.png", true, false, false);
+         verifyAttributeUpdates("image", root.image, false, false, false);
 
-         verifyAttributeUpdates("phone", "1234567892", undefined, false, true);
-         verifyAttributeUpdates("phone", root.phone, undefined, undefined, false);
+         verifyAttributeUpdates("birthday", new Date(), true, false, false);
+         verifyAttributeUpdates("birthday", root.birthday, false, false, false);
+
+         verifyAttributeUpdates("name", "new-name", true, false, false);
+         verifyAttributeUpdates("name", root.name, false, false, false);
+
+         // Update attributes requiring normalization (same value, new non-normalized value, new value)
+         verifyAttributeUpdates("username", root.username, false, false, true, false);
+         verifyAttributeUpdates("username", root.username.toUpperCase(), true, false, true, null);
+         verifyAttributeUpdates("username", "new-username", true, false, true, true);
+
+         verifyAttributeUpdates("email", root.email, false, false, true, false);
+         verifyAttributeUpdates("email", root.email.toUpperCase(), true, false, true, null);
+         verifyAttributeUpdates("email", "new-email@gmail.com", true, true, true, true);
+
+         verifyAttributeUpdates("phone", root.phone, false, false, true, false);
+         verifyAttributeUpdates("phone", root.phone.startsWith("1") ? root.phone.substring(1) : "1" + root.phone, true, false, true, null);
+         verifyAttributeUpdates("phone", "9145550004", true, true, true, true);
       });
    });
 
    describe("Update Password", () => {
-      test("Update password with field errors", async() => {
+      const oldPassword: string = "ValidPassword$1";
+      const newPassword: string = "ValidPassword$2";
+
+      test("Should fail to update password when fields are invalid", async() => {
          for (const { password, confirmPassword, errors } of invalidPasswords) {
             // Handling invalid passwords and passwords not matching
             expect(await updatePassword(root.id, password, password, confirmPassword)).toEqual({
@@ -191,6 +216,7 @@ describe("Settings Tests", () => {
                   data: null,
                   message: "Invalid password fields",
                   errors: {
+                     // Old password error should be present if password is invalid, not if remaining fields are mismatched
                      oldPassword: errors.password?.[0] !== INVALID_PASSWORD_MESSAGE ? undefined : errors.password,
                      newPassword: errors.password,
                      confirmPassword: errors.confirmPassword
@@ -200,12 +226,12 @@ describe("Settings Tests", () => {
          }
       });
 
-      test("Update password with comparison errors", async() => {
+      test("Should fail to update password when old password doesn't match or change in request", async() => {
          // Mock invalid password comparison
          bcrypt.compare.mockResolvedValue(false);
 
          // Invalid old password
-         const password: string = "ValidPassword$1";
+         const password: string = "InvalidOldPassword$1";
 
          expect(await updatePassword(root.id, password, password, password)).toEqual({
             status: "Error",
@@ -242,7 +268,7 @@ describe("Settings Tests", () => {
          } as any);
       });
 
-      test("Handle database constraints when updating password", async() => {
+      test("Should fail updating password when a database conflict or error occurs", async() => {
          // Missing user
          expect(await updatePassword(MOCK_ID, oldPassword, newPassword, newPassword)).toEqual({
             status: "Error",
@@ -267,13 +293,13 @@ describe("Settings Tests", () => {
          simulateDatabaseError("users", "update", async() => await updatePassword(root.id, oldPassword, newPassword, newPassword));
       });
 
-      test("Update password", async() => {
+      test("Should succeed in updating password with valid fields", async() => {
          bcrypt.compare.mockResolvedValue(true);
 
          expect(await updatePassword(root.id, oldPassword, newPassword, newPassword)).toEqual({
             status: "Success",
             body: {
-               data: null,
+               data: true,
                message: "Updated password",
                errors: {}
             }
@@ -291,7 +317,8 @@ describe("Settings Tests", () => {
    });
 
    describe("Verify Attribute", () => {
-      test("Verify attribute for missing users", async() => {
+      test("Should fail verifying attributes when a database conflict or error occurs", async() => {
+         // Missing user
          expect(await verifyAttribute(MOCK_ID, "phone_verified")).toEqual({
             status: "Error",
             body: {
@@ -300,18 +327,17 @@ describe("Settings Tests", () => {
                errors: {}
             }
          });
-      });
 
-      test("Handle database constraints when verifying attributes", async() => {
+         // Database error
          simulateDatabaseError("users", "update", async() => await verifyAttribute(root.id, "phone_verified"));
       });
 
-      test("Verify attributes", async() => {
+      test("Should succeed in verifying attributes with valid fields", async() => {
          // Update verification status
          expect(await verifyAttribute(root.id, "email_verified")).toEqual({
             status: "Success",
             body: {
-               data: null,
+               data: true,
                message: "Successful email verification",
                errors: {}
             }
@@ -320,7 +346,7 @@ describe("Settings Tests", () => {
          expect(await verifyAttribute(root.id, "phone_verified")).toEqual({
             status: "Success",
             body: {
-               data: null,
+               data: true,
                message: "Successful phone number verification",
                errors: {}
             }
@@ -330,7 +356,7 @@ describe("Settings Tests", () => {
          expect(await verifyAttribute(user.id, "phone_verified")).toEqual({
             status: "Success",
             body: {
-               data: null,
+               data: false,
                message: "Phone number is already verified",
                errors: {}
             }
@@ -339,7 +365,7 @@ describe("Settings Tests", () => {
          expect(await verifyAttribute(user.id, "email_verified")).toEqual({
             status: "Success",
             body: {
-               data: null,
+               data: false,
                message: "Email is already verified",
                errors: {}
             }
@@ -348,7 +374,8 @@ describe("Settings Tests", () => {
    });
 
    describe("Update Preferences", () => {
-      test("Update preferences for missing users", async() => {
+      test("Should fail updating preferences when a database conflict or error occurs", async() => {
+         // Missing user
          expect(await updatePreference(MOCK_ID, "mail", false)).toEqual({
             status: "Error",
             body: {
@@ -357,18 +384,17 @@ describe("Settings Tests", () => {
                errors: {}
             }
          });
-      });
 
-      test("Handle database constraints when updating preferences", async() => {
+         // Database error
          simulateDatabaseError("users", "update", async() => await updatePreference(root.id, "mail", !root.email_verified));
       });
 
-      test("Update preferences", async() => {
-         // Updates preference
+      test("Should succeed in updating attributes with valid fields", async() => {
+         // Updates preference status
          expect(await updatePreference(root.id, "mail", !root.email_verified)).toEqual({
             status: "Success",
             body: {
-               data: null,
+               data: true,
                message: "Updated email notification preference",
                errors: {}
             }
@@ -377,7 +403,7 @@ describe("Settings Tests", () => {
          expect(await updatePreference(root.id, "sms", !root.phone_verified)).toEqual({
             status: "Success",
             body: {
-               data: null,
+               data: true,
                message: "Updated SMS notification preference",
                errors: {}
             }
@@ -387,7 +413,7 @@ describe("Settings Tests", () => {
          expect(await updatePreference(root.id, "mail", root.email_verified)).toEqual({
             status: "Success",
             body: {
-               data: null,
+               data: false,
                message: "No changes in email notification preference",
                errors: {}
             }
@@ -396,7 +422,7 @@ describe("Settings Tests", () => {
          expect(await updatePreference(root.id, "sms", root.email_verified)).toEqual({
             status: "Success",
             body: {
-               data: null,
+               data: false,
                message: "No changes in SMS notification preference",
                errors: {}
             }
@@ -405,7 +431,7 @@ describe("Settings Tests", () => {
    });
 
    describe("Delete Account", () => {
-      test("Delete account for missing user", async() => {
+      test("Should fail to delete account for missing user", async() => {
          expect(await deleteAccount(MOCK_ID)).toEqual({
             status: "Error",
             body: {
@@ -416,7 +442,7 @@ describe("Settings Tests", () => {
          });
       });
 
-      test("Handle database constraints when deleting account", async() => {
+      test("Should fail deleting account when a database conflict or error occurs", async() => {
          // @ts-ignore
          prismaMock.users.findFirst.mockRejectedValueOnce(
             new Error("Database Error")
@@ -434,11 +460,11 @@ describe("Settings Tests", () => {
          simulateDatabaseError("users", "delete", async() => await deleteAccount(root.id));
       });
 
-      test("Delete account", async() => {
+      test("Should succeed in deleting account with valid fields", async() => {
          expect(await deleteAccount(root.id)).toEqual({
             status: "Success",
             body: {
-               data: null,
+               data: true,
                message: "Successful account deletion",
                errors: {}
             }

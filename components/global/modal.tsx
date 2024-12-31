@@ -1,34 +1,40 @@
-import clsx from "clsx";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
-  display: React.ReactNode;
-  children: React.ReactNode;
-  onClose?: () => void;
-  disabled?: boolean;
+   display: React.ReactNode;
+   children: React.ReactNode;
+   onClose?: () => void;
+   disabled?: boolean;
+   locked?: boolean;
 }
 
 const Modal = forwardRef(function Modal(props: ModalProps, ref) {
-   const { display, children, className, onClick, onClose, disabled } = props;
+   const { display, children, className, onClick, onClose, disabled, locked } = props;
    const [open, setOpen] = useState<boolean>(false);
    const modalRef = useRef(null);
 
    // Allow parent components to handle opening/closing the model
-   const handleOnOpen = (event: any) => {
+   const openModal = (event: any) => {
       onClick?.call(null, event);
       setOpen(true);
    };
 
-   const handleOnClose = useCallback(() => {
+   const closeModal = useCallback(() => {
+      if (locked) return;
+
       onClose?.call(null);
       setOpen(false);
-   }, [onClose]);
+   }, [
+      locked,
+      onClose
+   ]);
 
    useImperativeHandle(ref, () => ({
-      close: handleOnClose,
-      open: handleOnOpen,
+      close: closeModal,
+      open: openModal,
       isOpen: () => open
    }));
 
@@ -49,7 +55,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
    return (
       <div className = "relative">
          <div
-            onClick = { disabled !== true ? handleOnOpen : undefined }
+            onClick = { disabled !== true ? openModal : undefined }
          >
             { display }
          </div>
@@ -75,7 +81,7 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                            const target = event.target as HTMLElement;
 
                            if (event.key === "Escape" && target.classList.contains("modal")) {
-                              handleOnClose();
+                              closeModal();
                            }
                         }
                      }
@@ -86,11 +92,11 @@ const Modal = forwardRef(function Modal(props: ModalProps, ref) {
                            onClick = {
                               (event) => {
                                  event.stopPropagation();
-                                 handleOnClose();
+                                 closeModal();
                               }
                            }
                            icon = { faXmark }
-                           className = "modal-close size-4 shrink-0 cursor-pointer text-xl font-extrabold text-red-500"
+                           className = "modal-close cursor-pointer text-xl font-extrabold text-red-500"
                            fill = "black"
                         />
                      </div>

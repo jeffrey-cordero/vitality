@@ -1,50 +1,51 @@
 "use client";
-import Link from "next/link";
-import Heading from "@/components/global/heading";
-import Button from "@/components/global/button";
-import { Input } from "@/components/global/input";
-import { useCallback, useContext, useReducer, useRef } from "react";
-import { handleResponse } from "@/lib/global/response";
-import { login, Credentials } from "@/lib/authentication/login";
-import { VitalityState, formReducer } from "@/lib/global/state";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { NotificationContext } from "@/app/layout";
 import { faArrowRotateLeft, faKey, faUnlockKeyhole, faUserSecret } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
+import { useCallback, useContext, useReducer, useRef } from "react";
 
-const credentials: VitalityState = {
+import { NotificationContext } from "@/app/layout";
+import Button from "@/components/global/button";
+import Heading from "@/components/global/heading";
+import { Input } from "@/components/global/input";
+import { Credentials, login } from "@/lib/authentication/login";
+import { formReducer, VitalityState } from "@/lib/global/reducer";
+import { processResponse } from "@/lib/global/response";
+
+const form: VitalityState = {
    username: {
+      id: "username",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    password: {
+      id: "password",
       value: "",
-      error: null,
-      data: {}
+      error: null
    }
 };
 
 export default function Login(): JSX.Element {
-   const { updateNotification } = useContext(NotificationContext);
-   const [state, dispatch] = useReducer(formReducer, credentials);
+   const { updateNotifications } = useContext(NotificationContext);
+   const [state, dispatch] = useReducer(formReducer, form);
    const loginButtonRef = useRef<{ submit: () => void; confirm: () => void }>(null);
 
-   const handleAuthenticate = useCallback(async() => {
+   const authenticate = useCallback(async() => {
       const credentials: Credentials = {
          username: state.username.value.trim(),
          password: state.password.value.trim()
       };
 
-      handleResponse(await login(credentials), dispatch, updateNotification, () => {
+      processResponse(await login(credentials), dispatch, updateNotifications, () => {
          window.location.reload();
       });
    }, [
       state.username,
       state.password,
-      updateNotification
+      updateNotifications
    ]);
 
-   const handleSubmitAuthentication = useCallback(() => {
+   const submitAuthentication = useCallback(() => {
       loginButtonRef.current?.submit();
    }, []);
 
@@ -52,18 +53,22 @@ export default function Login(): JSX.Element {
       <div className = "mx-auto mb-12 flex w-full flex-col items-center justify-center text-center">
          <Heading
             title = "Log In"
-            description = "Enter valid credentials to enter"
+            message = "Enter valid credentials to enter"
          />
-         <div className = "mx-auto mt-8 w-11/12 sm:w-3/4 xl:w-5/12">
-            <div className = "relative flex w-full flex-col items-stretch justify-center gap-3">
+         <div className = "mx-auto mt-12 w-11/12 sm:w-3/4 lg:w-7/12 2xl:w-5/12">
+            <form className = "relative flex w-full flex-col items-stretch justify-center gap-3">
                <FontAwesomeIcon
                   icon = { faArrowRotateLeft }
                   onClick = {
-                     () =>
+                     () => {
+                        // Prevent resetting the form state during a submission
+                        if (document.getElementById("username")?.getAttribute("disabled") === "true") return;
+
                         dispatch({
                            type: "resetState",
-                           value: {}
-                        })
+                           value: form
+                        });
+                     }
                   }
                   className = "absolute right-[10px] top-[-25px] z-10 size-4 shrink-0 cursor-pointer text-base text-primary"
                />
@@ -75,7 +80,7 @@ export default function Login(): JSX.Element {
                   icon = { faUserSecret }
                   input = { state.username }
                   dispatch = { dispatch }
-                  onSubmit = { handleSubmitAuthentication }
+                  onSubmit = { submitAuthentication }
                   autoFocus
                   required
                />
@@ -87,21 +92,22 @@ export default function Login(): JSX.Element {
                   icon = { faKey }
                   input = { state.password }
                   dispatch = { dispatch }
-                  onSubmit = { handleSubmitAuthentication }
+                  onSubmit = { submitAuthentication }
                   required
                />
                <Button
                   ref = { loginButtonRef }
-                  type = "submit"
+                  type = "button"
                   className = "h-[2.6rem] bg-primary text-white"
                   icon = { faUnlockKeyhole }
-                  onSubmit = { handleAuthenticate }
-                  onClick = { handleSubmitAuthentication }
+                  onSubmit = { authenticate }
+                  onClick = { submitAuthentication }
                   isSingleSubmission = { true }
+                  inputIds = { ["username", "password"] }
                >
                   Log In
                </Button>
-            </div>
+            </form>
             <p className = "mt-4 px-2">
                Don&apos;t have an account? { " " }
                <Link

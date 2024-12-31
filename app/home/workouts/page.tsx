@@ -1,61 +1,65 @@
 "use client";
+import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
+
+import { AuthenticationContext } from "@/app/layout";
+import Loading from "@/components/global/loading";
 import Main from "@/components/global/main";
-import View from "@/components/home/workouts/view";
 import Filtering from "@/components/home/workouts/filtering";
 import Form from "@/components/home/workouts/form";
 import Pagination from "@/components/home/workouts/pagination";
-import { AuthenticationContext } from "@/app/layout";
-import { fetchWorkoutTags } from "@/lib/home/workouts/tags";
-import { formReducer, VitalityState } from "@/lib/global/state";
+import View from "@/components/home/workouts/view";
+import { formReducer, VitalityState } from "@/lib/global/reducer";
+import { fetchWorkoutTags, Tag } from "@/lib/home/workouts/tags";
 import { fetchWorkouts, Workout } from "@/lib/home/workouts/workouts";
-import { useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 
-const pagingValues = new Set<number>([5, 10, 25, 50, 100, 500, 1000]);
-const workouts: VitalityState = {
+const form: VitalityState = {
    search: {
+      id: "search",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    dateFilter: {
+      id: "dateFilter",
       value: "Is on or after",
-      error: null,
-      data: {}
+      error: null
    },
    minDate: {
+      id: "minDate",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    maxDate: {
+      id: "maxDate",
       value: "",
-      error: null,
-      data: {}
+      error: null
    },
    tags: {
-      value: null,
+      id: "tags",
+      value: [],
       error: null,
+      handlesChanges: true,
       data: {
-         options: [],
-         selected: [],
-         filtered: [],
-         dictionary: {},
-         fetched: false
-      },
-      handlesOnChange: true
+         options: [], // Options post-filtering of selected tags
+         selected: [], // Selected tags
+         filtered: [], // Cached tag filtering
+         dictionary: {}, // Tag dictionary
+         fetched: false // Fetched tags
+      }
    },
    workouts: {
+      id: "workouts",
       value: [],
       error: null,
       data: {
-         selected: new Set<Workout>(),
-         appliedDateFiltering: false,
-         appliedTagsFiltering: false,
-         filtered: [],
-         fetched: false
+         selected: new Set<Workout>(), // Selected workouts
+         appliedDateFiltering: false, // Applied date filtering
+         appliedTagsFiltering: false, // Applied tags filtering
+         filtered: [], // Visible workouts post-filtering
+         fetched: false // Fetched workouts
       }
    },
    workout: {
+      id: "workout",
       value: {
          id: "",
          user_id: "",
@@ -63,8 +67,8 @@ const workouts: VitalityState = {
          date: new Date(),
          image: "",
          description: "",
-         exercises: [],
-         tagIds: []
+         tagIds: [],
+         exercises: []
       },
       error: null,
       data: {
@@ -72,63 +76,70 @@ const workouts: VitalityState = {
       }
    },
    paging: {
+      id: "paging",
       value: 10,
       error: null,
-      data: {},
-      handlesOnChange: true
+      handlesChanges: true
    },
    page: {
+      id: "page",
       value: 0,
       error: null,
-      data: {},
-      handlesOnChange: true
+      handlesChanges: true
    }
 };
 
+const pagingValues = new Set<number>([5, 10, 25, 50, 100, 500, 1000]);
+
 export default function Page(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
-   const [globalState, globalDispatch] = useReducer(formReducer, workouts);
+   const [globalState, globalDispatch] = useReducer(formReducer, form);
    const [view, setView] = useState<"table" | "cards">("table");
 
+   // Determine if workouts have been fetched from the server
+   const fetched: boolean = globalState.workouts.data?.fetched ?? false;
+
+   // Search value for workouts based on title
    const search: string = useMemo(() => {
       return globalState.search.value.trim().toLowerCase();
    }, [globalState.search]);
 
-   // Case-insensitive title comparison for workouts search
+   // Case-insensitive workout title search results
    const results: Workout[] = useMemo(() => {
-      const filtered: Workout[] = globalState.workouts.data.filtered;
-      const lower = search.toLowerCase();
+      const filtered: Workout[] = globalState.workouts.data?.filtered;
+      const lower: string = search.toLowerCase();
 
-      return search === "" ?
-         filtered : filtered.filter((w) => w.title.toLowerCase().includes(lower));
+      return search === "" ? filtered : filtered.filter(
+         (workout) => workout.title.toLowerCase().includes(lower)
+      );
    }, [
-      globalState.workouts.data.filtered,
-      search
+      search,
+      globalState.workouts.data?.filtered
    ]);
 
-   // Pagination calculations
+   // Pagination calculations for workouts section
    const paging: number = globalState.paging.value;
    const page: number = globalState.page.value;
 
-   const workoutsSection: Workout[] = useMemo(() => {
+   const section: Workout[] = useMemo(() => {
       const low: number = page * paging;
-      const high = low + paging;
+      const high: number = low + paging;
 
       return results.slice(low, high);
    }, [
-      results,
+      page,
       paging,
-      page
+      results
    ]);
 
-   const fetchWorkoutsData = useCallback(async() => {
-      // Fetch user workouts and workout tags for global state
+   const fetchUserWorkouts = useCallback(async() => {
+      // Fetch user workouts and workout tags
       const [workoutsData, tagsData] = await Promise.all([
          fetchWorkouts(user.id),
          fetchWorkoutTags(user.id)
       ]);
 
-      // Ensure paging and page localStorage values align with pagination setup
+      // Ensure paging and page localStorage values align with pagination setup values
       let paging: number = Number.parseInt(window.localStorage.getItem("paging") ?? "10");
 
       if (!(pagingValues.has(paging))) {
@@ -145,26 +156,22 @@ export default function Page(): JSX.Element {
       }
 
       globalDispatch({
-         type: "initializeState",
+         type: "updateStates",
          value: {
             tags: {
-               ...globalState.tags,
                data: {
-                  ...globalState.tags.data,
                   options: tagsData,
                   selected: [],
                   filtered: [],
                   dictionary: Object.fromEntries(
-                     tagsData.map((tag) => [tag.id, tag]),
+                     tagsData.map((tag: Tag) => [tag.id, tag]),
                   ),
                   fetched: true
                }
             },
             workouts: {
-               ...globalState.workouts,
                value: workoutsData,
                data: {
-                  ...globalState.workouts.data,
                   filtered: workoutsData,
                   appliedDateFiltering: false,
                   appliedTagsFiltering: false,
@@ -172,70 +179,65 @@ export default function Page(): JSX.Element {
                }
             },
             workout: {
-               ...globalState.workout,
                value: {
-                  ...globalState.workout.value,
                   user_id: user.id
                }
             },
             paging: {
-               ...globalState.paging,
                value: paging
             },
             page: {
-               ...globalState.page,
                value: page
             }
          }
       });
-   }, [
-      globalState.tags,
-      globalState.workouts,
-      globalState.workout,
-      globalState.paging,
-      globalState.page,
-      user
-   ]);
+   }, [user]);
 
    useEffect(() => {
-      if (!globalState.workouts.data.fetched) {
-         setView(
-            window.localStorage.getItem("view") === "cards" ? "cards" : "table",
-         );
+      if (!globalState.workouts.data?.fetched) {
+         setView(window.localStorage.getItem("view") === "cards" ? "cards" : "table");
 
-         fetchWorkoutsData();
+         fetchUserWorkouts();
       }
    }, [
       user,
-      fetchWorkoutsData,
-      globalState.workouts.data.fetched,
+      view,
       globalState.tags,
+      fetchUserWorkouts,
       globalState.workouts,
-      view
+      globalState.workouts.data?.fetched
    ]);
 
    return (
       <Main className = "mb-12">
-         <Filtering
-            globalState = { globalState }
-            globalDispatch = { globalDispatch }
-         />
-         <View
-            view = { view }
-            setView = { setView }
-            workouts = { workoutsSection }
-            globalState = { globalState }
-            globalDispatch = { globalDispatch }
-         />
-         <Form
-            globalState = { globalState }
-            globalDispatch = { globalDispatch }
-         />
-         <Pagination
-            workouts = { results }
-            globalState = { globalState }
-            globalDispatch = { globalDispatch }
-         />
+         {
+            fetched ? (
+               <>
+                  <Filtering
+                     globalState = { globalState }
+                     globalDispatch = { globalDispatch }
+                  />
+                  <View
+                     view = { view }
+                     setView = { setView }
+                     workouts = { section }
+                     globalState = { globalState }
+                     globalDispatch = { globalDispatch }
+                  />
+                  <Form
+                     globalState = { globalState }
+                     globalDispatch = { globalDispatch }
+                  />
+                  <Pagination
+                     workouts = { results }
+                     globalState = { globalState }
+                     globalDispatch = { globalDispatch }
+                  />
+               </>
+            ) : (
+               <Loading />
+            )
+         }
       </Main>
    );
 }

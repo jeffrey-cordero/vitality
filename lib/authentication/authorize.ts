@@ -1,9 +1,10 @@
 "use server";
-import bcrypt from "bcryptjs";
-import prisma from "@/lib/prisma/client";
-import { z } from "zod";
 import { users as User } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import { z } from "zod";
+
 import { Credentials } from "@/lib/authentication/login";
+import prisma from "@/lib/database/client";
 
 export async function fetchAttributes(id: string): Promise<User | null> {
    try {
@@ -13,7 +14,7 @@ export async function fetchAttributes(id: string): Promise<User | null> {
          }
       });
 
-      // Remove password hash value for data integrity if a user is found
+      // Remove hashed password from user object
       return user !== null ? { ...user, password: "*".repeat(user.password.length) } : null;
    } catch (error) {
       return null;
