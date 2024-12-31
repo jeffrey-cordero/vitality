@@ -95,6 +95,8 @@ export async function signup(registration: Registration): Promise<VitalityRespon
          return sendErrorMessage("Account registration conflicts", errors);
       }
    } catch (error) {
+      console.error(error);
+      
       return sendFailureMessage(error);
    }
 }
