@@ -76,13 +76,6 @@ describe("Response Tests", () => {
 
    describe("Failure response", () => {
       test("Should handle failed backend responses gracefully", () => {
-         // Mock console.error and node environment for failure message logging
-         jest.spyOn(console, "error").mockImplementation();
-         Object.defineProperty(process.env, "NODE_ENV", {
-            value: "development",
-            configurable: true
-         });
-
          const error = new Error("Database connection error");
          response = sendFailureMessage(error);
 
@@ -100,7 +93,6 @@ describe("Response Tests", () => {
             status: "Failure",
             message: "Oops! Something went wrong. Try again later."
          });
-         expect(console.error).toHaveBeenCalledWith(error);
          expect(dispatch).not.toHaveBeenCalled();
          expect(successMethod).not.toHaveBeenCalled();
       });

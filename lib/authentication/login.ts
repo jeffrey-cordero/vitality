@@ -27,6 +27,8 @@ export async function login(credentials: Credentials): Promise<VitalityResponse<
                   password: ["Invalid credentials"]
                });
             default:
+               console.error(error);
+
                return sendFailureMessage(error);
          }
       }

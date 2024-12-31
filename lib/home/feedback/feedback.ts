@@ -53,6 +53,8 @@ export async function sendFeedback(user_id: string, feedback: Feedback): Promise
          return sendSuccessMessage("Feedback sent successfully", true);
       }
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }

@@ -41,6 +41,8 @@ async function validateUser(user_id: string, attribute: string): Promise<User | 
          }
       }) as any;
    } catch (error) {
+      console.error(error);
+
       return null;
    }
 }
@@ -77,6 +79,8 @@ export async function updatePreference(user_id: string, preference: "mail" | "sm
          );
       }
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }
@@ -140,6 +144,8 @@ export async function updatePassword(user_id:string, oldPassword: string, newPas
          }
       }
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }
@@ -230,6 +236,8 @@ export async function updateAttribute<T extends keyof User>(user_id: string, att
          return sendSuccessMessage(`Updated ${attribute}`, true);
       }
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }
@@ -267,6 +275,8 @@ export async function verifyAttribute(user_id: string, attribute: "email_verifie
          );
       }
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }
@@ -292,6 +302,8 @@ export async function deleteAccount(user_id: string): Promise<VitalityResponse<b
          return sendSuccessMessage("Successful account deletion", true);
       }
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }

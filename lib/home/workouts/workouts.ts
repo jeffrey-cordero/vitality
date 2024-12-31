@@ -89,6 +89,8 @@ export async function fetchWorkouts(user_id: string): Promise<Workout[]> {
          (workout) => formatDatabaseWorkout(workout)
       );
    } catch (error) {
+      console.error(error);
+
       return [];
    }
 }
@@ -143,6 +145,8 @@ export async function addWorkout(user_id: string, workout: Workout): Promise<Vit
 
       return sendSuccessMessage("Added new workout", formatDatabaseWorkout(newWorkout));
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }
@@ -258,6 +262,8 @@ export async function updateWorkout(user_id: string, workout: Workout, method: "
          }
       }
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }
@@ -302,6 +308,8 @@ export async function deleteWorkouts(user_id: string, workouts: Workout[]): Prom
          operation.count,
       );
    } catch (error) {
+      console.error(error);
+
       return sendFailureMessage(error);
    }
 }

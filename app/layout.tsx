@@ -64,9 +64,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       try {
          setUser(await getSession());
       } catch (error) {
+         console.error(error);
+
          updateNotifications({
             status: "Failure",
-            message: error.message
+            message: "Oops! Something went wrong. Try again later."
          });
 
          setUser(undefined);

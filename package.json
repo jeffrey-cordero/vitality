@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "dev": "next dev --turbo",
     "start": "next start",
     "lint": "npx eslint . --fix --ignore-pattern 'next-env.**'",
