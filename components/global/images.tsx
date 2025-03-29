@@ -194,7 +194,7 @@ function Form(props: FormProps): JSX.Element {
                                  alt = { `${page}-image` }
                                  className = {
                                     clsx(
-                                       "cursor-pointer rounded-xl object-cover object-center shadow-md transition duration-300 ease-in-out dark:shadow-sm dark:shadow-slate-950", {
+                                       "cursor-pointer rounded-xl object-cover object-center transition duration-300 ease-in-out", {
                                           "border-primary border-[4px] scale-[1.07]": isSelected
                                        }
                                     )
@@ -223,7 +223,7 @@ function Form(props: FormProps): JSX.Element {
                                  alt = "workout-image"
                                  className = {
                                     clsx(
-                                       "scale-105 cursor-default rounded-xl object-cover object-center shadow-md transition duration-300 ease-in-out dark:shadow-sm dark:shadow-slate-950",
+                                       "scale-105 cursor-default rounded-xl object-cover object-center transition duration-300 ease-in-out",
                                     )
                                  }
                               />
