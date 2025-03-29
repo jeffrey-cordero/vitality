@@ -20,7 +20,7 @@ function Service(props: ServiceProps): JSX.Element {
             cx(
                background,
                color,
-               "flex flex-col items-center justify-center gap-3 max-w-full mx-auto xsm:max-w-none size-[8rem] xsm:size-[9rem] text-center rounded-2xl shadow-md",
+               "flex flex-col items-center justify-center gap-3 max-w-full mx-auto xsm:max-w-none size-[8rem] xsm:size-[9rem] text-center rounded-2xl shadow-lg dark:shadow-slate-950 dark:shadow-md",
             )
          }
       >

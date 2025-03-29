@@ -95,7 +95,7 @@ function TagColorSelection(props: VitalityChildProps) {
    }, [localDispatch]);
 
    return (
-      <div className = "relative mx-auto flex w-full flex-col gap-1">
+      <div className = "relative mx-auto flex w-full flex-col gap-[0.4rem]">
          {
             names.map((name: string) => {
                const color: string = colors[name];
@@ -105,10 +105,9 @@ function TagColorSelection(props: VitalityChildProps) {
                      style = { { backgroundColor: color } }
                      className = {
                         clsx(
-                           "flex h-[2.7rem] w-full cursor-pointer items-center justify-center rounded-lg border-2 p-1 text-center text-sm text-white transition duration-300 ease-in-out focus:border-0 xxsm:text-sm",
+                           "flex h-[2.7rem] w-full cursor-pointer items-center justify-center rounded-lg p-1 text-center text-sm text-white shadow-xl transition duration-300 ease-in-out focus:border-0 xxsm:text-sm dark:shadow-sm dark:shadow-slate-950",
                            {
-                              "scale-[1.07] border-gray-200 dark:border-slate-700": localState.tagColor.value === color,
-                              "border-white dark:border-slate-800": localState.tagColor.value !== color
+                              "scale-[1.03]": localState.tagColor.value === color
                            },
                         )
                      }
