@@ -84,7 +84,7 @@ function Row(props: RowProps) {
       <div
          id = { workout.id }
          className = {
-            clsx("mx-auto flex min-h-60 w-full cursor-pointer flex-col items-center justify-between p-2 text-center text-lg lg:flex-row lg:rounded-none lg:p-6 lg:text-lg", {
+            clsx("mx-auto flex min-h-60 w-full cursor-pointer flex-col items-center justify-between p-4 text-center text-lg lg:flex-row lg:rounded-none lg:p-6 lg:text-lg", {
                "bg-gray-100 dark:bg-gray-700": isSelected,
                "bg-white dark:bg-slate-800": !isSelected
             })
