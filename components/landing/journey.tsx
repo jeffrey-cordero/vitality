@@ -29,7 +29,7 @@ export default function Journey(): JSX.Element {
                                     quality = { 100 }
                                     src = "/landing/journey.jpg"
                                     alt = "exercise-image"
-                                    className = "rounded-2xl shadow-sm"
+                                    className = "rounded-2xl shadow-lg dark:shadow-md dark:shadow-slate-950"
                                  />
                               </div>
                               <div className = "relative">
@@ -40,7 +40,7 @@ export default function Journey(): JSX.Element {
                                     quality = { 100 }
                                     src = "/landing/food.jpg"
                                     alt = "food-image"
-                                    className = "size-full rounded-2xl shadow-sm"
+                                    className = "size-full rounded-2xl shadow-lg dark:shadow-md dark:shadow-slate-950"
                                  />
                               </div>
                            </div>
@@ -54,7 +54,7 @@ export default function Journey(): JSX.Element {
                                  quality = { 100 }
                                  src = "/landing/mountains.jpg"
                                  alt = "biking-image"
-                                 className = "size-full rounded-2xl shadow-sm"
+                                 className = "size-full rounded-2xl shadow-lg dark:shadow-md dark:shadow-slate-950"
                               />
                            </div>
                         </div>

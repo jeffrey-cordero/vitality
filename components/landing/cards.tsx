@@ -9,7 +9,7 @@ function Card(props: CardProps): JSX.Element {
    const { className, children } = props;
 
    return (
-      <div className = { clsx("flex items-center justify-center rounded-2xl bg-white text-center shadow-md dark:bg-slate-800", className) }>
+      <div className = { clsx("flex items-center justify-center rounded-2xl bg-white text-center shadow-md dark:bg-slate-800 dark:shadow-md dark:shadow-slate-950", className) }>
          { children }
       </div>
    );

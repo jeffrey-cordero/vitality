@@ -4,7 +4,6 @@ import { useContext, useEffect } from "react";
 
 import { AuthenticationContext } from "@/app/layout";
 import Loading from "@/components/global/loading";
-import Main from "@/components/global/main";
 
 export default function NotFound(): JSX.Element {
    const { user } = useContext(AuthenticationContext);
@@ -21,8 +20,8 @@ export default function NotFound(): JSX.Element {
    ]);
 
    return (
-      <Main className = "mx-auto flex min-h-screen w-full flex-col items-center justify-center text-center">
+      <div className = "absolute inset-0 flex min-h-screen items-center justify-center">
          <Loading />
-      </Main>
+      </div>
    );
 }

@@ -209,35 +209,35 @@ export default function Page(): JSX.Element {
    ]);
 
    return (
-      <Main className = "mb-12">
-         {
-            fetched ? (
-               <>
-                  <Filtering
-                     globalState = { globalState }
-                     globalDispatch = { globalDispatch }
-                  />
-                  <View
-                     view = { view }
-                     setView = { setView }
-                     workouts = { section }
-                     globalState = { globalState }
-                     globalDispatch = { globalDispatch }
-                  />
-                  <Form
-                     globalState = { globalState }
-                     globalDispatch = { globalDispatch }
-                  />
-                  <Pagination
-                     workouts = { results }
-                     globalState = { globalState }
-                     globalDispatch = { globalDispatch }
-                  />
-               </>
-            ) : (
-               <Loading />
-            )
-         }
-      </Main>
+      fetched ? (
+         <Main className = "mb-12">
+            <>
+               <Filtering
+                  globalState = { globalState }
+                  globalDispatch = { globalDispatch }
+               />
+               <View
+                  view = { view }
+                  setView = { setView }
+                  workouts = { section }
+                  globalState = { globalState }
+                  globalDispatch = { globalDispatch }
+               />
+               <Form
+                  globalState = { globalState }
+                  globalDispatch = { globalDispatch }
+               />
+               <Pagination
+                  workouts = { results }
+                  globalState = { globalState }
+                  globalDispatch = { globalDispatch }
+               />
+            </>
+         </Main>
+      ) : (
+         <div className = "absolute inset-0 flex min-h-screen items-center justify-center">
+            <Loading />
+         </div>
+      )
    );
 }

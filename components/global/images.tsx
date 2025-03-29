@@ -180,7 +180,7 @@ function Form(props: FormProps): JSX.Element {
                         return (
                            <div
                               id = { source }
-                              className = "relative size-32 min-[275px]:size-40 xxsm:size-44 min-[425px]:size-72 sm:size-48"
+                              className = "relative size-48 min-[380px]:size-64 min-[480px]:size-80 sm:size-48"
                               key = { source }
                            >
                               <Image
@@ -194,7 +194,7 @@ function Form(props: FormProps): JSX.Element {
                                  alt = { `${page}-image` }
                                  className = {
                                     clsx(
-                                       "cursor-pointer rounded-xl object-cover object-center transition duration-300 ease-in-out", {
+                                       "cursor-pointer rounded-xl object-cover object-center shadow-md transition duration-300 ease-in-out dark:shadow-sm dark:shadow-slate-950", {
                                           "border-primary border-[4px] scale-[1.07]": isSelected
                                        }
                                     )
@@ -212,7 +212,7 @@ function Form(props: FormProps): JSX.Element {
                   {
                      isValidResource && isValidURL && (
                         <div className = "my-6 flex items-center justify-center">
-                           <div className = "relative size-32 min-[275px]:size-40 xxsm:size-44 min-[425px]:size-72">
+                           <div className = "relative size-48 min-[380px]:size-64 min-[480px]:size-80">
                               <Image
                                  fill
                                  priority
@@ -223,7 +223,7 @@ function Form(props: FormProps): JSX.Element {
                                  alt = "workout-image"
                                  className = {
                                     clsx(
-                                       "scale-105 cursor-default rounded-xl object-cover object-center transition duration-300 ease-in-out",
+                                       "scale-105 cursor-default rounded-xl object-cover object-center shadow-md transition duration-300 ease-in-out dark:shadow-sm dark:shadow-slate-950",
                                     )
                                  }
                               />

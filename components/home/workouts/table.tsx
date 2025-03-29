@@ -84,7 +84,7 @@ function Row(props: RowProps) {
       <div
          id = { workout.id }
          className = {
-            clsx("mx-auto flex min-h-60 w-full cursor-pointer flex-col items-center justify-between p-6 text-center text-lg lg:flex-row lg:rounded-none lg:p-6 lg:text-lg", {
+            clsx("mx-auto flex min-h-60 w-full cursor-pointer flex-col items-center justify-between p-2 text-center text-lg lg:flex-row lg:rounded-none lg:p-6 lg:text-lg", {
                "bg-gray-100 dark:bg-gray-700": isSelected,
                "bg-white dark:bg-slate-800": !isSelected
             })
@@ -278,7 +278,7 @@ export default function Table(props: TableProps): JSX.Element {
 
    return (
       <div className = "relative mx-auto w-full">
-         <div className = "mx-auto my-6 overflow-hidden rounded-2xl shadow-md">
+         <div className = "mx-auto my-6 overflow-hidden rounded-2xl shadow-lg dark:shadow-md dark:shadow-slate-950">
             <div className = "block bg-white py-4 lg:hidden dark:bg-slate-800">
                <input
                   id = "workout-select-all-mobile"

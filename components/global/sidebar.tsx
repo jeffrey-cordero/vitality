@@ -116,7 +116,7 @@ export function SideBar(): JSX.Element {
                <FontAwesomeIcon
                   id = "sideBarButton"
                   icon = { visibleSideBar ? faAnglesRight : faBars }
-                  className = "text-3xl font-extrabold text-black hover:cursor-pointer dark:text-white"
+                  className = "text-[1.6rem] font-extrabold text-black hover:cursor-pointer dark:text-white"
                   onClick = {
                      () => {
                         setVisibleSideBar(!visibleSideBar);
@@ -138,7 +138,7 @@ export function SideBar(): JSX.Element {
                   )
                }
             >
-               <div className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-3 py-4 shadow-md dark:bg-slate-800">
+               <div className = "mt-20 flex h-auto flex-col overflow-hidden rounded-2xl bg-gray-50 px-3 py-4 shadow-lg dark:bg-slate-800 dark:shadow-xl dark:shadow-slate-950">
                   <div className = "flex flex-col justify-center space-x-2 space-y-2 text-center">
                      <div className = "flex size-full flex-col items-center justify-between text-center">
                         <SideBarLinks />

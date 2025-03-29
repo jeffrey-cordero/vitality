@@ -71,7 +71,7 @@ function Card(props: CardProps): JSX.Element {
                });
             }
          }
-         className = "relative mx-0 flex h-[26rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-[1.03] focus:scale-[1.03] md:h-[23rem] md:w-72"
+         className = "relative mx-0 flex h-[26rem] w-full cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 ease-in-out hover:scale-[1.01] focus:scale-[1.01] md:h-[23rem] md:w-72 dark:shadow-xl dark:shadow-slate-950"
       >
          <div className = "relative mx-auto size-full">
             {
@@ -83,12 +83,12 @@ function Card(props: CardProps): JSX.Element {
                      sizes = "100%"
                      src = { workout.image }
                      alt = "workout-image"
-                     className = "object-cover object-center opacity-40"
+                     className = "object-cover object-center opacity-50"
                      onLoad = { () => !isValidImage && setIsValidImage(true) }
                      onErrorCapture = { () => isValidImage && setIsValidImage(false) }
                   />
                ) : (
-                  <div className = "absolute flex size-full items-center justify-center bg-white opacity-40">
+                  <div className = "absolute flex size-full items-center justify-center bg-white opacity-50">
                      <FontAwesomeIcon
                         className = "text-7xl text-primary"
                         icon = { faImage }

@@ -419,7 +419,7 @@ export default function Form(props: VitalityProps): JSX.Element {
          </Modal>
          <Button
             type = "button"
-            className = "h-[2.9rem] w-40 bg-primary text-base text-white"
+            className = "mt-6 h-[2.9rem] w-40 bg-primary text-base text-white"
             icon = { faPlus }
             onClick = {
                () => {
