@@ -40,7 +40,7 @@ export default function Services(): JSX.Element {
             title = "Our Services"
             message = "Driven by innovation, we continually explore new ways to elevate your wellness journey"
          />
-         <div className = "container relative mx-auto my-8 grid grid-cols-1 content-center justify-center gap-x-6 gap-y-8 px-2 min-[325px]:grid-cols-2 xsm:gap-x-0 xsm:gap-y-10 xsm:px-0 md:my-12 md:gap-x-[225px] lg:gap-x-0 xl:grid-cols-3">
+         <div className = "container relative mx-auto my-8 grid grid-cols-1 place-content-center gap-x-6 gap-y-8 px-2 min-[325px]:grid-cols-2 xsm:gap-x-0 xsm:gap-y-10 xsm:px-0 md:my-12 md:gap-x-[225px] lg:gap-x-0 xl:grid-cols-3">
             <Service
                background = "bg-white dark:bg-slate-800"
                color = "text-primary"

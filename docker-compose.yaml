@@ -1,6 +1,6 @@
 services:
   app:
-    image: node:alpine
+    image: node:lts
     working_dir: /app
     volumes:
       - .:/app
@@ -54,7 +54,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: vitality
     volumes:
-      - vitality_postgres_data:/var/lib/postgresql/data
+      - vitality_postgres_data:/var/lib/postgresql
       - ./lib/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - vitality_network
